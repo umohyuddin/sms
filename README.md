@@ -1,2 +1,2 @@
-# sms
-school management system (backend)
+# School Management System
+
