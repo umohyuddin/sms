@@ -1,4 +1,4 @@
-package com.smartsolutions.eschool.user.student.model;
+package com.smartsolutions.eschool.user.model;
 
 public class User {
     private Long id;

@@ -1,7 +1,7 @@
-package com.smartsolutions.eschool.user.student.service;
+package com.smartsolutions.eschool.user.service;
 
-import com.smartsolutions.eschool.user.student.model.User;
-import com.smartsolutions.eschool.user.student.repository.sql.UserDao;
+import com.smartsolutions.eschool.user.model.User;
+import com.smartsolutions.eschool.user.repository.UserDao;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

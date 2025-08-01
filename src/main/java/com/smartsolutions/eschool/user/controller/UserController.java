@@ -1,8 +1,8 @@
-package com.smartsolutions.eschool.user.student.controller;
+package com.smartsolutions.eschool.user.controller;
 
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.SingleResourceSuccessResponseObject;
-import com.smartsolutions.eschool.user.student.facade.UserServiceFacade;
+import com.smartsolutions.eschool.user.facade.UserServiceFacade;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

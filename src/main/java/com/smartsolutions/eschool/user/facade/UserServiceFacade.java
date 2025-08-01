@@ -1,8 +1,8 @@
-package com.smartsolutions.eschool.user.student.facade;
+package com.smartsolutions.eschool.user.facade;
 
 import com.smartsolutions.eschool.util.ReturnFunction;
-import com.smartsolutions.eschool.user.student.model.User;
-import com.smartsolutions.eschool.user.student.service.StudentService;
+import com.smartsolutions.eschool.user.model.User;
+import com.smartsolutions.eschool.user.service.StudentService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
-package com.smartsolutions.eschool.user.student.repository.sql;
+package com.smartsolutions.eschool.user.repository;
 
-import com.smartsolutions.eschool.user.student.model.User;
+import com.smartsolutions.eschool.user.model.User;
 
 import java.util.List;
 

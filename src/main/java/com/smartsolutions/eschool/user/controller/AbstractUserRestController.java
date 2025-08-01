@@ -1,8 +1,8 @@
-package com.smartsolutions.eschool.user.student.controller;
+package com.smartsolutions.eschool.user.controller;
 
 import com.smartsolutions.eschool.util.ResourceObject;
-import com.smartsolutions.eschool.user.student.model.User;
-import com.smartsolutions.eschool.user.student.facade.UserServiceFacade;
+import com.smartsolutions.eschool.user.model.User;
+import com.smartsolutions.eschool.user.facade.UserServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;

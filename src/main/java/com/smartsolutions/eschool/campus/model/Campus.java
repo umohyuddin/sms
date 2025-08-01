@@ -1,4 +1,4 @@
-package com.smartsolutions.eschool.school.campus.model;
+package com.smartsolutions.eschool.campus.model;
 
 public class Campus {
     private Long companyId;

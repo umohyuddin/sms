@@ -1,6 +1,6 @@
 package com.smartsolutions.eschool.school.model;
 
-import com.smartsolutions.eschool.school.campus.model.Campus;
+import com.smartsolutions.eschool.campus.model.Campus;
 
 import java.util.List;
 
