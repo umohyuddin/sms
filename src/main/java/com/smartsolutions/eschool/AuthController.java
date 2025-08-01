@@ -29,7 +29,7 @@ public class AuthController {
     }
 
 
-    @PostMapping(value = "/login")
+    @PostMapping(value = "/generateToken")
     public SingleResourceSuccessResponseObject signin(@Valid @RequestBody HashMap<String, String> request) {
         return new SingleResourceSuccessResponseObject(
                 new ResourceObject(
