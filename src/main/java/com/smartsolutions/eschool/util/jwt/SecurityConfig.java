@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(
                         HttpMethod.POST,
-                        "/auth/login"
+                        "/auth/generateToken"
                         )
                 .permitAll()
                 .requestMatchers(
