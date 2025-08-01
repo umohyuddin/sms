@@ -1,6 +1,6 @@
 package com.smartsolutions.eschool.user.entity;
 
-import com.smartsolutions.eschool.user.student.model.User;
+import com.smartsolutions.eschool.user.model.User;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
