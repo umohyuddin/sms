@@ -1,0 +1,16 @@
+=> inatall Docker and login
+
+=> open parent directory in CMD/shell
+
+Option I:
+
+	=> run command "docker pull mohsinarshad/sms-app:v1"
+
+	=> run command "docker build -t (imageName):(version) . "(only if you want to create new image) 
+
+	=> run command "docker run (imageName/ID)"
+
+	=> run command "docker-compose up"
+
+Option II:
+	simply run batch file "run.bat"

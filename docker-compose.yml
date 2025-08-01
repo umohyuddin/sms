@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8081:8080"
+    
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/students
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: rootpassword123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - sms-network
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword123
+      MYSQL_DATABASE: students
+      MYSQL_USER: Admin
+      MYSQL_PASSWORD: Admin123
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db-data:/var/lib/mysql
+    networks:
+      - sms-network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword123
+    networks:
+      - sms-network
+    depends_on:
+      - db
+
+networks:
+  sms-network:
+    driver: bridge

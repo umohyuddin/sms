@@ -28,6 +28,7 @@ public class AuthController {
         this.userDetailsService = userDetailsService;
     }
 
+
     @PostMapping(value = "/login")
     public SingleResourceSuccessResponseObject signin(@Valid @RequestBody HashMap<String, String> request) {
         return new SingleResourceSuccessResponseObject(
