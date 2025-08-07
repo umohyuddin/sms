@@ -1,6 +1,8 @@
 package com.smartsolutions.eschool.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -14,9 +16,13 @@ public final class ResourceObject {
 
     private Map<String, String> meta;
 
+    @JsonCreator
     public ResourceObject(
+            @JsonProperty("id")
             String id,
+            @JsonProperty("type")
             String type,
+            @JsonProperty("attributes")
             Map<String, Object> attributes) {
         this.id = id;
         this.type = type;

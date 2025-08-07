@@ -5,8 +5,8 @@ USE sms;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- USER_ROLE TABLE
-DROP TABLE IF EXISTS user_role;
-CREATE TABLE IF NOT EXISTS user_role (
+DROP TABLE IF EXISTS user_roles;
+CREATE TABLE IF NOT EXISTS user_roles (
   id BIGINT NOT NULL AUTO_INCREMENT,
   role_name VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   id BIGINT NOT NULL AUTO_INCREMENT,
   role_id BIGINT NOT NULL,
   emp_id BIGINT NOT NULL,
+  cmp_id BIGINT NOT NULL,
   isactive BIT(1),
   account_non_expired BIT(1) NOT NULL,
   account_non_locked BIT(1) NOT NULL,
@@ -30,13 +31,17 @@ CREATE TABLE IF NOT EXISTS `user` (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  CONSTRAINT fk_user_role
+  CONSTRAINT fk_user_roles
     FOREIGN KEY (role_id)
-    REFERENCES user_role (id)
+    REFERENCES user_roles (id)
     ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_emp_role
+  CONSTRAINT fk_user_emp_id
     FOREIGN KEY (emp_id)
     REFERENCES employee (employee_id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_user_cmp_id
+    FOREIGN KEY (cmp_id)
+    REFERENCES campuses (campus_id)
     ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -89,6 +94,7 @@ CREATE TABLE IF NOT EXISTS students (
     student_id BIGINT PRIMARY KEY AUTO_INCREMENT,
 	cmp_id BIGINT NOT NULL,
 	dpt_id INT NOT NULL,
+	grade INT NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     date_of_birth DATE NOT NULL,
@@ -123,6 +129,7 @@ CREATE TABLE IF NOT EXISTS employee (
     employee_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     emp_role_id INT NOT NULL,
 	cmp_id BIGINT NOT NULL,
+	dpt_id INT,
     f_name VARCHAR(50) NOT NULL,
     l_name VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE,
@@ -132,6 +139,7 @@ CREATE TABLE IF NOT EXISTS employee (
 	isactive BIT(1),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (dpt_id) REFERENCES departments(department_id),
     CONSTRAINT fk_emp_roles
 		FOREIGN KEY (emp_role_id)
 		REFERENCES emp_roles (id)
@@ -162,6 +170,7 @@ CREATE TABLE IF NOT EXISTS courses (
     course_id INT PRIMARY KEY AUTO_INCREMENT,
     course_code VARCHAR(10) UNIQUE NOT NULL,
     course_name VARCHAR(100) NOT NULL,
+	grade INT NOT NULL,
     dpt_id INT,
     teacher_id BIGINT,
 	isactive BIT(1),
@@ -186,18 +195,18 @@ CREATE TABLE IF NOT EXISTS enrollments (
 );
 
 -- assesments TABLE
-DROP TABLE IF EXISTS assesments;
-CREATE TABLE IF NOT EXISTS assesments (
-    assesments_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+DROP TABLE IF EXISTS assessments;
+CREATE TABLE IF NOT EXISTS assessments (
+    assessments_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     enr_id BIGINT NOT NULL,
     name VARCHAR(20) NOT NULL,
-    assesments_date DATE NOT NULL,
+    assessments_date DATE NOT NULL,
 	status ENUM('P', 'A') NOT NULL,
 	marks INT NOT NULL,
     grade VARCHAR(2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_assements_enr_id
+    CONSTRAINT fk_assessments_enr_id
 		FOREIGN KEY (enr_id) REFERENCES enrollments(enrollment_id)
 		ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -263,7 +272,7 @@ DROP TABLE IF EXISTS fee;
 CREATE TABLE IF NOT EXISTS fee (
     fee_id BIGINT PRIMARY KEY AUTO_INCREMENT,
 	std_id BIGINT,
-	tution_fee DECIMAL(10,2) DEFAULT 0.00,
+	tuition_fee DECIMAL(10,2) DEFAULT 0.00,
     stationery DECIMAL(10,2) DEFAULT 0.00,
     sports DECIMAL(10,2) DEFAULT 0.00,
     annual_fee DECIMAL(10,2) DEFAULT 0.00,
@@ -294,7 +303,7 @@ CREATE TRIGGER before_fee_insert
 BEFORE INSERT ON fee
 FOR EACH ROW
 BEGIN
-    SET NEW.t_amount = IFNULL(NEW.tution_fee,0)+IFNULL(NEW.stationery,0)+
+    SET NEW.t_amount = IFNULL(NEW.tuition_fee,0)+IFNULL(NEW.stationery,0)+
                        IFNULL(NEW.sports,0)+IFNULL(NEW.annual_fee,0)+
                        IFNULL(NEW.electricity,0)+IFNULL(NEW.maintenance,0)+
                        IFNULL(NEW.miscellaneous,0);
@@ -303,15 +312,71 @@ END$$
 
 DROP TRIGGER IF EXISTS before_fee_update$$
 CREATE TRIGGER before_fee_update
+
 BEFORE UPDATE ON fee
 FOR EACH ROW
 BEGIN
-    SET NEW.t_amount = IFNULL(NEW.tution_fee,0)+IFNULL(NEW.stationery,0)+
+    SET NEW.t_amount = IFNULL(NEW.tuition_fee,0)+IFNULL(NEW.stationery,0)+
                        IFNULL(NEW.sports,0)+IFNULL(NEW.annual_fee,0)+
                        IFNULL(NEW.electricity,0)+IFNULL(NEW.maintenance,0)+
                        IFNULL(NEW.miscellaneous,0);
     SET NEW.arrears = NEW.t_amount - IFNULL(NEW.p_amount,0);
 END$$
+
+DELIMITER ;
+-- ========================
+-- 3. TRIGGERS for matching grade (Student <-> Course)
+-- ========================
+DELIMITER $$
+
+
+CREATE TRIGGER check_grade_match_before_insert
+BEFORE INSERT ON enrollments
+FOR EACH ROW
+BEGIN
+    DECLARE student_grade VARCHAR(2);
+    DECLARE course_grade VARCHAR(2);
+
+    -- Get the student's grade
+    SELECT grade INTO student_grade
+    FROM students
+    WHERE student_id = NEW.student_id;
+
+    -- Get the course's grade
+    SELECT grade INTO course_grade
+    FROM courses
+    WHERE course_id = NEW.course_id;
+
+    -- Check if grades match (handle NULL cases if needed)
+    IF (student_grade IS NOT NULL AND course_grade IS NOT NULL AND student_grade != course_grade) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Student grade does not match course grade';
+    END IF;
+END $$
+
+CREATE TRIGGER check_grade_match_before_update
+BEFORE UPDATE ON enrollments
+FOR EACH ROW
+BEGIN
+    DECLARE student_grade VARCHAR(2);
+    DECLARE course_grade VARCHAR(2);
+
+    -- Get the student's grade
+    SELECT grade INTO student_grade
+    FROM students
+    WHERE student_id = NEW.student_id;
+
+    -- Get the course's grade
+    SELECT grade INTO course_grade
+    FROM courses
+    WHERE course_id = NEW.course_id;
+
+    -- Check if grades match (handle NULL cases if needed)
+    IF (student_grade IS NOT NULL AND course_grade IS NOT NULL AND student_grade != course_grade) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Student grade does not match course grade';
+    END IF;
+END $$
 
 DELIMITER ;
 
@@ -373,39 +438,39 @@ INSERT INTO employee (emp_role_id, cmp_id, f_name, l_name, email, phone, hire_da
 -- ========================
 -- 5.6 user_role
 -- ========================
-INSERT INTO user_role (role_name) VALUES
+INSERT INTO user_roles (role_name) VALUES
 ('Admin'), ('Manager'), ('Teacher'), ('Student'), ('HR'),
 ('Finance'), ('Parent'), ('Clerk'), ('Librarian'), ('IT Support');
 
 -- ========================
--- 5.7 user
+-- 5.7 userEntity
 -- ========================
-INSERT INTO `user` (role_id, emp_id, isactive, account_non_expired, account_non_locked, credentials_non_expired, email, enabled, password) VALUES
-(1,1,1,1,1,1,'user1@school.com',1,'pass1'),
-(2,2,1,1,1,1,'user2@school.com',1,'pass2'),
-(3,3,1,1,1,1,'user3@school.com',1,'pass3'),
-(4,4,1,1,1,1,'user4@school.com',1,'pass4'),
-(5,5,1,1,1,1,'user5@school.com',1,'pass5'),
-(6,6,1,1,1,1,'user6@school.com',1,'pass6'),
-(7,7,1,1,1,1,'user7@school.com',1,'pass7'),
-(8,8,1,1,1,1,'user8@school.com',1,'pass8'),
-(9,9,1,1,1,1,'user9@school.com',1,'pass9'),
-(10,10,1,1,1,1,'user10@school.com',1,'pass10');
+INSERT INTO `user` (role_id, emp_id, cmp_id, isactive, account_non_expired, account_non_locked, credentials_non_expired, email, enabled, password) VALUES
+(1,1,1,1,1,1,1,'user1@school.com',1,'pass1'),
+(2,2,2,1,1,1,1,'user2@school.com',1,'pass2'),
+(3,3,3,1,1,1,1,'user3@school.com',1,'pass3'),
+(4,4,4,1,1,1,1,'user4@school.com',1,'pass4'),
+(5,5,5,1,1,1,1,'user5@school.com',1,'pass5'),
+(6,6,6,1,1,1,1,'user6@school.com',1,'pass6'),
+(7,7,7,1,1,1,1,'user7@school.com',1,'pass7'),
+(8,8,8,1,1,1,1,'user8@school.com',1,'pass8'),
+(9,9,9,1,1,1,1,'user9@school.com',1,'pass9'),
+(10,10,10,1,1,1,1,'user10@school.com',1,'pass10');
 
 -- ========================
 -- 5.8 Students
 -- ========================
-INSERT INTO students (cmp_id, dpt_id, first_name, last_name, date_of_birth, email, phone, address, isactive, enrollment_date) VALUES
-(1,1,'Ahmed','Ali','2005-01-12','ahmed.ali@student.com','0301111111','City A',1,'2022-08-01'),
-(2,2,'Bilal','Khan','2006-03-15','bilal.khan@student.com','0301222222','City B',1,'2022-08-02'),
-(3,3,'Saad','Qureshi','2004-05-20','saad.qureshi@student.com','0301333333','City C',1,'2022-08-03'),
-(4,4,'Ayesha','Rashid','2007-06-25','ayesha.rashid@student.com','0301444444','City D',1,'2022-08-04'),
-(5,5,'Fatima','Shahid','2005-07-22','fatima.shahid@student.com','0301555555','City E',1,'2022-08-05'),
-(6,6,'Zara','Malik','2006-09-30','zara.malik@student.com','0301666666','City F',1,'2022-08-06'),
-(7,7,'Hassan','Tariq','2005-10-12','hassan.tariq@student.com','0301777777','City G',1,'2022-08-07'),
-(8,8,'Omar','Farooq','2004-11-18','omar.farooq@student.com','0301888888','City H',1,'2022-08-08'),
-(9,9,'Noor','Anwar','2006-12-25','noor.anwar@student.com','0301999999','City I',1,'2022-08-09'),
-(10,10,'Mariam','Latif','2007-01-30','mariam.latif@student.com','0301010101','City J',1,'2022-08-10');
+INSERT INTO students (cmp_id, dpt_id, grade, first_name, last_name, date_of_birth, email, phone, address, isactive, enrollment_date) VALUES
+(1, 1, 3, 'Ahmed', 'Ali', '2005-01-12', 'ahmed.ali@student.com', '0301111111', 'City A', 1, '2022-08-01'),
+(2, 2, 1, 'Bilal', 'Khan', '2006-03-15', 'bilal.khan@student.com', '0301222222', 'City B', 1, '2022-08-02'),
+(3, 3, 2, 'Saad', 'Qureshi', '2004-05-20', 'saad.qureshi@student.com', '0301333333', 'City C', 1, '2022-08-03'),
+(4, 4, 4, 'Ayesha', 'Rashid', '2007-06-25', 'ayesha.rashid@student.com', '0301444444', 'City D', 1, '2022-08-04'),
+(5, 5, 5, 'Fatima', 'Shahid', '2005-07-22', 'fatima.shahid@student.com', '0301555555', 'City E', 1, '2022-08-05'),
+(6, 6, 6, 'Zara', 'Malik', '2006-09-30', 'zara.malik@student.com', '0301666666', 'City F', 1, '2022-08-06'),
+(7, 7, 7, 'Hassan', 'Tariq', '2005-10-12', 'hassan.tariq@student.com', '0301777777', 'City G', 1, '2022-08-07'),
+(8, 8, 8, 'Omar', 'Farooq', '2004-11-18', 'omar.farooq@student.com', '0301888888', 'City H', 1, '2022-08-08'),
+(9, 9, 9, 'Noor', 'Anwar', '2006-12-25', 'noor.anwar@student.com', '0301999999', 'City I', 1, '2022-08-09'),
+(10, 10, 10, 'Mariam', 'Latif', '2007-01-30', 'mariam.latif@student.com', '0301010101', 'City J', 1, '2022-08-10');
 
 -- ========================
 -- 5.9 inventory
@@ -425,23 +490,33 @@ INSERT INTO inventory (cmp_id, item_name, quantity, status) VALUES
 -- ========================
 -- 5.10 courses
 -- ========================
-INSERT INTO courses (course_code, course_name, dpt_id, teacher_id, isactive, credits) VALUES
-('SCI101','Physics',1,1,1,3),('SCI102','Chemistry',1,2,1,3),
-('ART101','Drawing',2,3,1,2),('COM101','Accounting',3,4,1,3),
-('HR101','HR Management',7,5,1,2),('FIN101','Corporate Finance',8,6,1,3),
-('IT101','Programming',9,7,1,4),('ADM101','Admin Basics',10,8,1,2),
-('LIB101','Library Science',5,9,1,2),('TRN101','Logistics',6,10,1,2);
+INSERT INTO courses (course_code, course_name, grade, dpt_id, teacher_id, isactive, credits) VALUES
+('SCI101', 'Physics', 3, 1, 1, 1, 3),
+('SCI102', 'Chemistry', 1, 1, 2, 1, 3),
+('ART101', 'Drawing', 2, 2, 3, 1, 2),
+('COM101', 'Accounting', 4, 3, 4, 1, 3),
+('HR101', 'HR Management', 5, 7, 5, 1, 2),
+('FIN101', 'Corporate Finance', 6, 8, 6, 1, 3),
+('IT101', 'Programming', 7, 9, 7, 1, 4),
+('ADM101', 'Admin Basics', 8, 10, 8, 1, 2),
+('LIB101', 'Library Science', 9, 5, 9, 1, 2),
+('TRN101', 'Logistics', 10, 6, 10, 1, 2);
 
 -- ========================
 -- 5.11 enrollments
 -- ========================
 
 INSERT INTO enrollments (student_id, course_id, enrollment_date) VALUES
-(1,1,'2022-08-01'),(2,2,'2022-08-02'),
-(3,3,'2022-08-03'),(4,4,'2022-08-04'),
-(5,5,'2022-08-05'),(6,6,'2022-08-06'),
-(7,7,'2022-08-07'),(8,8,'2022-08-08'),
-(9,9,'2022-08-09'),(10,10,'2022-08-10');
+(1, 1, '2022-08-01'), -- grade 3 (student) matches grade 3 (course)
+(2, 2, '2022-08-02'), -- grade 1 matches grade 1
+(3, 3, '2022-08-03'), -- grade 2 matches grade 2
+(4, 4, '2022-08-04'), -- grade 4 matches grade 4
+(5, 5, '2022-08-05'), -- grade 5 matches grade 5
+(6, 6, '2022-08-06'), -- grade 6 matches grade 6
+(7, 7, '2022-08-07'), -- grade 7 matches grade 7
+(8, 8, '2022-08-08'), -- grade 8 matches grade 8
+(9, 9, '2022-08-09'), -- grade 9 matches grade 9
+(10, 10, '2022-08-10'); -- grade 10 matches grade 10
 
 -- ========================
 -- 5.12 assesments
@@ -502,7 +577,7 @@ INSERT INTO salary (emp_id, amount, `year`, `month`, status) VALUES
 -- ========================
 -- 5.17 fee
 -- ========================
-INSERT INTO fee (std_id, tution_fee, stationery, sports, annual_fee, electricity, maintenance, miscellaneous, p_amount, `year`, `month`, status) VALUES
+INSERT INTO fee (std_id, tuition_fee, stationery, sports, annual_fee, electricity, maintenance, miscellaneous, p_amount, `year`, `month`, status) VALUES
 (1,5000,500,300,2000,400,200,100,15000,2022,1,'Paid'),
 (2,5000,400,200,1800,300,100,50,12000,2022,1,'Pending'),
 (3,6000,600,350,2200,500,300,150,10000,2022,1,'Pending'),
@@ -517,5 +592,4 @@ INSERT INTO fee (std_id, tution_fee, stationery, sports, annual_fee, electricity
 -- ========================
 -- 5.18
 -- ========================
-
 
