@@ -37,11 +37,14 @@ public class UserRoleController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         UserRoleEntity nUserRoleEntity = objectMapper.convertValue(attributes, UserRoleEntity.class);
-//        UserRoleEntity nUserRoleEntity = new UserRoleEntity();
-//        nUserRoleEntity.setRoleName((String) attributes.get("name"));
+        Map<String, Object> resourceAttributes = objectMapper.convertValue(userRoleServiceFacade.create(nUserRoleEntity), Map.class);
+        ResourceObject resourceObject = new ResourceObject(
+                nUserRoleEntity.getRoleName(),
+                "User Role",
+                resourceAttributes
+        );
 
-        return new SingleResourceSuccessResponseObject(AbstractUserRestController.strToResourceObject(
-                userRoleServiceFacade.create(nUserRoleEntity)));
+        return new SingleResourceSuccessResponseObject(resourceObject);
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -53,9 +56,15 @@ public class UserRoleController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         UserRoleEntity nUserRoleEntity = objectMapper.convertValue(attributes, UserRoleEntity.class);
+
+        Map<String, Object> resourceAttributes = objectMapper.convertValue(userRoleServiceFacade.update(nUserRoleEntity), Map.class);
+        ResourceObject resourceObject = new ResourceObject(
+                String.valueOf(nUserRoleEntity.getId()),
+                "User Role",
+                resourceAttributes
+        );
         //nUserRoleEntity.setId((Long) attributes.get("id"));
-        return new SingleResourceSuccessResponseObject(AbstractUserRestController.strToResourceObject(
-                userRoleServiceFacade.update(nUserRoleEntity)));
+        return new SingleResourceSuccessResponseObject(resourceObject);
     }
 
     // Get Role by ID
@@ -94,8 +103,12 @@ public class UserRoleController {
     public SingleResourceSuccessResponseObject deleteUser(
             @PathVariable Long role_Id
             ) throws Exception {
-
-        return new SingleResourceSuccessResponseObject(AbstractUserRestController.strToResourceObject(
-                userRoleServiceFacade.delete(role_Id)));
+        Map<String, Object> resourceAttributes = objectMapper.convertValue(userRoleServiceFacade.delete(role_Id), Map.class);
+        ResourceObject resourceObject = new ResourceObject(
+                String.valueOf(role_Id),
+                "User Role",
+                resourceAttributes
+        );
+        return new SingleResourceSuccessResponseObject(resourceObject);
     }
 }
