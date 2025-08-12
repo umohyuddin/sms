@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.course.model.EnrollmentEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.model.DepartmentEntity;
@@ -68,19 +69,24 @@ public class StudentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id", nullable = false, insertable = false, updatable = false)
+    @JsonIgnore
     private CampusEntity campus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dpt_id", referencedColumnName = "department_id", nullable = false, insertable = false, updatable = false)
+    @JsonIgnore
     private DepartmentEntity department;
 
     @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<StudentAttendanceEntity> attendances;
 
     @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<FeeEntity> fees;
 
     @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<EnrollmentEntity> enrollments;
 
 }

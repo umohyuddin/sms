@@ -1,4 +1,5 @@
 package com.smartsolutions.eschool.employee.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class EmployeeAttendanceEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "emp_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
+    @JsonIgnore
     private EmployeeEntity employee;
 
     public enum AttendanceStatus {

@@ -1,7 +1,7 @@
-package com.smartsolutions.eschool.user.repository.sql;
+package com.smartsolutions.eschool.student.repository;
 
-import com.smartsolutions.eschool.user.model.UserEntity;
-import com.smartsolutions.eschool.user.model.UserRoleEntity;
+import com.smartsolutions.eschool.employee.model.EmployeeEntity;
+import com.smartsolutions.eschool.student.model.FeeEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -14,24 +14,23 @@ import java.util.List;
 
 @Transactional
 @Repository
-public class UserRoleDaoImpl implements UserRoleDao{
+public class FeeDaoImp implements FeeDao{
+
     private final JdbcTemplate jdbcTemplate;
 
-    public UserRoleDaoImpl(JdbcTemplate jdbcTemplate) {
+    public FeeDaoImp(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @PersistenceContext
     private EntityManager entityManager;
-
     private Session getSession() {
         return entityManager.unwrap(Session.class);
     }
-
     @Override
-    public int save(UserRoleEntity userRoleEntity) {
+    public int save(FeeEntity pFeeEntity) {
         try {
-            getSession().persist(userRoleEntity);
+            getSession().persist(pFeeEntity);
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -40,9 +39,9 @@ public class UserRoleDaoImpl implements UserRoleDao{
     }
 
     @Override
-    public int update(UserRoleEntity userRoleEntity) {
+    public int update(FeeEntity pFeeEntity) {
         try {
-            getSession().merge(userRoleEntity);
+            getSession().merge(pFeeEntity);
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,9 +50,9 @@ public class UserRoleDaoImpl implements UserRoleDao{
     }
 
     @Override
-    public int deleteById(Long id) {
+    public int delete(Long id) {
         try {
-            UserRoleEntity entity = getSession().get(UserRoleEntity.class, id);
+            FeeEntity entity = getSession().get(FeeEntity.class, id);
             if (entity != null) {
                 getSession().remove(entity);
                 return 1;
@@ -66,18 +65,22 @@ public class UserRoleDaoImpl implements UserRoleDao{
     }
 
     @Override
-    public List<UserRoleEntity> findById(Long id) {
-        String hql = "FROM UserRoleEntity u WHERE u.id = :roleId";
-        TypedQuery<UserRoleEntity> query = entityManager.createQuery(hql, UserRoleEntity.class);
-        query.setParameter("roleId", id);
-        return query.getResultList();
-       // return getSession().get(UserRoleEntity.class, id);
+    public FeeEntity findById(Long id) {
+        return getSession().get(FeeEntity.class, id);
     }
 
     @Override
-    public List<UserRoleEntity> findAll() {
-        String hql = "FROM UserRoleEntity";
-        TypedQuery<UserRoleEntity> query = entityManager.createQuery(hql, UserRoleEntity.class);
+    public List<FeeEntity> findAll() {
+        String hql = "FROM FeeEntity";
+        TypedQuery<FeeEntity> query = entityManager.createQuery(hql, FeeEntity.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<FeeEntity> findByStudent(Long std_id) {
+        String hql = "FROM FeeEntity e WHERE e.studentId = :std_id";
+        TypedQuery<FeeEntity> query = entityManager.createQuery(hql, FeeEntity.class);
+        query.setParameter("std_id", std_id);
         return query.getResultList();
     }
 }

@@ -1,7 +1,7 @@
 package com.smartsolutions.eschool.employee.service;
 
 import com.smartsolutions.eschool.employee.model.EmployeeRoleEntity;
-import com.smartsolutions.eschool.employee.repository.sql.EmployeeRoleDao;
+import com.smartsolutions.eschool.employee.repository.EmployeeRoleDao;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,4 +1,5 @@
 package com.smartsolutions.eschool.school.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.user.model.UserEntity;
@@ -46,20 +47,26 @@ public class CampusEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inst_id", referencedColumnName = "institute_id", insertable = false, updatable = false)
+    @JsonIgnore
     private InstituteEntity institute;
 
     @OneToMany(mappedBy = "campusId", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<InventoryEntity> inventories;
 
     @OneToMany(mappedBy = "campusId", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<DepartmentEntity> departments;
 
     @OneToMany(mappedBy = "campus", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<StudentEntity> students;
 
     @OneToMany(mappedBy = "campus", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<EmployeeEntity> employees;
 
     @OneToOne(mappedBy = "campus", fetch = FetchType.LAZY)
+    @JsonIgnore
     private UserEntity user;
 }

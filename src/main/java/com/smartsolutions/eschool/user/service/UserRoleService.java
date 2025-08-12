@@ -1,7 +1,7 @@
 package com.smartsolutions.eschool.user.service;
 
 import com.smartsolutions.eschool.user.model.UserRoleEntity;
-import com.smartsolutions.eschool.user.repository.sql.UserRoleDao;
+import com.smartsolutions.eschool.user.repository.UserRoleDao;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

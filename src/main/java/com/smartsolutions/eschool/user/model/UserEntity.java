@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
@@ -65,20 +66,26 @@ public class UserEntity implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JsonIgnore
     private UserRoleEntity role;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "emp_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
+    @JsonIgnore
     private EmployeeEntity employee;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id", insertable = false, updatable = false)
+    @JsonIgnore
     private CampusEntity campus;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<String> roles = Collections.singletonList("ROLE_USER");
+
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()

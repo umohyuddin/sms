@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.course.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "class")
+@Table(name = "classes")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -51,10 +52,12 @@ public class SClassEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", referencedColumnName = "course_id", insertable = false, updatable = false)
+    @JsonIgnore
     private CourseEntity course;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
+    @JsonIgnore
     private EmployeeEntity teacher;
 
     public enum DayOfWeek {

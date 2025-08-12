@@ -1,7 +1,7 @@
 package com.smartsolutions.eschool.user.service;
 
 import com.smartsolutions.eschool.user.model.UserEntity;
-import com.smartsolutions.eschool.user.repository.sql.UserDao;
+import com.smartsolutions.eschool.user.repository.UserDao;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,26 +15,26 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public List<UserEntity> getAllUsers() {
+    public List<UserEntity> getAll() {
         return userDao.findAll();
     }
-    public List<UserEntity> getUsers(Long institute_Id, Long campus_id) {
+    public List<UserEntity> getByCampus(Long institute_Id, Long campus_id) {
         return userDao.findUsers(institute_Id,campus_id);
     }
 
-    public UserEntity getUserById(Long id) {
+    public UserEntity getById(Long id) {
         return userDao.findById(id);
     }
 
-    public String createUser(UserEntity userEntity) {
+    public String create(UserEntity userEntity) {
         return userDao.save(userEntity) == 1 ? "User created" : "Error creating User";
     }
 
-    public String updateUser(UserEntity userEntity) {
+    public String update(UserEntity userEntity) {
         return userDao.update(userEntity) == 1 ? "User updated" : "Error updating User";
     }
 
-    public String deleteUser(Long id) {
+    public String delete(Long id) {
         return userDao.deleteById(id) == 1 ? "User deleted" : "Error deleting User";
     }
 }

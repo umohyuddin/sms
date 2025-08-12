@@ -1,4 +1,4 @@
-package com.smartsolutions.eschool.employee.repository.sql;
+package com.smartsolutions.eschool.employee.repository;
 
 
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;

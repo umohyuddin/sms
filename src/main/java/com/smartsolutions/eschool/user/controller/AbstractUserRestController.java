@@ -1,7 +1,6 @@
 package com.smartsolutions.eschool.user.controller;
 
 import com.smartsolutions.eschool.util.ResourceObject;
-import com.smartsolutions.eschool.user.model.User;
 import com.smartsolutions.eschool.user.facade.UserServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,17 +19,17 @@ public abstract class AbstractUserRestController {
 		return userServiceFacade.changeUser();
 	}
 
-	protected static ResourceObject toResourceObject(User user) {
-		if (user == null) {
-			return null;
-		}
-		final Map<String, Object> resourceAttributes = new HashMap<>(2);
-		resourceAttributes.put("schoolId", user.getSchoolId());
-		resourceAttributes.put("campusUuid", user.getCampusUuid());
-		resourceAttributes.put("firstName", user.getFirstName());
-		resourceAttributes.put("lastName", user.getLastName());
-		resourceAttributes.put("email", user.getEmail());
-
-		return new ResourceObject(String.valueOf(user.getId()), "students", resourceAttributes);
-	}
+//	protected static ResourceObject toResourceObject(User user) {
+//		if (user == null) {
+//			return null;
+//		}
+//		final Map<String, Object> resourceAttributes = new HashMap<>(2);
+//		resourceAttributes.put("schoolId", user.getSchoolId());
+//		resourceAttributes.put("campusUuid", user.getCampusUuid());
+//		resourceAttributes.put("firstName", user.getFirstName());
+//		resourceAttributes.put("lastName", user.getLastName());
+//		resourceAttributes.put("email", user.getEmail());
+//
+//		return new ResourceObject(String.valueOf(user.getId()), "students", resourceAttributes);
+//	}
 }

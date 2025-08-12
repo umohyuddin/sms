@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.course.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.school.model.DepartmentEntity;
 import com.smartsolutions.eschool.student.model.StudentAttendanceEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
@@ -34,7 +35,7 @@ public class CourseEntity {
     private Integer grade;
 
     @Column(name = "dpt_id")
-    private Integer departmentId;
+    private Long departmentId;
 
     @Column(name = "teacher_id")
     private Long teacherId;
@@ -55,18 +56,23 @@ public class CourseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dpt_id", referencedColumnName = "department_id", insertable = false, updatable = false)
+    @JsonIgnore
     private DepartmentEntity department;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
+    @JsonIgnore
     private EmployeeEntity teacher;
 
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<StudentAttendanceEntity> attendances;
 
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<SClassEntity> classes;
 
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<EnrollmentEntity> enrollments;
 }

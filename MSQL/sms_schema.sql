@@ -519,9 +519,9 @@ INSERT INTO enrollments (student_id, course_id, enrollment_date) VALUES
 (10, 10, '2022-08-10'); -- grade 10 matches grade 10
 
 -- ========================
--- 5.12 assesments
+-- 5.12 assessments
 -- ========================
-INSERT INTO assesments (enr_id, name, assesments_date, status, marks, grade) VALUES
+INSERT INTO assessments (enr_id, name, assessments_date, status, marks, grade) VALUES
 (1, 'Quiz 1', '2022-08-05', 'P', 85, 'B'),
 (2, 'Midterm', '2022-08-10', 'P', 78, 'C'),
 (3, 'Assignment 1', '2022-08-07', 'P', 92, 'A'),

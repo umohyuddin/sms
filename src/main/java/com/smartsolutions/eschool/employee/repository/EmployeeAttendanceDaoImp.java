@@ -1,7 +1,6 @@
-package com.smartsolutions.eschool.employee.repository.sql;
+package com.smartsolutions.eschool.employee.repository;
 
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
-import com.smartsolutions.eschool.employee.model.EmployeeSalaryEntity;
+import com.smartsolutions.eschool.employee.model.EmployeeAttendanceEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -14,24 +13,22 @@ import java.util.List;
 
 @Transactional
 @Repository
-public class EmployeeSalaryDaoImp implements  EmployeeSalaryDao{
+public class EmployeeAttendanceDaoImp implements EmployeeAttendanceDao{
 
     private final JdbcTemplate jdbcTemplate;
 
-    public EmployeeSalaryDaoImp(JdbcTemplate jdbcTemplate) {
+    public EmployeeAttendanceDaoImp(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
     @PersistenceContext
     private EntityManager entityManager;
-
     private Session getSession() {
         return entityManager.unwrap(Session.class);
     }
     @Override
-    public int save(EmployeeSalaryEntity employeeSalaryEntity) {
+    public int save(EmployeeAttendanceEntity employeeAttendanceEntity) {
         try {
-            getSession().persist(employeeSalaryEntity);
+            getSession().persist(employeeAttendanceEntity);
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -40,9 +37,9 @@ public class EmployeeSalaryDaoImp implements  EmployeeSalaryDao{
     }
 
     @Override
-    public int update(EmployeeSalaryEntity employeeSalaryEntity) {
+    public int update(EmployeeAttendanceEntity employeeAttendanceEntity) {
         try {
-            getSession().merge(employeeSalaryEntity);
+            getSession().persist(employeeAttendanceEntity);
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,7 +50,7 @@ public class EmployeeSalaryDaoImp implements  EmployeeSalaryDao{
     @Override
     public int delete(Long id) {
         try {
-            EmployeeSalaryEntity entity = getSession().get(EmployeeSalaryEntity.class, id);
+            EmployeeAttendanceEntity entity = getSession().get(EmployeeAttendanceEntity.class, id);
             if (entity != null) {
                 getSession().remove(entity);
                 return 1;
@@ -66,21 +63,20 @@ public class EmployeeSalaryDaoImp implements  EmployeeSalaryDao{
     }
 
     @Override
-    public EmployeeSalaryEntity findById(Long id) {
-        return  getSession().get(EmployeeSalaryEntity.class, id);
+    public EmployeeAttendanceEntity findById(Long id) {
+        return getSession().get(EmployeeAttendanceEntity.class, id);
     }
 
     @Override
-    public List<EmployeeSalaryEntity> findAll() {
-        String hql = "FROM EmployeeSalaryEntity";
-        TypedQuery<EmployeeSalaryEntity> query = entityManager.createQuery(hql, EmployeeSalaryEntity.class);
+    public List<EmployeeAttendanceEntity> findAll() {
+        String hql = "FROM EmployeeAttendanceEntity";
+        TypedQuery<EmployeeAttendanceEntity> query = entityManager.createQuery(hql, EmployeeAttendanceEntity.class);
         return query.getResultList();
     }
-
     @Override
-    public List<EmployeeSalaryEntity> findByEmpId(Long emp_id) {
-        String hql = "FROM EmployeeSalaryEntity e WHERE e.empId = :emp_id";
-        TypedQuery<EmployeeSalaryEntity> query = entityManager.createQuery(hql, EmployeeSalaryEntity.class);
+    public List<EmployeeAttendanceEntity> findByEmpId(Long emp_id) {
+        String hql = "FROM EmployeeAttendanceEntity e where e.empId = :emp_id";
+        TypedQuery<EmployeeAttendanceEntity> query = entityManager.createQuery(hql, EmployeeAttendanceEntity.class);
         query.setParameter("emp_id", emp_id);
         return query.getResultList();
     }

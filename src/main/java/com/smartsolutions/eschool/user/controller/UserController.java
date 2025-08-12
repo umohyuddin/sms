@@ -1,6 +1,11 @@
 package com.smartsolutions.eschool.user.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartsolutions.eschool.user.facade.UserRoleServiceFacade;
+import com.smartsolutions.eschool.user.model.UserEntity;
+import com.smartsolutions.eschool.user.model.UserRoleEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
+import com.smartsolutions.eschool.util.ResourceObject;
 import com.smartsolutions.eschool.util.SingleResourceSuccessResponseObject;
 import com.smartsolutions.eschool.user.facade.UserServiceFacade;
 import jakarta.validation.ValidationException;
@@ -14,66 +19,94 @@ import java.util.stream.Collectors;
 
 @Transactional
 @RestController
-@RequestMapping("/api/schools/{schoolId}/campuses/{campusUuid}/students")
+@RequestMapping("/api/user")
 public class UserController extends AbstractUserRestController {
-
+    private UserServiceFacade userServiceFacade;
+    private ObjectMapper objectMapper;
     @Autowired
-    public UserController(UserServiceFacade userServiceFacade) {
+    public UserController(UserServiceFacade userServiceFacade, ObjectMapper objectMapper) {
         super(userServiceFacade);
+        this.userServiceFacade = userServiceFacade;
+        this.objectMapper = objectMapper;
     }
 
-    @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject createStudent(
-            @PathVariable Long schoolId,
-            @PathVariable String campusUuid,
+
+    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
+    public SingleResourceSuccessResponseObject createUser(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
         if (!requestBody.containsKey("data")) {
             throw new ValidationException("The request body did not contain a data attribute");
         }
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        return new SingleResourceSuccessResponseObject(
-                asCurrentUser().createStudent(
-                        schoolId,
-                        campusUuid,
-                        attributes,
-                        AbstractUserRestController::toResourceObject));
+        UserEntity nUserEntity = objectMapper.convertValue(attributes, UserEntity.class);
+        Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.create(nUserEntity), Map.class);
+        ResourceObject resourceObject = new ResourceObject(
+                nUserEntity.getUsername(),
+                "User",
+                resourceAttributes
+        );
+
+        return new SingleResourceSuccessResponseObject(resourceObject);
     }
 
-    // Get all students
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getAll(@PathVariable Long schoolId, @PathVariable String campusUuid) throws Exception {
+    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public SingleResourceSuccessResponseObject updateUser(
+            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
+        if (!requestBody.containsKey("data")) {
+            throw new ValidationException("The request body did not contain a data attribute");
+        }
+        Map<String, Object> resourceMap = requestBody.get("data");
+        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
+        UserEntity nUserEntity = objectMapper.convertValue(attributes, UserEntity.class);
+
+        Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.update(nUserEntity), Map.class);
+        ResourceObject resourceObject = new ResourceObject(
+                String.valueOf(nUserEntity.getId()),
+                "User",
+                resourceAttributes
+        );
+        //nUserRoleEntity.setId((Long) attributes.get("id"));
+        return new SingleResourceSuccessResponseObject(resourceObject);
+    }
+
+    // Get Role by ID
+    @GetMapping(value = "/get/{id}/", produces = MediaType.APPLICATION_JSON_VALUE)
+    public SingleResourceSuccessResponseObject getUsers(@PathVariable Long id) throws Exception {
+        Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.getById(id), Map.class);
+        ResourceObject resourceObject = new ResourceObject(
+                String.valueOf(id),
+                "User",
+                resourceAttributes
+        );
+        return new SingleResourceSuccessResponseObject(resourceObject);
+    }
+    //  get all roles
+    @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MultiResourceSuccessResponseObject getAll() throws Exception {
         return new MultiResourceSuccessResponseObject(
-                asCurrentUser().getAllStudents(schoolId, campusUuid)
+                userServiceFacade.getAll()
                         .stream()
-                        .map(AbstractUserRestController::toResourceObject)
+                        .map(entity -> {
+                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
+                            return new ResourceObject(
+                                    String.valueOf(entity.getId()),
+                                    "User",
+                                    resourceAttributes
+                            );
+                        })
                         .collect(Collectors.toList()));
     }
-
-    // Get a student by ID
-//    @GetMapping("/{id}")
-//    public ResponseEntity<StudentDto> getStudentById(@PathVariable Long id) {
-//        Optional<StudentDto> student = studentService.findById(id);
-//        return student.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-//    }
-//
-//    // Update a student
-//    @PutMapping("/{id}")
-//    public ResponseEntity<StudentDto> updateStudent(@PathVariable Long id, @RequestBody StudentDto student) {
-//        Optional<StudentDto> existingStudentOpt = studentService.findById(id);
-//        if (existingStudentOpt.isPresent()) {
-//            student.setId(id); // Ensure the ID is set to update the correct student
-//            StudentDto updatedStudent = studentService.save(student);
-//            return ResponseEntity.ok(updatedStudent);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    // Delete a student
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
-//        studentService.deleteById(id);
-//        return ResponseEntity.noContent().build();
-//    }
+    @DeleteMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public SingleResourceSuccessResponseObject deleteUser(
+            @PathVariable Long id
+    ) throws Exception {
+        Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.delete(id), Map.class);
+        ResourceObject resourceObject = new ResourceObject(
+                String.valueOf(id),
+                "User",
+                resourceAttributes
+        );
+        return new SingleResourceSuccessResponseObject(resourceObject);
+    }
 }

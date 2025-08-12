@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.course.model.CourseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -44,10 +45,12 @@ public class StudentAttendanceEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", referencedColumnName = "student_id", insertable = false, updatable = false)
+    @JsonIgnore
     private StudentEntity student;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", referencedColumnName = "course_id", insertable = false, updatable = false)
+    @JsonIgnore
     private CourseEntity course;
 
     public enum AttendanceStatus {

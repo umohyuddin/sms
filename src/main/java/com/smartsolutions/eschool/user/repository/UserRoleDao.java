@@ -1,4 +1,4 @@
-package com.smartsolutions.eschool.user.repository.sql;
+package com.smartsolutions.eschool.user.repository;
 
 import com.smartsolutions.eschool.user.model.UserEntity;
 import com.smartsolutions.eschool.user.model.UserRoleEntity;

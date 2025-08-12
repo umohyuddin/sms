@@ -1,61 +1,88 @@
 package com.smartsolutions.eschool.user.repository;
 
-import com.smartsolutions.eschool.user.model.User;
+import com.smartsolutions.eschool.user.model.UserEntity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 
+@Transactional
 @Repository
 public class UserDaoImpl implements UserDao {
-
     private final JdbcTemplate jdbcTemplate;
 
     public UserDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private RowMapper<User> studentRowMapper = (rs, rowNum) -> {
-        User user = new User();
-        user.setId(rs.getLong("id"));
-        user.setSchoolId(rs.getLong("school_id"));
-        user.setCampusUuid(rs.getString("campus_uuid"));
-        user.setFirstName(rs.getString("first_name"));
-        user.setLastName(rs.getString("last_name"));
-        user.setEmail(rs.getString("email"));
-        return user;
-    };
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    @Override
-    public int save(User user) {
-        String sql = "INSERT INTO students (school_id, campus_uuid, first_name, last_name, email) VALUES (?, ?, ?, ?, ?)";
-        return jdbcTemplate.update(sql, user.getSchoolId(), user.getCampusUuid(), user.getFirstName(), user.getLastName(), user.getEmail());
+    private Session getSession() {
+        return entityManager.unwrap(Session.class);
     }
 
     @Override
-    public int update(User user) {
-        String sql = "UPDATE students SET first_name = ?, last_name = ?, email = ? WHERE id = ?";
-        return jdbcTemplate.update(sql, user.getFirstName(), user.getLastName(), user.getEmail(), user.getId());
+    public int save(UserEntity userEntity) {
+            try {
+                getSession().persist(userEntity);
+                return 1;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return 0;
+            }
+        }
+
+    @Override
+    public int update(UserEntity userEntity) {
+        try {
+            getSession().merge(userEntity);
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @Override
     public int deleteById(Long id) {
-        String sql = "DELETE FROM students WHERE id = ?";
-        return jdbcTemplate.update(sql, id);
+        try {
+            UserEntity entity = getSession().get(UserEntity.class, id);
+            if (entity != null) {
+                getSession().remove(entity);
+                return 1;
+            }
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @Override
-    public User findById(Long id) {
-        String sql = "SELECT * FROM students WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, studentRowMapper, id);
+    public UserEntity findById(Long id) {
+        return getSession().get(UserEntity.class, id);
     }
 
     @Override
-    public List<User> findAll(Long schoolId, String campusUuid) {
-        String sql = "SELECT * FROM students WHERE school_id = ? AND campus_uuid = ?";
-        return jdbcTemplate.query(sql, studentRowMapper, schoolId, campusUuid);
+    public List<UserEntity> findAll() {
+        String hql = "FROM UserEntity";
+        TypedQuery<UserEntity> query = entityManager.createQuery(hql, UserEntity.class);
+        return query.getResultList();
+    }
+    @Override
+    public List<UserEntity> findUsers(Long institute_Id, Long camp_id) {
+        String hql = "FROM UserEntity u WHERE u.cmpId = :campusId";
+        TypedQuery<UserEntity> query = entityManager.createQuery(hql, UserEntity.class);
+//        query.setParameter("instituteId", institute_Id);
+        query.setParameter("campusId", camp_id);
+        return query.getResultList();
     }
 }
 

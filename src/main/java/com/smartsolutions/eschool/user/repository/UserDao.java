@@ -1,14 +1,15 @@
 package com.smartsolutions.eschool.user.repository;
 
-import com.smartsolutions.eschool.user.model.User;
+import com.smartsolutions.eschool.user.model.UserEntity;
 
 import java.util.List;
 
 public interface UserDao {
-    int save(User user);
-    int update(User user);
+    int save(UserEntity userEntity);
+    int update(UserEntity userEntity);
     int deleteById(Long id);
-    User findById(Long id);
-    List<User> findAll(Long schoolId, String campusUuid);
+    UserEntity findById(Long id);
+    List<UserEntity> findAll();
+    List<UserEntity> findUsers(Long institute_id, Long campus_id);
 }
 

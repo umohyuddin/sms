@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.course.model.CourseEntity;
 import com.smartsolutions.eschool.course.model.SClassEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
@@ -64,31 +65,40 @@ public class EmployeeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "dpt_id", referencedColumnName = "department_id",insertable=false, updatable=false, nullable = true)
+    @JsonIgnore
     private DepartmentEntity departmentEntity;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "emp_role_id", referencedColumnName = "id",insertable=false, updatable=false, nullable = true)
+    @JsonIgnore
     private EmployeeRoleEntity role;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id",insertable=false, updatable=false, nullable = true)
+    @JsonIgnore
     private CampusEntity campus;
 
     @OneToOne(mappedBy = "head", fetch = FetchType.LAZY)
+    @JsonIgnore
     private DepartmentEntity head;
 
     @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<SClassEntity> classes;
 
     @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<CourseEntity> courses;
 
     @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
+    @JsonIgnore
     private UserEntity user;
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<EmployeeAttendanceEntity> attendance;
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<EmployeeSalaryEntity> salary;
 }

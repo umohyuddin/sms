@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.course.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -49,6 +50,7 @@ public class AssessmentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enr_id", referencedColumnName = "enrollment_id", nullable = false, insertable = false, updatable = false)
+    @JsonIgnore
     private EnrollmentEntity enrollment;
 
     public enum AssessmentStatus {

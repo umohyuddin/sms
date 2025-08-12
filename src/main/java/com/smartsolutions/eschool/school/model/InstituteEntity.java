@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.school.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,5 +48,6 @@ public class InstituteEntity {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "instituteId", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<CampusEntity> campuses;
 }

@@ -1,7 +1,7 @@
 package com.smartsolutions.eschool.employee.service;
 
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
-import com.smartsolutions.eschool.employee.repository.sql.EmployeeDao;
+import com.smartsolutions.eschool.employee.repository.EmployeeDao;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

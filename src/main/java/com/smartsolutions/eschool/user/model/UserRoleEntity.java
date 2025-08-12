@@ -1,6 +1,6 @@
 package com.smartsolutions.eschool.user.model;
 
-import com.smartsolutions.eschool.student.model.StudentAttendanceEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,6 +29,7 @@ public class UserRoleEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy = "role", fetch = FetchType.LAZY)
-    private UserEntity user;
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<UserEntity> user;
 }
