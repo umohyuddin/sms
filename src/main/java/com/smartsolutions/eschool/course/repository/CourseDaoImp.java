@@ -83,7 +83,7 @@ public class CourseDaoImp implements CourseDao {
 
     @Override
     public List<CourseEntity> findByDepartmentId(Long id) {
-        String hql = "FROM CourseEntity WHERE e.department = :departmentId";
+        String hql = "FROM CourseEntity e WHERE e.department = :departmentId";
         TypedQuery<CourseEntity> query = entityManager.createQuery(hql, CourseEntity.class);
         query.setParameter("departmentId", id);
         return query.getResultList();
