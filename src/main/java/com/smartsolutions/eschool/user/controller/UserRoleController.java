@@ -101,7 +101,7 @@ public class UserRoleController {
                         })
                         .collect(Collectors.toList()));
     }
-    @DeleteMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/delete/{role_id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject deleteUser(
             @PathVariable Long role_Id
             ) throws Exception {

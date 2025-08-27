@@ -98,7 +98,7 @@ public class UserController extends AbstractUserRestController {
                         })
                         .collect(Collectors.toList()));
     }
-    @DeleteMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject deleteUser(
             @PathVariable Long id
     ) throws Exception {
