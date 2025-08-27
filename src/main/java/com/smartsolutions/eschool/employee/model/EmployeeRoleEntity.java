@@ -19,7 +19,7 @@ public class EmployeeRoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
     @Column(name = "role_name", nullable = false)
     private String name;
@@ -30,7 +30,7 @@ public class EmployeeRoleEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<EmployeeEntity> employees;
 }

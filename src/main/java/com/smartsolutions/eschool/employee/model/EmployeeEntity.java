@@ -28,13 +28,13 @@ public class EmployeeEntity {
     private Long id;
 
     @Column(name = "emp_role_id", nullable = false)
-    private Long roleId;
+    private Integer roleId;
 
     @Column(name = "cmp_id", nullable = false)
     private Long campusId;
 
     @Column(name = "dpt_id", nullable = true)
-    private Long departmentId;
+    private Integer departmentId;
 
     @Column(name = "f_name", nullable = false)
     private String firstName;
@@ -63,42 +63,42 @@ public class EmployeeEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "dpt_id", referencedColumnName = "department_id",insertable=false, updatable=false, nullable = true)
     @JsonIgnore
     private DepartmentEntity departmentEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "emp_role_id", referencedColumnName = "id",insertable=false, updatable=false, nullable = true)
     @JsonIgnore
     private EmployeeRoleEntity role;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id",insertable=false, updatable=false, nullable = true)
     @JsonIgnore
     private CampusEntity campus;
 
-    @OneToOne(mappedBy = "head", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "head", fetch = FetchType.EAGER)
     @JsonIgnore
     private DepartmentEntity head;
 
-    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "teacher", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<SClassEntity> classes;
 
-    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "teacher", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<CourseEntity> courses;
 
-    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "employee", fetch = FetchType.EAGER)
     @JsonIgnore
     private UserEntity user;
 
-    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<EmployeeAttendanceEntity> attendance;
 
-    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<EmployeeSalaryEntity> salary;
 }

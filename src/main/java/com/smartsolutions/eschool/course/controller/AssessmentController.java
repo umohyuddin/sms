@@ -5,13 +5,14 @@ import com.smartsolutions.eschool.course.facade.AssessmentFacade;
 import com.smartsolutions.eschool.course.model.AssessmentEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
-import com.smartsolutions.eschool.util.SingleResourceSuccessResponseObject;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -46,15 +47,16 @@ public class AssessmentController {
     }
 //get assessment by ID
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
+    public MultiResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
 
         Map<String, Object> resourceAttributes = objectMapper.convertValue(assessmentFacade.getById(id), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
-                String.valueOf(id),
-                "Assessment",
-                resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(new ResourceObject(
+                                    String.valueOf(id),
+                                    "Assessment",
+                                    resourceAttributes
+                            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 //get all assessments of a course
     @GetMapping(value = "/getbycourseid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -110,7 +112,7 @@ public class AssessmentController {
 
 //add new assessment
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject create(
+    public MultiResourceSuccessResponseObject create(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
         if (!requestBody.containsKey("data")) {
             throw new ValidationException("The request body did not contain a data attribute");
@@ -118,17 +120,18 @@ public class AssessmentController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         AssessmentEntity nAssessmentEntity = objectMapper.convertValue(attributes, AssessmentEntity.class);
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(assessmentFacade.create(nAssessmentEntity), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
-                nAssessmentEntity.getName(),
-                "Assessment",
-                resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        Map<String, Object> resourceAttributes = Map.of("message",assessmentFacade.create(nAssessmentEntity));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(new ResourceObject(
+                                nAssessmentEntity.getName(),
+                                "Assessment",
+                                resourceAttributes
+                        ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject update(
+    public MultiResourceSuccessResponseObject update(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
         if (!requestBody.containsKey("data")) {
             throw new ValidationException("The request body did not contain a data attribute");
@@ -136,25 +139,27 @@ public class AssessmentController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         AssessmentEntity nAssessmentEntity = objectMapper.convertValue(attributes, AssessmentEntity.class);
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(assessmentFacade.update(nAssessmentEntity), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
-                String.valueOf(nAssessmentEntity.getAssessmentId()),
-                "Assessment ",
-                resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        Map<String, Object> resourceAttributes = Map.of("message",assessmentFacade.update(nAssessmentEntity));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(new ResourceObject(
+                                    String.valueOf(nAssessmentEntity.getAssessmentId()),
+                                    "Assessment ",
+                                    resourceAttributes
+                            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
     @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject delete(
+    public MultiResourceSuccessResponseObject delete(
             @PathVariable Long id
     ) throws Exception {
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(assessmentFacade.delete(id), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
-                String.valueOf(id),
-                "Assessment",
-                resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        Map<String, Object> resourceAttributes = Map.of("message",assessmentFacade.delete(id));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(new ResourceObject(
+                                    String.valueOf(id),
+                                    "Assessment",
+                                    resourceAttributes
+                            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 }

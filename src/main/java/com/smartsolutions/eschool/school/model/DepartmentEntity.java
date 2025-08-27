@@ -26,7 +26,7 @@ public class DepartmentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "department_id")
-    private Long departmentId;
+    private Integer departmentId;
 
     @Column(name = "cmp_id", nullable = false)
     private Long campusId;
@@ -45,25 +45,25 @@ public class DepartmentEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id", nullable = false, insertable = false, updatable = false)
     @JsonIgnore
     private CampusEntity campus;
 
-    @OneToOne(optional = true, fetch = FetchType.LAZY)
+    @OneToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "dpt_head_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
     @JsonIgnore
     private EmployeeEntity head;
 
-    @OneToMany(mappedBy = "departmentEntity", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "departmentEntity", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<EmployeeEntity> employees;
 
-    @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "department", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<StudentEntity> students;
 
-    @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "department", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<CourseEntity> courses;
 

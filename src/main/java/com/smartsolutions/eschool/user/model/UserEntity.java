@@ -66,31 +66,29 @@ public class UserEntity implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", referencedColumnName = "id", insertable = false, updatable = false)
     @JsonIgnore
     private UserRoleEntity role;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "emp_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
     @JsonIgnore
     private EmployeeEntity employee;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id", insertable = false, updatable = false)
     @JsonIgnore
     private CampusEntity campus;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<String> roles = Collections.singletonList("ROLE_USER");
 
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        if (role != null && role.getRoleName() != null) {
+            return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
+        }
+        return Collections.emptyList();
     }
 
     @Override

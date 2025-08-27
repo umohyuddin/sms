@@ -35,7 +35,7 @@ public class CourseEntity {
     private Integer grade;
 
     @Column(name = "dpt_id")
-    private Long departmentId;
+    private Integer departmentId;
 
     @Column(name = "teacher_id")
     private Long teacherId;
@@ -54,25 +54,25 @@ public class CourseEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dpt_id", referencedColumnName = "department_id", insertable = false, updatable = false)
     @JsonIgnore
     private DepartmentEntity department;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "teacher_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
     @JsonIgnore
     private EmployeeEntity teacher;
 
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<StudentAttendanceEntity> attendances;
 
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<SClassEntity> classes;
 
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<EnrollmentEntity> enrollments;
 }

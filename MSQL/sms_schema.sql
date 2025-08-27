@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS inventory (
     cmp_id BIGINT NOT NULL,
     item_name VARCHAR(100) NOT NULL,
     quantity INT NOT NULL,
-    status ENUM('Available', 'In Use', 'Damaged') NOT NULL,
+    status ENUM('Available', 'InUse', 'Damaged') NOT NULL,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_inv_cmp_id
@@ -477,14 +477,14 @@ INSERT INTO students (cmp_id, dpt_id, grade, first_name, last_name, date_of_birt
 -- ========================
 INSERT INTO inventory (cmp_id, item_name, quantity, status) VALUES
 (1, 'Projector', 5, 'Available'),
-(1, 'Laptop', 10, 'In Use'),
+(1, 'Laptop', 10, 'InUse'),
 (2, 'Desk', 20, 'Available'),
 (2, 'Whiteboard', 3, 'Damaged'),
 (3, 'Printer', 2, 'Available'),
-(4, 'Chair', 30, 'In Use'),
+(4, 'Chair', 30, 'InUse'),
 (5, 'Microscope', 15, 'Available'),
 (6, 'Bookshelf', 8, 'Available'),
-(7, 'Computer', 25, 'In Use'),
+(7, 'Computer', 25, 'InUse'),
 (8, 'Scanner', 1, 'Damaged');
 
 -- ========================

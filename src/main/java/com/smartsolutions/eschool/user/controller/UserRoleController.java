@@ -5,19 +5,20 @@ import com.smartsolutions.eschool.user.facade.UserRoleServiceFacade;
 import com.smartsolutions.eschool.user.model.UserRoleEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
-import com.smartsolutions.eschool.util.SingleResourceSuccessResponseObject;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Transactional
 @RestController
-@RequestMapping("/api/schools/user-role")
+@RequestMapping("/api/user/user-role")
 public class UserRoleController {
 
     private UserRoleServiceFacade userRoleServiceFacade;
@@ -29,7 +30,7 @@ public class UserRoleController {
     }
 
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject createUser(
+    public MultiResourceSuccessResponseObject createUser(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
         if (!requestBody.containsKey("data")) {
             throw new ValidationException("The request body did not contain a data attribute");
@@ -37,18 +38,19 @@ public class UserRoleController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         UserRoleEntity nUserRoleEntity = objectMapper.convertValue(attributes, UserRoleEntity.class);
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(userRoleServiceFacade.create(nUserRoleEntity), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
+        Map<String, Object> resourceAttributes = Map.of("message",userRoleServiceFacade.create(nUserRoleEntity) );
+        List<ResourceObject> resourceObject = new ArrayList<>();
+                resourceObject.add(new ResourceObject(
                 nUserRoleEntity.getRoleName(),
                 "User Role",
                 resourceAttributes
-        );
+        ));
 
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject updateUser(
+    public MultiResourceSuccessResponseObject updateUser(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
         if (!requestBody.containsKey("data")) {
             throw new ValidationException("The request body did not contain a data attribute");
@@ -57,18 +59,18 @@ public class UserRoleController {
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         UserRoleEntity nUserRoleEntity = objectMapper.convertValue(attributes, UserRoleEntity.class);
 
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(userRoleServiceFacade.update(nUserRoleEntity), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
+        Map<String, Object> resourceAttributes = Map.of("message",userRoleServiceFacade.update(nUserRoleEntity));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(new ResourceObject(
                 String.valueOf(nUserRoleEntity.getId()),
                 "User Role",
                 resourceAttributes
-        );
-        //nUserRoleEntity.setId((Long) attributes.get("id"));
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        ));
+        return  new MultiResourceSuccessResponseObject(resourceObject);
     }
 
     // Get Role by ID
-    @GetMapping(value = "/get/{role_id}/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/get/{role_id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getUsers(@PathVariable Long role_Id) throws Exception {
         return new MultiResourceSuccessResponseObject(
                 userRoleServiceFacade.getById(role_Id)
@@ -84,7 +86,7 @@ public class UserRoleController {
                         .collect(Collectors.toList()));
     }
     //  get all roles
-    @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getAll() throws Exception {
         return new MultiResourceSuccessResponseObject(
                 userRoleServiceFacade.getAll()
@@ -100,15 +102,16 @@ public class UserRoleController {
                         .collect(Collectors.toList()));
     }
     @DeleteMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject deleteUser(
+    public MultiResourceSuccessResponseObject deleteUser(
             @PathVariable Long role_Id
             ) throws Exception {
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(userRoleServiceFacade.delete(role_Id), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
+        Map<String, Object> resourceAttributes = Map.of("message",userRoleServiceFacade.delete(role_Id));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+                resourceObject.add(new ResourceObject(
                 String.valueOf(role_Id),
                 "User Role",
                 resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+                ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 }

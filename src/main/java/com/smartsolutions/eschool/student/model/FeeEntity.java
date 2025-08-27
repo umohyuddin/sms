@@ -74,7 +74,7 @@ public class FeeEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "std_id", referencedColumnName = "student_id", insertable = false, updatable = false)
     @JsonIgnore
     private StudentEntity student;

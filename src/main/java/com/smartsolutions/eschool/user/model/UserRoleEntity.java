@@ -29,7 +29,7 @@ public class UserRoleEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<UserEntity> user;
 }

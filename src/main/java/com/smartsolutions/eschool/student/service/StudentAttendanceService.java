@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.student.service;
 import com.smartsolutions.eschool.student.model.StudentAttendanceEntity;
 import com.smartsolutions.eschool.student.repository.StudentAttendanceDao;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class StudentAttendanceService {
     public StudentAttendanceService(StudentAttendanceDao studentAttendanceDao) {
         this.studentAttendanceDao = studentAttendanceDao;
     }
-
+    @Transactional
     public List<StudentAttendanceEntity> getAll() {
         return studentAttendanceDao.findAll();
     }

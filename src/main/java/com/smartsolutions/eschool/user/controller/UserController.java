@@ -1,12 +1,9 @@
 package com.smartsolutions.eschool.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartsolutions.eschool.user.facade.UserRoleServiceFacade;
 import com.smartsolutions.eschool.user.model.UserEntity;
-import com.smartsolutions.eschool.user.model.UserRoleEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
-import com.smartsolutions.eschool.util.SingleResourceSuccessResponseObject;
 import com.smartsolutions.eschool.user.facade.UserServiceFacade;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -32,7 +31,7 @@ public class UserController extends AbstractUserRestController {
 
 
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject createUser(
+    public MultiResourceSuccessResponseObject createUser(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
         if (!requestBody.containsKey("data")) {
             throw new ValidationException("The request body did not contain a data attribute");
@@ -40,18 +39,19 @@ public class UserController extends AbstractUserRestController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         UserEntity nUserEntity = objectMapper.convertValue(attributes, UserEntity.class);
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.create(nUserEntity), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
+        Map<String, Object> resourceAttributes = Map.of("message",userServiceFacade.create(nUserEntity));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add( new ResourceObject(
                 nUserEntity.getUsername(),
                 "User",
                 resourceAttributes
-        );
+            ));
 
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject updateUser(
+    public MultiResourceSuccessResponseObject updateUser(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
         if (!requestBody.containsKey("data")) {
             throw new ValidationException("The request body did not contain a data attribute");
@@ -60,29 +60,30 @@ public class UserController extends AbstractUserRestController {
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         UserEntity nUserEntity = objectMapper.convertValue(attributes, UserEntity.class);
 
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.update(nUserEntity), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
+        Map<String, Object> resourceAttributes = Map.of("message",userServiceFacade.update(nUserEntity));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(  new ResourceObject(
                 String.valueOf(nUserEntity.getId()),
                 "User",
                 resourceAttributes
-        );
-        //nUserRoleEntity.setId((Long) attributes.get("id"));
-        return new SingleResourceSuccessResponseObject(resourceObject);
+            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
     // Get Role by ID
-    @GetMapping(value = "/get/{id}/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject getUsers(@PathVariable Long id) throws Exception {
+    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MultiResourceSuccessResponseObject getUsers(@PathVariable Long id) throws Exception {
         Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.getById(id), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add( new ResourceObject(
                 String.valueOf(id),
                 "User",
                 resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
     //  get all roles
-    @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getAll() throws Exception {
         return new MultiResourceSuccessResponseObject(
                 userServiceFacade.getAll()
@@ -98,15 +99,16 @@ public class UserController extends AbstractUserRestController {
                         .collect(Collectors.toList()));
     }
     @DeleteMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject deleteUser(
+    public MultiResourceSuccessResponseObject deleteUser(
             @PathVariable Long id
     ) throws Exception {
         Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.delete(id), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add( new ResourceObject(
                 String.valueOf(id),
                 "User",
                 resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 }

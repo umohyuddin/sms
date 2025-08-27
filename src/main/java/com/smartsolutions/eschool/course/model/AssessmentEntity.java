@@ -48,7 +48,7 @@ public class AssessmentEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "enr_id", referencedColumnName = "enrollment_id", nullable = false, insertable = false, updatable = false)
     @JsonIgnore
     private EnrollmentEntity enrollment;

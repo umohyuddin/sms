@@ -1,6 +1,5 @@
 package com.smartsolutions.eschool.student.repository;
 
-import com.smartsolutions.eschool.student.model.FeeEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -68,6 +67,7 @@ public class StudentAttendanceDaoImp implements StudentAttendanceDao{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<StudentAttendanceEntity> findAll() {
         String hql = "FROM StudentAttendanceEntity";
         TypedQuery<StudentAttendanceEntity> query = entityManager.createQuery(hql, StudentAttendanceEntity.class);

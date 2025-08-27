@@ -67,25 +67,25 @@ public class StudentEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id", nullable = false, insertable = false, updatable = false)
     @JsonIgnore
     private CampusEntity campus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dpt_id", referencedColumnName = "department_id", nullable = false, insertable = false, updatable = false)
     @JsonIgnore
     private DepartmentEntity department;
 
-    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<StudentAttendanceEntity> attendances;
 
-    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<FeeEntity> fees;
 
-    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<EnrollmentEntity> enrollments;
 

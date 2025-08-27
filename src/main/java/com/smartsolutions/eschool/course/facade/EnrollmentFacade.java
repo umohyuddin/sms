@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.course.facade;
 
 import com.smartsolutions.eschool.course.model.EnrollmentEntity;
+import com.smartsolutions.eschool.course.service.EnrollmentService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,37 +18,37 @@ public class EnrollmentFacade {
     private static final Log LOG = LogFactory.getLog(CourseFacade.class);
     @Autowired
     @Lazy
-    private EnrollmentFacade enrollmentFacade;
+    private EnrollmentService enrollmentService;
 
     public List<EnrollmentEntity> getAll() {
-        return enrollmentFacade.getAll();
+        return enrollmentService.getAll();
     }
 
     public EnrollmentEntity getById(Long id) {
-        return enrollmentFacade.getById(id);
+        return enrollmentService.getById(id);
     }
 
     public List<EnrollmentEntity> getByTeacherId(Long id) {
-        return enrollmentFacade.getByTeacherId(id);
+        return enrollmentService.getByTeacherId(id);
     }
 
     public List<EnrollmentEntity> getByCourseId(Long id) {
-        return enrollmentFacade.getByCourseId(id);
+        return enrollmentService.getByCourseId(id);
     }
 
     public List<EnrollmentEntity> getByStudentId(Long id) {
-        return enrollmentFacade.getByStudentId(id);
+        return enrollmentService.getByStudentId(id);
     }
 
     public String create(EnrollmentEntity pEnrollmentEntity) {
-        return enrollmentFacade.create(pEnrollmentEntity);
+        return enrollmentService.create(pEnrollmentEntity);
     }
 
     public String update(EnrollmentEntity pEnrollmentEntity) {
-        return enrollmentFacade.update(pEnrollmentEntity);
+        return enrollmentService.update(pEnrollmentEntity);
     }
 
     public String delete(Long id) {
-        return enrollmentFacade.delete(id);
+        return enrollmentService.delete(id);
     }
 }

@@ -5,13 +5,14 @@ import com.smartsolutions.eschool.course.facade.SClassFacade;
 import com.smartsolutions.eschool.course.model.SClassEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
-import com.smartsolutions.eschool.util.SingleResourceSuccessResponseObject;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -45,15 +46,16 @@ public class SClassController {
     }
     //get Class by ID
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
+    public MultiResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
 
         Map<String, Object> resourceAttributes = objectMapper.convertValue(nSClassFacade.getById(id), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
-                String.valueOf(id),
-                "Class",
-                resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(new ResourceObject(
+                                    String.valueOf(id),
+                                    "Class",
+                                    resourceAttributes
+                            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
     //get all Classes of a teacher
     @GetMapping(value = "/getbyteacherid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,7 +94,7 @@ public class SClassController {
 
     //add new Class
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject create(
+    public MultiResourceSuccessResponseObject create(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
         if (!requestBody.containsKey("data")) {
             throw new ValidationException("The request body did not contain a data attribute");
@@ -100,17 +102,18 @@ public class SClassController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         SClassEntity nSClassEntity = objectMapper.convertValue(attributes, SClassEntity.class);
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(nSClassFacade.create(nSClassEntity), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
-                nSClassEntity.getClassroom(),
-                "Class",
-                resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        Map<String, Object> resourceAttributes = Map.of("message",nSClassFacade.create(nSClassEntity));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(new ResourceObject(
+                                    nSClassEntity.getClassroom(),
+                                    "Class",
+                                    resourceAttributes
+                            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
     @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject update(
+    public MultiResourceSuccessResponseObject update(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
         if (!requestBody.containsKey("data")) {
             throw new ValidationException("The request body did not contain a data attribute");
@@ -118,25 +121,27 @@ public class SClassController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         SClassEntity nSClassEntity = objectMapper.convertValue(attributes, SClassEntity.class);
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(nSClassFacade.update(nSClassEntity), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
-                String.valueOf(nSClassEntity.getCourseId()),
-                "Class",
-                resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        Map<String, Object> resourceAttributes = Map.of("message",nSClassFacade.update(nSClassEntity));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(new ResourceObject(
+                                    String.valueOf(nSClassEntity.getCourseId()),
+                                    "Class",
+                                    resourceAttributes
+                            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
     @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SingleResourceSuccessResponseObject delete(
+    public MultiResourceSuccessResponseObject delete(
             @PathVariable Long id
     ) throws Exception {
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(nSClassFacade.delete(id), Map.class);
-        ResourceObject resourceObject = new ResourceObject(
-                String.valueOf(id),
-                "Class",
-                resourceAttributes
-        );
-        return new SingleResourceSuccessResponseObject(resourceObject);
+        Map<String, Object> resourceAttributes = Map.of("message",nSClassFacade.delete(id));
+        List<ResourceObject> resourceObject = new ArrayList<>();
+        resourceObject.add(new ResourceObject(
+                                    String.valueOf(id),
+                                    "Class",
+                                    resourceAttributes
+                            ));
+        return new MultiResourceSuccessResponseObject(resourceObject);
     }
 }

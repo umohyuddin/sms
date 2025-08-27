@@ -50,12 +50,12 @@ public class SClassEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "course_id", referencedColumnName = "course_id", insertable = false, updatable = false)
     @JsonIgnore
     private CourseEntity course;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "teacher_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
     @JsonIgnore
     private EmployeeEntity teacher;

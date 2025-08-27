@@ -37,7 +37,7 @@ public class EmployeeAttendanceEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "emp_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
     @JsonIgnore
     private EmployeeEntity employee;

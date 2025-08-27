@@ -44,7 +44,7 @@ public class InventoryEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id", insertable = false, updatable = false)
     @JsonIgnore
     private CampusEntity campus;

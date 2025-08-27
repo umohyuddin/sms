@@ -21,6 +21,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }
@@ -29,8 +30,14 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        String authorizationHeader = request.getHeader("Authorization");
+        String path = request.getRequestURI();
+        // skip public APIs
+        if (path.equals("/api/auth/generateToken") || path.startsWith("/swagger-ui")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
+        String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
             if (jwtUtil.validateToken(token)) {
@@ -47,4 +54,5 @@ public class JwtFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
+
 }
