@@ -71,9 +71,9 @@ public class UserRoleController {
 
     // Get Role by ID
     @GetMapping(value = "/get/{role_id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getUsers(@PathVariable Long role_Id) throws Exception {
+    public MultiResourceSuccessResponseObject getUsers(@PathVariable Long role_id) throws Exception {
         return new MultiResourceSuccessResponseObject(
-                userRoleServiceFacade.getById(role_Id)
+                userRoleServiceFacade.getById(role_id)
                         .stream()
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
@@ -103,12 +103,12 @@ public class UserRoleController {
     }
     @DeleteMapping(value = "/delete/{role_id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject deleteUser(
-            @PathVariable Long role_Id
+            @PathVariable Long role_id
             ) throws Exception {
-        Map<String, Object> resourceAttributes = Map.of("message",userRoleServiceFacade.delete(role_Id));
+        Map<String, Object> resourceAttributes = Map.of("message",userRoleServiceFacade.delete(role_id));
         List<ResourceObject> resourceObject = new ArrayList<>();
                 resourceObject.add(new ResourceObject(
-                String.valueOf(role_Id),
+                String.valueOf(role_id),
                 "User Role",
                 resourceAttributes
                 ));
