@@ -27,6 +27,7 @@ public class CourseDaoImp implements CourseDao {
     @Override
     public int save(CourseEntity pCourseEntity) {
         try {
+            pCourseEntity.setCourseId(null);
             getSession().persist(pCourseEntity);
             return 1;
         } catch (Exception e) {

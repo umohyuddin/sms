@@ -1,9 +1,7 @@
 package com.smartsolutions.eschool.student.service;
 
 import com.smartsolutions.eschool.student.model.FeeEntity;
-import com.smartsolutions.eschool.student.model.StudentAttendanceEntity;
 import com.smartsolutions.eschool.student.repository.FeeDao;
-import com.smartsolutions.eschool.student.repository.StudentAttendanceDao;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -9,6 +9,7 @@ public interface UserDao {
     int update(UserEntity userEntity);
     int deleteById(Long id);
     UserEntity findById(Long id);
+    List<UserEntity> findByUserName(String userName);
     List<UserEntity> findAll();
     List<UserEntity> findUsers(Long institute_id, Long campus_id);
 }

@@ -50,6 +50,6 @@ public class InventoryEntity {
     private CampusEntity campus;
 
     public enum InventoryStatus {
-        Available, In_Use, Damaged
+        Available, InUse, Damaged
     }
 }

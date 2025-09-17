@@ -29,6 +29,7 @@ public class SClassDaoImp implements SClassDao{
     @Override
     public int save(SClassEntity pSClassEntity) {
         try {
+            pSClassEntity.setClassId(null);
             getSession().persist(pSClassEntity);
             return 1;
         } catch (Exception e) {

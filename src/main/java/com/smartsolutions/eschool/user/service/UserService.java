@@ -22,6 +22,10 @@ public class UserService {
         return userDao.findUsers(institute_Id,campus_id);
     }
 
+    public List<UserEntity> getByUserName(String userName) {
+        return userDao.findByUserName(userName);
+    }
+
     public UserEntity getById(Long id) {
         return userDao.findById(id);
     }

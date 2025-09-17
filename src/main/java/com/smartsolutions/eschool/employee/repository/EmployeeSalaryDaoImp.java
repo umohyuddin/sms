@@ -30,6 +30,7 @@ public class EmployeeSalaryDaoImp implements  EmployeeSalaryDao{
     @Override
     public int save(EmployeeSalaryEntity employeeSalaryEntity) {
         try {
+            employeeSalaryEntity.setId(null);
             getSession().persist(employeeSalaryEntity);
             return 1;
         } catch (Exception e) {

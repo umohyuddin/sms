@@ -26,6 +26,7 @@ public class EnrollmentDaoImp implements EnrollmentDao{
     @Override
     public int save(EnrollmentEntity pEnrollmentEntity) {
         try {
+            pEnrollmentEntity.setEnrollmentId(null);
             getSession().persist(pEnrollmentEntity);
             return 1;
         } catch (Exception e) {

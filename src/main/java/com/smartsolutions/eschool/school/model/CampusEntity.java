@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,8 +30,24 @@ public class CampusEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "contact", nullable = true, length = 20)
+    private String contactNumber;
+
+    @Column(name = "email", nullable = true, length = 100)
+    private String email;
+
+    @Column(name = "website", nullable = true, length = 100)
+    private String website;
+
     @Column(name = "address", length = 255)
     private String address;
+
+    @Column(name = "province", nullable = true, length = 100)
+    private String province;
+
+    @Lob
+    @Column(name = "logo", nullable = true, columnDefinition = "LONGBLOB")
+    private byte[] logo;
 
     @Column(name = "city", length = 50)
     private String city;

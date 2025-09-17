@@ -29,6 +29,7 @@ public class InstituteDaoImp implements InstituteDao{
     @Override
     public int save(InstituteEntity pInstituteEntity) {
         try {
+            pInstituteEntity.setInstituteId(null);
             getSession().persist(pInstituteEntity);
             return 1;
         } catch (Exception e) {

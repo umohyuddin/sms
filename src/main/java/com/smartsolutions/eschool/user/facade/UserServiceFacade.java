@@ -32,6 +32,10 @@ public class UserServiceFacade {
         return userService.getById(id);
     }
 
+    public List<UserEntity> getByUserName(String userName) {
+        return userService.getByUserName(userName);
+    }
+
     public String create(UserEntity pUserEntity) {
         return userService.create(pUserEntity);
     }

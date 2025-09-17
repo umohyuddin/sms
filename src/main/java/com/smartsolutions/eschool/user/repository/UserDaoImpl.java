@@ -30,14 +30,15 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public int save(UserEntity userEntity) {
-            try {
-                getSession().persist(userEntity);
-                return 1;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return 0;
-            }
+        try {
+            userEntity.setId(null);
+            getSession().persist(userEntity);
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
+    }
 
     @Override
     public int update(UserEntity userEntity) {
@@ -68,6 +69,14 @@ public class UserDaoImpl implements UserDao {
     @Override
     public UserEntity findById(Long id) {
         return getSession().get(UserEntity.class, id);
+    }
+
+    @Override
+    public List<UserEntity> findByUserName(String userName) {
+        String hql = "FROM UserEntity u WHERE u.email = :email";
+        TypedQuery<UserEntity> query = entityManager.createQuery(hql, UserEntity.class);
+        query.setParameter("email", userName);
+        return query.getResultList();
     }
 
     @Override

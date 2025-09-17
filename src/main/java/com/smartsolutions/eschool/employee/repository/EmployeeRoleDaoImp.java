@@ -31,6 +31,7 @@ public class EmployeeRoleDaoImp implements EmployeeRoleDao{
     @Override
     public int save(EmployeeRoleEntity employeeRoleEntity) {
         try {
+            employeeRoleEntity.setId(null);
             getSession().persist(employeeRoleEntity);
             return 1;
         } catch (Exception e) {

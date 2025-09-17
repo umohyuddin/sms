@@ -30,6 +30,7 @@ public class UserRoleDaoImpl implements UserRoleDao{
     @Override
     public int save(UserRoleEntity userRoleEntity) {
         try {
+            userRoleEntity.setId(null);
             getSession().persist(userRoleEntity);
             return 1;
         } catch (Exception e) {

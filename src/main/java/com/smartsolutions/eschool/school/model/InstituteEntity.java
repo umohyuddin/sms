@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.smartsolutions.eschool.user.model.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,9 @@ public class InstituteEntity {
     @Column(name = "institute_id")
     private Integer instituteId;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
@@ -35,6 +39,19 @@ public class InstituteEntity {
 
     @Column(name = "email", length = 100)
     private String email;
+
+    @Column(name = "website", nullable = true, length = 100)
+    private String website;
+
+    @Column(name = "tagline", length = 255)
+    private String tagLine;
+
+    @Column(name = "country", nullable = true, length = 100)
+    private String country;
+
+    @Lob
+    @Column(name = "logo", nullable = true, columnDefinition = "LONGBLOB")
+    private byte[] logo;
 
     @Column(name = "established_date")
     private LocalDate establishedDate;

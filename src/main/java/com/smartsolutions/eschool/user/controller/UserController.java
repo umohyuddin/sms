@@ -29,7 +29,6 @@ public class UserController extends AbstractUserRestController {
         this.objectMapper = objectMapper;
     }
 
-
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject createUser(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
@@ -87,6 +86,23 @@ public class UserController extends AbstractUserRestController {
     public MultiResourceSuccessResponseObject getAll() throws Exception {
         return new MultiResourceSuccessResponseObject(
                 userServiceFacade.getAll()
+                        .stream()
+                        .map(entity -> {
+                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
+                            return new ResourceObject(
+                                    String.valueOf(entity.getId()),
+                                    "User",
+                                    resourceAttributes
+                            );
+                        })
+                        .collect(Collectors.toList()));
+    }
+
+    //  get all roles
+    @GetMapping(value = "/getbyusername/{userName}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MultiResourceSuccessResponseObject getByUserName(@PathVariable String userName) throws Exception {
+        return new MultiResourceSuccessResponseObject(
+                userServiceFacade.getByUserName(userName)
                         .stream()
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);

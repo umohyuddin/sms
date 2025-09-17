@@ -28,6 +28,7 @@ public class EmployeeAttendanceDaoImp implements EmployeeAttendanceDao{
     @Override
     public int save(EmployeeAttendanceEntity employeeAttendanceEntity) {
         try {
+            employeeAttendanceEntity.setId(null);
             getSession().persist(employeeAttendanceEntity);
             return 1;
         } catch (Exception e) {

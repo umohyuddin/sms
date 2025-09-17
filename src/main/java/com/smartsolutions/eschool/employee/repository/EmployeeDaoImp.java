@@ -31,6 +31,7 @@ public class EmployeeDaoImp implements EmployeeDao{
     public int save(EmployeeEntity employeeEntity) {
 
         try {
+            employeeEntity.setId(null);
             getSession().persist(employeeEntity);
             return 1;
         } catch (Exception e) {

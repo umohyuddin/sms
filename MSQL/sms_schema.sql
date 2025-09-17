@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS sms;
-CREATE DATABASE IF NOT EXISTS sms;
-USE sms;
+-- DROP DATABASE IF EXISTS sms;
+-- CREATE DATABASE IF NOT EXISTS sms;
+-- USE sms;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -45,17 +45,75 @@ CREATE TABLE IF NOT EXISTS `user` (
     ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+DROP TABLE IF EXISTS theme;
+CREATE TABLE IF NOT EXISTS theme (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT,
+    inst_id INT,
+    name VARCHAR(100) NOT NULL,
+    sidebar_bg VARCHAR(100) NOT NULL,
+    sidebar_text VARCHAR(100) NOT NULL,
+    body_bg VARCHAR(100) NOT NULL,
+    body_text VARCHAR(100) NOT NULL,
+    header_bg VARCHAR(100) NOT NULL,
+    header_text VARCHAR(100) NOT NULL,
+    active_item_bg VARCHAR(100) NOT NULL,
+    active_item_text VARCHAR(100) NOT NULL
+);
+
+
 -- Creating table for Institutes
 DROP TABLE IF EXISTS institutes;
 CREATE TABLE IF NOT EXISTS institutes (
     institute_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT ,
     name VARCHAR(100) NOT NULL,
     address VARCHAR(255),
     contact_number VARCHAR(20),
     email VARCHAR(100),
+    website VARCHAR(100),
+    tagline VARCHAR(255),
+    country VARCHAR(100),
+    logo LONGBLOB,
     established_date DATE,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_institute_user_id
+    FOREIGN KEY (user_id)
+    REFERENCES user (id)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- Creating table rules
+DROP TABLE IF EXISTS rules;
+CREATE TABLE IF NOT EXISTS rules (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    inst_id INT,
+    rules MEDIUMTEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+
+-- Creating table fail criteria
+DROP TABLE IF EXISTS failcriteria;
+CREATE TABLE IF NOT EXISTS failcriteria (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    inst_id INT,
+    percentage INT,
+    subjectmarks INT,
+    noofsubjects INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Creating table marks grading
+DROP TABLE IF EXISTS marksgrading;
+CREATE TABLE IF NOT EXISTS marksgrading (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(2),
+    marks INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Creating table for Campuses
@@ -64,8 +122,13 @@ CREATE TABLE IF NOT EXISTS campuses (
     campus_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     inst_id INT,
     name VARCHAR(100) NOT NULL,
+    contact VARCHAR(20),
+    email VARCHAR(100),
+    website VARCHAR(100),
     address VARCHAR(255),
+    province VARCHAR(100),
     city VARCHAR(50),
+    logo LONGBLOB,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT fk_inst_id
@@ -267,18 +330,43 @@ CREATE TABLE IF NOT EXISTS salary (
     FOREIGN KEY (emp_id) REFERENCES employee(employee_id)
 );
 
--- Students Fee TABLE
-DROP TABLE IF EXISTS fee;
-CREATE TABLE IF NOT EXISTS fee (
-    fee_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-	std_id BIGINT,
-	tuition_fee DECIMAL(10,2) DEFAULT 0.00,
+-- Bank Details TABLE
+DROP TABLE IF EXISTS bankdetails;
+CREATE TABLE IF NOT EXISTS bankdetails (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    inst_id INT,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(300) NOT NULL,
+    account_no VARCHAR(20) NOT NULL,
+    iban VARCHAR(30) NOT NULL,
+    instruction VARCHAR(400) NOT NULL,
+    logo LONGBLOB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+
+-- Students fee particular TABLE
+DROP TABLE IF EXISTS feeparticular;
+CREATE TABLE IF NOT EXISTS feeparticular (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    inst_id INT,
+    name VARCHAR(100) NOT NULL,
+    tuition_fee DECIMAL(10,2) DEFAULT 0.00,
     stationery DECIMAL(10,2) DEFAULT 0.00,
     sports DECIMAL(10,2) DEFAULT 0.00,
     annual_fee DECIMAL(10,2) DEFAULT 0.00,
     electricity DECIMAL(10,2) DEFAULT 0.00,
     maintenance DECIMAL(10,2) DEFAULT 0.00,
     miscellaneous DECIMAL(10,2) DEFAULT 0.00,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+
+-- Students Fee TABLE
+DROP TABLE IF EXISTS fee;
+CREATE TABLE IF NOT EXISTS fee (
+    fee_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+	std_id BIGINT,
 	t_amount DECIMAL(10,2) DEFAULT 0.00,
 	p_amount DECIMAL(10,2) DEFAULT 0.00,
 	arrears DECIMAL(10,2) DEFAULT 0.00,

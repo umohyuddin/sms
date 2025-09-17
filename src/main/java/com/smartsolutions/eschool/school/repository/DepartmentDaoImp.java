@@ -29,6 +29,7 @@ public class DepartmentDaoImp implements DepartmentDao {
     @Override
     public int save(DepartmentEntity pDepartmentEntity) {
         try {
+            pDepartmentEntity.setDepartmentId(null);
             getSession().persist(pDepartmentEntity);
             return 1;
         } catch (Exception e) {

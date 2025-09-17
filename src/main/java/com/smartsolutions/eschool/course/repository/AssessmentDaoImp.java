@@ -28,6 +28,7 @@ public class AssessmentDaoImp implements  AssessmentDao{
     @Override
     public int save(AssessmentEntity pAssessmentEntity) {
         try {
+            pAssessmentEntity.setAssessmentId(null);
             getSession().persist(pAssessmentEntity);
             return 1;
         } catch (Exception e) {

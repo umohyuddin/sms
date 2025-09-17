@@ -28,6 +28,7 @@ public class InventoryDaoImp implements InventoryDao {
     @Override
     public int save(InventoryEntity pInventoryEntity) {
         try {
+            pInventoryEntity.setInventoryId(null);
             getSession().persist(pInventoryEntity);
             return 1;
         } catch (Exception e) {
