@@ -1,39 +1,46 @@
-package com.smartsolutions.eschool.student.model;
+package com.smartsolutions.eschool.sclass.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsolutions.eschool.sclass.model.SubjectEntity;
+import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
-@Table(name = "attendance")
+@Table(name = "timetable")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentAttendanceEntity {
+public class TimeTableEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
-
-    @Column(name = "std_id")
-    private Long studentId;
+    private Integer classId;
 
     @Column(name = "course_id")
     private Integer courseId;
 
-    @Column(name = "attendance_date", nullable = false)
-    private LocalDate attendanceDate;
+    @Column(name = "teacher_id")
+    private Long teacherId;
+
+    @Column(name = "classroom", length = 50)
+    private String classroom;
+
+    @Column(name = "start_time", nullable = false)
+    private LocalTime startTime;
+
+    @Column(name = "end_time", nullable = false)
+    private LocalTime endTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private AttendanceStatus status;
+    @Column(name = "day_of_week", nullable = false)
+    private DayOfWeek dayOfWeek;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -43,13 +50,8 @@ public class StudentAttendanceEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "std_id", referencedColumnName = "id", insertable = false, updatable = false)
-    @JsonIgnore
-    private StudentEntity student;
 
-
-    public enum AttendanceStatus {
-        P, A, L
+    public enum DayOfWeek {
+        Mon, Tue, Wed, Thu, Fri, Sat, Sun
     }
 }

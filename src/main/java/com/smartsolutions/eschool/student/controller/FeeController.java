@@ -86,7 +86,7 @@ public class FeeController {
         Map<String, Object> resourceAttributes = Map.of("message",feeFacade.create(nFeeEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add( new ResourceObject(
-                String.valueOf(nFeeEntity.getFeeId()),
+                String.valueOf(nFeeEntity.getId()),
                 "Fee",
                 resourceAttributes
             ));
@@ -105,7 +105,7 @@ public class FeeController {
         Map<String, Object> resourceAttributes = Map.of("message",feeFacade.update(nFeeEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add( new ResourceObject(
-                String.valueOf(nFeeEntity.getFeeId()),
+                String.valueOf(nFeeEntity.getId()),
                 "Fee",
                 resourceAttributes
             ));

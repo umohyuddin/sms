@@ -72,12 +72,12 @@ public class UserEntity implements UserDetails {
     private UserRoleEntity role;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "emp_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
+    @JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
     @JsonIgnore
     private EmployeeEntity employee;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id", insertable = false, updatable = false)
+    @JoinColumn(name = "cmp_id", referencedColumnName = "id", insertable = false, updatable = false)
     @JsonIgnore
     private CampusEntity campus;
 

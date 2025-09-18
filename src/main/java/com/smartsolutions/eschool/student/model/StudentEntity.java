@@ -1,9 +1,8 @@
 package com.smartsolutions.eschool.student.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsolutions.eschool.course.model.EnrollmentEntity;
+import com.smartsolutions.eschool.sclass.model.SClassEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
-import com.smartsolutions.eschool.school.model.DepartmentEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +22,7 @@ public class StudentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "student_id")
+    @Column(name = "id")
     private Long studentId;
 
     @Column(name = "cmp_id", nullable = false)
@@ -41,7 +40,7 @@ public class StudentEntity {
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @Column(name = "date_of_birth", nullable = false)
+    @Column(name = "dob", nullable = false)
     private LocalDate dateOfBirth;
 
     @Column(name = "email", unique = true, length = 100)
@@ -68,14 +67,10 @@ public class StudentEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "cmp_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     @JsonIgnore
     private CampusEntity campus;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "dpt_id", referencedColumnName = "department_id", nullable = false, insertable = false, updatable = false)
-    @JsonIgnore
-    private DepartmentEntity department;
 
     @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
     @JsonIgnore
@@ -85,8 +80,6 @@ public class StudentEntity {
     @JsonIgnore
     private List<FeeEntity> fees;
 
-    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<EnrollmentEntity> enrollments;
+
 
 }

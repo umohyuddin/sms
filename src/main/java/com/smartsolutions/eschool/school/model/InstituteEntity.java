@@ -22,11 +22,8 @@ public class InstituteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "institute_id")
-    private Integer instituteId;
-
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "id")
+    private Integer id;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;

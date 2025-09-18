@@ -21,8 +21,8 @@ import java.util.List;
 public class CampusEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "campus_id")
-    private Long campusId;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "inst_id")
     private Integer instituteId;
@@ -60,28 +60,4 @@ public class CampusEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "inst_id", referencedColumnName = "institute_id", insertable = false, updatable = false)
-    @JsonIgnore
-    private InstituteEntity institute;
-
-    @OneToMany(mappedBy = "campusId", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<InventoryEntity> inventories;
-
-    @OneToMany(mappedBy = "campusId", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<DepartmentEntity> departments;
-
-    @OneToMany(mappedBy = "campus", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<StudentEntity> students;
-
-    @OneToMany(mappedBy = "campus", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<EmployeeEntity> employees;
-
-    @OneToOne(mappedBy = "campus", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private UserEntity user;
 }

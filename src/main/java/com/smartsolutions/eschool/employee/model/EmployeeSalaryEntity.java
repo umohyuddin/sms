@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "salary")
@@ -19,7 +18,7 @@ public class EmployeeSalaryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "slr_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "emp_id", nullable = false)
@@ -45,13 +44,13 @@ public class EmployeeSalaryEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "emp_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
+    @JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
     @JsonIgnore
     private EmployeeEntity employee;
 
     public enum SalaryStatus {
         Paid,
         Pending,
-        Conflict
+        Forward
     }
 }

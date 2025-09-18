@@ -18,7 +18,7 @@ public class EmployeeAttendanceEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "emp_atn_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "emp_id")
@@ -38,7 +38,7 @@ public class EmployeeAttendanceEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "emp_id", referencedColumnName = "employee_id", insertable = false, updatable = false)
+    @JoinColumn(name = "emp_id", referencedColumnName = "id", insertable = false, updatable = false)
     @JsonIgnore
     private EmployeeEntity employee;
 

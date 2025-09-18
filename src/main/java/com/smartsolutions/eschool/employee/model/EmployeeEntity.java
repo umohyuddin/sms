@@ -1,10 +1,7 @@
 package com.smartsolutions.eschool.employee.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsolutions.eschool.course.model.CourseEntity;
-import com.smartsolutions.eschool.course.model.SClassEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
-import com.smartsolutions.eschool.school.model.DepartmentEntity;
 import com.smartsolutions.eschool.user.model.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,7 +21,7 @@ public class EmployeeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "employee_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "emp_role_id", nullable = false)
@@ -32,9 +29,6 @@ public class EmployeeEntity {
 
     @Column(name = "cmp_id", nullable = false)
     private Long campusId;
-
-    @Column(name = "dpt_id", nullable = true)
-    private Integer departmentId;
 
     @Column(name = "f_name", nullable = false)
     private String firstName;
@@ -51,8 +45,6 @@ public class EmployeeEntity {
     @Column(name = "hire_date", nullable = false)
     private Date hireDate;
 
-    @Column(name = "department")
-    private String department;
 
     @Column(name = "isactive")
     private String isActive;
@@ -63,10 +55,6 @@ public class EmployeeEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "dpt_id", referencedColumnName = "department_id",insertable=false, updatable=false, nullable = true)
-    @JsonIgnore
-    private DepartmentEntity departmentEntity;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JoinColumn(name = "emp_role_id", referencedColumnName = "id",insertable=false, updatable=false, nullable = true)
@@ -74,21 +62,10 @@ public class EmployeeEntity {
     private EmployeeRoleEntity role;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id",insertable=false, updatable=false, nullable = true)
+    @JoinColumn(name = "cmp_id", referencedColumnName = "id",insertable=false, updatable=false, nullable = true)
     @JsonIgnore
     private CampusEntity campus;
 
-    @OneToOne(mappedBy = "head", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private DepartmentEntity head;
-
-    @OneToMany(mappedBy = "teacher", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<SClassEntity> classes;
-
-    @OneToMany(mappedBy = "teacher", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<CourseEntity> courses;
 
     @OneToOne(mappedBy = "employee", fetch = FetchType.EAGER)
     @JsonIgnore

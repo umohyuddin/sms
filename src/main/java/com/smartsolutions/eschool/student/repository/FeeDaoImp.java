@@ -30,7 +30,7 @@ public class FeeDaoImp implements FeeDao{
     @Override
     public int save(FeeEntity pFeeEntity) {
         try {
-            pFeeEntity.setFeeId(null);
+            pFeeEntity.setId(null);
             getSession().persist(pFeeEntity);
             return 1;
         } catch (Exception e) {

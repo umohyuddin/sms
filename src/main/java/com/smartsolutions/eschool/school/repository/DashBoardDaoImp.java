@@ -56,18 +56,18 @@ public class DashBoardDaoImp implements DashBoardDao{
     public DashBoardEntity getCampusByMonth( Long  id, int year, int month) {
         String sql = """
                     SELECT
-                            COUNT(DISTINCT s.student_id) AS totalstudent,
-                            COUNT(DISTINCT e.employee_id) AS totalemployee,
+                            COUNT(DISTINCT s.id) AS totalstudent,
+                            COUNT(DISTINCT e.id) AS totalemployee,
                             COALESCE(SUM(CASE WHEN f.status = 'Paid' THEN f.t_amount ELSE 0 END), 0) AS revenue,
                             COALESCE(SUM(CASE WHEN f.status != 'Paid' THEN f.t_amount ELSE 0 END), 0) AS remaining,
                             COALESCE(SUM(CASE WHEN sl.status = 'Paid' THEN sl.amount ELSE 0 END), 0) AS expenses,
                             COALESCE(SUM(CASE WHEN sl.status != 'Paid' THEN sl.amount ELSE 0 END), 0) AS remainingExpenses
                         FROM students s
-                        INNER JOIN campuses c ON s.cmp_id = c.campus_id
-                        LEFT JOIN employee e ON e.cmp_id = c.campus_id
-                        LEFT JOIN fee f ON f.std_id = s.student_id AND f.year = :year AND f.month = :month
-                        LEFT JOIN salary sl ON sl.emp_id = e.employee_id AND sl.year = :year AND sl.month = :month
-                        WHERE c.campus_id = :cmpId
+                        INNER JOIN campuses c ON s.cmp_id = c.id
+                        LEFT JOIN employee e ON e.cmp_id = c.id
+                        LEFT JOIN fee f ON f.std_id = s.id AND f.year = :year AND f.month = :month
+                        LEFT JOIN salary sl ON sl.emp_id = e.id AND sl.year = :year AND sl.month = :month
+                        WHERE c.id = :cmpId
                     """;
 
         Tuple result = (Tuple) entityManager
@@ -84,18 +84,18 @@ public class DashBoardDaoImp implements DashBoardDao{
     public DashBoardEntity getCampusByYear( Long  id, int year) {
         String sql = """
                     SELECT
-                            COUNT(DISTINCT s.student_id) AS totalstudent,
-                            COUNT(DISTINCT e.employee_id) AS totalemployee,
+                            COUNT(DISTINCT s.id) AS totalstudent,
+                            COUNT(DISTINCT e.id) AS totalemployee,
                             COALESCE(SUM(CASE WHEN f.status = 'Paid' THEN f.t_amount ELSE 0 END), 0) AS revenue,
                             COALESCE(SUM(CASE WHEN f.status != 'Paid' THEN f.t_amount ELSE 0 END), 0) AS remaining,
                             COALESCE(SUM(CASE WHEN sl.status = 'Paid' THEN sl.amount ELSE 0 END), 0) AS expenses,
                             COALESCE(SUM(CASE WHEN sl.status != 'Paid' THEN sl.amount ELSE 0 END), 0) AS remainingExpenses
                         FROM students s
-                        INNER JOIN campuses c ON s.cmp_id = c.campus_id
-                        LEFT JOIN employee e ON e.cmp_id = c.campus_id
-                        LEFT JOIN fee f ON f.std_id = s.student_id AND f.year = :year
-                        LEFT JOIN salary sl ON sl.emp_id = e.employee_id AND sl.year = :year
-                        WHERE c.campus_id = :cmpId
+                        INNER JOIN campuses c ON s.cmp_id = c.id
+                        LEFT JOIN employee e ON e.cmp_id = c.id
+                        LEFT JOIN fee f ON f.std_id = s.id AND f.year = :year
+                        LEFT JOIN salary sl ON sl.emp_id = e.id AND sl.year = :year
+                        WHERE c.id = :cmpId
                     """;
 
         Tuple result = (Tuple) entityManager
@@ -111,17 +111,17 @@ public class DashBoardDaoImp implements DashBoardDao{
     public DashBoardEntity getInstituteByMonth( Long  id, int year, int month) {
         String sql = """
                     SELECT
-                            COUNT(DISTINCT s.student_id) AS totalstudent,
-                            COUNT(DISTINCT e.employee_id) AS totalemployee,
+                            COUNT(DISTINCT s.id) AS totalstudent,
+                            COUNT(DISTINCT e.id) AS totalemployee,
                             COALESCE(SUM(CASE WHEN f.status = 'Paid' THEN f.t_amount ELSE 0 END), 0) AS revenue,
                             COALESCE(SUM(CASE WHEN f.status != 'Paid' THEN f.t_amount ELSE 0 END), 0) AS remaining,
                             COALESCE(SUM(CASE WHEN sl.status = 'Paid' THEN sl.amount ELSE 0 END), 0) AS expenses,
                             COALESCE(SUM(CASE WHEN sl.status != 'Paid' THEN sl.amount ELSE 0 END), 0) AS remainingExpenses
                         FROM students s
-                        INNER JOIN campuses c ON s.cmp_id = c.campus_id
-                        LEFT JOIN employee e ON e.cmp_id = c.campus_id
-                        LEFT JOIN fee f ON f.std_id = s.student_id AND f.year = :year AND f.month = :month
-                        LEFT JOIN salary sl ON sl.emp_id = e.employee_id AND sl.year = :year AND sl.month = :month
+                        INNER JOIN campuses c ON s.cmp_id = c.id
+                        LEFT JOIN employee e ON e.cmp_id = c.id
+                        LEFT JOIN fee f ON f.std_id = s.id AND f.year = :year AND f.month = :month
+                        LEFT JOIN salary sl ON sl.emp_id = e.id AND sl.year = :year AND sl.month = :month
                         WHERE c.inst_id = :instId
                     """;
 
@@ -139,17 +139,17 @@ public class DashBoardDaoImp implements DashBoardDao{
     public DashBoardEntity getInstituteByYear( Long  id, int year) {
         String sql = """
                     SELECT
-                            COUNT(DISTINCT s.student_id) AS totalstudent,
-                            COUNT(DISTINCT e.employee_id) AS totalemployee,
+                            COUNT(DISTINCT s.id) AS totalstudent,
+                            COUNT(DISTINCT e.id) AS totalemployee,
                             COALESCE(SUM(CASE WHEN f.status = 'Paid' THEN f.t_amount ELSE 0 END), 0) AS revenue,
                             COALESCE(SUM(CASE WHEN f.status != 'Paid' THEN f.t_amount ELSE 0 END), 0) AS remaining,
                             COALESCE(SUM(CASE WHEN sl.status = 'Paid' THEN sl.amount ELSE 0 END), 0) AS expenses,
                             COALESCE(SUM(CASE WHEN sl.status != 'Paid' THEN sl.amount ELSE 0 END), 0) AS remainingExpenses
                         FROM students s
-                        INNER JOIN campuses c ON s.cmp_id = c.campus_id
-                        LEFT JOIN employee e ON e.cmp_id = c.campus_id
-                        LEFT JOIN fee f ON f.std_id = s.student_id AND f.year = :year
-                        LEFT JOIN salary sl ON sl.emp_id = e.employee_id AND sl.year = :year
+                        INNER JOIN campuses c ON s.cmp_id = c.id
+                        LEFT JOIN employee e ON e.cmp_id = c.id
+                        LEFT JOIN fee f ON f.std_id = s.id AND f.year = :year
+                        LEFT JOIN salary sl ON sl.emp_id = e.id AND sl.year = :year
                         WHERE c.inst_id = :instId
                     """;
 

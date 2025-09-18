@@ -20,8 +20,8 @@ public class FeeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "fee_id")
-    private Long feeId;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "std_id")
     private Long studentId;
@@ -75,7 +75,7 @@ public class FeeEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "std_id", referencedColumnName = "student_id", insertable = false, updatable = false)
+    @JoinColumn(name = "std_id", referencedColumnName = "id", insertable = false, updatable = false)
     @JsonIgnore
     private StudentEntity student;
 

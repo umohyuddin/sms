@@ -29,7 +29,7 @@ public class CampusDaoImp implements CampusDao{
     @Override
     public int save(CampusEntity pCampusEntity) {
         try {
-            pCampusEntity.setCampusId(null);
+            pCampusEntity.setId(null);
             getSession().persist(pCampusEntity);
             return 1;
         } catch (Exception e) {

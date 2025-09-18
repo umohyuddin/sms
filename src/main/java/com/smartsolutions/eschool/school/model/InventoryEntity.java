@@ -20,7 +20,7 @@ import java.util.List;
 public class InventoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "inventory_id")
+    @Column(name = "id")
     private Long inventoryId;
 
     @Column(name = "cmp_id", nullable = false)
@@ -45,7 +45,7 @@ public class InventoryEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cmp_id", referencedColumnName = "campus_id", insertable = false, updatable = false)
+    @JoinColumn(name = "cmp_id", referencedColumnName = "id", insertable = false, updatable = false)
     @JsonIgnore
     private CampusEntity campus;
 

@@ -37,7 +37,7 @@ public class CampusController {
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
                             return new ResourceObject(
-                                    String.valueOf(entity.getCampusId()),
+                                    String.valueOf(entity.getId()),
                                     "Campus",
                                     resourceAttributes
                             );
