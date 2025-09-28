@@ -327,11 +327,14 @@ DROP TABLE IF EXISTS timetable;
 CREATE TABLE IF NOT EXISTS timetable (
     id INT PRIMARY KEY AUTO_INCREMENT,
     cls_id INT,
-    sbj_id INT,
-    classroom VARCHAR(50),
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    day_of_week ENUM('Mon','Tue','Wed','Thu','Fri','Sat','Sun') NOT NULL,
+    duration VARCHAR(100),
+    mon VARCHAR(100),
+    tue VARCHAR(100),
+    wed VARCHAR(100),
+    thu VARCHAR(100),
+    fri VARCHAR(100),
+    sat VARCHAR(100),
+    sun VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (cls_id) REFERENCES sclass(id),
@@ -346,7 +349,7 @@ CREATE TABLE IF NOT EXISTS salary (
 	amount DECIMAL(10,2) NOT NULL,
     `year` YEAR(4) NOT NULL,
     `month` INT NOT NULL,
-	status ENUM('Paid', 'Pending', 'Conflict') NOT NULL,
+	status ENUM('Paid', 'Pending', 'Forward') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (emp_id) REFERENCES employee(id)
@@ -710,7 +713,7 @@ INSERT INTO salary (emp_id, amount, `year`, `month`, status) VALUES
 (6, 2700.00, 2025, 9, 'Pending'),
 (7, 3300.00, 2025, 9, 'Paid'),
 (8, 3000.00, 2025, 9, 'Paid'),
-(9, 2800.00, 2025, 9, 'Conflict'),
+(9, 2800.00, 2025, 9, 'Forward'),
 (10, 3100.00, 2025, 9, 'Paid');
 
 -- Insert data into bankdetails

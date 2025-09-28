@@ -24,26 +24,17 @@ public class SubjectEntity {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "course_code", nullable = false, unique = true, length = 10)
-    private String courseCode;
+    @Column(name = "c_id")
+    private Integer classId;
 
-    @Column(name = "course_name", nullable = false, length = 100)
-    private String courseName;
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
 
-    @Column(name = "grade", nullable = false)
-    private Integer grade;
-
-    @Column(name = "dpt_id")
-    private Integer departmentId;
-
-    @Column(name = "teacher_id")
+    @Column(name = "t_id")
     private Long teacherId;
 
     @Column(name = "isactive")
     private Boolean isActive;
-
-    @Column(name = "credits", nullable = false)
-    private Integer credits;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

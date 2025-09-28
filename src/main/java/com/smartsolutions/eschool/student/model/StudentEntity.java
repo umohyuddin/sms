@@ -28,11 +28,8 @@ public class StudentEntity {
     @Column(name = "cmp_id", nullable = false)
     private Long campusId;
 
-    @Column(name = "dpt_id", nullable = false)
-    private Integer departmentId;
-
-    @Column(name = "grade", nullable = false)
-    private Integer grade;
+    @Column(name = "class_id", nullable = false)
+    private Integer classId;
 
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
@@ -42,6 +39,9 @@ public class StudentEntity {
 
     @Column(name = "dob", nullable = false)
     private LocalDate dateOfBirth;
+
+    @Column(name = "gender", nullable = false, length = 10)
+    private String gender;
 
     @Column(name = "email", unique = true, length = 100)
     private String email;

@@ -25,9 +25,6 @@ public class StudentAttendanceEntity {
     @Column(name = "std_id")
     private Long studentId;
 
-    @Column(name = "course_id")
-    private Integer courseId;
-
     @Column(name = "attendance_date", nullable = false)
     private LocalDate attendanceDate;
 

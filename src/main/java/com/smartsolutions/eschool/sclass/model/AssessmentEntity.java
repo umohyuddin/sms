@@ -21,8 +21,11 @@ public class AssessmentEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "enr_id", nullable = false)
-    private Long enrollmentId;
+    @Column(name = "sbj_id", nullable = false)
+    private Integer subjectId;
+
+    @Column(name = "std_id", nullable = false)
+    private Long studentId;
 
     @Column(name = "name", nullable = false, length = 20)
     private String name;
@@ -36,9 +39,6 @@ public class AssessmentEntity {
 
     @Column(name = "marks", nullable = false)
     private Integer marks;
-
-    @Column(name = "grade", length = 2)
-    private String grade;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

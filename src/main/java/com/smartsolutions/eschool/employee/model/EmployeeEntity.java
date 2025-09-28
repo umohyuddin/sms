@@ -45,7 +45,6 @@ public class EmployeeEntity {
     @Column(name = "hire_date", nullable = false)
     private Date hireDate;
 
-
     @Column(name = "isactive")
     private String isActive;
 
