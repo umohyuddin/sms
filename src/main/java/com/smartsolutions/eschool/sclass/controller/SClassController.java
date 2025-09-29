@@ -2,7 +2,7 @@ package com.smartsolutions.eschool.sclass.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.sclass.facade.SClassFacade;
-import com.smartsolutions.eschool.sclass.model.TimeTableEntity;
+import com.smartsolutions.eschool.sclass.model.SClassEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
 import jakarta.validation.ValidationException;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Transactional
 @RestController
-@RequestMapping("/api/course/sclass")
+@RequestMapping("/api/class/class")
 public class SClassController {
     private SClassFacade nSClassFacade;
     private ObjectMapper objectMapper;
@@ -28,7 +28,7 @@ public class SClassController {
         this.objectMapper = objectMapper;
     }
 
-    //  get all Classes
+    //  get all Enrollments
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getAll() throws Exception {
         return new MultiResourceSuccessResponseObject(
@@ -37,14 +37,14 @@ public class SClassController {
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
                             return new ResourceObject(
-                                    String.valueOf(entity.getCourseId()),
-                                    "Class",
+                                    String.valueOf(entity.getId()),
+                                    "class",
                                     resourceAttributes
                             );
                         })
                         .collect(Collectors.toList()));
     }
-    //get Class by ID
+    //get Enrollment by ID
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
 
@@ -52,12 +52,12 @@ public class SClassController {
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
                                     String.valueOf(id),
-                                    "Class",
+                                    "class",
                                     resourceAttributes
                             ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
-    //get all Classes of a teacher
+    //get all Enrollment of a teacher
     @GetMapping(value = "/getbyteacherid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getByTeacherId(@PathVariable Long id) throws Exception {
 
@@ -67,14 +67,14 @@ public class SClassController {
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
                             return new ResourceObject(
-                                    String.valueOf(entity.getCourseId()),
-                                    "Class",
+                                    String.valueOf(entity.getId()),
+                                    "class",
                                     resourceAttributes
                             );
                         })
                         .collect(Collectors.toList()));
     }
-    //get all Classes of a course
+    //get all Enrollment of a course
     @GetMapping(value = "/getbycourseid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getByCourseId(@PathVariable Long id) throws Exception {
 
@@ -84,15 +84,32 @@ public class SClassController {
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
                             return new ResourceObject(
-                                    String.valueOf(entity.getCourseId()),
-                                    "Class",
+                                    String.valueOf(entity.getId()),
+                                    "class",
+                                    resourceAttributes
+                            );
+                        })
+                        .collect(Collectors.toList()));
+    }
+    //get all Enrollment of a Student
+    @GetMapping(value = "/getbystudentid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MultiResourceSuccessResponseObject getByStudentId(@PathVariable Long id) throws Exception {
+
+        return new MultiResourceSuccessResponseObject(
+                nSClassFacade.getByStudentId(id)
+                        .stream()
+                        .map(entity -> {
+                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
+                            return new ResourceObject(
+                                    String.valueOf(entity.getId()),
+                                    "class",
                                     resourceAttributes
                             );
                         })
                         .collect(Collectors.toList()));
     }
 
-    //add new Class
+    //add new Enrollment
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject create(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
@@ -101,14 +118,14 @@ public class SClassController {
         }
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        TimeTableEntity nTimeTableEntity = objectMapper.convertValue(attributes, TimeTableEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",nSClassFacade.create(nTimeTableEntity));
+        SClassEntity nSClassEntity = objectMapper.convertValue(attributes, SClassEntity.class);
+        Map<String, Object> resourceAttributes = Map.of("message", nSClassFacade.create(nSClassEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                    nTimeTableEntity.getClassroom(),
-                                    "Class",
-                                    resourceAttributes
-                            ));
+                                nSClassEntity.getName(),
+                                "class",
+                                resourceAttributes
+                        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
@@ -120,12 +137,12 @@ public class SClassController {
         }
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        TimeTableEntity nTimeTableEntity = objectMapper.convertValue(attributes, TimeTableEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",nSClassFacade.update(nTimeTableEntity));
+        SClassEntity nSClassEntity = objectMapper.convertValue(attributes, SClassEntity.class);
+        Map<String, Object> resourceAttributes = Map.of("message", nSClassFacade.update(nSClassEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                    String.valueOf(nTimeTableEntity.getCourseId()),
-                                    "Class",
+                                    String.valueOf(nSClassEntity.getId()),
+                                    "class ",
                                     resourceAttributes
                             ));
         return new MultiResourceSuccessResponseObject(resourceObject);
@@ -135,11 +152,11 @@ public class SClassController {
     public MultiResourceSuccessResponseObject delete(
             @PathVariable Long id
     ) throws Exception {
-        Map<String, Object> resourceAttributes = Map.of("message",nSClassFacade.delete(id));
+        Map<String, Object> resourceAttributes = Map.of("message", nSClassFacade.delete(id));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
                                     String.valueOf(id),
-                                    "Class",
+                                    "class",
                                     resourceAttributes
                             ));
         return new MultiResourceSuccessResponseObject(resourceObject);

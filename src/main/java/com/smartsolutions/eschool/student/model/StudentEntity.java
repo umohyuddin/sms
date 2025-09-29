@@ -1,7 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsolutions.eschool.sclass.model.SClassEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -59,5 +59,13 @@ public class CampusEntity {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+    @PrePersist
+    public  void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 
 }

@@ -1,6 +1,6 @@
 package com.smartsolutions.eschool.sclass.repository;
 
-import com.smartsolutions.eschool.sclass.model.TimeTableEntity;
+import com.smartsolutions.eschool.sclass.model.SClassEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -10,10 +10,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 @Transactional
 @Repository
-public class SClassDaoImp implements SClassDao{
+public class SClassDaoImp implements SClassDao {
     private final JdbcTemplate jdbcTemplate;
 
     public SClassDaoImp(JdbcTemplate jdbcTemplate) {
@@ -24,12 +23,11 @@ public class SClassDaoImp implements SClassDao{
     private Session getSession() {
         return entityManager.unwrap(Session.class);
     }
-
     @Override
-    public int save(TimeTableEntity pTimeTableEntity) {
+    public int save(SClassEntity pSClassEntity) {
         try {
-            pTimeTableEntity.setClassId(null);
-            getSession().persist(pTimeTableEntity);
+            pSClassEntity.setId(null);
+            getSession().persist(pSClassEntity);
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,9 +36,9 @@ public class SClassDaoImp implements SClassDao{
     }
 
     @Override
-    public int update(TimeTableEntity pTimeTableEntity) {
+    public int update(SClassEntity pSClassEntity) {
         try {
-            getSession().merge(pTimeTableEntity);
+            getSession().merge(pSClassEntity);
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,7 +49,7 @@ public class SClassDaoImp implements SClassDao{
     @Override
     public int delete(Long id) {
         try {
-            TimeTableEntity entity = getSession().get(TimeTableEntity.class, id);
+            SClassEntity entity = getSession().get(SClassEntity.class, id);
             if (entity != null) {
                 getSession().remove(entity);
                 return 1;
@@ -64,30 +62,38 @@ public class SClassDaoImp implements SClassDao{
     }
 
     @Override
-    public TimeTableEntity findById(Long id) {
-        return getSession().get(TimeTableEntity.class, id);
+    public SClassEntity findById(Long id) {
+        return getSession().get(SClassEntity.class, id);
     }
 
     @Override
-    public List<TimeTableEntity> findAll() {
-        String hql = "FROM TimeTableEntity";
-        TypedQuery<TimeTableEntity> query = entityManager.createQuery(hql, TimeTableEntity.class);
+    public List<SClassEntity> findAll() {
+        String hql = "FROM SClassEntity";
+        TypedQuery<SClassEntity> query = entityManager.createQuery(hql, SClassEntity.class);
         return query.getResultList();
     }
 
     @Override
-    public List<TimeTableEntity> findByTeacherId(Long id) {
-        String hql = "FROM TimeTableEntity e WHERE e.teacherId = :id";
-        TypedQuery<TimeTableEntity> query = entityManager.createQuery(hql, TimeTableEntity.class);
-        query.setParameter("id", id);
+    public List<SClassEntity> findByTeacherId(Long id) {
+        String hql = "FROM SClassEntity e WHERE e.course.teacherId = :teacherId";
+        TypedQuery<SClassEntity> query = entityManager.createQuery(hql, SClassEntity.class);
+        query.setParameter("teacherId", id);
         return query.getResultList();
     }
 
     @Override
-    public List<TimeTableEntity> findByCourseId(Long id) {
-        String hql = "FROM TimeTableEntity e WHERE e.courseId = :id";
-        TypedQuery<TimeTableEntity> query = entityManager.createQuery(hql, TimeTableEntity.class);
-        query.setParameter("id", id);
+    public List<SClassEntity> findByCourseId(Long id) {
+        String hql = "FROM SClassEntity e WHERE e.courseId=:courseId";
+        TypedQuery<SClassEntity> query = entityManager.createQuery(hql, SClassEntity.class);
+        query.setParameter("courseId", id);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<SClassEntity> findByStudentId(Long id) {
+        String hql = "FROM SClassEntity e Where e.studentId=:studentId";
+        TypedQuery<SClassEntity> query = entityManager.createQuery(hql, SClassEntity.class);
+        query.setParameter("studentId", id);
         return query.getResultList();
     }
 }

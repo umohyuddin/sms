@@ -1,7 +1,7 @@
 package com.smartsolutions.eschool.sclass.facade;
 
 import com.smartsolutions.eschool.sclass.model.SubjectEntity;
-import com.smartsolutions.eschool.sclass.service.CourseService;
+import com.smartsolutions.eschool.sclass.service.SubjectService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,37 +13,37 @@ import java.util.List;
 
 @Component
 @Scope("prototype")
-public class CourseFacade {
-    private static final Log LOG = LogFactory.getLog(CourseFacade.class);
+public class SubjectFacade {
+    private static final Log LOG = LogFactory.getLog(SubjectFacade.class);
     @Autowired
     @Lazy
-    private CourseService courseService;
+    private SubjectService subjectService;
 
     public List<SubjectEntity> getAll() {
-        return courseService.getAll();
+        return subjectService.getAll();
     }
 
     public SubjectEntity getById(Long id) {
-        return courseService.getById(id);
+        return subjectService.getById(id);
     }
 
     public List<SubjectEntity> getByTeacherId(Long id) {
-        return courseService.getByTeacherId(id);
+        return subjectService.getByTeacherId(id);
     }
 
     public List<SubjectEntity> getByDepartmentId(Long id) {
-        return courseService.getByDepartmentId(id);
+        return subjectService.getByDepartmentId(id);
     }
 
     public String create(SubjectEntity pSubjectEntity) {
-        return courseService.create(pSubjectEntity);
+        return subjectService.create(pSubjectEntity);
     }
 
     public String update(SubjectEntity pSubjectEntity) {
-        return courseService.update(pSubjectEntity);
+        return subjectService.update(pSubjectEntity);
     }
 
     public String delete(Long id) {
-        return courseService.delete(id);
+        return subjectService.delete(id);
     }
 }

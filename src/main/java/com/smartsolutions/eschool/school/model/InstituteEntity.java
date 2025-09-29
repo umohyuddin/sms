@@ -64,4 +64,13 @@ public class InstituteEntity {
     @OneToMany(mappedBy = "instituteId", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<CampusEntity> campuses;
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+    @PrePersist
+    public  void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

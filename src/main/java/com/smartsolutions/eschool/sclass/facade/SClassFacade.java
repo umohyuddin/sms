@@ -1,6 +1,6 @@
 package com.smartsolutions.eschool.sclass.facade;
 
-import com.smartsolutions.eschool.sclass.model.TimeTableEntity;
+import com.smartsolutions.eschool.sclass.model.SClassEntity;
 import com.smartsolutions.eschool.sclass.service.SClassService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,36 +14,41 @@ import java.util.List;
 @Component
 @Scope("prototype")
 public class SClassFacade {
-    private static final Log LOG = LogFactory.getLog(CourseFacade.class);
+
+    private static final Log LOG = LogFactory.getLog(SClassFacade.class);
     @Autowired
     @Lazy
-    private SClassService sClassService;
+    private SClassService SClassService;
 
-    public List<TimeTableEntity> getAll() {
-        return sClassService.getAll();
+    public List<SClassEntity> getAll() {
+        return SClassService.getAll();
     }
 
-    public TimeTableEntity getById(Long id) {
-        return sClassService.getById(id);
+    public SClassEntity getById(Long id) {
+        return SClassService.getById(id);
     }
 
-    public List<TimeTableEntity> getByTeacherId(Long id) {
-        return sClassService.getByTeacherId(id);
+    public List<SClassEntity> getByTeacherId(Long id) {
+        return SClassService.getByTeacherId(id);
     }
 
-    public List<TimeTableEntity> getByCourseId(Long id) {
-        return sClassService.getByCourseId(id);
+    public List<SClassEntity> getByCourseId(Long id) {
+        return SClassService.getByCourseId(id);
     }
 
-    public String create(TimeTableEntity pTimeTableEntity) {
-        return sClassService.create(pTimeTableEntity);
+    public List<SClassEntity> getByStudentId(Long id) {
+        return SClassService.getByStudentId(id);
     }
 
-    public String update(TimeTableEntity pTimeTableEntity) {
-        return sClassService.update(pTimeTableEntity);
+    public String create(SClassEntity pSClassEntity) {
+        return SClassService.create(pSClassEntity);
+    }
+
+    public String update(SClassEntity pSClassEntity) {
+        return SClassService.update(pSClassEntity);
     }
 
     public String delete(Long id) {
-        return sClassService.delete(id);
+        return SClassService.delete(id);
     }
 }

@@ -12,10 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 @Transactional
 @Repository
-public class CourseDaoImp implements CourseDao {
+public class SubjectDaoImp implements SubjectDao {
     private final JdbcTemplate jdbcTemplate;
 
-    public CourseDaoImp(JdbcTemplate jdbcTemplate) {
+    public SubjectDaoImp(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     @PersistenceContext

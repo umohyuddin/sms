@@ -52,4 +52,13 @@ public class InventoryEntity {
     public enum InventoryStatus {
         Available, InUse, Damaged
     }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+    @PrePersist
+    public  void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

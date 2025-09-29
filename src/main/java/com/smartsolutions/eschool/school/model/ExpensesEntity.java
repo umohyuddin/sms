@@ -27,7 +27,7 @@ public class ExpensesEntity {
     private Long amount;
 
     @Column(name = "details")
-    private Long details;
+    private String details;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

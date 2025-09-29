@@ -4,7 +4,7 @@ import com.smartsolutions.eschool.sclass.model.SubjectEntity;
 
 import java.util.List;
 
-public interface CourseDao {
+public interface SubjectDao {
     int save(SubjectEntity pSubjectEntity);
     int update(SubjectEntity pSubjectEntity);
     int delete(Long id);

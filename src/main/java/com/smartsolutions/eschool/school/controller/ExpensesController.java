@@ -1,8 +1,7 @@
-package com.smartsolutions.eschool.sclass.controller;
-
+package com.smartsolutions.eschool.school.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartsolutions.eschool.sclass.facade.AssessmentFacade;
-import com.smartsolutions.eschool.sclass.model.AssessmentEntity;
+import com.smartsolutions.eschool.school.facade.ExpensesFacade;
+import com.smartsolutions.eschool.school.model.ExpensesEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
 import jakarta.validation.ValidationException;
@@ -18,99 +17,78 @@ import java.util.stream.Collectors;
 
 @Transactional
 @RestController
-@RequestMapping("/api/class/assessment")
-public class AssessmentController {
+@RequestMapping("/api/schools/expenses")
+public class ExpensesController {
 
-    private AssessmentFacade assessmentFacade;
+    private ExpensesFacade nExpensesFacade;
     private ObjectMapper objectMapper;
     @Autowired
-    public AssessmentController(AssessmentFacade pAssessmentFacade, ObjectMapper objectMapper) {
-        this.assessmentFacade = pAssessmentFacade;
+    public ExpensesController(ExpensesFacade pExpensesFacade, ObjectMapper objectMapper) {
+        this.nExpensesFacade = pExpensesFacade;
         this.objectMapper = objectMapper;
     }
 
-    //  get all Assessments
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getAll() throws Exception {
         return new MultiResourceSuccessResponseObject(
-                assessmentFacade.getAll()
+                nExpensesFacade.getAll()
                         .stream()
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
                             return new ResourceObject(
                                     String.valueOf(entity.getId()),
-                                    "Assessment",
+                                    "Expenses",
                                     resourceAttributes
                             );
                         })
                         .collect(Collectors.toList()));
     }
-//get assessment by ID
+
+    @GetMapping(value = "/getbyinstitute/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MultiResourceSuccessResponseObject getByInstitute(@PathVariable Long id) throws Exception {
+        return new MultiResourceSuccessResponseObject(
+                nExpensesFacade.getByInstitute(id)
+                        .stream()
+                        .map(entity -> {
+                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
+                            return new ResourceObject(
+                                    String.valueOf(entity.getId()),
+                                    "Expenses",
+                                    resourceAttributes
+                            );
+                        })
+                        .collect(Collectors.toList()));
+    }
+
+    @GetMapping(value = "/getbycampus/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MultiResourceSuccessResponseObject getByCampus(@PathVariable Long id) throws Exception {
+        return new MultiResourceSuccessResponseObject(
+                nExpensesFacade.getByCampus(id)
+                        .stream()
+                        .map(entity -> {
+                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
+                            return new ResourceObject(
+                                    String.valueOf(entity.getId()),
+                                    "Expenses",
+                                    resourceAttributes
+                            );
+                        })
+                        .collect(Collectors.toList()));
+    }
+
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
 
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(assessmentFacade.getById(id), Map.class);
+        Map<String, Object> resourceAttributes = objectMapper.convertValue(nExpensesFacade.getById(id), Map.class);
         List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(new ResourceObject(
-                                    String.valueOf(id),
-                                    "Assessment",
-                                    resourceAttributes
-                            ));
+        resourceObject.add( new ResourceObject(
+                String.valueOf(id),
+                "Expenses",
+                resourceAttributes
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
-//get all assessments of a course
-    @GetMapping(value = "/getbycourseid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getByCourseId(@PathVariable Long id) throws Exception {
 
-        return new MultiResourceSuccessResponseObject(
-                assessmentFacade.getByCourseId(id)
-                        .stream()
-                        .map(entity -> {
-                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-                            return new ResourceObject(
-                                    String.valueOf(entity.getId()),
-                                    "Assessment",
-                                    resourceAttributes
-                            );
-                        })
-                        .collect(Collectors.toList()));
-    }
-//get all assessments of a student
-    @GetMapping(value = "/getbystudentid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getByStudentId(@PathVariable Long id) throws Exception {
-
-        return new MultiResourceSuccessResponseObject(
-                assessmentFacade.getByStudentId(id)
-                        .stream()
-                        .map(entity -> {
-                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-                            return new ResourceObject(
-                                    String.valueOf(entity.getId()),
-                                    "Assessment",
-                                    resourceAttributes
-                            );
-                        })
-                        .collect(Collectors.toList()));
-    }
-    // get all assessments of a student related to a course
-    @GetMapping(value = "/getstudentwithincourse/{std_id}/{course_id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getStudentWithinCourse(@PathVariable Long std_id, @PathVariable Long course_id ) throws Exception {
-
-        return new MultiResourceSuccessResponseObject(
-                assessmentFacade.getStudentWithinCourse(std_id, course_id)
-                        .stream()
-                        .map(entity -> {
-                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-                            return new ResourceObject(
-                                    String.valueOf(entity.getId()),
-                                    "Assessment",
-                                    resourceAttributes
-                            );
-                        })
-                        .collect(Collectors.toList()));
-    }
-
-//add new assessment
     @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject create(
             @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
@@ -119,14 +97,14 @@ public class AssessmentController {
         }
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        AssessmentEntity nAssessmentEntity = objectMapper.convertValue(attributes, AssessmentEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",assessmentFacade.create(nAssessmentEntity));
+        ExpensesEntity nExpensesEntity = objectMapper.convertValue(attributes, ExpensesEntity.class);
+        Map<String, Object> resourceAttributes = Map.of("message",nExpensesFacade.create(nExpensesEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                nAssessmentEntity.getName(),
-                                "Assessment",
-                                resourceAttributes
-                        ));
+                nExpensesEntity.getDetails(),
+                "Expenses",
+                resourceAttributes
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
@@ -138,14 +116,14 @@ public class AssessmentController {
         }
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        AssessmentEntity nAssessmentEntity = objectMapper.convertValue(attributes, AssessmentEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",assessmentFacade.update(nAssessmentEntity));
+        ExpensesEntity nExpensesEntity = objectMapper.convertValue(attributes, ExpensesEntity.class);
+        Map<String, Object> resourceAttributes = Map.of("message",nExpensesFacade.update(nExpensesEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                    String.valueOf(nAssessmentEntity.getId()),
-                                    "Assessment ",
-                                    resourceAttributes
-                            ));
+                String.valueOf(nExpensesEntity.getId()),
+                "Expenses",
+                resourceAttributes
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
@@ -153,13 +131,13 @@ public class AssessmentController {
     public MultiResourceSuccessResponseObject delete(
             @PathVariable Long id
     ) throws Exception {
-        Map<String, Object> resourceAttributes = Map.of("message",assessmentFacade.delete(id));
+        Map<String, Object> resourceAttributes = Map.of("message",nExpensesFacade.delete(id));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                    String.valueOf(id),
-                                    "Assessment",
-                                    resourceAttributes
-                            ));
+                String.valueOf(id),
+                "Expenses",
+                resourceAttributes
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 }

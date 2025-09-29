@@ -1,7 +1,6 @@
-package com.smartsolutions.eschool.school.repository;
+package com.smartsolutions.eschool.sclass.repository;
 
-import com.smartsolutions.eschool.school.model.BankEntity;
-import com.smartsolutions.eschool.school.model.ExpensesEntity;
+import com.smartsolutions.eschool.sclass.model.TimeTableEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -14,22 +13,23 @@ import java.util.List;
 
 @Transactional
 @Repository
-public class ExpensesDaoImp implements  ExpensesDao{
+public class TimeTableDaoImp implements TimeTableDao {
     private final JdbcTemplate jdbcTemplate;
-    public ExpensesDaoImp(JdbcTemplate jdbcTemplate) {
+
+    public TimeTableDaoImp(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     @PersistenceContext
     private EntityManager entityManager;
-
     private Session getSession() {
         return entityManager.unwrap(Session.class);
     }
+
     @Override
-    public int save(ExpensesEntity pExpensesEntity) {
+    public int save(TimeTableEntity pTimeTableEntity) {
         try {
-            pExpensesEntity.setId(null);
-            getSession().persist(pExpensesEntity);
+            pTimeTableEntity.setClassId(null);
+            getSession().persist(pTimeTableEntity);
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,9 +38,9 @@ public class ExpensesDaoImp implements  ExpensesDao{
     }
 
     @Override
-    public int update(ExpensesEntity pExpensesEntity) {
+    public int update(TimeTableEntity pTimeTableEntity) {
         try {
-            getSession().merge(pExpensesEntity);
+            getSession().merge(pTimeTableEntity);
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,7 +51,7 @@ public class ExpensesDaoImp implements  ExpensesDao{
     @Override
     public int delete(Long id) {
         try {
-            ExpensesEntity entity = getSession().get(ExpensesEntity.class, id);
+            TimeTableEntity entity = getSession().get(TimeTableEntity.class, id);
             if (entity != null) {
                 getSession().remove(entity);
                 return 1;
@@ -64,30 +64,30 @@ public class ExpensesDaoImp implements  ExpensesDao{
     }
 
     @Override
-    public ExpensesEntity findById(Long id) {
-        return getSession().get(ExpensesEntity.class, id);
+    public TimeTableEntity findById(Long id) {
+        return getSession().get(TimeTableEntity.class, id);
     }
 
     @Override
-    public List<ExpensesEntity> findByInstitute(Long id) {
-        String hql = "From ExpensesEntity e where e.campusId=:id";
-        TypedQuery<ExpensesEntity> query = entityManager.createQuery(hql,ExpensesEntity.class);
+    public List<TimeTableEntity> findAll() {
+        String hql = "FROM TimeTableEntity";
+        TypedQuery<TimeTableEntity> query = entityManager.createQuery(hql, TimeTableEntity.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<TimeTableEntity> findByTeacherId(Long id) {
+        String hql = "FROM TimeTableEntity e WHERE e.teacherId = :id";
+        TypedQuery<TimeTableEntity> query = entityManager.createQuery(hql, TimeTableEntity.class);
         query.setParameter("id", id);
         return query.getResultList();
     }
 
     @Override
-    public List<ExpensesEntity> findByCampus(Long id) {
-        String hql = "From ExpensesEntity e where e.campusId=:id";
-        TypedQuery<ExpensesEntity> query = entityManager.createQuery(hql,ExpensesEntity.class);
+    public List<TimeTableEntity> findByCourseId(Long id) {
+        String hql = "FROM TimeTableEntity e WHERE e.courseId = :id";
+        TypedQuery<TimeTableEntity> query = entityManager.createQuery(hql, TimeTableEntity.class);
         query.setParameter("id", id);
-        return query.getResultList();
-    }
-
-    @Override
-    public List<ExpensesEntity> findAll() {
-        String hql = "From ExpensesEntity";
-        TypedQuery<ExpensesEntity> query = entityManager.createQuery(hql,ExpensesEntity.class);
         return query.getResultList();
     }
 }
