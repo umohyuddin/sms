@@ -83,10 +83,10 @@ public class SubjectDaoImp implements SubjectDao {
     }
 
     @Override
-    public List<SubjectEntity> findByDepartmentId(Long id) {
-        String hql = "FROM SubjectEntity e WHERE e.department = :departmentId";
+    public List<SubjectEntity> findByClassId(Long id) {
+        String hql = "FROM SubjectEntity e WHERE e.classId = :id";
         TypedQuery<SubjectEntity> query = entityManager.createQuery(hql, SubjectEntity.class);
-        query.setParameter("departmentId", id);
+        query.setParameter("id", id);
         return query.getResultList();
     }
 }

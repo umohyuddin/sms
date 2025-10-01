@@ -75,11 +75,11 @@ public class SubjectController {
                         .collect(Collectors.toList()));
     }
     //get all course of a department
-    @GetMapping(value = "/getbydepartmentid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getByDepartmentId(@PathVariable Long id) throws Exception {
+    @GetMapping(value = "/getbyclassid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MultiResourceSuccessResponseObject getByClassId(@PathVariable Long id) throws Exception {
 
         return new MultiResourceSuccessResponseObject(
-                subjectFacade.getByDepartmentId(id)
+                subjectFacade.getByClassId(id)
                         .stream()
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);

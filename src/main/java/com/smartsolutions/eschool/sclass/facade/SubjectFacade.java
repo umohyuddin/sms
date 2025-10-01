@@ -31,8 +31,8 @@ public class SubjectFacade {
         return subjectService.getByTeacherId(id);
     }
 
-    public List<SubjectEntity> getByDepartmentId(Long id) {
-        return subjectService.getByDepartmentId(id);
+    public List<SubjectEntity> getByClassId(Long id) {
+        return subjectService.getByClassId(id);
     }
 
     public String create(SubjectEntity pSubjectEntity) {

@@ -11,5 +11,5 @@ public interface TimeTableDao {
     TimeTableEntity findById(Long id);
     List<TimeTableEntity> findAll();
     List<TimeTableEntity> findByTeacherId(Long id);
-    List<TimeTableEntity> findByCourseId(Long id);
+    List<TimeTableEntity> findByClassId(Long id);
 }

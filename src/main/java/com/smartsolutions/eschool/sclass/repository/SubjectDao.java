@@ -11,5 +11,5 @@ public interface SubjectDao {
     SubjectEntity findById(Long id);
     List<SubjectEntity> findAll();
     List<SubjectEntity> findByTeacherId(Long id);
-    List<SubjectEntity> findByDepartmentId(Long id);
+    List<SubjectEntity> findByClassId(Long id);
 }

@@ -31,8 +31,8 @@ public class TimeTableFacade {
         return timeTableService.getByTeacherId(id);
     }
 
-    public List<TimeTableEntity> getByCourseId(Long id) {
-        return timeTableService.getByCourseId(id);
+    public List<TimeTableEntity> getByClassId(Long id) {
+        return timeTableService.getByClassId(id);
     }
 
     public String create(TimeTableEntity pTimeTableEntity) {

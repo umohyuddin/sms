@@ -26,8 +26,8 @@ public class SubjectService {
         return subjectDao.findByTeacherId(id);
     }
 
-    public List<SubjectEntity> getByDepartmentId(Long id) {
-        return subjectDao.findByDepartmentId(id);
+    public List<SubjectEntity> getByClassId(Long id) {
+        return subjectDao.findByClassId(id);
     }
 
     public String create(SubjectEntity pSubjectEntity) {

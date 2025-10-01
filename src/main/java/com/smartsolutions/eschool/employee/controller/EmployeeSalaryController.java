@@ -85,7 +85,7 @@ public class EmployeeSalaryController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         EmployeeSalaryEntity nEmployeeSalaryEntity = objectMapper.convertValue(attributes, EmployeeSalaryEntity.class);
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(employeeSalaryFaced.create(nEmployeeSalaryEntity), Map.class);
+        Map<String, Object> resourceAttributes = Map.of("message",employeeSalaryFaced.create(nEmployeeSalaryEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
                                 String.valueOf(nEmployeeSalaryEntity.getEmpId()),
@@ -104,7 +104,7 @@ public class EmployeeSalaryController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         EmployeeSalaryEntity nEmployeeSalaryEntity = objectMapper.convertValue(attributes, EmployeeSalaryEntity.class);
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(employeeSalaryFaced.update(nEmployeeSalaryEntity), Map.class);
+        Map<String, Object> resourceAttributes = Map.of("message",employeeSalaryFaced.update(nEmployeeSalaryEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
                                     String.valueOf(nEmployeeSalaryEntity.getId()),
@@ -118,11 +118,11 @@ public class EmployeeSalaryController {
     public MultiResourceSuccessResponseObject delete(
             @PathVariable Long id
     ) throws Exception {
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(employeeSalaryFaced.delete(id), Map.class);
+        Map<String, Object> resourceAttributes = Map.of("message",employeeSalaryFaced.delete(id));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
                                     String.valueOf(id),
-                                    "Employee Role",
+                                    "Employee salary",
                                     resourceAttributes
                             ));
         return new MultiResourceSuccessResponseObject(resourceObject);

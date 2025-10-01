@@ -75,11 +75,11 @@ public class TimeTableController {
                         .collect(Collectors.toList()));
     }
     //get all Classes of a course
-    @GetMapping(value = "/getbycourseid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getByCourseId(@PathVariable Long id) throws Exception {
+    @GetMapping(value = "/getbyclassid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public MultiResourceSuccessResponseObject getByClassId(@PathVariable Long id) throws Exception {
 
         return new MultiResourceSuccessResponseObject(
-                nTimeTableFacade.getByCourseId(id)
+                nTimeTableFacade.getByClassId(id)
                         .stream()
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);

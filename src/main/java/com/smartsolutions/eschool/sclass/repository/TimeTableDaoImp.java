@@ -84,8 +84,8 @@ public class TimeTableDaoImp implements TimeTableDao {
     }
 
     @Override
-    public List<TimeTableEntity> findByCourseId(Long id) {
-        String hql = "FROM TimeTableEntity e WHERE e.courseId = :id";
+    public List<TimeTableEntity> findByClassId(Long id) {
+        String hql = "FROM TimeTableEntity e WHERE e.classId = :id";
         TypedQuery<TimeTableEntity> query = entityManager.createQuery(hql, TimeTableEntity.class);
         query.setParameter("id", id);
         return query.getResultList();

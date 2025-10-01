@@ -26,8 +26,8 @@ public class TimeTableService {
         return timeTableDao.findByTeacherId(id);
     }
 
-    public List<TimeTableEntity> getByCourseId(Long id) {
-        return timeTableDao.findByCourseId(id);
+    public List<TimeTableEntity> getByClassId(Long id) {
+        return timeTableDao.findByClassId(id);
     }
 
     public String create(TimeTableEntity pTimeTableEntity) {
