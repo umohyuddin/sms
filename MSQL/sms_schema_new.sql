@@ -243,16 +243,26 @@ CREATE TABLE IF NOT EXISTS employee (
 DROP TABLE IF EXISTS sclass;
 CREATE TABLE IF NOT EXISTS sclass (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    inst_id INT Not NULL,
+    cmp_id BIGINT NOT NULL,
     name VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	FOREIGN KEY (inst_id)
-    REFERENCES institutes (id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (cmp_id) REFERENCES campuses(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- sections TABLE
+DROP TABLE IF EXISTS sections;
+CREATE TABLE IF NOT EXISTS sections (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT ,
+    c_id INT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (c_id) REFERENCES sclass(id) ON DELETE CASCADE
 );
 
 -- subject TABLE
+
 DROP TABLE IF EXISTS subject;
 CREATE TABLE IF NOT EXISTS subject (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -264,6 +274,26 @@ CREATE TABLE IF NOT EXISTS subject (
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (c_id) REFERENCES sclass(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- Question
+DROP TABLE IF EXISTS mcq_bank;
+CREATE TABLE IF NOT EXISTS mcq_bank (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    inst_id INT NOT NULL,
+    sbj_id INT NOT NULL,
+    ch_number INT NOT NULL,
+    question TEXT NOT NULL,
+    a VARCHAR(255) NOT NULL,
+    b VARCHAR(255) NOT NULL,
+    c VARCHAR(255) NOT NULL,
+    d VARCHAR(255) NOT NULL,
+    answer ENUM('A', 'B', 'C', 'D') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (inst_id) REFERENCES institutes (id),
+    FOREIGN KEY (sbj_id) REFERENCES subject (id)
+);
+
 -- assesments TABLE
 DROP TABLE IF EXISTS assessments;
 CREATE TABLE IF NOT EXISTS assessments (
@@ -337,8 +367,7 @@ CREATE TABLE IF NOT EXISTS timetable (
     sun VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (cls_id) REFERENCES sclass(id),
-    FOREIGN KEY (sbj_id) REFERENCES subject(id)
+    FOREIGN KEY (cls_id) REFERENCES sclass(id)
 );
 
 -- Employee Slaray TABLE
@@ -613,7 +642,7 @@ INSERT INTO students (cmp_id, class_id, first_name, last_name, dob, gender, emai
 (8, 10, 'Phyllis', 'Vance', '2005-10-10', 'Female', 'phyllis.vance@example.com', '8901234567', '505 Cedar Ln', 1, '2023-09-01');
 
 -- Insert data into sclass
-INSERT INTO sclass (inst_id, name) VALUES
+INSERT INTO sclass (cmp_id, name) VALUES
 (1, 'Class 1A'),
 (1, 'Class 1B'),
 (2, 'Class 2A'),
@@ -691,17 +720,17 @@ INSERT INTO emp_attendance (emp_id, attendance_date, status) VALUES
 (10, '2025-09-01', 'P');
 
 -- Insert data into timetable
-INSERT INTO timetable (cls_id, sbj_id, classroom, start_time, end_time, day_of_week) VALUES
-(1, 1, 'Room 101', '08:00:00', '09:00:00', 'Mon'),
-(1, 2, 'Room 102', '09:00:00', '10:00:00', 'Mon'),
-(2, 3, 'Room 201', '08:00:00', '09:00:00', 'Tue'),
-(2, 4, 'Room 202', '09:00:00', '10:00:00', 'Tue'),
-(3, 5, 'Gym', '08:00:00', '09:00:00', 'Wed'),
-(4, 6, 'Art Room', '08:00:00', '09:00:00', 'Thu'),
-(5, 7, 'Music Room', '08:00:00', '09:00:00', 'Fri'),
-(6, 8, 'Computer Lab', '08:00:00', '09:00:00', 'Mon'),
-(7, 9, 'Science Lab', '08:00:00', '09:00:00', 'Tue'),
-(8, 10, 'Chemistry Lab', '08:00:00', '09:00:00', 'Wed');
+-- INSERT INTO timetable (cls_id, classroom, start_time, end_time, day_of_week) VALUES
+-- (1,  'Room 101', '08:00:00', '09:00:00', 'Mon'),
+-- (1,  'Room 102', '09:00:00', '10:00:00', 'Mon'),
+-- (2, 3, 'Room 201', '08:00:00', '09:00:00', 'Tue'),
+-- (2, 4, 'Room 202', '09:00:00', '10:00:00', 'Tue'),
+-- (3, 5, 'Gym', '08:00:00', '09:00:00', 'Wed'),
+-- (4, 6, 'Art Room', '08:00:00', '09:00:00', 'Thu'),
+-- (5, 7, 'Music Room', '08:00:00', '09:00:00', 'Fri'),
+-- (6, 8, 'Computer Lab', '08:00:00', '09:00:00', 'Mon'),
+-- (7, 9, 'Science Lab', '08:00:00', '09:00:00', 'Tue'),
+-- (8, 10, 'Chemistry Lab', '08:00:00', '09:00:00', 'Wed');
 
 -- Insert data into salary
 INSERT INTO salary (emp_id, amount, `year`, `month`, status) VALUES

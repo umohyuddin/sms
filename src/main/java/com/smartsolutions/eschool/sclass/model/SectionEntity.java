@@ -16,15 +16,15 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SClassEntity {
+public class SectionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "cmp_id")
-    private Long campusId;
+    @Column(name = "c_id")
+    private Integer classId;
 
     @Column(name = "name")
     private String name;
@@ -36,5 +36,4 @@ public class SClassEntity {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
 }

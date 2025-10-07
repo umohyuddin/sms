@@ -1,8 +1,6 @@
 package com.smartsolutions.eschool.sclass.service;
 import com.smartsolutions.eschool.sclass.model.ResultEntity;
-import com.smartsolutions.eschool.sclass.model.SClassEntity;
 import com.smartsolutions.eschool.sclass.repository.ResultDao;
-import com.smartsolutions.eschool.sclass.repository.SClassDao;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,7 +1,6 @@
 package com.smartsolutions.eschool.sclass.repository;
 
 import com.smartsolutions.eschool.sclass.model.ResultEntity;
-import com.smartsolutions.eschool.sclass.model.SClassEntity;
 
 import java.util.List;
 

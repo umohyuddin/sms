@@ -9,25 +9,44 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "sclass")
+@Table(name = "mcq_bank")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SClassEntity {
-
+public class MCQEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "cmp_id")
-    private Long campusId;
+    @Column(name = "inst_id")
+    private Integer instituteId;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "sbj_id")
+    private Integer subjectId;
+
+    @Column(name = "ch_number")
+    private Integer chapter;
+
+    @Column(name = "question")
+    private String question;
+
+    @Column(name = "a")
+    private String a;
+
+    @Column(name = "b")
+    private String b;
+
+    @Column(name = "c")
+    private String c;
+
+    @Column(name = "d")
+    private String d;
+
+    @Column(name = "answer")
+    private answerenum answer;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -37,4 +56,10 @@ public class SClassEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    public enum answerenum {
+        A,
+        B,
+        C,
+        D
+    }
 }
