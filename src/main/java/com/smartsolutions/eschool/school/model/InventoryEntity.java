@@ -21,7 +21,7 @@ public class InventoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long inventoryId;
+    private Long id;
 
     @Column(name = "cmp_id", nullable = false)
     private Long campusId;
