@@ -68,8 +68,9 @@ This script will:
 Once the containers are running, open your browser and navigate to:
 
 1. **👉 SMS Backend =>** [localhost:8081](http://localhost:8081)
-2. **👉 SQL Server =>** [localhost:3306](http://localhost:3306)
-3. **👉 phpmyadmin =>** [localhost:8082](http://localhost:8082)
+2. **👉 Swagger =>** [swagger-ui](http://localhost:8081/swagger-ui/index.html)
+3. **👉 SQL Server =>** [localhost:3306](http://localhost:3306)
+4. **👉 phpmyadmin =>** [localhost:8082](http://localhost:8082)
 
 ---
 
