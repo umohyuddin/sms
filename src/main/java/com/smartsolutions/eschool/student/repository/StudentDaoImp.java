@@ -29,7 +29,7 @@ public class StudentDaoImp implements StudentDao{
     @Override
     public int save(StudentEntity pStudentEntity) {
         try {
-            pStudentEntity.setStudentId(null);
+            pStudentEntity.setId(null);
             getSession().persist(pStudentEntity);
             return 1;
         } catch (Exception e) {

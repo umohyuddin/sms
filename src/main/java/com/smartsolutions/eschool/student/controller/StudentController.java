@@ -38,7 +38,7 @@ public class StudentController {
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
                             return new ResourceObject(
-                                    String.valueOf(entity.getStudentId()),
+                                    String.valueOf(entity.getId()),
                                     "Student",
                                     resourceAttributes
                             );
@@ -68,7 +68,7 @@ public class StudentController {
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
                             return new ResourceObject(
-                                    String.valueOf(entity.getStudentId()),
+                                    String.valueOf(entity.getId()),
                                     "Student",
                                     resourceAttributes
                             );
@@ -85,7 +85,7 @@ public class StudentController {
                         .map(entity -> {
                             Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
                             return new ResourceObject(
-                                    String.valueOf(entity.getStudentId()),
+                                    String.valueOf(entity.getId()),
                                     "Student",
                                     resourceAttributes
                             );
@@ -125,7 +125,7 @@ public class StudentController {
         Map<String, Object> resourceAttributes = Map.of("message",studentFacade.update(nStudentEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                    String.valueOf(nStudentEntity.getStudentId()),
+                                    String.valueOf(nStudentEntity.getId()),
                                     "Student",
                                     resourceAttributes
                             ));

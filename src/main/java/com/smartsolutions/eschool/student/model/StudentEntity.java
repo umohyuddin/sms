@@ -22,7 +22,7 @@ public class StudentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long studentId;
+    private Long id;
 
     @Column(name = "cmp_id", nullable = false)
     private Long campusId;
