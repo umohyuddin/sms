@@ -29,31 +29,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        http
-//                .csrf().disable()
-//                .authorizeHttpRequests()
-//                .anyRequest().permitAll();
-//        return http.build();
+//                .csrf(csrf -> csrf.disable())
+//                .cors(cors -> {})
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(HttpMethod.POST, "/api/auth/generateToken").permitAll()
+//                        .requestMatchers(
+//                                "/v3/api-docs/**",
+//                                "/swagger-ui/**",
+//                                "/swagger/index.html",
+//                                "/swagger-ui.html"
+//                        ).permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService),
+//                        UsernamePasswordAuthenticationFilter.class);
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {})
-                .authorizeHttpRequests()
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/api/auth/generateToken"
-                        )
-                .permitAll()
-                .requestMatchers(
-                        "/v3/api-docs/**",
-                        "/swagger-ui/**",
-                        "/swagger/index.html",
-                        "/swagger-ui.html")
-                .permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class);
+                .cors(cors -> cors.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                )
+                .logout(logout -> logout.disable())
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

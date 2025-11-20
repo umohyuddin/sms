@@ -83,6 +83,7 @@ public class UserDaoImpl implements UserDao {
     public List<UserEntity> findAll() {
         String hql = "FROM UserEntity";
         TypedQuery<UserEntity> query = entityManager.createQuery(hql, UserEntity.class);
+        List<UserEntity> result = query.getResultList();
         return query.getResultList();
     }
     @Override

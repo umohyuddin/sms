@@ -6,6 +6,7 @@ import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
 import com.smartsolutions.eschool.user.facade.UserServiceFacade;
 import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +20,11 @@ import java.util.stream.Collectors;
 @Transactional
 @RestController
 @RequestMapping("/api/user")
+@Slf4j
 public class UserController extends AbstractUserRestController {
     private UserServiceFacade userServiceFacade;
     private ObjectMapper objectMapper;
+
     @Autowired
     public UserController(UserServiceFacade userServiceFacade, ObjectMapper objectMapper) {
         super(userServiceFacade);
@@ -38,13 +41,13 @@ public class UserController extends AbstractUserRestController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         UserEntity nUserEntity = objectMapper.convertValue(attributes, UserEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",userServiceFacade.create(nUserEntity));
+        Map<String, Object> resourceAttributes = Map.of("message", userServiceFacade.create(nUserEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add( new ResourceObject(
+        resourceObject.add(new ResourceObject(
                 nUserEntity.getUsername(),
                 "User",
                 resourceAttributes
-            ));
+        ));
 
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
@@ -59,13 +62,13 @@ public class UserController extends AbstractUserRestController {
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         UserEntity nUserEntity = objectMapper.convertValue(attributes, UserEntity.class);
 
-        Map<String, Object> resourceAttributes = Map.of("message",userServiceFacade.update(nUserEntity));
+        Map<String, Object> resourceAttributes = Map.of("message", userServiceFacade.update(nUserEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(  new ResourceObject(
+        resourceObject.add(new ResourceObject(
                 String.valueOf(nUserEntity.getId()),
                 "User",
                 resourceAttributes
-            ));
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
@@ -74,16 +77,18 @@ public class UserController extends AbstractUserRestController {
     public MultiResourceSuccessResponseObject getUsers(@PathVariable Long id) throws Exception {
         Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.getById(id), Map.class);
         List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add( new ResourceObject(
+        resourceObject.add(new ResourceObject(
                 String.valueOf(id),
                 "User",
                 resourceAttributes
-            ));
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
+
     //  get all roles
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getAll() throws Exception {
+        log.info("getAll");
         return new MultiResourceSuccessResponseObject(
                 userServiceFacade.getAll()
                         .stream()
@@ -114,17 +119,18 @@ public class UserController extends AbstractUserRestController {
                         })
                         .collect(Collectors.toList()));
     }
+
     @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject deleteUser(
             @PathVariable Long id
     ) throws Exception {
         Map<String, Object> resourceAttributes = objectMapper.convertValue(userServiceFacade.delete(id), Map.class);
         List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add( new ResourceObject(
+        resourceObject.add(new ResourceObject(
                 String.valueOf(id),
                 "User",
                 resourceAttributes
-            ));
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 }

@@ -6,6 +6,7 @@ import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
 import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +20,12 @@ import java.util.stream.Collectors;
 @Transactional
 @RestController
 @RequestMapping("/api/student")
+@Slf4j
 public class StudentController {
 
     private StudentFacade studentFacade;
     private ObjectMapper objectMapper;
+
     @Autowired
     public StudentController(StudentFacade pStudentFacade, ObjectMapper objectMapper) {
         this.studentFacade = pStudentFacade;
@@ -32,6 +35,7 @@ public class StudentController {
     //  get all employee
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getAll() throws Exception {
+        log.info("getAll");
         return new MultiResourceSuccessResponseObject(
                 studentFacade.getAll()
                         .stream()
@@ -51,7 +55,7 @@ public class StudentController {
 
         Map<String, Object> resourceAttributes = objectMapper.convertValue(studentFacade.getById(id), Map.class);
         List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add( new ResourceObject(
+        resourceObject.add(new ResourceObject(
                 String.valueOf(id),
                 "Student",
                 resourceAttributes
@@ -103,13 +107,13 @@ public class StudentController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         StudentEntity nStudentEntity = objectMapper.convertValue(attributes, StudentEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",studentFacade.create(nStudentEntity));
+        Map<String, Object> resourceAttributes = Map.of("message", studentFacade.create(nStudentEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add( new ResourceObject(
-                                        nStudentEntity.getFirstName(),
-                                        "Student",
-                                        resourceAttributes
-                                ));
+        resourceObject.add(new ResourceObject(
+                nStudentEntity.getFirstName(),
+                "Student",
+                resourceAttributes
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
@@ -122,13 +126,13 @@ public class StudentController {
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
         StudentEntity nStudentEntity = objectMapper.convertValue(attributes, StudentEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",studentFacade.update(nStudentEntity));
+        Map<String, Object> resourceAttributes = Map.of("message", studentFacade.update(nStudentEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                    String.valueOf(nStudentEntity.getId()),
-                                    "Student",
-                                    resourceAttributes
-                            ));
+                String.valueOf(nStudentEntity.getId()),
+                "Student",
+                resourceAttributes
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
@@ -136,13 +140,13 @@ public class StudentController {
     public MultiResourceSuccessResponseObject delete(
             @PathVariable Long id
     ) throws Exception {
-        Map<String, Object> resourceAttributes = Map.of("message",studentFacade.delete(id));
+        Map<String, Object> resourceAttributes = Map.of("message", studentFacade.delete(id));
         List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add( new ResourceObject(
-                                    String.valueOf(id),
-                                    "Student",
-                                    resourceAttributes
-                            ));
+        resourceObject.add(new ResourceObject(
+                String.valueOf(id),
+                "Student",
+                resourceAttributes
+        ));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 }
