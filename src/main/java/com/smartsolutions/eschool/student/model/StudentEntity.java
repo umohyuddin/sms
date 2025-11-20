@@ -33,6 +33,9 @@ public class StudentEntity {
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
+    @Column(name = "full_name", nullable = false, length = 50)
+    private String fullName;
+
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
@@ -51,8 +54,15 @@ public class StudentEntity {
     @Column(name = "address", length = 200)
     private String address;
 
+    //uzair need to remove going to use status
     @Column(name = "isactive")
     private Boolean isActive;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "enrollment_date", nullable = false)
     private LocalDate enrollmentDate;
@@ -78,7 +88,4 @@ public class StudentEntity {
     @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<FeeEntity> fees;
-
-
-
 }
