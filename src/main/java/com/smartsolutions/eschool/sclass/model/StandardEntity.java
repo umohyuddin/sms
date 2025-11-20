@@ -1,19 +1,19 @@
 package com.smartsolutions.eschool.sclass.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "standards")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class StandardEntity {
 
     @Id
@@ -25,7 +25,7 @@ public class StandardEntity {
 //    private Long campusId;
 
     @Column(name = "standard_name")
-    private String standard_name;
+    private String standardName;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -34,5 +34,8 @@ public class StandardEntity {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "standard", cascade = CascadeType.ALL)
+    private List<SectionEntity> sections;
 
 }

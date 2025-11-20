@@ -1,8 +1,10 @@
 package com.smartsolutions.eschool.sclass.facade;
 
+import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.service.SClassService;
 import com.smartsolutions.eschool.sclass.service.SectionService;
+import com.smartsolutions.eschool.util.ResourceObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,35 +22,35 @@ public class SectionFacade {
     @Lazy
     private SectionService nSectionService;
 
-    public List<SectionEntity> getAll() {
+    public List<SectionDTO> getAll() {
         return nSectionService.getAll();
     }
 
-    public SectionEntity getById(Long id) {
+    public SectionDTO getById(Long id) {
         return nSectionService.getById(id);
     }
 
-    public List<SectionEntity> getByInstituteId(Long id) {
-        return nSectionService.getByInstituteId(id);
-    }
-
-    public List<SectionEntity> getByCampusId(Long id) {
-        return nSectionService.getByCampusId(id);
-    }
-
-    public List<SectionEntity> getByClassId(Long id) {
-        return nSectionService.getByClassId(id);
-    }
-
-    public String create(SectionEntity pSectionEntity) {
-        return nSectionService.create(pSectionEntity);
-    }
-
-    public String update(SectionEntity pSectionEntity) {
-        return nSectionService.update(pSectionEntity);
-    }
-
-    public String delete(Long id) {
-        return nSectionService.delete(id);
-    }
+//    public List<SectionEntity> getByInstituteId(Long id) {
+//        return nSectionService.getByInstituteId(id);
+//    }
+//
+//    public List<SectionEntity> getByCampusId(Long id) {
+//        return nSectionService.getByCampusId(id);
+//    }
+//
+//    public List<SectionEntity> getByClassId(Long id) {
+//        return nSectionService.getByClassId(id);
+//    }
+//
+//    public String create(SectionEntity pSectionEntity) {
+//        return nSectionService.create(pSectionEntity);
+//    }
+//
+//    public String update(SectionEntity pSectionEntity) {
+//        return nSectionService.update(pSectionEntity);
+//    }
+//
+//    public String delete(Long id) {
+//        return nSectionService.delete(id);
+//    }
 }

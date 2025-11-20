@@ -1,23 +1,23 @@
 package com.smartsolutions.eschool.sclass.repository;
 
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
+import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 @Transactional
 @Repository
+@Slf4j
 public class SectionDaoImp implements  SectionDao {
-    private final JdbcTemplate jdbcTemplate;
 
-    public SectionDaoImp(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
     @PersistenceContext
     private EntityManager entityManager;
     private Session getSession() {
@@ -70,9 +70,17 @@ public class SectionDaoImp implements  SectionDao {
 
     @Override
     public List<SectionEntity> findAll() {
-        String hql = "FROM SectionEntity";
-        TypedQuery<SectionEntity> query = entityManager.createQuery(hql, SectionEntity.class);
-        return query.getResultList();
+        try {
+            //String hql = "FROM SectionEntity";
+            String hql = "SELECT s FROM SectionEntity s LEFT JOIN FETCH s.standard";
+            TypedQuery<SectionEntity> query = entityManager.createQuery(hql, SectionEntity.class);
+            List<SectionEntity> results = query.getResultList();
+
+            return results;
+        } catch (Exception e) {
+            log.error("Error while fetching all sections", e);
+            return Collections.emptyList();
+        }
     }
 
     @Override

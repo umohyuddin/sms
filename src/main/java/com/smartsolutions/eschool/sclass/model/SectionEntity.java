@@ -2,9 +2,7 @@ package com.smartsolutions.eschool.sclass.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDate;
@@ -12,10 +10,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "sclass")
-@Data
+@Table(name = "sections")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class SectionEntity {
 
     @Id
@@ -23,11 +22,14 @@ public class SectionEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "c_id")
-    private Integer classId;
+//    @Column(name = "standard_id")
+//    private Integer standardId;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "section_name")
+    private String sectionName;
+
+    @Column(name = "section_code")
+    private String sectionCode;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -36,4 +38,9 @@ public class SectionEntity {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "standard_id", nullable = false)
+    @JsonIgnore
+    private StandardEntity standard;
 }

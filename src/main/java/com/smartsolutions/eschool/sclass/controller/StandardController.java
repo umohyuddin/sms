@@ -31,7 +31,6 @@ public class StandardController {
     public MultiResourceSuccessResponseObject<ResourceObject> getAll() {
 
         log.info("GET /api/standards called");
-        // Intentionally throw an exception to test global handler
         List<ResourceObject> resources = standardFacade.getAll();
         log.info("GET /api/standards succeeded, returned {} resources", resources.size());
         return new MultiResourceSuccessResponseObject<>(resources);
