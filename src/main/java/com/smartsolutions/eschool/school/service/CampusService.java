@@ -84,7 +84,7 @@ public class CampusService {
             throw new IllegalArgumentException("Campus name must not be null or empty");
         }
 
-        List<CampusEntity> campusEntities = campusRepository.findByCampusNameContaining(name);
+        List<CampusEntity> campusEntities = campusRepository.findByCampusNameContainingAndDeletedFalse(name);
         if (campusEntities.isEmpty()) {
             log.warn("No campuses found for institute name: {}", name);
             return List.of(); // safe empty list

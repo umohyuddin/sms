@@ -17,5 +17,5 @@ public interface CampusRepository extends JpaRepository<CampusEntity, Long> {
     List<CampusEntity> findByInstituteId(Long instituteId);
 
     // Find a campus by its name WHERE campus_name LIKE %?%
-    List<CampusEntity> findByCampusNameContaining(String campusName);
+    List<CampusEntity> findByCampusNameContainingAndDeletedFalse(String campusName);
 }

@@ -54,7 +54,7 @@ public class CampusController {
         return ResponseEntity.ok(campuses);
     }
 
-    @GetMapping(value = "/getByInstituteName/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getByCampusName/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByInstituteId(@PathVariable String name) throws Exception {
         log.info("Received request to fetch campus by Institute name: {}", name);
         List<CampusDTO> campuses = nCampusFacade.findByCampusNameContaining(name);

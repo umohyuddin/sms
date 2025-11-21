@@ -1,6 +1,8 @@
 package com.smartsolutions.eschool.sclass.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartsolutions.eschool.school.dtos.CampusDTO;
+import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.facade.SClassFacade;
 import com.smartsolutions.eschool.sclass.facade.StandardFacade;
 import com.smartsolutions.eschool.sclass.model.SClassEntity;
@@ -10,6 +12,7 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,12 +31,20 @@ public class StandardController {
 
     //  get all Enrollments
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject<ResourceObject> getAll() {
+    public ResponseEntity<?> getAll() {
 
         log.info("GET /api/standards called");
-        List<ResourceObject> resources = standardFacade.getAll();
+        List<StandardDTO> resources = standardFacade.getAll();
         log.info("GET /api/standards succeeded, returned {} resources", resources.size());
-        return new MultiResourceSuccessResponseObject<>(resources);
+        return ResponseEntity.ok().body(resources);
+    }
+
+    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getById(@PathVariable Long id) throws Exception {
+        log.info("Received request to fetch standard with id: {}", id);
+        StandardDTO standardDTO = standardFacade.getById(id);
+        log.info("Returning standard: id={}", standardDTO.getId());
+        return ResponseEntity.ok(standardDTO);
     }
 
 

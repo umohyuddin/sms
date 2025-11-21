@@ -87,22 +87,24 @@ CREATE TABLE standards
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     standard_name VARCHAR(50) NOT NULL,
     campus_id     BIGINT      NOT NULL,
-    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at    DATETIME             DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted       BOOLEAN     NOT NULL DEFAULT FALSE,
+    deleted_at    DATETIME,
     FOREIGN KEY (campus_id) REFERENCES campuses (id)
 );
 
-INSERT INTO standards (id, standard_name, campus_id, created_at, updated_at)
-VALUES (1, '1st Grade', 1, NOW(), NOW()),
-       (2, '2nd Grade', 1, NOW(), NOW()),
-       (3, '3rd Grade', 1, NOW(), NOW()),
-       (4, '4th Grade', 1, NOW(), NOW()),
-       (5, '5th Grade', 1, NOW(), NOW()),
-       (6, '6th Grade', 1, NOW(), NOW()),
-       (7, '7th Grade', 1, NOW(), NOW()),
-       (8, '8th Grade', 1, NOW(), NOW()),
-       (9, '9th Grade', 1, NOW(), NOW()),
-       (10, '10th Grade', 1, NOW(), NOW());
+INSERT INTO standards (id, standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES (1, '1st Grade', 1, NOW(), NOW(), 1, NULL),
+       (2, '2nd Grade', 1, NOW(), NOW(), 1, NULL),
+       (3, '3rd Grade', 1, NOW(), NOW(), 0, NULL),
+       (4, '4th Grade', 1, NOW(), NOW(), 0, NULL),
+       (5, '5th Grade', 1, NOW(), NOW(), 0, NULL),
+       (6, '6th Grade', 1, NOW(), NOW(), 0, NULL),
+       (7, '7th Grade', 1, NOW(), NOW(), 0, NULL),
+       (8, '8th Grade', 1, NOW(), NOW(), 0, NULL),
+       (9, '9th Grade', 1, NOW(), NOW(), 0, NULL),
+       (10, '10th Grade', 1, NOW(), NOW(), 0, NULL);
 
 
 -- sections TABLE

@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.sclass.facade;
 
+import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.model.SClassEntity;
 import com.smartsolutions.eschool.sclass.service.SClassService;
 import com.smartsolutions.eschool.sclass.service.StandardService;
@@ -22,13 +23,17 @@ public class StandardFacade {
     @Lazy
     private StandardService standardServicee;
 
-    public List<ResourceObject> getAll() {
+//    public List<ResourceObject> getAll() {
+//        return standardServicee.getAll();
+//    }
+
+    public List<StandardDTO> getAll() {
         return standardServicee.getAll();
     }
 
-//    public SClassEntity getById(Long id) {
-//        return standardServicee.getById(id);
-//    }
+    public StandardDTO getById(Long id) {
+        return standardServicee.getById(id);
+    }
 //
 //    public List<SClassEntity> getByTeacherId(Long id) {
 //        return standardServicee.getByTeacherId(id);
