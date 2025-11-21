@@ -38,7 +38,6 @@ public class StudentController {
     //  get all employee
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() throws Exception {
-        log.info("getAll");
         log.info("GET /api/students/getall called");
         List<StudentDTO> resources  =studentFacade.getAll();
         log.info("GET /api/student/getall succeeded, returned {} resources", resources.size());

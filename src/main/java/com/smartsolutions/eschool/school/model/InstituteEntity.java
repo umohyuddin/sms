@@ -23,7 +23,7 @@ public class InstituteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;
@@ -61,7 +61,7 @@ public class InstituteEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "instituteId", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "institute", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<CampusEntity> campuses;
 

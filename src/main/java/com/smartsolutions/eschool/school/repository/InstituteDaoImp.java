@@ -4,21 +4,26 @@ import com.smartsolutions.eschool.school.model.InstituteEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Transactional
 @Repository
-public class InstituteDaoImp implements InstituteDao{
+@Slf4j
+public class InstituteDaoImp implements InstituteDao {
 
     private final JdbcTemplate jdbcTemplate;
+
     public InstituteDaoImp(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -71,9 +76,13 @@ public class InstituteDaoImp implements InstituteDao{
 
     @Override
     public List<InstituteEntity> findAll() {
-        String hql = "From InstituteEntity";
-        TypedQuery<InstituteEntity> query = entityManager.createQuery(hql,InstituteEntity.class);
-
-        return query.getResultList();
+        try {
+            String hql = "From InstituteEntity";
+            TypedQuery<InstituteEntity> query = entityManager.createQuery(hql, InstituteEntity.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            log.error("Error while fetching all students", e);
+            return Collections.emptyList();
+        }
     }
 }

@@ -1,18 +1,22 @@
 package com.smartsolutions.eschool.school.repository;
 
 import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.school.model.InstituteEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Transactional
 @Repository
+@Slf4j
 public class CampusDaoImp implements CampusDao{
 
     private final JdbcTemplate jdbcTemplate;
@@ -71,9 +75,13 @@ public class CampusDaoImp implements CampusDao{
 
     @Override
     public List<CampusEntity> findAll() {
-        String hql = "From CampusEntity";
-        TypedQuery<CampusEntity> query = entityManager.createQuery(hql,CampusEntity.class);
-
-        return query.getResultList();
+        try {
+            String hql = "From CampusEntity";
+            TypedQuery<CampusEntity> query = entityManager.createQuery(hql,CampusEntity.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            log.error("Error while fetching all campuses", e);
+            return Collections.emptyList();
+        }
     }
 }

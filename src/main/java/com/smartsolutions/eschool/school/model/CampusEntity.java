@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
+import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.user.model.UserEntity;
 import jakarta.persistence.*;
@@ -24,11 +25,12 @@ public class CampusEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "inst_id")
-    private Integer instituteId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "institute_id")
+    private InstituteEntity institute;
 
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    @Column(name = "campus_name", nullable = false, length = 100)
+    private String campusName;
 
     @Column(name = "contact", nullable = true, length = 20)
     private String contactNumber;
@@ -67,5 +69,8 @@ public class CampusEntity {
     public  void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "campus", cascade = CascadeType.ALL)
+    private List<StandardEntity> standards;
 
 }

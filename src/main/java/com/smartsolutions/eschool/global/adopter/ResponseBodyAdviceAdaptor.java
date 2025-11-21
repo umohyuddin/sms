@@ -34,9 +34,9 @@ public class ResponseBodyAdviceAdaptor implements ResponseBodyAdvice<Object> {
         // Convert the response body to JSON using Jackson's ObjectMapper
         try {
             String json = objectMapper.writeValueAsString(object);
-            log.info(String.format("ResponseBody [%s]", json));
+            log.info("ResponseBody [{}]", json);
         } catch (Exception e) {
-            log.info("Error converting response body to JSON: " + e.getMessage());
+            log.info("Error converting response body to JSON: {}", e.getMessage());
         }
         return object;
     }

@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.sclass.model;
 
+import com.smartsolutions.eschool.school.model.CampusEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -37,5 +38,9 @@ public class StandardEntity {
 
     @OneToMany(mappedBy = "standard", cascade = CascadeType.ALL)
     private List<SectionEntity> sections;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campus_id", nullable = false)
+    private CampusEntity campus;
 
 }

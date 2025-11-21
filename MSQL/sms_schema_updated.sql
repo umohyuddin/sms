@@ -57,6 +57,39 @@ CREATE TABLE students
     FOREIGN KEY (section_id) REFERENCES sections (id)
 );
 
+CREATE TABLE institutes
+(
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name             VARCHAR(100) NOT NULL,
+    address          VARCHAR(255),
+    contact_number   VARCHAR(20),
+    email            VARCHAR(100),
+    website          VARCHAR(100),
+    tagline          VARCHAR(255),
+    country          VARCHAR(100),
+    logo             LONGBLOB,
+    established_date DATE,
+    created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE campuses
+(
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    institute_id BIGINT       NOT NULL,
+    campus_name  VARCHAR(100) NOT NULL,
+    contact      VARCHAR(20),
+    email        VARCHAR(100),
+    website      VARCHAR(100),
+    address      VARCHAR(255),
+    province     VARCHAR(100),
+    city         VARCHAR(50),
+    logo         LONGBLOB,
+    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_institute FOREIGN KEY (institute_id) REFERENCES institutes (id)
+);
+
 
 
 INSERT INTO standards (id, standard_name, created_at, updated_at)
@@ -178,3 +211,33 @@ VALUES (1, 'STU001', 'Ali Khan', 'Ali', 'Khan', '2008-05-15', 'Male', 'ali.khan@
 
        (3, 'STU020', 'Zunaira Malik', 'Zunaira', 'Malik', '2009-07-07', 'Female', 'zunaira.malik@example.com',
         '03002345670', '888 Boulevard, City', 1, 'Enrolled', '2023-09-08', 0);
+
+
+INSERT INTO institutes (name, address, contact_number, email, website, tagline, country, logo, established_date)
+VALUES ('Smart Solutions School', '123 Main Street, Cityville', '03001234567', 'info@smartsolutions.edu',
+        'https://www.smartsolutions.edu', 'Excellence in Education', 'Pakistan',
+        NULL, '2005-08-15');
+
+
+INSERT INTO campuses (id, institute_id, campus_name, contact, email, website, address, province, city, created_at,
+                      updated_at)
+VALUES (1, 1, 'Downtown Campus', '+92-300-1234567', 'downtown@smarteschool.com', 'https://downtown.smarteschool.com',
+        '123 Main Street', 'Punjab', 'Lahore', NOW(), NOW()),
+       (2, 1, 'Uptown Campus', '+92-300-7654321', 'uptown@smarteschool.com', 'https://uptown.smarteschool.com',
+        '456 Park Avenue', 'Punjab', 'Lahore', NOW(), NOW()),
+       (3, 1, 'Riverside Campus', '+92-301-1112223', 'riverside@smarteschool.com', 'https://riverside.smarteschool.com',
+        '789 River Road', 'Sindh', 'Karachi', NOW(), NOW()),
+       (4, 1, 'Hilltop Campus', '+92-301-3334445', 'hilltop@smarteschool.com', 'https://hilltop.smarteschool.com',
+        '101 Hill Street', 'KPK', 'Peshawar', NOW(), NOW()),
+       (5, 1, 'Greenfield Campus', '+92-302-5556667', 'greenfield@smarteschool.com',
+        'https://greenfield.smarteschool.com', '202 Green Road', 'Punjab', 'Faisalabad', NOW(), NOW()),
+       (6, 1, 'Seaside Campus', '+92-302-7778889', 'seaside@smarteschool.com', 'https://seaside.smarteschool.com',
+        '303 Beach Avenue', 'Sindh', 'Karachi', NOW(), NOW()),
+       (7, 1, 'Central Campus', '+92-303-9990001', 'central@smarteschool.com', 'https://central.smarteschool.com',
+        '404 Central Street', 'Punjab', 'Multan', NOW(), NOW()),
+       (8, 1, 'Lakeside Campus', '+92-303-2223334', 'lakeside@smarteschool.com', 'https://lakeside.smarteschool.com',
+        '505 Lake Road', 'Sindh', 'Hyderabad', NOW(), NOW()),
+       (9, 1, 'Sunrise Campus', '+92-304-4445556', 'sunrise@smarteschool.com', 'https://sunrise.smarteschool.com',
+        '606 Sunrise Blvd', 'Punjab', 'Rawalpindi', NOW(), NOW()),
+       (10, 1, 'Maple Campus', '+92-304-6667778', 'maple@smarteschool.com', 'https://maple.smarteschool.com',
+        '707 Maple Street', 'Balochistan', 'Quetta', NOW(), NOW());
