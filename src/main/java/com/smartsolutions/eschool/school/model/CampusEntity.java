@@ -61,6 +61,13 @@ public class CampusEntity {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();

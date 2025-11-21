@@ -1,10 +1,8 @@
 package com.smartsolutions.eschool.school.facade;
 
 import com.smartsolutions.eschool.school.dtos.CampusDTO;
-import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.service.CampusService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -23,9 +21,19 @@ public class CampusFacade {
         return nCampusService.getAll();
     }
 
-//    public CampusEntity getById(Long id) {
-//        return nCampusService.getById(id);
-//    }
+    public CampusDTO getById(Long id) {
+        return nCampusService.getById(id);
+    }
+
+    public List<CampusDTO> findByInstituteId(Long id) {
+        return nCampusService.findByInstituteId(id);
+    }
+    public List<CampusDTO> findByCampusNameContaining(String name) {
+        return nCampusService.findByCampusNameContaining(name);
+    }
+
+
+
 //
 //    public String create(CampusEntity pCampusEntity) {
 //        return nCampusService.create(pCampusEntity);

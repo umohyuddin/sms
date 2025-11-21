@@ -50,31 +50,34 @@ CREATE TABLE campuses
     logo         LONGBLOB,
     created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted      BOOLEAN      NOT NULL DEFAULT FALSE,
+    deleted_at   DATETIME,
     CONSTRAINT fk_institute FOREIGN KEY (institute_id) REFERENCES institutes (id)
 );
 
 INSERT INTO campuses (id, institute_id, campus_name, contact, email, website, address, province, city, created_at,
-                      updated_at)
+                      updated_at, deleted, deleted_at)
 VALUES (1, 1, 'Downtown Campus', '+92-300-1234567', 'downtown@smarteschool.com', 'https://downtown.smarteschool.com',
-        '123 Main Street', 'Punjab', 'Lahore', NOW(), NOW()),
+        '123 Main Street', 'Punjab', 'Lahore', NOW(), NOW(), TRUE, NULL),
        (2, 1, 'Uptown Campus', '+92-300-7654321', 'uptown@smarteschool.com', 'https://uptown.smarteschool.com',
-        '456 Park Avenue', 'Punjab', 'Lahore', NOW(), NOW()),
+        '456 Park Avenue', 'Punjab', 'Lahore', NOW(), NOW(), TRUE, NULL),
        (3, 1, 'Riverside Campus', '+92-301-1112223', 'riverside@smarteschool.com', 'https://riverside.smarteschool.com',
-        '789 River Road', 'Sindh', 'Karachi', NOW(), NOW()),
+        '789 River Road', 'Sindh', 'Karachi', NOW(), NOW(), FALSE, NULL),
        (4, 1, 'Hilltop Campus', '+92-301-3334445', 'hilltop@smarteschool.com', 'https://hilltop.smarteschool.com',
-        '101 Hill Street', 'KPK', 'Peshawar', NOW(), NOW()),
+        '101 Hill Street', 'KPK', 'Peshawar', NOW(), NOW(), FALSE, NULL),
        (5, 1, 'Greenfield Campus', '+92-302-5556667', 'greenfield@smarteschool.com',
-        'https://greenfield.smarteschool.com', '202 Green Road', 'Punjab', 'Faisalabad', NOW(), NOW()),
+        'https://greenfield.smarteschool.com',
+        '202 Green Road', 'Punjab', 'Faisalabad', NOW(), NOW(), FALSE, NULL),
        (6, 1, 'Seaside Campus', '+92-302-7778889', 'seaside@smarteschool.com', 'https://seaside.smarteschool.com',
-        '303 Beach Avenue', 'Sindh', 'Karachi', NOW(), NOW()),
+        '303 Beach Avenue', 'Sindh', 'Karachi', NOW(), NOW(), FALSE, NULL),
        (7, 1, 'Central Campus', '+92-303-9990001', 'central@smarteschool.com', 'https://central.smarteschool.com',
-        '404 Central Street', 'Punjab', 'Multan', NOW(), NOW()),
+        '404 Central Street', 'Punjab', 'Multan', NOW(), NOW(), FALSE, NULL),
        (8, 1, 'Lakeside Campus', '+92-303-2223334', 'lakeside@smarteschool.com', 'https://lakeside.smarteschool.com',
-        '505 Lake Road', 'Sindh', 'Hyderabad', NOW(), NOW()),
+        '505 Lake Road', 'Sindh', 'Hyderabad', NOW(), NOW(), FALSE, NULL),
        (9, 1, 'Sunrise Campus', '+92-304-4445556', 'sunrise@smarteschool.com', 'https://sunrise.smarteschool.com',
-        '606 Sunrise Blvd', 'Punjab', 'Rawalpindi', NOW(), NOW()),
+        '606 Sunrise Blvd', 'Punjab', 'Rawalpindi', NOW(), NOW(), FALSE, NULL),
        (10, 1, 'Maple Campus', '+92-304-6667778', 'maple@smarteschool.com', 'https://maple.smarteschool.com',
-        '707 Maple Street', 'Balochistan', 'Quetta', NOW(), NOW());
+        '707 Maple Street', 'Balochistan', 'Quetta', NOW(), NOW(), FALSE, NULL);
 
 
 -- standards TABLE

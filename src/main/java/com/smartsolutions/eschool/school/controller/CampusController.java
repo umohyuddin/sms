@@ -1,4 +1,5 @@
 package com.smartsolutions.eschool.school.controller;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.school.dtos.CampusDTO;
 import com.smartsolutions.eschool.school.dtos.InstituteDTO;
@@ -32,23 +33,36 @@ public class CampusController {
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() throws Exception {
         log.info("GET /api/institute/getall called");
-        List<CampusDTO> resources  =nCampusFacade.getAll();
+        List<CampusDTO> resources = nCampusFacade.getAll();
         log.info("GET /api/institute/getall succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
 
-//    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
-//
-//        Map<String, Object> resourceAttributes = objectMapper.convertValue(nCampusFacade.getById(id), Map.class);
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add( new ResourceObject(
-//                                    String.valueOf(id),
-//                                    "Campus",
-//                                    resourceAttributes
-//                            ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
+    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getById(@PathVariable Long id) throws Exception {
+        log.info("Received request to fetch campus with id: {}", id);
+        CampusDTO campus = nCampusFacade.getById(id);
+        log.info("Returning campus: id={}", campus.getId());
+        return ResponseEntity.ok(campus);
+    }
+
+    @GetMapping(value = "/getByInstituteId/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getByInstituteId(@PathVariable Long id) throws Exception {
+        log.info("Received request to fetch campus by Institute Id: {}", id);
+        List<CampusDTO> campuses = nCampusFacade.findByInstituteId(id);
+        log.info("Returning campuses data");
+        return ResponseEntity.ok(campuses);
+    }
+
+    @GetMapping(value = "/getByInstituteName/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getByInstituteId(@PathVariable String name) throws Exception {
+        log.info("Received request to fetch campus by Institute name: {}", name);
+        List<CampusDTO> campuses = nCampusFacade.findByCampusNameContaining(name);
+        log.info("Returning campuses  data");
+        return ResponseEntity.ok(campuses);
+    }
+
+
 //
 //    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
 //    public MultiResourceSuccessResponseObject create(
