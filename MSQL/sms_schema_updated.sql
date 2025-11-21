@@ -9,54 +9,9 @@ SET
 FOREIGN_KEY_CHECKS = 0;
 
 
--- standards TABLE
-DROP TABLE IF EXISTS standards;
-CREATE TABLE standards
-(
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    standard_name VARCHAR(50) NOT NULL,
-    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
 
--- sections TABLE
-DROP TABLE IF EXISTS `sections`;
-CREATE TABLE sections
-(
-    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
-    standard_id  BIGINT      NOT NULL,
-    section_name VARCHAR(10) NOT NULL,
-    section_code VARCHAR(15),
-    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (standard_id) REFERENCES standards (id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
-);
-
-DROP TABLE IF EXISTS `students`;
-CREATE TABLE students
-(
-    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    section_id      BIGINT      NOT NULL,
-    student_code    VARCHAR(20) NOT NULL,
-    full_name       VARCHAR(100),
-    first_name      VARCHAR(50),
-    last_name       VARCHAR(50),
-    date_of_birth   DATE,
-    gender          VARCHAR(10),
-    email           VARCHAR(100),
-    phone           VARCHAR(20),
-    address         VARCHAR(500),
-    is_active       TINYINT(1) DEFAULT 1,
-    status          VARCHAR(50),
-    enrollment_date DATE,
-    is_deleted      TINYINT(1) DEFAULT 0,
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (section_id) REFERENCES sections (id)
-);
-
+-- institutes TABLE
+DROP TABLE IF EXISTS `institutes`;
 CREATE TABLE institutes
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -73,6 +28,14 @@ CREATE TABLE institutes
     updated_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+INSERT INTO institutes (name, address, contact_number, email, website, tagline, country, logo, established_date)
+VALUES ('Smart Solutions School', '123 Main Street, Cityville', '03001234567', 'info@smartsolutions.edu',
+        'https://www.smartsolutions.edu', 'Excellence in Education', 'Pakistan',
+        NULL, '2005-08-15');
+
+
+-- campuses TABLE
+DROP TABLE IF EXISTS `campuses`;
 CREATE TABLE campuses
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -90,21 +53,69 @@ CREATE TABLE campuses
     CONSTRAINT fk_institute FOREIGN KEY (institute_id) REFERENCES institutes (id)
 );
 
+INSERT INTO campuses (id, institute_id, campus_name, contact, email, website, address, province, city, created_at,
+                      updated_at)
+VALUES (1, 1, 'Downtown Campus', '+92-300-1234567', 'downtown@smarteschool.com', 'https://downtown.smarteschool.com',
+        '123 Main Street', 'Punjab', 'Lahore', NOW(), NOW()),
+       (2, 1, 'Uptown Campus', '+92-300-7654321', 'uptown@smarteschool.com', 'https://uptown.smarteschool.com',
+        '456 Park Avenue', 'Punjab', 'Lahore', NOW(), NOW()),
+       (3, 1, 'Riverside Campus', '+92-301-1112223', 'riverside@smarteschool.com', 'https://riverside.smarteschool.com',
+        '789 River Road', 'Sindh', 'Karachi', NOW(), NOW()),
+       (4, 1, 'Hilltop Campus', '+92-301-3334445', 'hilltop@smarteschool.com', 'https://hilltop.smarteschool.com',
+        '101 Hill Street', 'KPK', 'Peshawar', NOW(), NOW()),
+       (5, 1, 'Greenfield Campus', '+92-302-5556667', 'greenfield@smarteschool.com',
+        'https://greenfield.smarteschool.com', '202 Green Road', 'Punjab', 'Faisalabad', NOW(), NOW()),
+       (6, 1, 'Seaside Campus', '+92-302-7778889', 'seaside@smarteschool.com', 'https://seaside.smarteschool.com',
+        '303 Beach Avenue', 'Sindh', 'Karachi', NOW(), NOW()),
+       (7, 1, 'Central Campus', '+92-303-9990001', 'central@smarteschool.com', 'https://central.smarteschool.com',
+        '404 Central Street', 'Punjab', 'Multan', NOW(), NOW()),
+       (8, 1, 'Lakeside Campus', '+92-303-2223334', 'lakeside@smarteschool.com', 'https://lakeside.smarteschool.com',
+        '505 Lake Road', 'Sindh', 'Hyderabad', NOW(), NOW()),
+       (9, 1, 'Sunrise Campus', '+92-304-4445556', 'sunrise@smarteschool.com', 'https://sunrise.smarteschool.com',
+        '606 Sunrise Blvd', 'Punjab', 'Rawalpindi', NOW(), NOW()),
+       (10, 1, 'Maple Campus', '+92-304-6667778', 'maple@smarteschool.com', 'https://maple.smarteschool.com',
+        '707 Maple Street', 'Balochistan', 'Quetta', NOW(), NOW());
 
 
-INSERT INTO standards (id, standard_name, created_at, updated_at)
-VALUES (1, '1st Grade', NOW(), NOW()),
-       (2, '2nd Grade', NOW(), NOW()),
-       (3, '3rd Grade', NOW(), NOW()),
-       (4, '4th Grade', NOW(), NOW()),
-       (5, '5th Grade', NOW(), NOW()),
-       (6, '6th Grade', NOW(), NOW()),
-       (7, '7th Grade', NOW(), NOW()),
-       (8, '8th Grade', NOW(), NOW()),
-       (9, '9th Grade', NOW(), NOW()),
-       (10, '10th Grade', NOW(), NOW());
+-- standards TABLE
+DROP TABLE IF EXISTS standards;
+CREATE TABLE standards
+(
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    standard_name VARCHAR(50) NOT NULL,
+    campus_id     BIGINT      NOT NULL,
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (campus_id) REFERENCES campuses (id)
+);
+
+INSERT INTO standards (id, standard_name, campus_id, created_at, updated_at)
+VALUES (1, '1st Grade', 1, NOW(), NOW()),
+       (2, '2nd Grade', 1, NOW(), NOW()),
+       (3, '3rd Grade', 1, NOW(), NOW()),
+       (4, '4th Grade', 1, NOW(), NOW()),
+       (5, '5th Grade', 1, NOW(), NOW()),
+       (6, '6th Grade', 1, NOW(), NOW()),
+       (7, '7th Grade', 1, NOW(), NOW()),
+       (8, '8th Grade', 1, NOW(), NOW()),
+       (9, '9th Grade', 1, NOW(), NOW()),
+       (10, '10th Grade', 1, NOW(), NOW());
 
 
+-- sections TABLE
+DROP TABLE IF EXISTS `sections`;
+CREATE TABLE sections
+(
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    standard_id  BIGINT      NOT NULL,
+    section_name VARCHAR(10) NOT NULL,
+    section_code VARCHAR(15),
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (standard_id) REFERENCES standards (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
 INSERT INTO sections (standard_id, section_name, created_at, updated_at)
 VALUES
     -- Standard 1
@@ -148,6 +159,30 @@ VALUES
     (10, 'B', NOW(), NOW()),
     (10, 'C', NOW(), NOW());
 
+
+-- students TABLE
+DROP TABLE IF EXISTS `students`;
+CREATE TABLE students
+(
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    section_id      BIGINT      NOT NULL,
+    student_code    VARCHAR(20) NOT NULL,
+    full_name       VARCHAR(100),
+    first_name      VARCHAR(50),
+    last_name       VARCHAR(50),
+    date_of_birth   DATE,
+    gender          VARCHAR(10),
+    email           VARCHAR(100),
+    phone           VARCHAR(20),
+    address         VARCHAR(500),
+    is_active       TINYINT(1) DEFAULT 1,
+    status          VARCHAR(50),
+    enrollment_date DATE,
+    is_deleted      TINYINT(1) DEFAULT 0,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (section_id) REFERENCES sections (id)
+);
 
 INSERT INTO students
 (section_id, student_code, full_name, first_name, last_name, date_of_birth, gender, email, phone, address, is_active,
@@ -213,31 +248,5 @@ VALUES (1, 'STU001', 'Ali Khan', 'Ali', 'Khan', '2008-05-15', 'Male', 'ali.khan@
         '03002345670', '888 Boulevard, City', 1, 'Enrolled', '2023-09-08', 0);
 
 
-INSERT INTO institutes (name, address, contact_number, email, website, tagline, country, logo, established_date)
-VALUES ('Smart Solutions School', '123 Main Street, Cityville', '03001234567', 'info@smartsolutions.edu',
-        'https://www.smartsolutions.edu', 'Excellence in Education', 'Pakistan',
-        NULL, '2005-08-15');
 
 
-INSERT INTO campuses (id, institute_id, campus_name, contact, email, website, address, province, city, created_at,
-                      updated_at)
-VALUES (1, 1, 'Downtown Campus', '+92-300-1234567', 'downtown@smarteschool.com', 'https://downtown.smarteschool.com',
-        '123 Main Street', 'Punjab', 'Lahore', NOW(), NOW()),
-       (2, 1, 'Uptown Campus', '+92-300-7654321', 'uptown@smarteschool.com', 'https://uptown.smarteschool.com',
-        '456 Park Avenue', 'Punjab', 'Lahore', NOW(), NOW()),
-       (3, 1, 'Riverside Campus', '+92-301-1112223', 'riverside@smarteschool.com', 'https://riverside.smarteschool.com',
-        '789 River Road', 'Sindh', 'Karachi', NOW(), NOW()),
-       (4, 1, 'Hilltop Campus', '+92-301-3334445', 'hilltop@smarteschool.com', 'https://hilltop.smarteschool.com',
-        '101 Hill Street', 'KPK', 'Peshawar', NOW(), NOW()),
-       (5, 1, 'Greenfield Campus', '+92-302-5556667', 'greenfield@smarteschool.com',
-        'https://greenfield.smarteschool.com', '202 Green Road', 'Punjab', 'Faisalabad', NOW(), NOW()),
-       (6, 1, 'Seaside Campus', '+92-302-7778889', 'seaside@smarteschool.com', 'https://seaside.smarteschool.com',
-        '303 Beach Avenue', 'Sindh', 'Karachi', NOW(), NOW()),
-       (7, 1, 'Central Campus', '+92-303-9990001', 'central@smarteschool.com', 'https://central.smarteschool.com',
-        '404 Central Street', 'Punjab', 'Multan', NOW(), NOW()),
-       (8, 1, 'Lakeside Campus', '+92-303-2223334', 'lakeside@smarteschool.com', 'https://lakeside.smarteschool.com',
-        '505 Lake Road', 'Sindh', 'Hyderabad', NOW(), NOW()),
-       (9, 1, 'Sunrise Campus', '+92-304-4445556', 'sunrise@smarteschool.com', 'https://sunrise.smarteschool.com',
-        '606 Sunrise Blvd', 'Punjab', 'Rawalpindi', NOW(), NOW()),
-       (10, 1, 'Maple Campus', '+92-304-6667778', 'maple@smarteschool.com', 'https://maple.smarteschool.com',
-        '707 Maple Street', 'Balochistan', 'Quetta', NOW(), NOW());
