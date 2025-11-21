@@ -24,11 +24,11 @@ public class StudentEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "cmp_id", nullable = false)
-    private Long campusId;
-
-    @Column(name = "class_id", nullable = false)
-    private Integer classId;
+//    @Column(name = "cmp_id", nullable = false)
+//    private Long campusId;
+//
+//    @Column(name = "class_id", nullable = false)
+//    private Integer classId;
 
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
@@ -39,7 +39,7 @@ public class StudentEntity {
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @Column(name = "dob", nullable = false)
+    @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
     @Column(name = "gender", nullable = false, length = 10)
@@ -75,17 +75,17 @@ public class StudentEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cmp_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    @JsonIgnore
-    private CampusEntity campus;
-
-
-    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<StudentAttendanceEntity> attendances;
-
-    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<FeeEntity> fees;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "cmp_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+//    @JsonIgnore
+//    private CampusEntity campus;
+//
+//
+//    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
+//    @JsonIgnore
+//    private List<StudentAttendanceEntity> attendances;
+//
+//    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
+//    @JsonIgnore
+//    private List<FeeEntity> fees;
 }

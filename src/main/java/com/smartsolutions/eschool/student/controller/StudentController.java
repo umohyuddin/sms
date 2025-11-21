@@ -1,6 +1,8 @@
 package com.smartsolutions.eschool.student.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
+import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.facade.StudentFacade;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
@@ -9,6 +11,7 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Transactional
 @RestController
-@RequestMapping("/api/student")
+@RequestMapping("/api/students")
 @Slf4j
 public class StudentController {
 
@@ -34,20 +37,12 @@ public class StudentController {
 
     //  get all employee
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getAll() throws Exception {
+    public ResponseEntity<?> getAll() throws Exception {
         log.info("getAll");
-        return new MultiResourceSuccessResponseObject(
-                studentFacade.getAll()
-                        .stream()
-                        .map(entity -> {
-                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-                            return new ResourceObject(
-                                    String.valueOf(entity.getId()),
-                                    "Student",
-                                    resourceAttributes
-                            );
-                        })
-                        .collect(Collectors.toList()));
+        log.info("GET /api/students/getall called");
+        List<StudentDTO> resources  =studentFacade.getAll();
+        log.info("GET /api/student/getall succeeded, returned {} resources", resources.size());
+        return ResponseEntity.ok().body(resources);
     }
 
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

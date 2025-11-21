@@ -1,8 +1,12 @@
 package com.smartsolutions.eschool.student.dtos;
 
+import lombok.Data;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+
+@Data
 public class StudentDTO {
     private Long id;
     private Long campusId;

@@ -81,7 +81,7 @@ public class StudentDaoImp implements StudentDao{
             List<StudentEntity> results = query.getResultList();
             return results;
         } catch (Exception e) {
-            log.error("Error while fetching all sections", e);
+            log.error("Error while fetching all students", e);
             return Collections.emptyList();
         }
     }

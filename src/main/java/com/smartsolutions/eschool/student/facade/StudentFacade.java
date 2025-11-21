@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.student.facade;
 import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.employee.service.EmployeeService;
+import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.model.FeeEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.service.FeeService;
@@ -26,7 +27,7 @@ public class StudentFacade {
     private StudentService studentService;
 
 
-    public List<StudentEntity> getAll() {
+    public List<StudentDTO> getAll() {
         return studentService.getAll();
     }
     public StudentEntity getById(Long id) {
