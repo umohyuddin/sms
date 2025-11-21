@@ -1,18 +1,22 @@
 package com.smartsolutions.eschool.student.repository;
 
+import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Transactional
 @Repository
+@Slf4j
 public class StudentDaoImp implements StudentDao{
 
     private final JdbcTemplate jdbcTemplate;
@@ -71,9 +75,15 @@ public class StudentDaoImp implements StudentDao{
 
     @Override
     public List<StudentEntity> findAll() {
-        String hql = "FROM StudentEntity";
-        TypedQuery<StudentEntity> query = entityManager.createQuery(hql, StudentEntity.class);
-        return query.getResultList();
+        try {
+            String hql = "FROM StudentEntity";
+            TypedQuery<StudentEntity> query = entityManager.createQuery(hql, StudentEntity.class);
+            List<StudentEntity> results = query.getResultList();
+            return results;
+        } catch (Exception e) {
+            log.error("Error while fetching all sections", e);
+            return Collections.emptyList();
+        }
     }
 
     @Override

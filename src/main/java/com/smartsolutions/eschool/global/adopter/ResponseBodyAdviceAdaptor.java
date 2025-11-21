@@ -13,8 +13,6 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import java.io.IOException;
-
 @Slf4j
 @ControllerAdvice
 public class ResponseBodyAdviceAdaptor implements ResponseBodyAdvice<Object> {
@@ -32,7 +30,6 @@ public class ResponseBodyAdviceAdaptor implements ResponseBodyAdvice<Object> {
 
         HttpServletResponse httpServletResponse = ((ServletServerHttpResponse) serverHttpResponse).getServletResponse();
         httpServletResponse.getStatus();
-
 
         // Convert the response body to JSON using Jackson's ObjectMapper
         try {

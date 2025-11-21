@@ -55,7 +55,7 @@ public class StudentEntity {
     private String address;
 
     //uzair need to remove going to use status
-    @Column(name = "isactive")
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @Column(name = "is_deleted")
