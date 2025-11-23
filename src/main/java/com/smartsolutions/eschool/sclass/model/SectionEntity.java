@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.sclass.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.smartsolutions.eschool.student.model.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,9 +23,6 @@ public class SectionEntity {
     @Column(name = "id")
     private Long id;
 
-//    @Column(name = "standard_id")
-//    private Integer standardId;
-
     @Column(name = "section_name")
     private String sectionName;
 
@@ -39,8 +37,19 @@ public class SectionEntity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "standard_id", nullable = false)
     @JsonIgnore
     private StandardEntity standard;
+
+    @OneToMany(mappedBy = "section", fetch = FetchType.LAZY)
+    private List<StudentEntity> students;
 }

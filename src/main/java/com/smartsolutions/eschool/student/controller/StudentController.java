@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.student.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartsolutions.eschool.school.dtos.CampusDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.facade.StudentFacade;
@@ -26,121 +27,62 @@ import java.util.stream.Collectors;
 @Slf4j
 public class StudentController {
 
-    private StudentFacade studentFacade;
-    private ObjectMapper objectMapper;
-
     @Autowired
-    public StudentController(StudentFacade pStudentFacade, ObjectMapper objectMapper) {
-        this.studentFacade = pStudentFacade;
-        this.objectMapper = objectMapper;
-    }
+    private StudentFacade studentFacade;
 
-    //  get all employee
-    @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() throws Exception {
         log.info("GET /api/students/getall called");
-        List<StudentDTO> resources  =studentFacade.getAll();
+        List<StudentDTO> resources = studentFacade.getAll();
         log.info("GET /api/student/getall succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
 
-    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
-
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(studentFacade.getById(id), Map.class);
-        List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(new ResourceObject(
-                String.valueOf(id),
-                "Student",
-                resourceAttributes
-        ));
-        return new MultiResourceSuccessResponseObject(resourceObject);
+    @GetMapping(value = "/campus/{campusId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<StudentDTO> getStudentsByCampus(@PathVariable Long campusId) {
+        log.info("GET /api/students/by-campus called");
+        List<StudentDTO> resources = studentFacade.getStudentsByCampus(campusId);
+        log.info("GET /api/student/by-campus succeeded, returned {} resources", resources.size());
+        return resources;
     }
 
-    @GetMapping(value = "/getbycampus/{cmp_id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getByCampus(@PathVariable Long cmp_id) throws Exception {
-
-        return new MultiResourceSuccessResponseObject(
-                studentFacade.getByCampus(cmp_id)
-                        .stream()
-                        .map(entity -> {
-                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-                            return new ResourceObject(
-                                    String.valueOf(entity.getId()),
-                                    "Student",
-                                    resourceAttributes
-                            );
-                        })
-                        .collect(Collectors.toList()));
+    @GetMapping(value = "/search/name/{studentName}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<StudentDTO> getStudentName(@PathVariable String studentName) {
+        log.info("GET /api/students/by-name called");
+        List<StudentDTO> resources = studentFacade.getStudentsByName(studentName);
+        log.info("GET /api/student/by-name succeeded, returned {} resources", resources.size());
+        return resources;
     }
 
-    @GetMapping(value = "/getbyinst/{inst_id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getByInstitute(@PathVariable Long inst_id) throws Exception {
-
-        return new MultiResourceSuccessResponseObject(
-                studentFacade.getByInstitute(inst_id)
-                        .stream()
-                        .map(entity -> {
-                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-                            return new ResourceObject(
-                                    String.valueOf(entity.getId()),
-                                    "Student",
-                                    resourceAttributes
-                            );
-                        })
-                        .collect(Collectors.toList()));
+    @GetMapping(value = "/standard/{standardId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<StudentDTO> getStudentsByStandard(@PathVariable Long standardId) {
+        log.info("GET /api/students/by-standard called");
+        List<StudentDTO> resources = studentFacade.getStudentsByStandard(standardId);
+        log.info("GET /api/student/by-standardId succeeded, returned {} resources", resources.size());
+        return resources;
     }
 
-
-    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject create(
-            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-        if (!requestBody.containsKey("data")) {
-            throw new ValidationException("The request body did not contain a data attribute");
-        }
-        Map<String, Object> resourceMap = requestBody.get("data");
-        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        StudentEntity nStudentEntity = objectMapper.convertValue(attributes, StudentEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message", studentFacade.create(nStudentEntity));
-        List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(new ResourceObject(
-                nStudentEntity.getFirstName(),
-                "Student",
-                resourceAttributes
-        ));
-        return new MultiResourceSuccessResponseObject(resourceObject);
+    @GetMapping(value = "/section/{sectionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<StudentDTO> getStudentsBySection(@PathVariable Long sectionId) {
+        log.info("GET /api/students/by-section called");
+        List<StudentDTO> resources = studentFacade.getStudentsBySection(sectionId);
+        log.info("GET /api/student/by-section succeeded, returned {} resources", resources.size());
+        return resources;
     }
 
-    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject update(
-            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-        if (!requestBody.containsKey("data")) {
-            throw new ValidationException("The request body did not contain a data attribute");
-        }
-        Map<String, Object> resourceMap = requestBody.get("data");
-        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        StudentEntity nStudentEntity = objectMapper.convertValue(attributes, StudentEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message", studentFacade.update(nStudentEntity));
-        List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(new ResourceObject(
-                String.valueOf(nStudentEntity.getId()),
-                "Student",
-                resourceAttributes
-        ));
-        return new MultiResourceSuccessResponseObject(resourceObject);
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getById(@PathVariable Long id) throws Exception {
+        log.info("Received request to fetch Student with id: {}", id);
+        StudentDTO studentDTO = studentFacade.getById(id);
+        log.info("Returning Student: id={}", studentDTO.getId());
+        return ResponseEntity.ok(studentDTO);
     }
 
-    @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject delete(
-            @PathVariable Long id
-    ) throws Exception {
-        Map<String, Object> resourceAttributes = Map.of("message", studentFacade.delete(id));
-        List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(new ResourceObject(
-                String.valueOf(id),
-                "Student",
-                resourceAttributes
-        ));
-        return new MultiResourceSuccessResponseObject(resourceObject);
+    @GetMapping(value = "/code/{studentCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getByStudentCode(@PathVariable String studentCode) throws Exception {
+        log.info("Received request to fetch Student with studentCode: {}", studentCode);
+        StudentDTO studentDTO = studentFacade.getByStudentCode(studentCode);
+        log.info("Returning Student: code={}", studentDTO.getStudentCode());
+        return ResponseEntity.ok(studentDTO);
     }
 }

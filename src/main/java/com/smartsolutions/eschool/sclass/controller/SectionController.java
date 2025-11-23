@@ -24,128 +24,90 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional
 @RestController
-@RequestMapping("/api/standard/sections")
+@RequestMapping("/api/sections")
 public class SectionController {
     @Autowired
     private SectionFacade sectionFacade;
-    @Autowired
-    private ObjectMapper objectMapper;
 
-
-    @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() {
-        log.info("GET /api/standards/sections called");
+        log.info("GET /api/sections called");
         List<SectionDTO> resources = sectionFacade.getAll();
-        log.info("GET /api/standards/sections succeeded, returned {} resources", resources.size());
+        log.info("GET /api/sections succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
 
-    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable Long id) {
+        log.info("GET /api/sections by id called");
         SectionDTO sectionDTO = sectionFacade.getById(id);
+        log.info("GET /api/sections by id succeeded");
         return ResponseEntity.ok().body(sectionDTO);
     }
-//    //get all Enrollment of a teacher
-//    @GetMapping(value = "/getbyinstituteid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject getByInstituteId(@PathVariable Long id) throws Exception {
-//
-//        return new MultiResourceSuccessResponseObject(
-//                nSectionFacade.getByInstituteId(id)
-//                        .stream()
-//                        .map(entity -> {
-//                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-//                            return new ResourceObject(
-//                                    String.valueOf(entity.getId()),
-//                                    "section",
-//                                    resourceAttributes
-//                            );
-//                        })
-//                        .collect(Collectors.toList()));
-//    }
-//
-//    @GetMapping(value = "/getbycampusid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject getByCampusId(@PathVariable Long id) throws Exception {
-//
-//        return new MultiResourceSuccessResponseObject(
-//                nSectionFacade.getByCampusId(id)
-//                        .stream()
-//                        .map(entity -> {
-//                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-//                            return new ResourceObject(
-//                                    String.valueOf(entity.getId()),
-//                                    "section",
-//                                    resourceAttributes
-//                            );
-//                        })
-//                        .collect(Collectors.toList()));
-//    }
-//
-//    @GetMapping(value = "/getbyclassid/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject getByClassId(@PathVariable Long id) throws Exception {
-//
-//        return new MultiResourceSuccessResponseObject(
-//                nSectionFacade.getByClassId(id)
-//                        .stream()
-//                        .map(entity -> {
-//                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-//                            return new ResourceObject(
-//                                    String.valueOf(entity.getId()),
-//                                    "section",
-//                                    resourceAttributes
-//                            );
-//                        })
-//                        .collect(Collectors.toList()));
-//    }
-//
-//    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject create(
-//            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-//        if (!requestBody.containsKey("data")) {
-//            throw new ValidationException("The request body did not contain a data attribute");
-//        }
-//        Map<String, Object> resourceMap = requestBody.get("data");
-//        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-//        SectionEntity entity = objectMapper.convertValue(attributes, SectionEntity.class);
-//        Map<String, Object> resourceAttributes = Map.of("message", nSectionFacade.create(entity));
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                                entity.getName(),
-//                                "section",
-//                                resourceAttributes
-//                        ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
-//
-//    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject update(
-//            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-//        if (!requestBody.containsKey("data")) {
-//            throw new ValidationException("The request body did not contain a data attribute");
-//        }
-//        Map<String, Object> resourceMap = requestBody.get("data");
-//        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-//        SectionEntity entity = objectMapper.convertValue(attributes, SectionEntity.class);
-//        Map<String, Object> resourceAttributes = Map.of("message", nSectionFacade.update(entity));
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                                    String.valueOf(entity.getId()),
-//                                    "section",
-//                                    resourceAttributes
-//                            ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
-//
-//    @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject delete(
-//            @PathVariable Long id
-//    ) throws Exception {
-//        Map<String, Object> resourceAttributes = Map.of("message", nSectionFacade.delete(id));
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                                    String.valueOf(id),
-//                                    "section",
-//                                    resourceAttributes
-//                            ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
+
+    @GetMapping(value = "standard/{standardId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getByStandardId(@PathVariable Long standardId) {
+        log.info("GET /api/sections by standard id called");
+        List<SectionDTO> sectionDTO = sectionFacade.getByStandardId(standardId);
+        log.info("GET /api/sections by standard id succeeded");
+        return ResponseEntity.ok().body(sectionDTO);
+    }
+
+    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
+        log.info("GET /api/sections/search by keyword called");
+        List<SectionDTO> sectionDTO = sectionFacade.searchByKeyword(keyword);
+        log.info("GET /api/sections/search by keyword succeeded");
+        return ResponseEntity.ok().body(sectionDTO);
+    }
+
+
+    @DeleteMapping("/{sectionId}")
+    public ResponseEntity<?> softDeleteById(@PathVariable Long sectionId) {
+        log.info("API Request: Soft delete Section ID: {}", sectionId);
+        try {
+            int result = sectionFacade.softDeleteById(sectionId);
+            if (result == 0) {
+                log.warn("delete failed — Section not found: {}", sectionId);
+                return ResponseEntity.notFound().build();
+            }
+            log.info("Section deleted successfully: {}", sectionId);
+            return ResponseEntity.ok("Section deleted successfully");
+        } catch (Exception ex) {
+            log.error("Error deleting Section ID: {}", sectionId, ex);
+            return ResponseEntity.internalServerError().body("Failed to delete section");
+        }
+    }
+
+    @DeleteMapping("/standard/{standardId}")
+    public ResponseEntity<?> softDeleteByStandardId(@PathVariable Long standardId) {
+        log.info("API Request: delete Sections by Standard ID: {}", standardId);
+        try {
+            int rows = sectionFacade.softDeleteByStandardId(standardId);
+            if (rows == 0) {
+                log.warn("No sections found for Standard ID: {}", standardId);
+                return ResponseEntity.notFound().build();
+            }
+            log.info("deleted {} sections for Standard ID: {}", rows, standardId);
+            return ResponseEntity.ok(rows + " sections soft deleted");
+        } catch (Exception ex) {
+            log.error("Error deleting by standardId {} ", standardId, ex);
+            return ResponseEntity.internalServerError()
+                    .body("Failed to delete sections by standard");
+        }
+    }
+
+    @DeleteMapping("/all")
+    public ResponseEntity<?> softDeleteAll() {
+        log.info("API Request: Soft delete ALL sections");
+        try {
+            int rows = sectionFacade.softDeleteAll();
+            log.info("Soft deleted ALL sections. Count: {}", rows);
+            return ResponseEntity.ok(rows + " sections soft deleted");
+        } catch (Exception ex) {
+            log.error("Error soft deleting ALL sections", ex);
+            return ResponseEntity.internalServerError()
+                    .body("Failed to soft delete all sections");
+        }
+    }
 }

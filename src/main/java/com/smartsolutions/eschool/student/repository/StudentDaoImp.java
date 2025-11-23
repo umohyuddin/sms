@@ -33,8 +33,8 @@ public class StudentDaoImp implements StudentDao{
     @Override
     public int save(StudentEntity pStudentEntity) {
         try {
-            pStudentEntity.setId(null);
-            getSession().persist(pStudentEntity);
+//            pStudentEntity.setId(null);
+//            getSession().persist(pStudentEntity);
             return 1;
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,12 +1,7 @@
 package com.smartsolutions.eschool.student.facade;
 
-import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
-import com.smartsolutions.eschool.employee.service.EmployeeService;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
-import com.smartsolutions.eschool.student.model.FeeEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.student.service.FeeService;
 import com.smartsolutions.eschool.student.service.StudentService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,25 +25,47 @@ public class StudentFacade {
     public List<StudentDTO> getAll() {
         return studentService.getAll();
     }
-    public StudentEntity getById(Long id) {
+
+    public List<StudentDTO> getStudentsByCampus(Long campusId) {
+        return studentService.getStudentsByCampus(campusId);
+    }
+    public List<StudentDTO> getStudentsByName(String studentName) {
+        return studentService.getStudentsByName(studentName);
+    }
+    public List<StudentDTO> getStudentsByStandard(Long id) {
+        return studentService.getStudentsByStandard(id);
+    }
+    public List<StudentDTO> getStudentsBySection(Long id) {
+        return studentService.getStudentsBySection(id);
+    }
+
+    public StudentDTO getById(Long id) {
         return studentService.getById(id);
     }
-
-    public List<StudentEntity> getByInstitute(Long inst_id) {
-        return studentService.getByInstitute(inst_id);
-    }
-    public List<StudentEntity> getByCampus(Long cmp_id) {
-        return studentService.getByCampus(cmp_id);
+    public StudentDTO getByStudentCode(String studentCode) {
+        return studentService.getByStudentCode(studentCode);
     }
 
-    public String create(StudentEntity pStudentEntity) {
-        return studentService.create(pStudentEntity);
-    }
 
-    public String update(StudentEntity pStudentEntity) {
-        return studentService.update(pStudentEntity);
-    }
-    public String delete(Long id) {
-        return studentService.delete(id);
-    }
+
+
+
+
+//    public List<StudentEntity> getByInstitute(Long inst_id) {
+//        return studentService.getByInstitute(inst_id);
+//    }
+//    public List<StudentEntity> getByCampus(Long cmp_id) {
+//        return studentService.getByCampus(cmp_id);
+//    }
+//
+//    public String create(StudentEntity pStudentEntity) {
+//        return studentService.create(pStudentEntity);
+//    }
+//
+//    public String update(StudentEntity pStudentEntity) {
+//        return studentService.update(pStudentEntity);
+//    }
+//    public String delete(Long id) {
+//        return studentService.delete(id);
+//    }
 }

@@ -30,6 +30,27 @@ public class SectionFacade {
         return nSectionService.getById(id);
     }
 
+    public List<SectionDTO> getByStandardId(Long id) {
+        return nSectionService.getByStandardId(id);
+    }
+
+    public int softDeleteById(Long sectionId){
+        return nSectionService.softDeleteById(sectionId);
+    }
+    public int softDeleteByStandardId(Long sectionId){
+       return nSectionService.softDeleteByStandardId(sectionId);
+    }
+    public int softDeleteAll(){
+        return nSectionService.softDeleteAll();
+    }
+
+    public List<SectionDTO> searchByKeyword(String keyword) {
+        return nSectionService.searchByKeyword(keyword);
+    }
+
+
+
+
 //    public List<SectionEntity> getByInstituteId(Long id) {
 //        return nSectionService.getByInstituteId(id);
 //    }

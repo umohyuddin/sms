@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.sclass.model;
 
 import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.student.model.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,9 +22,6 @@ public class StandardEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-//    @Column(name = "cmp_id")
-//    private Long campusId;
 
     @Column(name = "standard_name")
     private String standardName;
@@ -48,5 +46,8 @@ public class StandardEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "campus_id", nullable = false)
     private CampusEntity campus;
+
+    @OneToMany(mappedBy = "standard", fetch = FetchType.LAZY)
+    private List<StudentEntity> students;
 
 }

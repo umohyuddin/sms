@@ -21,7 +21,7 @@ public class CampusDTO {
     private String province;
     private String city;
     // Optional: convert byte[] to Base64 string for API transfer
-    private String logo;
+    private byte[] logo;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean deleted = false;

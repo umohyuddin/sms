@@ -1,9 +1,14 @@
 package com.smartsolutions.eschool.sclass.service;
 
+import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.repository.SectionDao;
+import com.smartsolutions.eschool.sclass.repository.SectionRepository;
+import com.smartsolutions.eschool.student.dtos.StudentDTO;
+import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.util.MapperUtil;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,58 +21,93 @@ import java.util.List;
 @Slf4j
 public class SectionService {
     @Autowired
-    private SectionDao sectionDao;
+    private SectionRepository sectionRepository;
 
 
     public List<SectionDTO> getAll() {
         log.info("Fetching all sections from database");
-        List<SectionEntity> result = sectionDao.findAll();
-
+        List<SectionEntity> result = sectionRepository.findByDeletedFalse();
         List<SectionDTO> sectionDTO = MapperUtil.mapList(result, SectionDTO.class);
-        log.info("Successfully fetched {} sections", sectionDTO);
+        log.info("Successfully fetched sections");
         return sectionDTO;
-
     }
-
 
     public SectionDTO getById(Long id) {
+        log.info("Fetching Section with id: {}", id);
+        SectionEntity sectionEntity = sectionRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
+            log.info("Fetching Section with id: {}", id);
+            return new ResourceNotFoundException("Section not found with id: " + id);
+        });
+        SectionDTO sectionDTO = MapperUtil.mapObject(sectionEntity, SectionDTO.class);
+        log.info("Successfully fetched Section: id={}", sectionDTO.getId());
+        return sectionDTO;
+    }
+
+    public List<SectionDTO> getByStandardId(Long standardId) {
+        log.info("Fetching all sections by standard id {} from database", standardId);
+        List<SectionEntity> result = sectionRepository.findByStandardIdAndDeletedFalse(standardId);
+        List<SectionDTO> sectionDTO = MapperUtil.mapList(result, SectionDTO.class);
+        log.info("Successfully fetched sections by standard id {}", standardId);
+        return sectionDTO;
+    }
+
+    public int softDeleteById(Long id) {
+        log.info("Soft delete request received for Section ID: {}", id);
         try {
-            log.info("Fetching section with id {} from database", id);
-            SectionEntity result = sectionDao.findById(id);
-            if (result == null) {
-                log.warn("Section with id {} not found", id);
-                throw new NotFoundException("Section not found with id: " + id);
-            }
-            SectionDTO sectionDTO = MapperUtil.mapObject(result, SectionDTO.class);
-            log.info("Successfully fetched section with id {}", id);
-            return sectionDTO;
+            return sectionRepository.softDeleteById(id);
         } catch (Exception e) {
-            log.error("Error while fetching section with id {}: {}", id, e.getMessage(), e);
-            throw new ServiceException("Failed to fetch section with id: " + id, e);
+            log.error("Error while soft deleting section with ID {}", id, e);
+            throw e;
         }
     }
-//
-//    public List<SectionEntity> getByInstituteId(Long id) {
-//        return nSectionDao.findByInstituteId(id);
-//    }
-//
-//    public List<SectionEntity> getByCampusId(Long id) {
-//        return nSectionDao.findByCampusId(id);
-//    }
-//
-//    public List<SectionEntity> getByClassId(Long id) {
-//        return nSectionDao.findByClassId(id);
-//    }
-//
-//    public String create(SectionEntity pSectionEntity) {
-//        return nSectionDao.save(pSectionEntity) == 1 ? "Section created" : "Error creating Section";
-//    }
-//
-//    public String update(SectionEntity pSectionEntity) {
-//        return nSectionDao.update(pSectionEntity) == 1 ? "Section updated" : "Error updating Section";
-//    }
-//
-//    public String delete(Long id) {
-//        return nSectionDao.delete(id) == 1 ? "Section deleted" : "Error deleting Section";
-//    }
+
+    public int softDeleteByStandardId(Long standardId) {
+        log.info("Soft delete requested for sections under Standard ID: {}", standardId);
+        try {
+            int rows = sectionRepository.softDeleteByStandardId(standardId);
+            if (rows == 0) {
+                log.warn("No sections found for Standard ID {}. Nothing was updated.", standardId);
+            } else {
+                log.info("Soft delete succeeded. {} sections deleted for Standard ID {}", rows, standardId);
+            }
+            return rows;
+        } catch (Exception e) {
+            log.error("Error while soft deleting sections for Standard ID {}", standardId, e);
+            throw e;
+        }
+    }
+
+    public int softDeleteAll() {
+        log.info("Soft delete ALL sections requested.");
+        try {
+            int rows = sectionRepository.softDeleteAll();
+            if (rows == 0) {
+                log.warn("Soft delete completed but no sections were updated.");
+            } else {
+                log.info("Successfully soft deleted ALL sections. Total affected: {}", rows);
+            }
+            return rows;
+        } catch (Exception e) {
+            log.error("Error occurred while soft deleting ALL sections", e);
+            throw e;
+        }
+    }
+
+    public List<SectionDTO> searchByKeyword(String keyword) {
+        log.info("Fetching all sections by keyword: {}", keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            log.error("Keyword is null or empty");
+            throw new ValidationException("Keyword must not be empty");
+        }
+        List<SectionEntity> result = sectionRepository.searchByKeyword(keyword);
+        if (result.isEmpty()) {
+            log.warn("No sections found for keyword: {}", keyword);
+            throw new ResourceNotFoundException("No sections found matching: " + keyword);
+        }
+        List<SectionDTO> sectionDTO = MapperUtil.mapList(result, SectionDTO.class);
+        log.info("Successfully fetched {} sections", sectionDTO.size());
+        return sectionDTO;
+    }
+
 }
+

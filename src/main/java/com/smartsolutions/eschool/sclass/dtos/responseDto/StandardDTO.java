@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.sclass.dtos.responseDto;
 
+import com.smartsolutions.eschool.school.dtos.CampusDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,4 +11,5 @@ public class StandardDTO {
     private String standardName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private CampusDTO campus;
 }

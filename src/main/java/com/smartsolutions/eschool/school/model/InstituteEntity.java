@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.user.model.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -73,4 +74,5 @@ public class InstituteEntity {
     public  void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
 }

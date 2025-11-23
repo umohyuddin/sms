@@ -5,9 +5,7 @@ import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.user.model.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,7 +14,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "campuses")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CampusEntity {
@@ -77,7 +76,11 @@ public class CampusEntity {
         this.createdAt = LocalDateTime.now();
     }
 
+    // ---- RELATIONSHIPS ---- //
     @OneToMany(mappedBy = "campus", cascade = CascadeType.ALL)
     private List<StandardEntity> standards;
+
+    @OneToMany(mappedBy = "campus", fetch = FetchType.LAZY)
+    private List<StudentEntity> students;
 
 }
