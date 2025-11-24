@@ -66,6 +66,10 @@ public class CampusEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+    @Column(name = "province_id")
+    private Long provinceId;
+    @Column(name = "city_id")
+    private Long cityId;
 
     @PreUpdate
     public void preUpdate() {

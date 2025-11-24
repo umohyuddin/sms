@@ -1,10 +1,10 @@
 package com.smartsolutions.eschool.sclass.facade;
 
+import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
-import com.smartsolutions.eschool.sclass.model.SectionEntity;
-import com.smartsolutions.eschool.sclass.service.SClassService;
+import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.service.SectionService;
-import com.smartsolutions.eschool.util.ResourceObject;
+import jakarta.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,13 @@ public class SectionFacade {
         return nSectionService.searchByKeyword(keyword);
     }
 
+    public SectionCreateRequestDTO createSection(@Valid SectionCreateRequestDTO dto) {
+       return nSectionService.createSection(dto);
+    }
 
+    public SectionDTO updateSection(Long id, @Valid SectionCreateRequestDTO dto) {
+    return nSectionService.updateSection(id,dto);
+    }
 
 
 //    public List<SectionEntity> getByInstituteId(Long id) {

@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,11 @@ public class StandardEntity {
     @Column(name = "standard_name")
     private String standardName;
 
+    @Column(name = "standard_code")
+    private String standardCode;
+
+    @Column(name = "description")
+    private String description;
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

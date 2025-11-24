@@ -1,17 +1,25 @@
 package com.smartsolutions.eschool.school.service;
 
+import com.smartsolutions.eschool.global.enums.Cities;
+import com.smartsolutions.eschool.global.enums.Province;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.dtos.CampusDTO;
+import com.smartsolutions.eschool.school.dtos.requestDto.CampusCreateRequestDTO;
 import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.CampusDao;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
+import com.smartsolutions.eschool.school.repository.InstituteDaoImp;
+import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
+import com.smartsolutions.eschool.sclass.model.StandardEntity;
+import com.smartsolutions.eschool.util.EnumValidatorUtil;
 import com.smartsolutions.eschool.util.MapperUtil;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +30,8 @@ public class CampusService {
 
     @Autowired
     private CampusDao campusDao;
-
+    @Autowired
+    private InstituteDaoImp instituteDaoImp;
 
     @Autowired
     private CampusRepository campusRepository;
@@ -77,6 +86,7 @@ public class CampusService {
         return campusDTOList;
     }
 
+
     public List<CampusDTO> findByCampusNameContaining(String name) {
         log.info("Fetching campuses containing name: '{}'", name);
         if (name == null || name.trim().isEmpty()) {
@@ -94,17 +104,110 @@ public class CampusService {
         return campusDTOList;
     }
 
+    public int softDeleteById(Long id) {
+        log.info("Soft delete request received for Campus ID: {}", id);
+        try {
+            return campusRepository.softDeleteById(id);
+        } catch (Exception e) {
+            log.error("Error while soft deleting Campus with ID {}", id, e);
+            throw e;
+        }
+    }
 
+    public CampusCreateRequestDTO createCampus(CampusCreateRequestDTO requestDTO) {
+        log.info("Creating new Campus: {}", requestDTO);
+        try {
+            Province province = EnumValidatorUtil.getEnumByName(Province.class, requestDTO.getProvinceName());
+            Cities city = EnumValidatorUtil.getEnumByName(Cities.class, requestDTO.getCityName());
+
+            CampusEntity entity = MapperUtil.mapObject(requestDTO, CampusEntity.class);
+            entity.setId(null);
+            entity.setProvinceId(province.getId());
+            entity.setCityId(city.getId());
+            entity.setDeleted(false);
+            entity.setDeletedAt(null);
+
+            CampusEntity campusEntity = campusRepository.save(entity);
+
+            CampusCreateRequestDTO response = MapperUtil.mapObject(campusEntity, CampusCreateRequestDTO.class);
+            log.info("Campus created successfully with ID: {}", response.getId());
+            return response;
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while creating Campus", dae);
+            throw dae;
+        } catch (Exception ex) {
+            log.error("Unexpected error creating Campus");
+            throw ex;
+        }
+    }
+
+
+    public CampusDTO updateSection(Long id, @Valid CampusCreateRequestDTO requestDTO) {
+        log.info("Updating Campus with id {} using DTO {}", id, requestDTO);
+
+        CampusEntity entity = campusRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + id));
+
+        if (requestDTO.getCampusName() != null && !requestDTO.getCampusName().isBlank()) {
+            entity.setCampusName(requestDTO.getCampusName());
+        }
+
+        if (requestDTO.getContactNumber() != null) {
+            entity.setContactNumber(requestDTO.getContactNumber());
+        }
+
+        if (requestDTO.getEmail() != null) {
+            entity.setEmail(requestDTO.getEmail());
+        }
+
+        if (requestDTO.getWebsite() != null) {
+            entity.setWebsite(requestDTO.getWebsite());
+        }
+
+        if (requestDTO.getAddress() != null) {
+            entity.setAddress(requestDTO.getAddress());
+        }
+
+//        // Province (String)
+//        if (requestDTO.getProvinceName() != null) {
+//            entity.setProvince(requestDTO.getProvinceName());
+//        }
 //
-//    public String create(CampusEntity pCampusEntity) {
-//        return nCampusDao.save(pCampusEntity) == 1 ? "Campus created" : "Error creating Campus";
-//    }
-//
-//    public String update(CampusEntity pCampusEntity) {
-//        return nCampusDao.update(pCampusEntity) == 1 ? "Campus updated" : "Error updating Campus";
-//    }
-//
-//    public String delete(Long id) {
-//        return nCampusDao.delete(id) == 1 ? "Campus deleted" : "Error deleting Campus";
-//    }
+//        // City (String)
+//        if (requestDTO.getCityName() != null) {
+//            entity.setCity(requestDTO.getCityName());
+//        }
+
+        // Province Id
+        if (requestDTO.getProvinceId() != null) {
+            entity.setProvinceId(requestDTO.getProvinceId());
+        }
+
+        // City Id
+        if (requestDTO.getCityId() != null) {
+            entity.setCityId(requestDTO.getCityId());
+        }
+        // Update Logo (byte[])
+        if (requestDTO.getLogo() != null) {
+            entity.setLogo(requestDTO.getLogo());
+        }
+
+
+
+        if (requestDTO.getInstituteId() != null &&
+                (entity.getInstitute() == null || !entity.getInstitute().getId().equals(requestDTO.getInstituteId()))) {
+
+            InstituteEntity institute = instituteDaoImp.findById(requestDTO.getInstituteId());
+//                    .orElseThrow(() -> new ResourceNotFoundException("Institute not found with id: " + requestDTO.getInstituteId()));
+
+            entity.setInstitute(institute);
+        }
+
+        CampusEntity updated = campusRepository.save(entity);
+        CampusDTO response = MapperUtil.mapObject(updated, CampusDTO.class);
+        log.info("Campus updated successfully: {}", response.getId());
+        return response;
+    }
 }
+

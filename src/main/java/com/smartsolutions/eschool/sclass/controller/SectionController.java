@@ -1,25 +1,19 @@
 package com.smartsolutions.eschool.sclass.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
-import com.smartsolutions.eschool.sclass.facade.SClassFacade;
+import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.facade.SectionFacade;
-import com.smartsolutions.eschool.sclass.model.SClassEntity;
-import com.smartsolutions.eschool.sclass.model.SectionEntity;
-import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
-import com.smartsolutions.eschool.util.ResourceObject;
-import jakarta.validation.ValidationException;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional
@@ -92,8 +86,7 @@ public class SectionController {
             return ResponseEntity.ok(rows + " sections soft deleted");
         } catch (Exception ex) {
             log.error("Error deleting by standardId {} ", standardId, ex);
-            return ResponseEntity.internalServerError()
-                    .body("Failed to delete sections by standard");
+            return ResponseEntity.internalServerError().body("Failed to delete sections by standard");
         }
     }
 
@@ -106,8 +99,30 @@ public class SectionController {
             return ResponseEntity.ok(rows + " sections soft deleted");
         } catch (Exception ex) {
             log.error("Error soft deleting ALL sections", ex);
-            return ResponseEntity.internalServerError()
-                    .body("Failed to soft delete all sections");
+            return ResponseEntity.internalServerError().body("Failed to soft delete all sections");
         }
     }
+
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SectionCreateRequestDTO> createSection(@Valid @RequestBody SectionCreateRequestDTO dto) {
+
+        log.info("Received request to create new Section: {}", dto.getSectionName());
+        SectionCreateRequestDTO createdSection = sectionFacade.createSection(dto);
+        log.info("Section created successfully with id: {}", createdSection.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSection);
+    }
+
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SectionDTO> updateSection(@PathVariable Long id, @Valid @RequestBody SectionCreateRequestDTO dto) {
+
+        log.info("Received request to update Section with id: {}", id);
+        SectionDTO updatedStandard = sectionFacade.updateSection(id, dto);
+        log.info("Returning updated Section: id={}", updatedStandard.getId());
+        return ResponseEntity.ok(updatedStandard);
+    }
+
+
+
+
+
 }

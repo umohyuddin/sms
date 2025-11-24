@@ -1,27 +1,33 @@
 package com.smartsolutions.eschool.sclass.service;
 
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
+import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
-import com.smartsolutions.eschool.sclass.repository.SectionDao;
+import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.sclass.repository.SectionRepository;
-import com.smartsolutions.eschool.student.dtos.StudentDTO;
-import com.smartsolutions.eschool.student.model.StudentEntity;
+import com.smartsolutions.eschool.sclass.repository.StandardRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
+import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.service.spi.ServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.util.List;
 
 @Service
 @Slf4j
 public class SectionService {
-    @Autowired
-    private SectionRepository sectionRepository;
+    private final SectionRepository sectionRepository;
+    private final StandardRepository standardRepository;
+
+    public SectionService(SectionRepository sectionRepository, StandardRepository standardRepository) {
+        this.sectionRepository = sectionRepository;
+        this.standardRepository = standardRepository;
+    }
 
 
     public List<SectionDTO> getAll() {
@@ -109,5 +115,57 @@ public class SectionService {
         return sectionDTO;
     }
 
+    public SectionCreateRequestDTO createSection(SectionCreateRequestDTO standardDTO) {
+        log.info("Creating new Section: {}", standardDTO);
+        try {
+            SectionEntity entity = MapperUtil.mapObject(standardDTO, SectionEntity.class);
+            entity.setId(null);
+            entity.getStandard().setId(standardDTO.getStandardId());
+            entity.setDeleted(false);
+            entity.setDeletedAt(null);
+
+            SectionEntity saved = sectionRepository.save(entity);
+            SectionCreateRequestDTO responseDTO = MapperUtil.mapObject(saved, SectionCreateRequestDTO.class);
+
+            log.info("Section created successfully with ID: {}", responseDTO.getId());
+
+            return responseDTO;
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while creating Section", dae);
+            throw dae;
+        } catch (Exception ex) {
+            log.error("Unexpected error creating Section", ex);
+            throw ex;
+        }
+    }
+
+    public SectionDTO updateSection(Long id, @Valid SectionCreateRequestDTO dto) {
+        log.info("Updating Section with id {} using DTO {}", id, dto);
+
+        SectionEntity entity = sectionRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + id));
+
+        if (dto.getSectionName() != null && !dto.getSectionName().isBlank()) {
+            entity.setSectionName(dto.getSectionName());
+        }
+        if (dto.getSectionCode() != null) {
+            entity.setSectionCode(dto.getSectionCode());
+        }
+
+
+        if (dto.getStandardId() != null && (entity.getStandard() == null || !entity.getStandard().getId().equals(dto.getStandardId()))) {
+            StandardEntity standardEntity = standardRepository.findByIdAndDeletedFalse(dto.getStandardId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Standard not found with id: " + dto.getStandardId()));
+            entity.setStandard(standardEntity);
+        }
+
+        SectionEntity updated = sectionRepository.save(entity);
+
+        SectionDTO response = MapperUtil.mapObject(updated, SectionDTO.class);
+
+        log.info("Section updated successfully: {}", response.getId());
+        return response;
+    }
 }
 

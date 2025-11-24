@@ -1,8 +1,13 @@
 package com.smartsolutions.eschool.school.repository;
 
 import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,4 +23,12 @@ public interface CampusRepository extends JpaRepository<CampusEntity, Long> {
 
     // Find a campus by its name WHERE campus_name LIKE %?%
     List<CampusEntity> findByCampusNameContainingAndDeletedFalse(String campusName);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE CampusEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " +
+            "WHERE s.id = :id")
+    int softDeleteById(@Param("id") Long id);
+
+    Long id(Long id);
 }

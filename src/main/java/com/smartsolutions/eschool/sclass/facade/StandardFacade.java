@@ -1,12 +1,8 @@
 package com.smartsolutions.eschool.sclass.facade;
 
+import com.smartsolutions.eschool.sclass.dtos.requestDto.StandardCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
-import com.smartsolutions.eschool.sclass.model.SClassEntity;
-import com.smartsolutions.eschool.sclass.service.SClassService;
 import com.smartsolutions.eschool.sclass.service.StandardService;
-import com.smartsolutions.eschool.util.ResourceObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
@@ -21,19 +17,41 @@ public class StandardFacade {
 
     @Autowired
     @Lazy
-    private StandardService standardServicee;
-
-//    public List<ResourceObject> getAll() {
-//        return standardServicee.getAll();
-//    }
+    private StandardService standardService;
 
     public List<StandardDTO> getAll() {
-        return standardServicee.getAll();
+        return standardService.getAll();
     }
 
     public StandardDTO getById(Long id) {
-        return standardServicee.getById(id);
+        return standardService.getById(id);
     }
+
+    public StandardCreateRequestDTO create(StandardCreateRequestDTO standardDTO) {
+        return standardService.create(standardDTO);
+    }
+
+    public int softDeleteById(Long standardId) {
+        return standardService.softDeleteById(standardId);
+    }
+
+    public StandardDTO updateStandard(Long id, StandardCreateRequestDTO dto) {
+        return standardService.updateStandard(id, dto);
+    }
+
+    public List<StandardDTO> searchByKeyword(String keyword) {
+        return standardService.searchByKeyword(keyword);
+    }
+
+    public List<StandardDTO> getByCampusId(Long id) {
+        return standardService.findByCampusId(id);
+    }
+
+    public int softDeleteByCampusId(Long campusId) {
+       return standardService.sofDeleteByCampusId(campusId);
+    }
+
+
 //
 //    public List<SClassEntity> getByTeacherId(Long id) {
 //        return standardServicee.getByTeacherId(id);
