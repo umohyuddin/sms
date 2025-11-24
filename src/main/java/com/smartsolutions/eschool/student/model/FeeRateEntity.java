@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import jakarta.persistence.*;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "fee_rates")
@@ -26,6 +28,11 @@ public class FeeRateEntity {
     private Long id;
 
     // Foreign key to campus
+
+    @OneToMany(mappedBy = "feeRate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<StudentFeeAssignment> feeAssignments;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "campus_id", nullable = false)
     private CampusEntity campus;

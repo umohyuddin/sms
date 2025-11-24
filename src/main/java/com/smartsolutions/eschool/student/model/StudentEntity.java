@@ -99,8 +99,11 @@ public class StudentEntity {
     private SectionEntity section;
 
     // Optional: bidirectional mapping to FeeRateEntity
-    @OneToMany(mappedBy = "campus", fetch = FetchType.LAZY)
-    private List<FeeRateEntity> feeRates;
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<StudentFeeAssignment> feeAssignments;
 
-    // ---- BASIC FIELDS ---- //
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<StudentFeePayment> feePayments;
+
 }
