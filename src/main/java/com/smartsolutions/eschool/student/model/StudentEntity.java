@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -96,6 +97,10 @@ public class StudentEntity {
     @JoinColumn(name = "section_id")
     @JsonIgnore
     private SectionEntity section;
+
+    // Optional: bidirectional mapping to FeeRateEntity
+    @OneToMany(mappedBy = "campus", fetch = FetchType.LAZY)
+    private List<FeeRateEntity> feeRates;
 
     // ---- BASIC FIELDS ---- //
 }

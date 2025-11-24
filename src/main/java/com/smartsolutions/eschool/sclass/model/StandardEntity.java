@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.sclass.model;
 
 import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.student.model.FeeRateEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -55,5 +56,8 @@ public class StandardEntity {
 
     @OneToMany(mappedBy = "standard", fetch = FetchType.LAZY)
     private List<StudentEntity> students;
+
+    @OneToMany(mappedBy = "standard", fetch = FetchType.LAZY)
+    private List<FeeRateEntity> feeRates;
 
 }

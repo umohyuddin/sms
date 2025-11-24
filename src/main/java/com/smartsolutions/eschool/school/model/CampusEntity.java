@@ -1,9 +1,7 @@
 package com.smartsolutions.eschool.school.model;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
+import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.user.model.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -86,5 +84,8 @@ public class CampusEntity {
 
     @OneToMany(mappedBy = "campus", fetch = FetchType.LAZY)
     private List<StudentEntity> students;
+
+    @OneToMany(mappedBy = "campus", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<FeeCatalogEntity> feeCatalogs;
 
 }

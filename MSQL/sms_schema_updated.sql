@@ -8,6 +8,24 @@ sms;
 SET
 FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS `academic_years`;
+CREATE TABLE academic_years
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(50) NOT NULL, -- e.g., "2024-2025"
+    start_date DATE        NOT NULL,
+    end_date   DATE        NOT NULL,
+    is_current BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at DATETIME             DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+INSERT INTO academic_years (name, start_date, end_date, is_current, created_at, updated_at)
+VALUES ('2022-2023', '2022-08-01', '2023-07-31', false, NOW(), NOW()),
+       ('2023-2024', '2023-08-01', '2024-07-31', false, NOW(), NOW()),
+       ('2024-2025', '2024-08-01', '2025-07-31', true, NOW(), NOW()),
+       ('2025-2026', '2025-08-01', '2026-07-31', false, NOW(), NOW()),
+       ('2026-2027', '2026-08-01', '2027-07-31', false, NOW(), NOW());
 
 
 -- institutes TABLE
