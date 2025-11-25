@@ -407,6 +407,7 @@ CREATE TABLE fee_rates
 
     campus_id        BIGINT       NOT NULL,
     standard_id      BIGINT       NOT NULL,
+    academic_year_id BIGINT       NOT NULL,
     fee_component_id BIGINT,
 
     code             VARCHAR(50)  NOT NULL,
@@ -417,7 +418,6 @@ CREATE TABLE fee_rates
     recurrence_rule  VARCHAR(100),
 
     active           BOOLEAN      NOT NULL DEFAULT TRUE,
-    academic_year    VARCHAR(20),
 
     amount           DECIMAL(10, 2),
     effective_from   DATE,
@@ -426,74 +426,77 @@ CREATE TABLE fee_rates
     created_at       DATETIME              DEFAULT CURRENT_TIMESTAMP,
     updated_at       DATETIME              DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
+    deleted          BOOLEAN      NOT NULL DEFAULT FALSE,
+    deleted_at       DATETIME,
     CONSTRAINT fk_fee_rates_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
 
     CONSTRAINT fk_fee_rates_standard FOREIGN KEY (standard_id) REFERENCES standards (id),
 
-    CONSTRAINT fk_fee_rates_component FOREIGN KEY (fee_component_id) REFERENCES fee_component (id)
+    CONSTRAINT fk_fee_rates_component FOREIGN KEY (fee_component_id) REFERENCES fee_component (id),
+    CONSTRAINT fk_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );
 
 
 INSERT INTO fee_rates
 (campus_id, standard_id, fee_component_id, code, name, description, charge_type,
- recurrence_rule, active, academic_year, amount, effective_from, effective_to)
+ recurrence_rule, active, amount, effective_from, effective_to, academic_year_id)
 VALUES
 -- Library Fee
 (1, 1, 11, 'LIB-MAIN-001-RATE', 'Library Fee – Basic', 'Monthly library charges', 'FIXED',
- 'MONTHLY', TRUE, '2024-25', 300.00, '2024-04-01', NULL),
+ 'MONTHLY', TRUE,  300.00, '2024-04-01', NULL, 3),
 
 -- Computer Lab
 (1, 2, 2, 'CMP-MAIN-001-RATE', 'Computer Lab Fee', 'System usage + maintenance', 'FIXED',
- 'MONTHLY', TRUE, '2024-25', 500.00, '2024-04-01', NULL),
+ 'MONTHLY', TRUE,  500.00, '2024-04-01', NULL, 3),
 
 -- Science Lab
 (1, 3, 3, 'SCI-MAIN-001-RATE', 'Science Lab Fee', 'Lab consumables fee', 'FIXED',
- 'MONTHLY', TRUE, '2024-25', 450.00, '2024-04-01', NULL),
+ 'MONTHLY', TRUE,  450.00, '2024-04-01', NULL, 3),
 
 -- Registration Fee (One-time)
 (1, 1, 4, 'REG-MAIN-001-RATE', 'Registration Fee', 'One-time student registration', 'FIXED',
- 'ONE_TIME', TRUE, '2024-25', 2000.00, '2024-04-01', NULL),
+ 'ONE_TIME', TRUE, 2000.00, '2024-04-01', NULL, 3),
 
 -- Security Charges (Annual)
 (1, 4, 5, 'SEC-MAIN-001-RATE', 'Security Charges', 'Annual security management fee', 'FIXED',
- 'YEARLY', TRUE, '2024-25', 1200.00, '2024-04-01', NULL);
+ 'YEARLY', TRUE,  1200.00, '2024-04-01', NULL, 3);
 
 INSERT INTO fee_rates
 (campus_id, standard_id, fee_component_id, code, name, description, charge_type,
- recurrence_rule, active, academic_year, amount, effective_from, effective_to)
+ recurrence_rule, active, amount, effective_from, effective_to, academic_year_id)
 VALUES
 -- Computer Lab Fee
 (2, 1, 14, 'CMP-CITY-001-RATE', 'Computer Lab Fee – City', 'City campus lab charges', 'FIXED',
- 'MONTHLY', TRUE, '2024-25', 400.00, '2024-04-01', NULL),
+ 'MONTHLY', TRUE,  400.00, '2024-04-01', NULL, 3),
 
 -- Registration Fee
 (2, 2, 16, 'REG-CITY-001-RATE', 'Registration Fee – City', 'One-time fee', 'FIXED',
- 'ONE_TIME', TRUE, '2024-25', 1800.00, '2024-04-01', NULL),
+ 'ONE_TIME', TRUE, 1800.00, '2024-04-01', NULL, 3),
 
 -- Exam Fee
 (2, 3, 17, 'EXM-CITY-001-RATE', 'Examination Charges', 'Mid/Final exam charges', 'FIXED',
- 'ONE_TIME', TRUE, '2024-25', 1500.00, '2024-04-01', NULL);
+ 'ONE_TIME', TRUE, 1500.00, '2024-04-01', NULL, 3);
 
 
 INSERT INTO fee_rates
 (campus_id, standard_id, fee_component_id, code, name, description, charge_type,
- recurrence_rule, active, academic_year, amount, effective_from, effective_to)
+ recurrence_rule, active, amount, effective_from, effective_to, academic_year_id)
 VALUES
 -- Computer Lab Fee
 (3, 1, 20, 'CMP-GIRLS-001-RATE', 'Computer Lab Fee – Girls', 'Lab maintenance (girls campus)', 'FIXED',
- 'MONTHLY', TRUE, '2024-25', 350.00, '2024-04-01', NULL),
+ 'MONTHLY', TRUE,  350.00, '2024-04-01', NULL, 3),
 
 -- Exam Fee
 (3, 2, 22, 'EXM-GIRLS-001-RATE', 'Examination Fee – Girls', 'Annual exam charges', 'FIXED',
- 'ONE_TIME', TRUE, '2024-25', 1400.00, '2024-04-01', NULL),
+ 'ONE_TIME', TRUE, 1400.00, '2024-04-01', NULL, 3),
 
 -- Activity Fee
 (3, 3, 23, 'ACT-GIRLS-001-RATE', 'Activity Fee', 'Extracurricular activities', 'FIXED',
- 'MONTHLY', TRUE, '2024-25', 250.00, '2024-04-01', NULL),
+ 'MONTHLY', TRUE,  250.00, '2024-04-01', NULL, 3),
 
 -- Health Fee
 (3, 4, 24, 'HEALTH-GIRLS-001-RATE', 'Health & Medical Fee', 'Medical aid & hygiene', 'FIXED',
- 'YEARLY', TRUE, '2024-25', 1000.00, '2024-04-01', NULL);
+ 'YEARLY', TRUE,  1000.00, '2024-04-01', NULL, 3);
 
 DROP TABLE IF EXISTS student_fee_assignments;
 
@@ -515,28 +518,28 @@ CREATE TABLE student_fee_assignments
     CONSTRAINT fk_sfa_fee_rate FOREIGN KEY (fee_rate_id) REFERENCES fee_rates (id)
 );
 
-INSERT INTO student_fee_assignments (student_id, fee_rate_id, total_amount, due_date, assigned_date)
-VALUES
--- STU001 (Ali Khan)
-(1, 1, 2300.00, '2024-05-02', '2024-04-02'),
-
--- STU002 (Ayesha Malik)
-(2, 1, 2300.00, '2024-05-03', '2024-04-03'),
-
--- STU003 (Hassan Ali)
-(3, 2, 500.00, '2024-05-05', '2024-04-05'),
-
--- STU004
-(4, 7, 1800.00, '2024-05-06', '2024-04-06'),
-
--- STU005
-(5, 8, 1500.00, '2024-05-06', '2024-04-06'),
-
--- STU006 (Zainab Raza)
-(6, 3, 450.00, '2024-05-07', '2024-04-07'),
-
--- STU007 (Ahmed Farooq)
-(7, 5, 1200.00, '2024-05-10', '2024-04-10');
+-- INSERT INTO student_fee_assignments (student_id, fee_rate_id, total_amount, due_date, assigned_date)
+-- VALUES
+-- -- STU001 (Ali Khan)
+-- (1, 1, 2300.00, '2024-05-02', '2024-04-02'),
+--
+-- -- STU002 (Ayesha Malik)
+-- (2, 1, 2300.00, '2024-05-03', '2024-04-03'),
+--
+-- -- STU003 (Hassan Ali)
+-- (3, 2, 500.00, '2024-05-05', '2024-04-05'),
+--
+-- -- STU004
+-- (4, 7, 1800.00, '2024-05-06', '2024-04-06'),
+--
+-- -- STU005
+-- (5, 8, 1500.00, '2024-05-06', '2024-04-06'),
+--
+-- -- STU006 (Zainab Raza)
+-- (6, 3, 450.00, '2024-05-07', '2024-04-07'),
+--
+-- -- STU007 (Ahmed Farooq)
+-- (7, 5, 1200.00, '2024-05-10', '2024-04-10');
 
 
 DROP TABLE IF EXISTS student_fee_payments;
@@ -559,19 +562,36 @@ CREATE TABLE student_fee_payments
     CONSTRAINT fk_sfp_assignment FOREIGN KEY (assignment_id) REFERENCES student_fee_assignments (id)
 );
 
-INSERT INTO student_fee_payments
-(student_id, assignment_id, payment_date, amount_paid, payment_month, payment_year, payment_mode, created_at)
-VALUES (1, 1, '2024-05-02', 2300.00, 'May', 2024, 'Cash', NOW()),
-       (1, 1, '2024-06-02', 2300.00, 'June', 2024, 'Bank Transfer', NOW()),
+-- INSERT INTO student_fee_payments
+-- (student_id, assignment_id, payment_date, amount_paid, payment_month, payment_year, payment_mode, created_at)
+-- VALUES (1, 1, '2024-05-02', 2300.00, 'May', 2024, 'Cash', NOW()),
+--        (1, 1, '2024-06-02', 2300.00, 'June', 2024, 'Bank Transfer', NOW()),
+--
+--        (2, 2, '2024-05-03', 2300.00, 'May', 2024, 'Cheque', NOW()),
+--
+--        (3, 3, '2024-05-05', 500.00, 'May', 2024, 'Cash', NOW()),
+--
+--        (4, 4, '2024-05-06', 1800.00, 'May', 2024, 'Bank Transfer', NOW()),
+--
+--        (5, 5, '2024-05-06', 1500.00, 'May', 2024, 'Cash', NOW()),
+--
+--        (6, 6, '2024-05-07', 450.00, 'May', 2024, 'Cash', NOW()),
+--
+--        (7, 7, '2024-05-10', 1200.00, 'May', 2024, 'Cheque', NOW());
 
-       (2, 2, '2024-05-03', 2300.00, 'May', 2024, 'Cheque', NOW()),
+DROP TABLE IF EXISTS student_fee_summary;
+CREATE TABLE student_fee_summary
+(
+    id                 BIGINT PRIMARY KEY AUTO_INCREMENT,
+    student_id         BIGINT         NOT NULL,
+    academic_year_id   BIGINT         NOT NULL,
+    total_assigned_fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    total_paid         DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    balance            DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    updated_at         TIMESTAMP               DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-       (3, 3, '2024-05-05', 500.00, 'May', 2024, 'Cash', NOW()),
-
-       (4, 4, '2024-05-06', 1800.00, 'May', 2024, 'Bank Transfer', NOW()),
-
-       (5, 5, '2024-05-06', 1500.00, 'May', 2024, 'Cash', NOW()),
-
-       (6, 6, '2024-05-07', 450.00, 'May', 2024, 'Cash', NOW()),
-
-       (7, 7, '2024-05-10', 1200.00, 'May', 2024, 'Cheque', NOW());
+    CONSTRAINT fk_student_fee_summary_student
+        FOREIGN KEY (student_id) REFERENCES students (id),
+    CONSTRAINT fk_Student_fee_academic_year
+        FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
+);

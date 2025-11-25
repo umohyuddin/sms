@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.student.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import jakarta.persistence.*;
@@ -27,25 +28,6 @@ public class FeeRateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Foreign key to campus
-
-    @OneToMany(mappedBy = "feeRate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<StudentFeeAssignment> feeAssignments;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "campus_id", nullable = false)
-    private CampusEntity campus;
-
-    // Foreign key to standard
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "standard_id", nullable = false)
-    private StandardEntity standard;
-
-    // Foreign key to fee component (nullable)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fee_component_id")
-    private FeeComponentEntity feeComponent;
 
     @Column(name = "code", length = 50, nullable = false)
     private String code;
@@ -65,9 +47,6 @@ public class FeeRateEntity {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    @Column(name = "academic_year", length = 20)
-    private String academicYear;
-
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -84,4 +63,35 @@ public class FeeRateEntity {
 
     @Column(name = "effective_to")
     private LocalDate effectiveTo;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+
+    @OneToMany(mappedBy = "feeRate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<StudentFeeAssignmentEntity> feeAssignments;
+
+    // Foreign key to campus
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campus_id", nullable = false)
+    private CampusEntity campus;
+
+    // Foreign key to standard
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "standard_id", nullable = false)
+    private StandardEntity standard;
+
+    // Foreign key to fee component (nullable)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fee_component_id")
+    private FeeComponentEntity feeComponent;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academic_year_id", nullable = false)
+    private AcademicYearEntity academicYear;
+
 }

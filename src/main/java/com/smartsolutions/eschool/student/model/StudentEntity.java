@@ -101,9 +101,13 @@ public class StudentEntity {
     // Optional: bidirectional mapping to FeeRateEntity
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<StudentFeeAssignment> feeAssignments;
+    private List<StudentFeeAssignmentEntity> feeAssignments;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<StudentFeePayment> feePayments;
+
+    // --- Fee Summary (total per academic year) ---
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<StudentFeeSummaryEntity> feeSummaries;
 
 }

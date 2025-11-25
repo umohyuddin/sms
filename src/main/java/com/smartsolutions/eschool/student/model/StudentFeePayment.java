@@ -29,7 +29,7 @@ public class StudentFeePayment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignment_id", nullable = false)
-    private StudentFeeAssignment assignment;
+    private StudentFeeAssignmentEntity assignment;
 
     // --- Fields ---
 

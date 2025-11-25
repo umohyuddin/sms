@@ -39,6 +39,8 @@ public class AcademicYearEntity {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+
 }
 
 

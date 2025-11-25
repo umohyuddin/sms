@@ -1,6 +1,5 @@
 package com.smartsolutions.eschool.student.repository;
 
-import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,5 +36,6 @@ public interface FeeComponentRepository extends JpaRepository<FeeComponentEntity
             "AND fc.feeCatalog.deleted = false")
     List<FeeComponentEntity> findFeeComponentsByCatalogId(@Param("catalogId") Long catalogId);
 }
+
 
 
