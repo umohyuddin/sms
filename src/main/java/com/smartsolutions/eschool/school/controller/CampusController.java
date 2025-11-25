@@ -35,7 +35,6 @@ public class CampusController {
     @Autowired
     private CampusFacade nCampusFacade;
 
-    //  get all employee
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() throws Exception {
         log.info("GET /api/institute/campus called");

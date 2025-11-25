@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -35,6 +36,14 @@ public class FeeComponentEntity {
 
     @Column(name = "taxable", nullable = false)
     private boolean taxable = false;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+
 
     @OneToMany(mappedBy = "feeComponent", fetch = FetchType.LAZY)
     private List<FeeRateEntity> feeRates;

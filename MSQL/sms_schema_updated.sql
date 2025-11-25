@@ -259,7 +259,8 @@ CREATE TABLE fee_catalog
 
     created_at       DATETIME              DEFAULT CURRENT_TIMESTAMP,
     updated_at       DATETIME              DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
+    deleted          BOOLEAN      NOT NULL DEFAULT FALSE,
+    deleted_at       DATETIME,
     CONSTRAINT fk_fee_catalog_campus
         FOREIGN KEY (campus_id) REFERENCES campuses (id),
 
@@ -269,37 +270,47 @@ CREATE TABLE fee_catalog
 
 
 INSERT INTO fee_catalog
-(code, name, description, charge_type, recurrence_rule, active, academic_year_id, campus_id)
+(code, name, description, charge_type, recurrence_rule, active, academic_year_id, campus_id, deleted, deleted_at)
 VALUES
-
 -- General School Charges (Campus 1 – Main)
-('LIB-MAIN-001', 'Library Fee', 'Library maintenance and book renewal charges', 'FIXED', 'MONTHLY', TRUE, 1, 1),
-('CMP-MAIN-001', 'Computer Lab Fee', 'Computer lab usage and maintenance charges', 'FIXED', 'MONTHLY', TRUE, 1, 1),
-('SCI-MAIN-001', 'Science Lab Fee', 'Charges for science laboratory usage', 'FIXED', 'MONTHLY', TRUE, 1, 1),
-('REG-MAIN-001', 'Registration Fee', 'New student registration charges', 'FIXED', 'ONE_TIME', TRUE, 1, 1),
-('SEC-MAIN-001', 'Security Charges', 'Annual security and safety maintenance fee', 'FIXED', 'YEARLY', TRUE, 1, 1),
-('GEN-MAIN-001', 'Generator Fuel Charges', 'Fuel cost for backup generator', 'FIXED', 'MONTHLY', TRUE, 1, 1),
+('LIB-MAIN-001', 'Library Fee', 'Library maintenance and book renewal charges', 'FIXED', 'MONTHLY', TRUE, 1, 1, FALSE,
+ NULL),
+('CMP-MAIN-001', 'Computer Lab Fee', 'Computer lab usage and maintenance charges', 'FIXED', 'MONTHLY', TRUE, 1, 1,
+ FALSE, NULL),
+('SCI-MAIN-001', 'Science Lab Fee', 'Charges for science laboratory usage', 'FIXED', 'MONTHLY', TRUE, 1, 1, FALSE,
+ NULL),
+('REG-MAIN-001', 'Registration Fee', 'New student registration charges', 'FIXED', 'ONE_TIME', TRUE, 1, 1, FALSE, NULL),
+('SEC-MAIN-001', 'Security Charges', 'Annual security and safety maintenance fee', 'FIXED', 'YEARLY', TRUE, 1, 1, FALSE,
+ NULL),
+('GEN-MAIN-001', 'Generator Fuel Charges', 'Fuel cost for backup generator', 'FIXED', 'MONTHLY', TRUE, 1, 1, FALSE,
+ NULL),
 ('DEV-MAIN-001', 'Development Charges', 'School building and infrastructure development fund', 'FIXED', 'YEARLY', TRUE,
- 1, 1),
-('MAINT-MAIN-001', 'Maintenance Charges', 'School maintenance and repair charges', 'FIXED', 'MONTHLY', TRUE, 1, 1),
-('SPORT-MAIN-001', 'Sports Fee', 'Sports activities and facilities fee', 'FIXED', 'MONTHLY', TRUE, 1, 1),
-('ID-MAIN-001', 'Student ID Card Fee', 'Charges for issuing student ID card', 'FIXED', 'ONE_TIME', TRUE, 1, 1),
+ 1, 1, FALSE, NULL),
+('MAINT-MAIN-001', 'Maintenance Charges', 'School maintenance and repair charges', 'FIXED', 'MONTHLY', TRUE, 1, 1,
+ FALSE, NULL),
+('SPORT-MAIN-001', 'Sports Fee', 'Sports activities and facilities fee', 'FIXED', 'MONTHLY', TRUE, 1, 1, FALSE, NULL),
+('ID-MAIN-001', 'Student ID Card Fee', 'Charges for issuing student ID card', 'FIXED', 'ONE_TIME', TRUE, 1, 1, FALSE,
+ NULL),
 
-('HST-ANN-001', 'Hostel Security Deposit', 'Refundable hostel security deposit', 'FIXED', 'ONE_TIME', TRUE, 1, 1),
+('HST-ANN-001', 'Hostel Security Deposit', 'Refundable hostel security deposit', 'FIXED', 'ONE_TIME', TRUE, 1, 1, FALSE,
+ NULL),
 
 -- Campus 2 (City Campus)
-('CMP-CITY-001', 'Computer Lab Fee', 'Charges for computer lab usage', 'FIXED', 'MONTHLY', TRUE, 1, 2),
-('REG-CITY-001', 'Registration Fee', 'Student registration fee - City Campus', 'FIXED', 'ONE_TIME', TRUE, 1, 2),
-('EXM-CITY-001', 'Exam Charges', 'Mid & final exam charges', 'FIXED', 'ONE_TIME', TRUE, 1, 2),
-('DEV-CITY-001', 'Development Fee', 'Campus development & improvement fund', 'FIXED', 'YEARLY', TRUE, 1, 2),
+('CMP-CITY-001', 'Computer Lab Fee', 'Charges for computer lab usage', 'FIXED', 'MONTHLY', TRUE, 1, 2, FALSE, NULL),
+('REG-CITY-001', 'Registration Fee', 'Student registration fee - City Campus', 'FIXED', 'ONE_TIME', TRUE, 1, 2, FALSE,
+ NULL),
+('EXM-CITY-001', 'Exam Charges', 'Mid & final exam charges', 'FIXED', 'ONE_TIME', TRUE, 1, 2, FALSE, NULL),
+('DEV-CITY-001', 'Development Fee', 'Campus development & improvement fund', 'FIXED', 'YEARLY', TRUE, 1, 2, FALSE,
+ NULL),
 
 -- Campus 3 (Girls Campus)
-('CMP-GIRLS-001', 'Computer Lab Fee', 'Girls campus computer lab usage', 'FIXED', 'MONTHLY', TRUE, 1, 3),
-('EXM-GIRLS-001', 'Examination Charges', 'Girls campus exam fee', 'FIXED', 'ONE_TIME', TRUE, 1, 3),
-('REG-GIRLS-001', 'Registration Fee', 'Girls campus registration charges', 'FIXED', 'ONE_TIME', TRUE, 1, 3),
-('ACT-GIRLS-001', 'Activity Fee', 'Co-curricular & extra activities fee', 'FIXED', 'MONTHLY', TRUE, 1, 3),
+('CMP-GIRLS-001', 'Computer Lab Fee', 'Girls campus computer lab usage', 'FIXED', 'MONTHLY', TRUE, 1, 3, FALSE, NULL),
+('EXM-GIRLS-001', 'Examination Charges', 'Girls campus exam fee', 'FIXED', 'ONE_TIME', TRUE, 1, 3, FALSE, NULL),
+('REG-GIRLS-001', 'Registration Fee', 'Girls campus registration charges', 'FIXED', 'ONE_TIME', TRUE, 1, 3, FALSE,
+ NULL),
+('ACT-GIRLS-001', 'Activity Fee', 'Co-curricular & extra activities fee', 'FIXED', 'MONTHLY', TRUE, 1, 3, FALSE, NULL),
 ('HEALTH-GIRLS-001', 'Health & Medical Fee', 'Basic first-aid, medical checkup, and hygiene support', 'FIXED', 'YEARLY',
- TRUE, 1, 3);
+ TRUE, 1, 3, FALSE, NULL);
 
 
 CREATE TABLE fee_component
@@ -311,7 +322,8 @@ CREATE TABLE fee_component
     component_name VARCHAR(100) NOT NULL,
     account_code   VARCHAR(50),
     taxable        BOOLEAN      NOT NULL DEFAULT FALSE,
-
+    deleted        BOOLEAN      NOT NULL DEFAULT FALSE,
+    deleted_at     DATETIME,
     CONSTRAINT fk_fee_component_catalog
         FOREIGN KEY (fee_catalog_id) REFERENCES fee_catalog (id)
 );
@@ -549,18 +561,17 @@ CREATE TABLE student_fee_payments
 
 INSERT INTO student_fee_payments
 (student_id, assignment_id, payment_date, amount_paid, payment_month, payment_year, payment_mode, created_at)
-VALUES
-    (1, 1, '2024-05-02', 2300.00, 'May', 2024, 'Cash', NOW()),
-    (1, 1, '2024-06-02', 2300.00, 'June', 2024, 'Bank Transfer', NOW()),
+VALUES (1, 1, '2024-05-02', 2300.00, 'May', 2024, 'Cash', NOW()),
+       (1, 1, '2024-06-02', 2300.00, 'June', 2024, 'Bank Transfer', NOW()),
 
-    (2, 2, '2024-05-03', 2300.00, 'May', 2024, 'Cheque', NOW()),
+       (2, 2, '2024-05-03', 2300.00, 'May', 2024, 'Cheque', NOW()),
 
-    (3, 3, '2024-05-05', 500.00, 'May', 2024, 'Cash', NOW()),
+       (3, 3, '2024-05-05', 500.00, 'May', 2024, 'Cash', NOW()),
 
-    (4, 4, '2024-05-06', 1800.00, 'May', 2024, 'Bank Transfer', NOW()),
+       (4, 4, '2024-05-06', 1800.00, 'May', 2024, 'Bank Transfer', NOW()),
 
-    (5, 5, '2024-05-06', 1500.00, 'May', 2024, 'Cash', NOW()),
+       (5, 5, '2024-05-06', 1500.00, 'May', 2024, 'Cash', NOW()),
 
-    (6, 6, '2024-05-07', 450.00, 'May', 2024, 'Cash', NOW()),
+       (6, 6, '2024-05-07', 450.00, 'May', 2024, 'Cash', NOW()),
 
-    (7, 7, '2024-05-10', 1200.00, 'May', 2024, 'Cheque', NOW());
+       (7, 7, '2024-05-10', 1200.00, 'May', 2024, 'Cheque', NOW());

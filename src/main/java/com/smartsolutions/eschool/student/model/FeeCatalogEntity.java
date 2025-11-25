@@ -55,6 +55,12 @@ public class FeeCatalogEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
 
     // ---------- RELATIONS ----------
     @ManyToOne(fetch = FetchType.LAZY)
