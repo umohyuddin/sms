@@ -53,7 +53,7 @@ public class FeeRateController {
     public ResponseEntity<?> getByFeeComponentId(@PathVariable Long componentId) {
         log.info("GET /api/fee/rates by componentId called");
         List<FeeRateDTO> resources = feeRateFacade.getByFeeComponentId(componentId);
-        log.info("GET /api/fee/rates by ComponentId succeeded, returned {} resources", resources.size());
+        log.info("GET /api/fee/rates by  succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok(resources);
     }
 

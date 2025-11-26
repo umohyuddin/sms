@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.student.repository;
 
 import com.smartsolutions.eschool.student.model.StudentFeeAssignmentEntity;
+import com.smartsolutions.eschool.student.model.StudentFeePaymentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Transactional
 @Repository
-public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFeeAssignmentEntity, Long> {
+public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePaymentEntity, Long> {
 
 
     @Query("""
@@ -24,8 +25,6 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             @Param("studentId") Long studentId,
             @Param("academicYearId") Long academicYearId
     );
-
-
 
     @Query("""
             SELECT sf
@@ -40,7 +39,6 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             @Param("studentId") Long studentId,
             @Param("academicYearId") Long academicYearId
     );
-
 }
 
 

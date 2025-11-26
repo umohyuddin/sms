@@ -104,7 +104,7 @@ public class StudentEntity {
     private List<StudentFeeAssignmentEntity> feeAssignments;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<StudentFeePayment> feePayments;
+    private List<StudentFeePaymentEntity> feePayments;
 
     // --- Fee Summary (total per academic year) ---
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

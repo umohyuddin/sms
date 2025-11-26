@@ -11,22 +11,24 @@ FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `academic_years`;
 CREATE TABLE academic_years
 (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name       VARCHAR(50) NOT NULL, -- e.g., "2024-2025"
-    start_date DATE        NOT NULL,
-    end_date   DATE        NOT NULL,
-    is_current BOOLEAN     NOT NULL DEFAULT FALSE,
-    created_at DATETIME             DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name         VARCHAR(50) NOT NULL, -- e.g., "2024-2025"
+    start_date   DATE        NOT NULL,
+    end_date     DATE        NOT NULL,
+    total_months INT         NOT NULL, -- Total months in the academic year
+    is_current   BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at   DATETIME             DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO academic_years (name, start_date, end_date, is_current, created_at, updated_at)
-VALUES ('2022-2023', '2022-08-01', '2023-07-31', false, NOW(), NOW()),
-       ('2023-2024', '2023-08-01', '2024-07-31', false, NOW(), NOW()),
-       ('2024-2025', '2024-08-01', '2025-07-31', true, NOW(), NOW()),
-       ('2025-2026', '2025-08-01', '2026-07-31', false, NOW(), NOW()),
-       ('2026-2027', '2026-08-01', '2027-07-31', false, NOW(), NOW());
 
+INSERT INTO academic_years (name, start_date, end_date, total_months, is_current, created_at, updated_at)
+VALUES
+    ('2022-2023', '2022-08-01', '2023-07-31', TIMESTAMPDIFF(MONTH, '2022-08-01', '2023-07-31') + 1, FALSE, NOW(), NOW()),
+    ('2023-2024', '2023-08-01', '2024-07-31', TIMESTAMPDIFF(MONTH, '2023-08-01', '2024-07-31') + 1, FALSE, NOW(), NOW()),
+    ('2024-2025', '2024-08-01', '2025-07-31', TIMESTAMPDIFF(MONTH, '2024-08-01', '2025-07-31') + 1, TRUE, NOW(), NOW()),
+    ('2025-2026', '2025-08-01', '2026-07-31', TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1, FALSE, NOW(), NOW()),
+    ('2026-2027', '2026-08-01', '2027-07-31', TIMESTAMPDIFF(MONTH, '2026-08-01', '2027-07-31') + 1, FALSE, NOW(), NOW());
 
 -- institutes TABLE
 DROP TABLE IF EXISTS `institutes`;
@@ -443,15 +445,15 @@ INSERT INTO fee_rates
 VALUES
 -- Library Fee
 (1, 1, 11, 'LIB-MAIN-001-RATE', 'Library Fee – Basic', 'Monthly library charges', 'FIXED',
- 'MONTHLY', TRUE,  300.00, '2024-04-01', NULL, 3),
+ 'MONTHLY', TRUE, 300.00, '2024-04-01', NULL, 3),
 
 -- Computer Lab
 (1, 2, 2, 'CMP-MAIN-001-RATE', 'Computer Lab Fee', 'System usage + maintenance', 'FIXED',
- 'MONTHLY', TRUE,  500.00, '2024-04-01', NULL, 3),
+ 'MONTHLY', TRUE, 500.00, '2024-04-01', NULL, 3),
 
 -- Science Lab
 (1, 3, 3, 'SCI-MAIN-001-RATE', 'Science Lab Fee', 'Lab consumables fee', 'FIXED',
- 'MONTHLY', TRUE,  450.00, '2024-04-01', NULL, 3),
+ 'MONTHLY', TRUE, 450.00, '2024-04-01', NULL, 3),
 
 -- Registration Fee (One-time)
 (1, 1, 4, 'REG-MAIN-001-RATE', 'Registration Fee', 'One-time student registration', 'FIXED',
@@ -459,7 +461,7 @@ VALUES
 
 -- Security Charges (Annual)
 (1, 4, 5, 'SEC-MAIN-001-RATE', 'Security Charges', 'Annual security management fee', 'FIXED',
- 'YEARLY', TRUE,  1200.00, '2024-04-01', NULL, 3);
+ 'YEARLY', TRUE, 1200.00, '2024-04-01', NULL, 3);
 
 INSERT INTO fee_rates
 (campus_id, standard_id, fee_component_id, code, name, description, charge_type,
@@ -467,7 +469,7 @@ INSERT INTO fee_rates
 VALUES
 -- Computer Lab Fee
 (2, 1, 14, 'CMP-CITY-001-RATE', 'Computer Lab Fee – City', 'City campus lab charges', 'FIXED',
- 'MONTHLY', TRUE,  400.00, '2024-04-01', NULL, 3),
+ 'MONTHLY', TRUE, 400.00, '2024-04-01', NULL, 3),
 
 -- Registration Fee
 (2, 2, 16, 'REG-CITY-001-RATE', 'Registration Fee – City', 'One-time fee', 'FIXED',
@@ -484,7 +486,7 @@ INSERT INTO fee_rates
 VALUES
 -- Computer Lab Fee
 (3, 1, 20, 'CMP-GIRLS-001-RATE', 'Computer Lab Fee – Girls', 'Lab maintenance (girls campus)', 'FIXED',
- 'MONTHLY', TRUE,  350.00, '2024-04-01', NULL, 3),
+ 'MONTHLY', TRUE, 350.00, '2024-04-01', NULL, 3),
 
 -- Exam Fee
 (3, 2, 22, 'EXM-GIRLS-001-RATE', 'Examination Fee – Girls', 'Annual exam charges', 'FIXED',
@@ -492,11 +494,11 @@ VALUES
 
 -- Activity Fee
 (3, 3, 23, 'ACT-GIRLS-001-RATE', 'Activity Fee', 'Extracurricular activities', 'FIXED',
- 'MONTHLY', TRUE,  250.00, '2024-04-01', NULL, 3),
+ 'MONTHLY', TRUE, 250.00, '2024-04-01', NULL, 3),
 
 -- Health Fee
 (3, 4, 24, 'HEALTH-GIRLS-001-RATE', 'Health & Medical Fee', 'Medical aid & hygiene', 'FIXED',
- 'YEARLY', TRUE,  1000.00, '2024-04-01', NULL, 3);
+ 'YEARLY', TRUE, 1000.00, '2024-04-01', NULL, 3);
 
 DROP TABLE IF EXISTS student_fee_assignments;
 

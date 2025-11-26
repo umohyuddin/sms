@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AcademicYearEntity {
+public class DiscountTypeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -49,5 +49,5 @@ public class StudentFeeAssignmentEntity {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<StudentFeePayment> payments;
+    private List<StudentFeePaymentEntity> payments;
 }

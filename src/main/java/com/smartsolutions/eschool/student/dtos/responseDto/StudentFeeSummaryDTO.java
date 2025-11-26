@@ -19,7 +19,7 @@ public class StudentFeeSummaryDTO {
     private BigDecimal balance;
 
     private Long studentId;
-    private String fullName;   // optional (recommended)
+    private String studentFullName;   // optional (recommended)
 
     private Long academicYearId;
     private String academicYearName;
