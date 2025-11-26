@@ -7,6 +7,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Transactional
 @Repository
 public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFeeAssignmentEntity, Long> {
@@ -19,6 +21,20 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
                   AND a.feeRate.academicYear.id = :academicYearId
             """)
     Double findTotalAssignedFee(
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId
+    );
+
+    @Query("""
+            SELECT sf
+            FROM StudentFeeAssignmentEntity sf
+            JOIN FETCH sf.student s
+            JOIN FETCH sf.feeRate fr
+            JOIN FETCH sf.feeRate.feeComponent c
+            WHERE s.id = :studentId
+              AND fr.academicYear.id = :academicYearId
+            """)
+    List<StudentFeeAssignmentEntity> findAllByStudentAndAcademicYear(
             @Param("studentId") Long studentId,
             @Param("academicYearId") Long academicYearId
     );

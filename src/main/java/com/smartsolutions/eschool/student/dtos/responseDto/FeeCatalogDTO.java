@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class FeeCatalogDTO {
     private Long id;
-
     private String code;
     private String name;
     private String description;
@@ -22,7 +21,6 @@ public class FeeCatalogDTO {
     // Relations (exposed as IDs + optional basic info)
     private Long campusId;
     private String campusName;
-
     private Long academicYearId;
     private String academicYearName;  // "2024-2025"
 

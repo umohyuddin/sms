@@ -1,9 +1,9 @@
 package com.smartsolutions.eschool.student.facade;
 
-import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeeAssignmentRequestDTO;
-import com.smartsolutions.eschool.student.dtos.responseDto.FeeRateDTO;
-import com.smartsolutions.eschool.student.service.FeeRateService;
+import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeAssignmentDTO;
+import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
+import com.smartsolutions.eschool.student.dtos.responseDto.byStudentId.StudentFeeAssignmentsResponseDTO;
 import com.smartsolutions.eschool.student.service.StudentFeeAssignmentService;
 import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
@@ -21,8 +21,13 @@ private StudentFeeAssignmentService studentFeeAssignmentService;
         this.studentFeeAssignmentService = studentFeeAssignmentService;
     }
 
-    public StudentFeeAssignmentRequestDTO assignStudentFee(Long id,@Valid StudentFeeAssignmentRequestDTO dto) {
+    public StudentFeeSummaryDTO assignStudentFee(Long id, @Valid StudentFeeAssignmentRequestDTO dto) {
         return studentFeeAssignmentService.assignStudentFee(id,dto);
     }
+
+    public StudentFeeAssignmentsResponseDTO getFeeAssignmentByStudentId(Long studentId, Long academicYearId) {
+        return studentFeeAssignmentService.getFeeAssignmentByStudentId(studentId,academicYearId);
+    }
+
 }
 
