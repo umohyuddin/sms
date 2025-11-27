@@ -616,7 +616,8 @@ CREATE TABLE discount_type
     updated_by    BIGINT,
     updated_at    TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
     deleted       BOOLEAN            NOT NULL DEFAULT FALSE,
-    deleted_at    DATETIME
+    deleted_at    DATETIME,
+    deleted_by    BIGINT
 );
 
 INSERT INTO discount_type
