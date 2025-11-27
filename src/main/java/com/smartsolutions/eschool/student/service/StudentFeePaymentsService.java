@@ -42,7 +42,7 @@ public class StudentFeePaymentsService {
 
 
     public StudentFeePaymentRequestDTO studentFeePayment(Long studentId, @Valid StudentFeePaymentRequestDTO requestDTO) {
-        log.info("💰 Processing fee payment | studentId={}, assignmentId={}, amount={}", studentId, requestDTO.getAssignmentId(), requestDTO.getAmountPaid());
+        log.info("💰 Processing fee payment | studentId={},  amount={}", studentId, requestDTO.getAmountPaid());
         try {
             // Fetch and validate student --add academic year
             StudentEntity student = studentRepository.findByIdAndDeletedFalse(studentId).orElseThrow(() -> {
@@ -50,27 +50,36 @@ public class StudentFeePaymentsService {
                 return new ResourceNotFoundException("Student not found with id " + studentId);
             });
 
-            //validate fee assignment
-            StudentFeeAssignmentEntity assignment = studentFeeAssignmentRepository.findById(requestDTO.getAssignmentId()).orElseThrow(() -> new ResourceNotFoundException("Fee Assignment not found"));
-
             // Fetch academic year
             AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> {
                 log.error("Current academic year not found");
                 return new ResourceNotFoundException("Current academic year not found");
             });
 
-            if (!assignment.getStudent().getId().equals(requestDTO.getStudentId())) {
-                throw new IllegalArgumentException("Assignment does not belong to the given student");
+            //validate fee assignment
+            //StudentFeeAssignmentEntity assignment = studentFeeAssignmentRepository.findById(requestDTO.getAssignmentId()).orElseThrow(() -> new ResourceNotFoundException("Fee Assignment not found"));
+
+            List<StudentFeeAssignmentEntity> assignments =
+                    studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, currentYear.getId());
+
+            if (assignments.isEmpty()) {
+                throw new ResourceNotFoundException("No fee assignments found for this student");
             }
+
+
+//            if (!assignment.getStudent().getId().equals(requestDTO.getStudentId())) {
+//                throw new IllegalArgumentException("Assignment does not belong to the given student");
+//            }
             StudentFeePaymentEntity payment = new StudentFeePaymentEntity();
             payment.setStudent(student);
-            payment.setAssignment(assignment);
+            //payment.setAssignment(assignment);
             payment.setPaymentDate(requestDTO.getPaymentDate());
             payment.setAmountPaid(requestDTO.getAmountPaid());
             payment.setPaymentMonth(requestDTO.getPaymentMonth());
             payment.setPaymentYear(requestDTO.getPaymentYear());
             payment.setPaymentMode(requestDTO.getPaymentMode());
             payment.setCreatedAt(LocalDateTime.now());
+            payment.setAcademicYear(currentYear);
 
             studentFeePaymentsRepository.save(payment);
             log.info("Fee payment recorded successfully | paymentId={}", payment.getId());
@@ -80,7 +89,6 @@ public class StudentFeePaymentsService {
 
             if (totalAssigned == null) totalAssigned = 0.0;
             BigDecimal assignedBD = BigDecimal.valueOf(totalAssigned);
-
 
 
             // Optional: Add a new field in assignment entity if you want:

@@ -20,9 +20,6 @@ public class StudentFeePaymentRequestDTO {
     @NotNull(message = "Student ID is required")
     private Long studentId;
 
-    @NotNull(message = "Assignment ID is required")
-    private Long assignmentId;
-
     @NotNull(message = "Payment date is required")
     private LocalDate paymentDate;
 

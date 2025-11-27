@@ -23,12 +23,16 @@ CREATE TABLE academic_years
 
 
 INSERT INTO academic_years (name, start_date, end_date, total_months, is_current, created_at, updated_at)
-VALUES
-    ('2022-2023', '2022-08-01', '2023-07-31', TIMESTAMPDIFF(MONTH, '2022-08-01', '2023-07-31') + 1, FALSE, NOW(), NOW()),
-    ('2023-2024', '2023-08-01', '2024-07-31', TIMESTAMPDIFF(MONTH, '2023-08-01', '2024-07-31') + 1, FALSE, NOW(), NOW()),
-    ('2024-2025', '2024-08-01', '2025-07-31', TIMESTAMPDIFF(MONTH, '2024-08-01', '2025-07-31') + 1, TRUE, NOW(), NOW()),
-    ('2025-2026', '2025-08-01', '2026-07-31', TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1, FALSE, NOW(), NOW()),
-    ('2026-2027', '2026-08-01', '2027-07-31', TIMESTAMPDIFF(MONTH, '2026-08-01', '2027-07-31') + 1, FALSE, NOW(), NOW());
+VALUES ('2022-2023', '2022-08-01', '2023-07-31', TIMESTAMPDIFF(MONTH, '2022-08-01', '2023-07-31') + 1, FALSE, NOW(),
+        NOW()),
+       ('2023-2024', '2023-08-01', '2024-07-31', TIMESTAMPDIFF(MONTH, '2023-08-01', '2024-07-31') + 1, FALSE, NOW(),
+        NOW()),
+       ('2024-2025', '2024-08-01', '2025-07-31', TIMESTAMPDIFF(MONTH, '2024-08-01', '2025-07-31') + 1, TRUE, NOW(),
+        NOW()),
+       ('2025-2026', '2025-08-01', '2026-07-31', TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1, FALSE, NOW(),
+        NOW()),
+       ('2026-2027', '2026-08-01', '2027-07-31', TIMESTAMPDIFF(MONTH, '2026-08-01', '2027-07-31') + 1, FALSE, NOW(),
+        NOW());
 
 -- institutes TABLE
 DROP TABLE IF EXISTS `institutes`;
@@ -547,21 +551,18 @@ CREATE TABLE student_fee_assignments
 DROP TABLE IF EXISTS student_fee_payments;
 CREATE TABLE student_fee_payments
 (
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-
-    student_id    BIGINT      NOT NULL,
-    assignment_id BIGINT      NOT NULL,
-
-    payment_date  DATE,
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    academic_year_id BIGINT      NOT NULL,
+    student_id       BIGINT      NOT NULL,
+    payment_date     DATE,
     amount_paid DOUBLE NOT NULL,
-    payment_month VARCHAR(20) NOT NULL,
-    payment_year  INT         NOT NULL,
-    payment_mode  VARCHAR(50),
+    payment_month    VARCHAR(20) NOT NULL,
+    payment_year     INT         NOT NULL,
+    payment_mode     VARCHAR(50),
 
-    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_sfp_student FOREIGN KEY (student_id) REFERENCES students (id),
-    CONSTRAINT fk_sfp_assignment FOREIGN KEY (assignment_id) REFERENCES student_fee_assignments (id)
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_fee_payment_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
+    CONSTRAINT fk_sfp_student FOREIGN KEY (student_id) REFERENCES students (id)
 );
 
 -- INSERT INTO student_fee_payments

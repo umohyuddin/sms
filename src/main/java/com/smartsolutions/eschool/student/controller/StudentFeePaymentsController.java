@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Transactional
 @RestController
-@RequestMapping("/api/student/payments")
+@RequestMapping("/api/students")
 @Slf4j
 public class StudentFeePaymentsController {
 
@@ -26,8 +26,8 @@ private final StudentFeePaymentsFacade studentFeePaymentsFacade;
         this.studentFeePaymentsFacade = studentFeePaymentsFacade;
     }
 
-    @PostMapping( value = "/{studentId}/fees/assign",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createSection(@PathVariable Long studentId, @RequestBody @Valid StudentFeePaymentRequestDTO requestDTO) {
+    @PostMapping( value = "/{studentId}/payments",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> studentFeePayment(@PathVariable Long studentId, @RequestBody @Valid StudentFeePaymentRequestDTO requestDTO) {
 
         log.info("Received request to Student Fee payment for student Id: {}", studentId);
         StudentFeePaymentRequestDTO studentFeePayment = studentFeePaymentsFacade.studentFeePayment(studentId,requestDTO);

@@ -48,6 +48,6 @@ public class StudentFeeAssignmentEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<StudentFeePaymentEntity> payments;
+//    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = false)
+//    private List<StudentFeePaymentEntity> payments;
 }

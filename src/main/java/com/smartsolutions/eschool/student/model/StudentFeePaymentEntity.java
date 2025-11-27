@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,9 +28,9 @@ public class StudentFeePaymentEntity {
     @JoinColumn(name = "student_id", nullable = false)
     private StudentEntity student;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignment_id", nullable = false)
-    private StudentFeeAssignmentEntity assignment;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "assignment_id", nullable = false)
+//    private StudentFeeAssignmentEntity assignment;
 
     // --- Fields ---
 
@@ -50,4 +51,8 @@ public class StudentFeePaymentEntity {
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academic_year_id", nullable = false)
+    private AcademicYearEntity academicYear;
 }
