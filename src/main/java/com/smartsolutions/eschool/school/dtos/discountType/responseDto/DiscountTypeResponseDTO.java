@@ -17,14 +17,12 @@ import java.time.LocalDate;
 public class DiscountTypeResponseDTO {
 
     private Long id;
-    @NotBlank(message = "Academic year name cannot be empty")
-    private String name; // e.g., "2024-2025"
+    private String code;
+    private String name;
+    private String description;
 
-    @NotNull(message = "Start date is required")
-    private LocalDate startDate;
+    private Boolean isActive;
+    //private Integer priority;
+    //private Integer displayOrder;
 
-    @NotNull(message = "End date is required")
-    private LocalDate endDate;
-
-    private Boolean isCurrent;
 }

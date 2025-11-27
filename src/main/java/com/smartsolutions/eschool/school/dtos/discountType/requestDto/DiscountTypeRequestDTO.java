@@ -13,10 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiscountTypeRequestDTO {
-
-    private Long id;
-    private String name; // e.g., "2024-2025"
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private Boolean isCurrent;
+    private String code;
+    private String name;
+    private String description;
+    private Boolean isActive;
 }

@@ -598,3 +598,40 @@ CREATE TABLE student_fee_summary
     CONSTRAINT fk_Student_fee_academic_year
         FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );
+
+DROP TABLE IF EXISTS discount_type;
+CREATE TABLE discount_type
+(
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code          VARCHAR(50) UNIQUE NOT NULL,
+    name          VARCHAR(150)       NOT NULL,
+    description   VARCHAR(500),
+
+    is_active     BOOLEAN            NOT NULL DEFAULT TRUE,
+    priority      INT                         DEFAULT 0,
+    display_order INT                         DEFAULT 0,
+
+    created_by    BIGINT,
+    created_at    TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+    updated_by    BIGINT,
+    updated_at    TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+    deleted       BOOLEAN            NOT NULL DEFAULT FALSE,
+    deleted_at    DATETIME
+);
+
+INSERT INTO discount_type
+(code, name, description, is_active, priority, display_order, created_by)
+VALUES ('MERIT', 'Academic / Merit-Based Discounts',
+        'Scholarships and awards based on academic excellence or subject performance.', TRUE, 100, 1, 1),
+       ('FAMILY', 'Family-Based Discounts', 'Discounts for siblings, staff children, or alumni children.', TRUE, 80, 2,
+        1),
+       ('FINANCIAL', 'Financial / Social Support', 'Need-based, government, or NGO-sponsored tuition support.', TRUE,
+        90, 3, 1),
+       ('PERFORMANCE', 'Performance / Extra-Curricular',
+        'Discounts for sports, cultural achievements, leadership roles.', TRUE, 70, 4, 1),
+       ('ATTENDANCE', 'Attendance / Behavior-Based', 'Rewards for perfect attendance or exemplary behavior.', TRUE, 60,
+        5, 1),
+       ('SPECIAL', 'One-Time / Special Case Discounts',
+        'Medical, emergency, transfer, or custom administrative discounts.', TRUE, 50, 6, 1);
+
+
