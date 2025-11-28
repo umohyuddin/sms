@@ -8,6 +8,7 @@ import com.smartsolutions.eschool.school.model.DiscountRateEntity;
 import com.smartsolutions.eschool.school.repository.*;
 import com.smartsolutions.eschool.student.dtos.studentDiscountAssignment.requestDto.StudentDiscountAssignmentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.studentDiscountAssignment.responseDto.StudentDiscountAssignmentResponseDTO;
+import com.smartsolutions.eschool.student.model.StudentDiscountAssignmentEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.repository.StudentDiscountAssignmentRepository;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
@@ -74,7 +75,7 @@ public class StudentDiscountAssignmentService {
             assignmentRepository.save(entity);
 
             log.info("Successfully assigned discount, id: {}", entity.getId());
-            return MapperUtil.mapObject(entity, StudentDiscountResponseDTO.class);
+            return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while assigning discount", dae);
             throw new CustomServiceException("Failed to assign discount due to database error");
@@ -90,10 +91,10 @@ public class StudentDiscountAssignmentService {
     // -------------------------------------------------------------------------
     // GET ALL ASSIGNMENTS
     // -------------------------------------------------------------------------
-    public List<StudentDiscountResponseDTO> getAll() {
+    public List<StudentDiscountAssignmentResponseDTO> getAll() {
         try {
             List<StudentDiscountAssignmentEntity> result = assignmentRepository.findAllDeletedFalse();
-            return MapperUtil.mapList(result, StudentDiscountResponseDTO.class);
+            return MapperUtil.mapList(result, StudentDiscountAssignmentResponseDTO.class);
         } catch (Exception e) {
             log.error("Error fetching all student discount assignments", e);
             throw new CustomServiceException("Failed to fetch student discount assignments");
@@ -103,30 +104,30 @@ public class StudentDiscountAssignmentService {
     // -------------------------------------------------------------------------
     // GET BY ID
     // -------------------------------------------------------------------------
-    public StudentDiscountResponseDTO getById(Long assignmentId) {
+    public StudentDiscountAssignmentResponseDTO getById(Long assignmentId) {
         StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
-        return MapperUtil.mapObject(entity, StudentDiscountResponseDTO.class);
+        return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
     }
 
     // -------------------------------------------------------------------------
     // GET BY STUDENT
     // -------------------------------------------------------------------------
-    public List<StudentDiscountResponseDTO> getByStudent(Long studentId) {
+    public List<StudentDiscountAssignmentResponseDTO> getByStudent(Long studentId) {
         List<StudentDiscountAssignmentEntity> result = assignmentRepository.findAllByStudent(studentId);
-        return MapperUtil.mapList(result, StudentDiscountResponseDTO.class);
+        return MapperUtil.mapList(result, StudentDiscountAssignmentResponseDTO.class);
     }
 
     // -------------------------------------------------------------------------
     // UPDATE ASSIGNMENT
     // -------------------------------------------------------------------------
     @Transactional
-    public StudentDiscountResponseDTO updateAssignment(Long assignmentId, @Valid StudentDiscountRequestDTO requestDTO) {
+    public StudentDiscountAssignmentResponseDTO updateAssignment(Long assignmentId, @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
         StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
         MapperUtil.mapObject(requestDTO, entity); // update fields from DTO
         assignmentRepository.save(entity);
-        return MapperUtil.mapObject(entity, StudentDiscountResponseDTO.class);
+        return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
     }
 
     // -------------------------------------------------------------------------
@@ -161,11 +162,11 @@ public class StudentDiscountAssignmentService {
         return assignmentRepository.markAsInactive(assignmentId);
     }
 
-    // -------------------------------------------------------------------------
-    // SEARCH
-    // -------------------------------------------------------------------------
-    public List<StudentDiscountResponseDTO> search(String keyword) {
-        List<StudentDiscountAssignmentEntity> result = assignmentRepository.searchByKeyword(keyword);
-        return MapperUtil.mapList(result, StudentDiscountResponseDTO.class);
-    }
+//    // -------------------------------------------------------------------------
+//    // SEARCH
+//    // -------------------------------------------------------------------------
+//    public List<StudentDiscountAssignmentResponseDTO> search(String keyword) {
+//        List<StudentDiscountAssignmentEntity> result = assignmentRepository.searchByKeyword(keyword);
+//        return MapperUtil.mapList(result, StudentDiscountResponseDTO.class);
+//    }
 }
