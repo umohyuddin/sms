@@ -18,6 +18,8 @@ import java.time.LocalDate;
 public class StudentDiscountAssignmentRequestDTO {
     @NotNull(message = "Student ID is required")
     private Long studentId;
+    @NotNull(message = "Campus ID is required")
+    private Long campusId;
 
     @NotNull(message = "Discount Rate ID is required")
     private Long discountRateId;
