@@ -1,10 +1,6 @@
 package com.smartsolutions.eschool.student.controller;
 
-import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeeAssignmentRequestDTO;
-import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeePaymentRequestDTO;
-import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
-import com.smartsolutions.eschool.student.dtos.responseDto.byStudentId.StudentFeeAssignmentsResponseDTO;
-import com.smartsolutions.eschool.student.facade.StudentFeeAssignmentFacade;
+import com.smartsolutions.eschool.student.dtos.requestDto.StudentDiscountAssignmentRequestDTO;
 import com.smartsolutions.eschool.student.facade.StudentFeePaymentsFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +23,10 @@ private final StudentFeePaymentsFacade studentFeePaymentsFacade;
     }
 
     @PostMapping( value = "/{studentId}/payments",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> studentFeePayment(@PathVariable Long studentId, @RequestBody @Valid StudentFeePaymentRequestDTO requestDTO) {
+    public ResponseEntity<?> studentFeePayment(@PathVariable Long studentId, @RequestBody @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
 
         log.info("Received request to Student Fee payment for student Id: {}", studentId);
-        StudentFeePaymentRequestDTO studentFeePayment = studentFeePaymentsFacade.studentFeePayment(studentId,requestDTO);
+        StudentDiscountAssignmentRequestDTO studentFeePayment = studentFeePaymentsFacade.studentFeePayment(studentId,requestDTO);
         log.info("Student Fee Assignment created successfully with id: {}", studentFeePayment.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(studentFeePayment);
     }

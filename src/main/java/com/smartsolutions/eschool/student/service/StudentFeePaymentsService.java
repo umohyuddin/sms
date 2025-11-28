@@ -3,8 +3,7 @@ package com.smartsolutions.eschool.student.service;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
-import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeePaymentRequestDTO;
-import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
+import com.smartsolutions.eschool.student.dtos.requestDto.StudentDiscountAssignmentRequestDTO;
 import com.smartsolutions.eschool.student.model.*;
 import com.smartsolutions.eschool.student.repository.*;
 import com.smartsolutions.eschool.util.MapperUtil;
@@ -13,10 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -41,7 +38,7 @@ public class StudentFeePaymentsService {
     }
 
 
-    public StudentFeePaymentRequestDTO studentFeePayment(Long studentId, @Valid StudentFeePaymentRequestDTO requestDTO) {
+    public StudentDiscountAssignmentRequestDTO studentFeePayment(Long studentId, @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
         log.info("💰 Processing fee payment | studentId={},  amount={}", studentId, requestDTO.getAmountPaid());
         try {
             // Fetch and validate student --add academic year
@@ -123,7 +120,7 @@ public class StudentFeePaymentsService {
 
             studentFeeSummaryRepository.save(summary);
             log.info("Fee summary updated | studentId={}, balance={}", studentId, summary.getBalance());
-            return MapperUtil.mapObject(payment, StudentFeePaymentRequestDTO.class);
+            return MapperUtil.mapObject(payment, StudentDiscountAssignmentRequestDTO.class);
 
         } catch (ResourceNotFoundException e) {
             // Already logged, rethrow to propagate

@@ -636,3 +636,220 @@ VALUES ('MERIT', 'Academic / Merit-Based Discounts',
         'Medical, emergency, transfer, or custom administrative discounts.', TRUE, 50, 6, 1);
 
 
+CREATE TABLE discount_sub_type
+(
+    id               BIGINT PRIMARY KEY AUTO_INCREMENT,
+    discount_type_id BIGINT             NOT NULL,
+    code             VARCHAR(50) UNIQUE NOT NULL,
+    name             VARCHAR(150)       NOT NULL,
+    description      VARCHAR(500),
+    is_active        BOOLEAN            NOT NULL DEFAULT TRUE,
+    priority         INT                         DEFAULT 0,
+    display_order    INT                         DEFAULT 0,
+    created_by       BIGINT,
+    created_at       TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+    updated_by       BIGINT,
+    updated_at       TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+    deleted          BOOLEAN            NOT NULL DEFAULT FALSE,
+    deleted_at       DATETIME,
+    deleted_by       BIGINT,
+
+    CONSTRAINT fk_discount_type FOREIGN KEY (discount_type_id) REFERENCES discount_type (id)
+);
+
+INSERT INTO discount_sub_type
+(code, name, description, discount_type_id, is_active, display_order, created_by)
+VALUES
+-- ============================
+-- MERIT Sub-Types
+-- ============================
+('MERIT_TOPPER', 'Class Topper Discount',
+ 'Awarded to top-performing students in their class or grade.',
+ 1, TRUE, 1, 1),
+
+('MERIT_POSITION', 'Position Holder Discount',
+ 'Given to students securing 1st, 2nd, or 3rd position in exams.',
+ 1, TRUE, 2, 1),
+
+('MERIT_SUBJECT', 'Subject Excellence Discount',
+ 'For exceptional performance in specific subjects like Math, Science, English.',
+ 1, TRUE, 3, 1),
+
+('MERIT_OVERALL', 'Overall Academic Excellence',
+ 'For consistent high academic performance throughout the year.',
+ 1, TRUE, 4, 1),
+
+('MERIT_BOARD', 'Board Exam Achievement',
+ 'Discount for high marks in Federal/Board examinations.',
+ 1, TRUE, 5, 1),
+
+-- ============================
+-- FAMILY Sub-Types
+-- ============================
+('FAMILY_SIBLING', 'Sibling Discount',
+ 'Given when multiple siblings are enrolled in the school.',
+ 2, TRUE, 1, 1),
+
+('FAMILY_STAFF_CHILD', 'Staff Child Discount',
+ 'Special discount for children of school employees and staff.',
+ 2, TRUE, 2, 1),
+
+('FAMILY_ALUMNI', 'Alumni Child Discount',
+ 'For children of former students (alumni).',
+ 2, TRUE, 3, 1),
+
+('FAMILY_MULTI_CHILD', 'Multi-Child Scheme',
+ 'For families with 3 or more children in the school.',
+ 2, TRUE, 4, 1),
+
+('FAMILY_GUARDIAN', 'Guardian-Based Discount',
+ 'Discount for students under the care of registered guardians.',
+ 2, TRUE, 5, 1),
+
+-- ============================
+-- FINANCIAL Sub-Types
+-- ============================
+('FINANCIAL_NEED', 'Low-Income Support',
+ 'Need-based fee support for low-income households.',
+ 3, TRUE, 1, 1),
+
+('FINANCIAL_GOVT', 'Government-Sponsored Support',
+ 'Discounts applied through government assistance programs.',
+ 3, TRUE, 2, 1),
+
+('FINANCIAL_NGO', 'NGO / Donor Sponsored Discount',
+ 'Financial support provided through NGOs or private donors.',
+ 3, TRUE, 3, 1),
+
+('FINANCIAL_ORPHAN', 'Orphan Support Program',
+ 'Fee discount or waiver for orphan students.',
+ 3, TRUE, 4, 1),
+
+('FINANCIAL_SPECIAL_CASE', 'Special Financial Hardship Discount',
+ 'Temporary discount due to sudden hardship such as job loss or crisis.',
+ 3, TRUE, 5, 1),
+
+-- ============================
+-- PERFORMANCE Sub-Types
+-- ============================
+('PERF_SPORTS', 'Sports Achievement Discount',
+ 'For achievements or participation in district, state, or national-level sports events.',
+ 4, TRUE, 1, 1),
+
+('PERF_CULTURAL', 'Cultural Achievement Discount',
+ 'For achievements in music, dance, art, or cultural competitions.',
+ 4, TRUE, 2, 1),
+
+('PERF_LEADERSHIP', 'Leadership Role Discount',
+ 'Given to student leaders such as Head Boy, Head Girl, or Prefects.',
+ 4, TRUE, 3, 1),
+
+('PERF_COMPETITION', 'Inter-School Competition Award',
+ 'For achievements in inter-school competitions (debate, quiz, science fair, etc.).',
+ 4, TRUE, 4, 1),
+
+('PERF_ATTENDANCE', 'High Attendance with Performance',
+ 'Given for consistent attendance combined with active performance.',
+ 4, TRUE, 5, 1),
+
+-- ============================
+-- ATTENDANCE Sub-Types
+-- ============================
+('ATTEND_100', '100% Attendance Discount',
+ 'Awarded for perfect attendance throughout the academic year.',
+ 5, TRUE, 1, 1),
+
+('ATTEND_95', '95% Attendance Discount',
+ 'For students who maintain 95% or above attendance.',
+ 5, TRUE, 2, 1),
+
+('ATTEND_BEHAVIOR', 'Good Behavior Discount',
+ 'Awarded for maintaining discipline, manners, and positive behavior.',
+ 5, TRUE, 3, 1),
+
+('ATTEND_CONDUCT', 'Conduct Excellence Discount',
+ 'For exemplary conduct and overall discipline.',
+ 5, TRUE, 4, 1),
+
+-- ============================
+-- SPECIAL Sub-Types
+-- ============================
+('SPECIAL_MEDICAL', 'Medical Emergency Discount',
+ 'Given due to critical medical issues in student or family.',
+ 6, TRUE, 1, 1),
+
+('SPECIAL_TRANSFER', 'Transfer Case Support',
+ 'For students admitted due to relocation or transfers.',
+ 6, TRUE, 2, 1),
+
+('SPECIAL_COVID', 'Emergency Relief Discount',
+ 'Emergency relief discount in crisis situations (pandemic, natural disasters).',
+ 6, TRUE, 3, 1),
+
+('SPECIAL_ADMIN', 'Administrative Discount',
+ 'Principal/Administrator approved discount for special cases.',
+ 6, TRUE, 4, 1),
+
+('SPECIAL_FEE_WAIVER', 'Fee Waiver (Full/Partial)',
+ 'One-time custom fee waiver based on case-by-case evaluation.',
+ 6, TRUE, 5, 1);
+
+
+
+CREATE TABLE discount_rate
+(
+    id                   BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    value                DECIMAL(10, 2) NOT NULL,
+    is_percentage        BOOLEAN        NOT NULL DEFAULT TRUE,
+
+    effective_from       DATE NULL,
+    effective_to         DATE NULL,
+
+    is_active            BOOLEAN        NOT NULL DEFAULT TRUE,
+    deleted              BOOLEAN        NOT NULL DEFAULT FALSE,
+
+    discount_sub_type_id BIGINT         NOT NULL,
+    campus_id            BIGINT NULL,
+    academic_year_id     BIGINT         NOT NULL,
+
+    created_at           DATETIME                DEFAULT CURRENT_TIMESTAMP,
+    created_by           BIGINT NULL,
+    updated_at           DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    updated_by           BIGINT NULL,
+    deleted_at           DATETIME,
+    deleted_by           BIGINT,
+
+    CONSTRAINT fk_discount_rate_discount_sub_type FOREIGN KEY (discount_sub_type_id) REFERENCES discount_sub_type (id),
+    CONSTRAINT fk_discount_rate_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
+    CONSTRAINT fk_discount_rate_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
+);
+
+
+CREATE TABLE student_discount_assignment
+(
+    id                 BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    student_id         BIGINT NOT NULL,
+    discount_rate_id   BIGINT NOT NULL,
+    academic_year_id   BIGINT NOT NULL,
+
+    applied_amount     DECIMAL(10, 2),
+    applied_percentage DECIMAL(5, 2),
+
+    reason             VARCHAR(255),
+    is_active          BOOLEAN DEFAULT TRUE,
+    deleted            BOOLEAN DEFAULT FALSE,
+
+    created_at         DATETIME,
+    created_by         BIGINT,
+    updated_at         DATETIME,
+    updated_by         BIGINT,
+    deleted_at         DATETIME,
+    deleted_by         BIGINT,
+
+
+    CONSTRAINT fk_sda_student FOREIGN KEY (student_id) REFERENCES student (id),
+    CONSTRAINT fk_sda_rate FOREIGN KEY (discount_rate_id) REFERENCES discount_rate (id),
+    CONSTRAINT fk_sda_year FOREIGN KEY (academic_year_id) REFERENCES academic_year (id)
+);
