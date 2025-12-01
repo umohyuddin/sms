@@ -1,4 +1,5 @@
 package com.smartsolutions.eschool.school.model;
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
@@ -16,7 +17,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CampusEntity {
+public class CampusEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -41,42 +42,20 @@ public class CampusEntity {
     @Column(name = "address", length = 255)
     private String address;
 
-    @Column(name = "province", nullable = true, length = 100)
-    private String province;
-
     @Lob
     @Column(name = "logo", nullable = true, columnDefinition = "LONGBLOB")
     private byte[] logo;
 
-    @Column(name = "city", length = 50)
-    private String city;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+
     @Column(name = "province_id")
     private Long provinceId;
     @Column(name = "city_id")
     private Long cityId;
 
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-    @PrePersist
-    public  void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 
     // ---- RELATIONSHIPS ---- //
     @OneToMany(mappedBy = "campus", cascade = CascadeType.ALL)

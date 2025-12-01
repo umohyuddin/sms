@@ -5,35 +5,50 @@ DATABASE IF NOT EXISTS sms;
 USE
 sms;
 
-SET
-FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE IF EXISTS `academic_years`;
-CREATE TABLE academic_years
+-- Table: provinces
+-- Purpose:
+--   Stores the list of provinces/states used across the school management system.
+--   Each campus, student, and employee address references a province from this table.
+DROP TABLE IF EXISTS provinces;
+CREATE TABLE provinces
 (
-    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name         VARCHAR(50) NOT NULL, -- e.g., "2024-2025"
-    start_date   DATE        NOT NULL,
-    end_date     DATE        NOT NULL,
-    total_months INT         NOT NULL, -- Total months in the academic year
-    is_current   BOOLEAN     NOT NULL DEFAULT FALSE,
-    created_at   DATETIME             DEFAULT CURRENT_TIMESTAMP,
-    updated_at   DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL UNIQUE,
+    code       VARCHAR(10),
+    is_active  BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    deleted    BOOLEAN      NOT NULL DEFAULT FALSE
 );
 
-
-INSERT INTO academic_years (name, start_date, end_date, total_months, is_current, created_at, updated_at)
-VALUES ('2022-2023', '2022-08-01', '2023-07-31', TIMESTAMPDIFF(MONTH, '2022-08-01', '2023-07-31') + 1, FALSE, NOW(),
-        NOW()),
-       ('2023-2024', '2023-08-01', '2024-07-31', TIMESTAMPDIFF(MONTH, '2023-08-01', '2024-07-31') + 1, FALSE, NOW(),
-        NOW()),
-       ('2024-2025', '2024-08-01', '2025-07-31', TIMESTAMPDIFF(MONTH, '2024-08-01', '2025-07-31') + 1, TRUE, NOW(),
-        NOW()),
-       ('2025-2026', '2025-08-01', '2026-07-31', TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1, FALSE, NOW(),
-        NOW()),
-       ('2026-2027', '2026-08-01', '2027-07-31', TIMESTAMPDIFF(MONTH, '2026-08-01', '2027-07-31') + 1, FALSE, NOW(),
-        NOW());
-
+-- Table: cities
+-- Purpose:
+--   Stores the list of cities belonging to a province.
+--   A city must belong to a valid province via province_id.
+--   Used for campus addresses, student records, staff records, etc.
+DROP TABLE IF EXISTS cities;
+CREATE TABLE cities
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    province_id BIGINT       NOT NULL,
+    name        VARCHAR(100) NOT NULL,
+    code        VARCHAR(10),
+    is_active   BOOLEAN               DEFAULT TRUE,
+    created_at  DATETIME     NOT NULL,
+    created_by  BIGINT,
+    updated_at  DATETIME,
+    updated_by  BIGINT,
+    deleted_at  DATETIME,
+    deleted_by  BIGINT,
+    deleted     BOOLEAN      NOT NULL DEFAULT FALSE,
+    CONSTRAINT fk_province FOREIGN KEY (province_id) REFERENCES provinces (id)
+);
+-- TODO_
 -- institutes TABLE
 DROP TABLE IF EXISTS `institutes`;
 CREATE TABLE institutes
@@ -52,58 +67,195 @@ CREATE TABLE institutes
     updated_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO institutes (name, address, contact_number, email, website, tagline, country, logo, established_date)
-VALUES ('Smart Solutions School', '123 Main Street, Cityville', '03001234567', 'info@smartsolutions.edu',
-        'https://www.smartsolutions.edu', 'Excellence in Education', 'Pakistan',
-        NULL, '2005-08-15');
+-- Table: campuses
+-- Purpose:
+--   Stores all campus records for each institute within the school management system.
+--   An institute can have multiple campuses (One-to-Many relationship).
+--   Each campus belongs to a province and a city for address mapping.
+--   Used in admissions, fee management, user profiles, and employee allocation.
 
-
--- campuses TABLE
 DROP TABLE IF EXISTS `campuses`;
 CREATE TABLE campuses
 (
-    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT,
     province_id  BIGINT,
     city_id      BIGINT,
-    institute_id BIGINT       NOT NULL,
     campus_name  VARCHAR(100) NOT NULL,
     contact      VARCHAR(20),
     email        VARCHAR(100),
     website      VARCHAR(100),
     address      VARCHAR(255),
-    province     VARCHAR(100),
-    city         VARCHAR(50),
     logo         LONGBLOB,
-    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted      BOOLEAN      NOT NULL DEFAULT FALSE,
+
+    created_at   DATETIME,
+    created_by   BIGINT,
+    updated_at   DATETIME,
+    updated_by   BIGINT,
     deleted_at   DATETIME,
-    CONSTRAINT fk_institute FOREIGN KEY (institute_id) REFERENCES institutes (id)
+    deleted_by   BIGINT,
+
+    CONSTRAINT fk_campuses_institute FOREIGN KEY (institute_id) REFERENCES institutes (id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
-INSERT INTO campuses (id, institute_id, campus_name, contact, email, website, address, province, city, created_at,
-                      updated_at, deleted, deleted_at)
-VALUES (1, 1, 'Downtown Campus', '+92-300-1234567', 'downtown@smarteschool.com', 'https://downtown.smarteschool.com',
-        '123 Main Street', 'Punjab', 'Lahore', NOW(), NOW(), TRUE, NULL),
-       (2, 1, 'Uptown Campus', '+92-300-7654321', 'uptown@smarteschool.com', 'https://uptown.smarteschool.com',
-        '456 Park Avenue', 'Punjab', 'Lahore', NOW(), NOW(), TRUE, NULL),
-       (3, 1, 'Riverside Campus', '+92-301-1112223', 'riverside@smarteschool.com', 'https://riverside.smarteschool.com',
-        '789 River Road', 'Sindh', 'Karachi', NOW(), NOW(), FALSE, NULL),
-       (4, 1, 'Hilltop Campus', '+92-301-3334445', 'hilltop@smarteschool.com', 'https://hilltop.smarteschool.com',
-        '101 Hill Street', 'KPK', 'Peshawar', NOW(), NOW(), FALSE, NULL),
-       (5, 1, 'Greenfield Campus', '+92-302-5556667', 'greenfield@smarteschool.com',
-        'https://greenfield.smarteschool.com',
-        '202 Green Road', 'Punjab', 'Faisalabad', NOW(), NOW(), FALSE, NULL),
-       (6, 1, 'Seaside Campus', '+92-302-7778889', 'seaside@smarteschool.com', 'https://seaside.smarteschool.com',
-        '303 Beach Avenue', 'Sindh', 'Karachi', NOW(), NOW(), FALSE, NULL),
-       (7, 1, 'Central Campus', '+92-303-9990001', 'central@smarteschool.com', 'https://central.smarteschool.com',
-        '404 Central Street', 'Punjab', 'Multan', NOW(), NOW(), FALSE, NULL),
-       (8, 1, 'Lakeside Campus', '+92-303-2223334', 'lakeside@smarteschool.com', 'https://lakeside.smarteschool.com',
-        '505 Lake Road', 'Sindh', 'Hyderabad', NOW(), NOW(), FALSE, NULL),
-       (9, 1, 'Sunrise Campus', '+92-304-4445556', 'sunrise@smarteschool.com', 'https://sunrise.smarteschool.com',
-        '606 Sunrise Blvd', 'Punjab', 'Rawalpindi', NOW(), NOW(), FALSE, NULL),
-       (10, 1, 'Maple Campus', '+92-304-6667778', 'maple@smarteschool.com', 'https://maple.smarteschool.com',
-        '707 Maple Street', 'Balochistan', 'Quetta', NOW(), NOW(), FALSE, NULL);
+
+
+DROP TABLE IF EXISTS `academic_years`;
+CREATE TABLE academic_years
+(
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name         VARCHAR(50) NOT NULL, -- e.g., "2024-2025"
+    start_date   DATE        NOT NULL,
+    end_date     DATE        NOT NULL,
+    total_months INT         NOT NULL, -- Total months in the academic year
+    is_current   BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at   DATETIME             DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+
+INSERT INTO provinces (name, code, is_active, created_by, updated_by)
+VALUES ('Punjab', 'PB', TRUE, 1, 1),
+       ('Sindh', 'SD', TRUE, 1, 1),
+       ('Khyber Pakhtunkhwa', 'KP', TRUE, 1, 1),
+       ('Balochistan', 'BL', TRUE, 1, 1),
+       ('Islamabad Capital Territory', 'ICT', TRUE, 1, 1),
+       ('Gilgit-Baltistan', 'GB', TRUE, 1, 1),
+       ('Azad Jammu & Kashmir', 'AJK', TRUE, 1, 1);
+-- Cities for Punjab (id=1)
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES (1, 'Lahore', 'LHE', TRUE, 1, 1, NOW()),
+       (1, 'Faisalabad', 'FSD', TRUE, 1, 1, NOW()),
+       (1, 'Rawalpindi', 'RWP', TRUE, 1, 1, NOW()),
+       (1, 'Multan', 'MLN', TRUE, 1, 1,
+        NOW());
+-- Cities for Sindh (id=2)
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES (2, 'Karachi', 'KHI', TRUE, 1, 1, NOW()),
+       (2, 'Hyderabad', 'HYD', TRUE, 1, 1, NOW()),
+       (2, 'Sukkur', 'SUK', TRUE, 1, 1, NOW()),
+       (2, 'Larkana', 'LRK', TRUE, 1, 1,
+        NOW());
+-- Cities for Khyber Pakhtunkhwa (id=3)
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES (3, 'Peshawar', 'PEW', TRUE, 1, 1, NOW()),
+       (3, 'Mardan', 'MRD', TRUE, 1, 1, NOW()),
+       (3, 'Abbottabad', 'ABT', TRUE, 1, 1, NOW()),
+       (3, 'Swat', 'SWT', TRUE, 1, 1,
+        NOW());
+-- Cities for Balochistan (id=4)
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES (4, 'Quetta', 'QTA', TRUE, 1, 1, NOW()),
+       (4, 'Gwadar', 'GWD', TRUE, 1, 1, NOW()),
+       (4, 'Sibi', 'SBI', TRUE, 1, 1, NOW()),
+       (4, 'Zhob', 'ZHB', TRUE, 1, 1,
+        NOW());
+-- Cities for Islamabad Capital Territory (id=5)
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES (5, 'Islamabad', 'ISB', TRUE, 1, 1,
+        NOW());
+-- Cities for Gilgit-Baltistan (id=6)
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES (6, 'Gilgit', 'GIL', TRUE, 1, 1, NOW()),
+       (6, 'Skardu', 'SKD', TRUE, 1, 1,
+        NOW());
+-- Cities for Azad Jammu & Kashmir (id=7)
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES (7, 'Muzaffarabad', 'MZD', TRUE, 1, 1, NOW()),
+       (7, 'Mirpur', 'MIR', TRUE, 1, 1, NOW()),
+       (7, 'Kotli', 'KOT', TRUE, 1, 1,
+        NOW());
+
+INSERT INTO academic_years (name, start_date, end_date, total_months, is_current, created_at, updated_at)
+VALUES ('2022-2023', '2022-08-01', '2023-07-31', TIMESTAMPDIFF(MONTH, '2022-08-01', '2023-07-31') + 1, FALSE, NOW(),
+        NOW()),
+       ('2023-2024', '2023-08-01', '2024-07-31', TIMESTAMPDIFF(MONTH, '2023-08-01', '2024-07-31') + 1, FALSE, NOW(),
+        NOW()),
+       ('2024-2025', '2024-08-01', '2025-07-31', TIMESTAMPDIFF(MONTH, '2024-08-01', '2025-07-31') + 1, TRUE, NOW(),
+        NOW()),
+       ('2025-2026', '2025-08-01', '2026-07-31', TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1, FALSE, NOW(),
+        NOW()),
+       ('2026-2027', '2026-08-01', '2027-07-31', TIMESTAMPDIFF(MONTH, '2026-08-01', '2027-07-31') + 1, FALSE, NOW(),
+        NOW());
+
+
+INSERT INTO institutes
+(name, address, contact_number, email, website, tagline, country, logo, established_date, created_at, updated_at)
+VALUES ('Smart Solutions School', '123 Main Street, Lahore', '+92-300-1234567', 'info@smartsolutions.edu',
+        'https://www.smartsolutions.edu', 'Excellence in Education', 'Pakistan', NULL, '2005-08-15', NOW(), NOW()),
+
+       ('Bright Future Academy', '456 Park Avenue, Karachi', '+92-301-7654321', 'contact@brightfuture.edu',
+        'https://www.brightfuture.edu', 'Empowering Young Minds', 'Pakistan', NULL, '2010-01-10', NOW(), NOW()),
+
+       ('Global Vision School', '789 River Road, Islamabad', '+92-302-1112223', 'admin@globalvision.edu',
+        'https://www.globalvision.edu', 'Learning Beyond Boundaries', 'Pakistan', NULL, '2012-05-20', NOW(), NOW()),
+
+       ('Riverside International School', '101 Riverside Street, Faisalabad', '+92-303-3334445',
+        'info@riversideschool.edu',
+        'https://www.riversideschool.edu', 'Nurturing Excellence', 'Pakistan', NULL, '2008-09-05', NOW(), NOW()),
+
+       ('Hilltop Learning Center', '202 Hilltop Road, Peshawar', '+92-304-5556667', 'contact@hilltop.edu',
+        'https://www.hilltop.edu', 'Climbing Higher Together', 'Pakistan', NULL, '2015-03-15', NOW(), NOW());
+
+
+
+INSERT INTO campuses (institute_id, province_id, city_id,
+                      campus_name, contact, email, website, address,
+                      logo, deleted,
+                      created_at, created_by, updated_at, updated_by,
+                      deleted_at, deleted_by)
+VALUES
+-- Punjab → Lahore (1)
+(1, 1, 1, 'Downtown Campus', '+92-300-1234567', 'downtown@smarteschool.com',
+ 'https://downtown.smarteschool.com', '123 Main Street', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Punjab → Lahore (1)
+(1, 1, 1, 'Uptown Campus', '+92-300-7654321', 'uptown@smarteschool.com',
+ 'https://uptown.smarteschool.com', '456 Park Avenue', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Sindh → Karachi (5)
+(1, 2, 5, 'Riverside Campus', '+92-301-1112223', 'riverside@smarteschool.com',
+ 'https://riverside.smarteschool.com', '789 River Road', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- KPK → Peshawar (9)
+(1, 3, 9, 'Hilltop Campus', '+92-301-3334445', 'hilltop@smarteschool.com',
+ 'https://hilltop.smarteschool.com', '101 Hill Street', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Punjab → Faisalabad (2)
+(1, 1, 2, 'Greenfield Campus', '+92-302-5556667', 'greenfield@smarteschool.com',
+ 'https://greenfield.smarteschool.com', '202 Green Road', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Sindh → Karachi (5)
+(1, 2, 5, 'Seaside Campus', '+92-302-7778889', 'seaside@smarteschool.com',
+ 'https://seaside.smarteschool.com', '303 Beach Avenue', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Punjab → Multan (4)
+(1, 1, 4, 'Central Campus', '+92-303-9990001', 'central@smarteschool.com',
+ 'https://central.smarteschool.com', '404 Central Street', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Sindh → Hyderabad (6)
+(1, 2, 6, 'Lakeside Campus', '+92-303-2223334', 'lakeside@smarteschool.com',
+ 'https://lakeside.smarteschool.com', '505 Lake Road', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Punjab → Rawalpindi (3)
+(1, 1, 3, 'Sunrise Campus', '+92-304-4445556', 'sunrise@smarteschool.com',
+ 'https://sunrise.smarteschool.com', '606 Sunrise Blvd', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Balochistan → Quetta (13)
+(1, 4, 13, 'Maple Campus', '+92-304-6667778', 'maple@smarteschool.com',
+ 'https://maple.smarteschool.com', '707 Maple Street', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL);
 
 
 -- standards TABLE
@@ -849,7 +1001,7 @@ CREATE TABLE student_discount_assignment
     deleted_by         BIGINT,
 
 
-    CONSTRAINT fk_sda_student FOREIGN KEY (student_id) REFERENCES student (id),
+    CONSTRAINT fk_sda_student FOREIGN KEY (student_id) REFERENCES students (id),
     CONSTRAINT fk_sda_rate FOREIGN KEY (discount_rate_id) REFERENCES discount_rate (id),
-    CONSTRAINT fk_sda_year FOREIGN KEY (academic_year_id) REFERENCES academic_year (id)
+    CONSTRAINT fk_sda_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );

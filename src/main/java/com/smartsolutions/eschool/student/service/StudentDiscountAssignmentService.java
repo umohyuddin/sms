@@ -125,7 +125,7 @@ public class StudentDiscountAssignmentService {
     public StudentDiscountAssignmentResponseDTO updateAssignment(Long assignmentId, @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
         StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
-        MapperUtil.mapObject(requestDTO, entity); // update fields from DTO
+        //MapperUtil.mapObject(requestDTO, entity); // update fields from DTO
         assignmentRepository.save(entity);
         return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
     }

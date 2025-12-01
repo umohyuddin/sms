@@ -1,17 +1,9 @@
 package com.smartsolutions.eschool.sclass.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartsolutions.eschool.school.dtos.CampusDTO;
 import com.smartsolutions.eschool.sclass.dtos.requestDto.StandardCreateRequestDTO;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
-import com.smartsolutions.eschool.sclass.facade.SClassFacade;
 import com.smartsolutions.eschool.sclass.facade.StandardFacade;
-import com.smartsolutions.eschool.sclass.model.SClassEntity;
-import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
-import com.smartsolutions.eschool.util.ResourceObject;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Transactional
 @RestController

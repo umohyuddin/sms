@@ -1,33 +1,28 @@
-package com.smartsolutions.eschool.school.dtos.requestDto;
+package com.smartsolutions.eschool.school.dtos.campuses.responseDto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CampusCreateRequestDTO {
+public class CampusResponseDTO {
     private Long id;
-    @NotNull
+    // Use the ID of the institute for simplicity in API calls
     private Long instituteId;
-
-    @NotNull
     private String campusName;
-
     private String contactNumber;
     private String email;
     private String website;
     private String address;
-    private String provinceName;
-    private String cityName;
-    private String city;
+    // Optional: convert byte[] to Base64 string for API transfer
     private byte[] logo;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private boolean deleted = false;
     private Long provinceId;
-
     private Long cityId;
 }

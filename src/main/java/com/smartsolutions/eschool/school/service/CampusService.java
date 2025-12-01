@@ -1,18 +1,13 @@
 package com.smartsolutions.eschool.school.service;
 
-import com.smartsolutions.eschool.global.enums.Cities;
-import com.smartsolutions.eschool.global.enums.Province;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.school.dtos.CampusDTO;
-import com.smartsolutions.eschool.school.dtos.requestDto.CampusCreateRequestDTO;
+import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
+import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.CampusDao;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
 import com.smartsolutions.eschool.school.repository.InstituteDaoImp;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
-import com.smartsolutions.eschool.sclass.model.StandardEntity;
-import com.smartsolutions.eschool.util.EnumValidatorUtil;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -36,15 +31,15 @@ public class CampusService {
     @Autowired
     private CampusRepository campusRepository;
 
-    public List<CampusDTO> getAll() {
+    public List<CampusResponseDTO> getAll() {
         try {
             log.info("Fetching all Campuses from database");
             //List<CampusEntity> result = campusDao.findAll();
             List<CampusEntity> result = campusRepository.findByDeletedFalse();
             log.info("Successfully fetched {} Campuses", result.size());
-            List<CampusDTO> campusDTOList = MapperUtil.mapList(result, CampusDTO.class);
-            log.info("Successfully fetched {} Campuses", campusDTOList);
-            return campusDTOList;
+            List<CampusResponseDTO> campusResponseDTOList = MapperUtil.mapList(result, CampusResponseDTO.class);
+            log.info("Successfully fetched {} Campuses", campusResponseDTOList);
+            return campusResponseDTOList;
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Campuses", dae);
             //throw new CustomServiceException("Unable to fetch students from database", dae);
@@ -58,18 +53,18 @@ public class CampusService {
         return Collections.emptyList();
     }
 
-    public CampusDTO getById(Long id) {
+    public CampusResponseDTO getById(Long id) {
         log.info("Fetching Campus with id: {}", id);
         CampusEntity campusEntity = campusRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
             log.info("Fetching Campus with id: {}", id);
             return new ResourceNotFoundException("Campus not found with id: " + id);
         });
-        CampusDTO campusDTO = MapperUtil.mapObject(campusEntity, CampusDTO.class);
-        log.info("Successfully fetched Campus: id={}", campusDTO.getId());
-        return campusDTO;
+        CampusResponseDTO campusResponseDTO = MapperUtil.mapObject(campusEntity, CampusResponseDTO.class);
+        log.info("Successfully fetched Campus: id={}", campusResponseDTO.getId());
+        return campusResponseDTO;
     }
 
-    public List<CampusDTO> findByInstituteId(Long id) {
+    public List<CampusResponseDTO> findByInstituteId(Long id) {
         log.info("Fetching campuses for institute ID: {}", id);
         if (id == null) {
             log.error("Institute ID is null");
@@ -81,13 +76,13 @@ public class CampusService {
             log.warn("No campuses found for institute ID: {}", id);
             return List.of(); // safe empty list
         }
-        List<CampusDTO> campusDTOList = MapperUtil.mapList(campusEntities, CampusDTO.class);
-        log.info("Found {} campuses for institute ID: {}", campusDTOList.size(), id);
-        return campusDTOList;
+        List<CampusResponseDTO> campusResponseDTOList = MapperUtil.mapList(campusEntities, CampusResponseDTO.class);
+        log.info("Found {} campuses for institute ID: {}", campusResponseDTOList.size(), id);
+        return campusResponseDTOList;
     }
 
 
-    public List<CampusDTO> findByCampusNameContaining(String name) {
+    public List<CampusResponseDTO> findByCampusNameContaining(String name) {
         log.info("Fetching campuses containing name: '{}'", name);
         if (name == null || name.trim().isEmpty()) {
             log.error("Campus name is null or empty");
@@ -99,9 +94,9 @@ public class CampusService {
             log.warn("No campuses found for institute name: {}", name);
             return List.of(); // safe empty list
         }
-        List<CampusDTO> campusDTOList = MapperUtil.mapList(campusEntities, CampusDTO.class);
-        log.info("Found {} campuses containing name: '{}'", campusDTOList.size(), name);
-        return campusDTOList;
+        List<CampusResponseDTO> campusResponseDTOList = MapperUtil.mapList(campusEntities, CampusResponseDTO.class);
+        log.info("Found {} campuses containing name: '{}'", campusResponseDTOList.size(), name);
+        return campusResponseDTOList;
     }
 
     public int softDeleteById(Long id) {
@@ -117,16 +112,12 @@ public class CampusService {
     public CampusCreateRequestDTO createCampus(CampusCreateRequestDTO requestDTO) {
         log.info("Creating new Campus: {}", requestDTO);
         try {
-            Province province = EnumValidatorUtil.getEnumByName(Province.class, requestDTO.getProvinceName());
-            Cities city = EnumValidatorUtil.getEnumByName(Cities.class, requestDTO.getCityName());
-
+//            Province province = EnumValidatorUtil.getEnumByName(Province.class, requestDTO.getProvinceName());
+//            Cities city = EnumValidatorUtil.getEnumByName(Cities.class, requestDTO.getCityName());
+            InstituteEntity instituteEntity = instituteDaoImp.findById(1L);
             CampusEntity entity = MapperUtil.mapObject(requestDTO, CampusEntity.class);
             entity.setId(null);
-            entity.setProvinceId(province.getId());
-            entity.setCityId(city.getId());
-            entity.setDeleted(false);
-            entity.setDeletedAt(null);
-
+            entity.setInstitute(instituteEntity);
             CampusEntity campusEntity = campusRepository.save(entity);
 
             CampusCreateRequestDTO response = MapperUtil.mapObject(campusEntity, CampusCreateRequestDTO.class);
@@ -143,7 +134,7 @@ public class CampusService {
     }
 
 
-    public CampusDTO updateSection(Long id, @Valid CampusCreateRequestDTO requestDTO) {
+    public CampusResponseDTO updateSection(Long id, @Valid CampusCreateRequestDTO requestDTO) {
         log.info("Updating Campus with id {} using DTO {}", id, requestDTO);
 
         CampusEntity entity = campusRepository.findByIdAndDeletedFalse(id)
@@ -194,7 +185,6 @@ public class CampusService {
         }
 
 
-
         if (requestDTO.getInstituteId() != null &&
                 (entity.getInstitute() == null || !entity.getInstitute().getId().equals(requestDTO.getInstituteId()))) {
 
@@ -205,7 +195,7 @@ public class CampusService {
         }
 
         CampusEntity updated = campusRepository.save(entity);
-        CampusDTO response = MapperUtil.mapObject(updated, CampusDTO.class);
+        CampusResponseDTO response = MapperUtil.mapObject(updated, CampusResponseDTO.class);
         log.info("Campus updated successfully: {}", response.getId());
         return response;
     }

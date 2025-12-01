@@ -3,7 +3,7 @@ package com.smartsolutions.eschool.student.service;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
-import com.smartsolutions.eschool.student.dtos.requestDto.StudentDiscountAssignmentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeePaymentRequestDTO;
 import com.smartsolutions.eschool.student.model.*;
 import com.smartsolutions.eschool.student.repository.*;
 import com.smartsolutions.eschool.util.MapperUtil;
@@ -38,7 +38,7 @@ public class StudentFeePaymentsService {
     }
 
 
-    public StudentDiscountAssignmentRequestDTO studentFeePayment(Long studentId, @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
+    public StudentFeePaymentRequestDTO studentFeePayment(Long studentId, @Valid StudentFeePaymentRequestDTO requestDTO) {
         log.info("💰 Processing fee payment | studentId={},  amount={}", studentId, requestDTO.getAmountPaid());
         try {
             // Fetch and validate student --add academic year
@@ -120,7 +120,7 @@ public class StudentFeePaymentsService {
 
             studentFeeSummaryRepository.save(summary);
             log.info("Fee summary updated | studentId={}, balance={}", studentId, summary.getBalance());
-            return MapperUtil.mapObject(payment, StudentDiscountAssignmentRequestDTO.class);
+            return MapperUtil.mapObject(payment, StudentFeePaymentRequestDTO.class);
 
         } catch (ResourceNotFoundException e) {
             // Already logged, rethrow to propagate

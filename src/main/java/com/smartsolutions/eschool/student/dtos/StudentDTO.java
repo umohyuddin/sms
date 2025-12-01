@@ -1,6 +1,6 @@
 package com.smartsolutions.eschool.student.dtos;
 
-import com.smartsolutions.eschool.school.dtos.CampusDTO;
+import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import lombok.AllArgsConstructor;
@@ -34,7 +34,7 @@ public class StudentDTO {
     private LocalDateTime updatedAt;
 
     // Relationships
-    private CampusDTO campus;
+    private CampusResponseDTO campus;
     private StandardDTO standard;
     private SectionDTO section;
 

@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.student.facade;
 
-import com.smartsolutions.eschool.student.dtos.requestDto.StudentDiscountAssignmentRequestDTO;
+
+import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeePaymentRequestDTO;
 import com.smartsolutions.eschool.student.service.StudentFeePaymentsService;
 import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
@@ -17,7 +18,7 @@ public class StudentFeePaymentsFacade {
     }
 
 
-    public StudentDiscountAssignmentRequestDTO studentFeePayment(Long studentId, @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
+    public StudentFeePaymentRequestDTO studentFeePayment(Long studentId, @Valid StudentFeePaymentRequestDTO requestDTO) {
         return studentFeePaymentsService.studentFeePayment(studentId, requestDTO);
     }
 }

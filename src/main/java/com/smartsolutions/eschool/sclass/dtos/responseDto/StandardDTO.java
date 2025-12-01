@@ -1,6 +1,6 @@
 package com.smartsolutions.eschool.sclass.dtos.responseDto;
 
-import com.smartsolutions.eschool.school.dtos.CampusDTO;
+import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,5 +16,5 @@ public class StandardDTO {
     private Boolean deleted;
     private LocalDateTime deletedAt;
     private Long campusId;
-    private CampusDTO campus;
+    private CampusResponseDTO campus;
 }

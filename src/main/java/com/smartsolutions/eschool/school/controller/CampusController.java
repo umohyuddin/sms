@@ -1,18 +1,9 @@
 package com.smartsolutions.eschool.school.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartsolutions.eschool.school.dtos.CampusDTO;
-import com.smartsolutions.eschool.school.dtos.InstituteDTO;
-import com.smartsolutions.eschool.school.dtos.requestDto.CampusCreateRequestDTO;
+import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
+import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
 import com.smartsolutions.eschool.school.facade.CampusFacade;
-import com.smartsolutions.eschool.school.model.CampusEntity;
-import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
-import com.smartsolutions.eschool.sclass.dtos.requestDto.StandardCreateRequestDTO;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
-import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
-import com.smartsolutions.eschool.util.ResourceObject;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,14 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Transactional
 @RestController
-@RequestMapping("/api/institute/campus")
+@RequestMapping("/api/institute/campuses")
 @Slf4j
 public class CampusController {
 
@@ -38,7 +26,7 @@ public class CampusController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() throws Exception {
         log.info("GET /api/institute/campus called");
-        List<CampusDTO> resources = nCampusFacade.getAll();
+        List<CampusResponseDTO> resources = nCampusFacade.getAll();
         log.info("GET /api/institute/campus succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
@@ -46,7 +34,7 @@ public class CampusController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable Long id) throws Exception {
         log.info("Received request to fetch campus with id: {}", id);
-        CampusDTO campus = nCampusFacade.getById(id);
+        CampusResponseDTO campus = nCampusFacade.getById(id);
         log.info("Returning campus: id={}", campus.getId());
         return ResponseEntity.ok(campus);
     }
@@ -54,7 +42,7 @@ public class CampusController {
     @GetMapping(value = "/by-institute/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByInstituteId(@PathVariable Long id) throws Exception {
         log.info("Received request to fetch campus by Institute Id: {}", id);
-        List<CampusDTO> campuses = nCampusFacade.findByInstituteId(id);
+        List<CampusResponseDTO> campuses = nCampusFacade.findByInstituteId(id);
         log.info("Returning campuses data");
         return ResponseEntity.ok(campuses);
     }
@@ -62,7 +50,7 @@ public class CampusController {
     @GetMapping(value = "/by-name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByInstituteId(@PathVariable String name) throws Exception {
         log.info("Received request to fetch campus by Institute name: {}", name);
-        List<CampusDTO> campuses = nCampusFacade.findByCampusNameContaining(name);
+        List<CampusResponseDTO> campuses = nCampusFacade.findByCampusNameContaining(name);
         log.info("Returning campuses  data");
         return ResponseEntity.ok(campuses);
     }
@@ -94,9 +82,9 @@ public class CampusController {
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CampusDTO> updateStandard(@PathVariable Long id, @Valid @RequestBody CampusCreateRequestDTO dto) {
+    public ResponseEntity<CampusResponseDTO> updateStandard(@PathVariable Long id, @Valid @RequestBody CampusCreateRequestDTO dto) {
         log.info("Received request to update Campus with id: {}", id);
-        CampusDTO updatedCampus = nCampusFacade.updateStandard(id, dto);
+        CampusResponseDTO updatedCampus = nCampusFacade.updateStandard(id, dto);
         log.info("Returning updated Campus: id={}", updatedCampus.getId());
         return ResponseEntity.ok(updatedCampus);
     }
