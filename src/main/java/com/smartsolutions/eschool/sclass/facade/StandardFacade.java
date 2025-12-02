@@ -1,9 +1,14 @@
 package com.smartsolutions.eschool.sclass.facade;
 
+import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
+import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
+import com.smartsolutions.eschool.lookups.service.CityService;
+import com.smartsolutions.eschool.lookups.service.ProvinceService;
 import com.smartsolutions.eschool.sclass.dtos.requestDto.StandardCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.service.StandardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,12 +24,24 @@ public class StandardFacade {
     @Lazy
     private StandardService standardService;
 
+    @Autowired
+    @Lazy
+    private ProvinceService provinceService;
+    @Autowired
+    @Lazy
+    private CityService cityService;
+
     public List<StandardDTO> getAll() {
         return standardService.getAll();
     }
 
     public StandardDTO getById(Long id) {
-        return standardService.getById(id);
+        StandardDTO standardDTO =  standardService.getById(id);
+        ProvinceResponseDTO provinceResponseDTO = provinceService.getById(standardDTO.getCampus().getProvinceId());
+        CityResponseDTO cityResponseDTO = cityService.getById(standardDTO.getCampus().getCityId());
+        standardDTO.getCampus().setProvince(provinceResponseDTO);
+        standardDTO.getCampus().setCity(cityResponseDTO);
+        return standardDTO;
     }
 
     public StandardCreateRequestDTO create(StandardCreateRequestDTO standardDTO) {
