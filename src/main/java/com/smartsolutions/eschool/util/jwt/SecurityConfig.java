@@ -43,9 +43,20 @@ public class SecurityConfig {
 //                )
 //                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService),
 //                        UsernamePasswordAuthenticationFilter.class);
+//        http
+//                .csrf(csrf -> csrf.disable())
+//                .cors(cors -> cors.disable())
+//                .authorizeHttpRequests(auth -> auth
+//                        .anyRequest().permitAll()
+//                )
+//                .logout(logout -> logout.disable())
+//                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
+//
+//        return http.build();
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
+                .cors(cors -> {
+                }) // <-- ENABLE CORS, use defaults to pick up WebConfig
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
@@ -66,4 +77,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+
+
 }

@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.sclass.service;
 
+import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
@@ -177,5 +178,25 @@ public class StandardService {
                 log.error("Error while deleting Standards for Campus ID {}", campusId, e);
                 throw e;
             }
+    }
+
+    public List<StandardDTO> getStandardByFilter(Long campusId, String keyword) {
+        log.info("Fetching Standards for campusId={} with keyword='{}'", campusId, keyword);
+
+        try {
+            String search = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+            List<StandardEntity> result = standardRepository.searchStandards(campusId, search);
+            if (result.isEmpty()) {
+                log.warn("No Standards found for campusId={} with keyword='{}'", campusId, keyword);
+                throw new ResourceNotFoundException("No Standards found matching the criteria");
+            }
+            List<StandardDTO> standardDTOS = MapperUtil.mapList(result, StandardDTO.class);
+            log.info("Successfully fetched {} Standards", standardDTOS.size());
+            return standardDTOS;
+
+        } catch (Exception e) {
+            log.error("Error fetching Standards for campusId={} with keyword='{}'", campusId, keyword, e);
+            throw new CustomServiceException("Failed to fetch Standards", e);
+        }
     }
 }

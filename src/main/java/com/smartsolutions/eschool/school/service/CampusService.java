@@ -1,9 +1,18 @@
 package com.smartsolutions.eschool.school.service;
 
+import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
+import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
+import com.smartsolutions.eschool.lookups.model.CityEntity;
+import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
+import com.smartsolutions.eschool.lookups.repository.CityRepository;
+import com.smartsolutions.eschool.lookups.repository.ProvinceRepository;
 import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
+import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.school.model.DiscountTypeEntity;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.CampusDao;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
@@ -18,18 +27,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
 public class CampusService {
 
-    @Autowired
-    private CampusDao campusDao;
-    @Autowired
-    private InstituteDaoImp instituteDaoImp;
 
-    @Autowired
-    private CampusRepository campusRepository;
+    private final CampusRepository campusRepository;
+    private final InstituteDaoImp instituteDaoImp;
+    private final ProvinceRepository provinceRepository;
+    private final CityRepository cityRepository;
+
+    public CampusService(CampusRepository campusRepository, InstituteDaoImp instituteDaoImp, ProvinceRepository provinceRepository, CityRepository cityRepository) {
+        this.campusRepository = campusRepository;
+        this.instituteDaoImp = instituteDaoImp;
+        this.provinceRepository = provinceRepository;
+        this.cityRepository = cityRepository;
+    }
 
     public List<CampusResponseDTO> getAll() {
         try {
@@ -59,7 +74,20 @@ public class CampusService {
             log.info("Fetching Campus with id: {}", id);
             return new ResourceNotFoundException("Campus not found with id: " + id);
         });
+
+        ProvinceEntity provinceEntity = provinceRepository.findByIdAndDeletedFalse(campusEntity.getProvinceId()).orElseThrow(() -> {
+            log.info("Fetching Province with id: {}", campusEntity.getProvinceId());
+            return new ResourceNotFoundException("Province not found with id: " + id);
+        });
+        CityEntity cityEntity = cityRepository.findByIdAndDeletedFalse(campusEntity.getCityId()).orElseThrow(() -> {
+            log.info("Fetching City with id: {}", campusEntity.getCityId());
+            return new ResourceNotFoundException("City not found with id: " + id);
+        });
+
+
         CampusResponseDTO campusResponseDTO = MapperUtil.mapObject(campusEntity, CampusResponseDTO.class);
+        campusResponseDTO.setProvince(MapperUtil.mapObject(provinceEntity, ProvinceResponseDTO.class));
+        campusResponseDTO.setCity(MapperUtil.mapObject(cityEntity, CityResponseDTO.class));
         log.info("Successfully fetched Campus: id={}", campusResponseDTO.getId());
         return campusResponseDTO;
     }
@@ -199,5 +227,25 @@ public class CampusService {
         log.info("Campus updated successfully: {}", response.getId());
         return response;
     }
+
+    public List<CampusResponseDTO> searchByKeyword(String keyword) {
+        try {
+            log.info("Fetching all Campuses based on search from database");
+            List<CampusEntity> result = campusRepository.searchByKeyword(keyword);
+            List<CampusResponseDTO> responseDTOS = MapperUtil.mapList(result, CampusResponseDTO.class);
+            log.info("Successfully fetched Campuses based on search {} ", responseDTOS.size());
+            return responseDTOS;
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching Discount Types based on search", dae);
+            throw new CustomServiceException("Unable to fetch Discount Types based on search from database", dae);
+        } catch (MappingException me) {
+            log.error("Error mapping DiscountTpe Entity to Discount Types based on search", me);
+            throw new CustomServiceException("Error converting  Discount Types data based on search", me);
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Discount Types based on search", e);
+            throw new CustomServiceException("Unexpected error occurred", e);
+        }
+    }
 }
+
 

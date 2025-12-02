@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.school.controller;
 
 import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
+import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.facade.CampusFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,14 @@ public class CampusController {
         CampusResponseDTO campus = nCampusFacade.getById(id);
         log.info("Returning campus: id={}", campus.getId());
         return ResponseEntity.ok(campus);
+    }
+
+    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
+        log.info("GET /api/school/discounts/types/search by keyword called");
+        List<CampusResponseDTO> sectionDTO = nCampusFacade.searchByKeyword(keyword);
+        log.info("GET /api/school/discounts/types/search by keyword succeeded");
+        return ResponseEntity.ok().body(sectionDTO);
     }
 
     @GetMapping(value = "/by-institute/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

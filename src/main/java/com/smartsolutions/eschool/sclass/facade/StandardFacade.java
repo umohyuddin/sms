@@ -51,6 +51,10 @@ public class StandardFacade {
        return standardService.sofDeleteByCampusId(campusId);
     }
 
+    public List<StandardDTO> getStandardsByFilter(Long campusId, String keyword) {
+        return standardService.getStandardByFilter(campusId,keyword);
+    }
+
 
 //
 //    public List<SClassEntity> getByTeacherId(Long id) {

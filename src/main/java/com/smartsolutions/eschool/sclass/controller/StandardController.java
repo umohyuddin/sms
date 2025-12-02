@@ -15,7 +15,7 @@ import java.util.List;
 
 @Transactional
 @RestController
-@RequestMapping("/api/standards")
+@RequestMapping("/api/institute/campuses/standards")
 @Slf4j
 public class StandardController {
     @Autowired
@@ -48,13 +48,29 @@ public class StandardController {
     }
 
 
-    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
-        log.info("GET /api/sections/search by keyword called");
-        List<StandardDTO> sectionDTO = standardFacade.searchByKeyword(keyword);
-        log.info("GET /api/sections/search by keyword succeeded");
-        return ResponseEntity.ok().body(sectionDTO);
+//    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
+//        log.info("GET /api/sections/search by keyword called");
+//        List<StandardDTO> sectionDTO = standardFacade.searchByKeyword(keyword);
+//        log.info("GET /api/sections/search by keyword succeeded");
+//        return ResponseEntity.ok().body(sectionDTO);
+//    }
+
+    // Search standards by campus and keyword
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getStandardsByFilter(@RequestParam(required = false) Long campusId,@RequestParam(required = false) String keyword) {
+        log.info("GET /api/institute/campuses/standards/search called with campusId={} and keyword={}", campusId, keyword);
+
+        try {
+            List<StandardDTO> results = standardFacade.getStandardsByFilter(campusId, keyword);
+            log.info("Search completed. Found {} standards", results.size());
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            log.error("Failed to search standards", e);
+            return ResponseEntity.internalServerError().body("Failed to search standards");
+        }
     }
+
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

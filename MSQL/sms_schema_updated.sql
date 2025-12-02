@@ -82,10 +82,12 @@ CREATE TABLE campuses
     province_id  BIGINT,
     city_id      BIGINT,
     campus_name  VARCHAR(100) NOT NULL,
+    campus_code  VARCHAR(100),
     contact      VARCHAR(20),
     email        VARCHAR(100),
     website      VARCHAR(100),
     address      VARCHAR(255),
+    is_active    BOOLEAN      NOT NULL DEFAULT TRUE,
     logo         LONGBLOB,
     deleted      BOOLEAN      NOT NULL DEFAULT FALSE,
 
@@ -273,18 +275,95 @@ CREATE TABLE standards
     deleted_at    DATETIME,
     FOREIGN KEY (campus_id) REFERENCES campuses (id)
 );
+-- Standards for Downtown Campus (campus_id = 1)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 1, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 1, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 1, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 1, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 1, NOW(), NOW(), 0, NULL);
 
-INSERT INTO standards (id, standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES (1, '1st Grade', 1, NOW(), NOW(), 1, NULL),
-       (2, '2nd Grade', 1, NOW(), NOW(), 1, NULL),
-       (3, '3rd Grade', 1, NOW(), NOW(), 0, NULL),
-       (4, '4th Grade', 1, NOW(), NOW(), 0, NULL),
-       (5, '5th Grade', 1, NOW(), NOW(), 0, NULL),
-       (6, '6th Grade', 1, NOW(), NOW(), 0, NULL),
-       (7, '7th Grade', 1, NOW(), NOW(), 0, NULL),
-       (8, '8th Grade', 1, NOW(), NOW(), 0, NULL),
-       (9, '9th Grade', 1, NOW(), NOW(), 0, NULL),
-       (10, '10th Grade', 1, NOW(), NOW(), 0, NULL);
+-- Standards for Uptown Campus (campus_id = 2)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 2, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 2, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 2, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 2, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 2, NOW(), NOW(), 0, NULL);
+
+-- Standards for Riverside Campus (campus_id = 3)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 3, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 3, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 3, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 3, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 3, NOW(), NOW(), 0, NULL);
+
+-- Standards for Hilltop Campus (campus_id = 4)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 4, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 4, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 4, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 4, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 4, NOW(), NOW(), 0, NULL);
+
+-- Standards for Greenfield Campus (campus_id = 5)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 5, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 5, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 5, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 5, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 5, NOW(), NOW(), 0, NULL);
+
+-- Standards for Seaside Campus (campus_id = 6)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 6, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 6, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 6, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 6, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 6, NOW(), NOW(), 0, NULL);
+
+-- Standards for Central Campus (campus_id = 7)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 7, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 7, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 7, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 7, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 7, NOW(), NOW(), 0, NULL);
+
+-- Standards for Lakeside Campus (campus_id = 8)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 8, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 8, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 8, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 8, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 8, NOW(), NOW(), 0, NULL);
+
+-- Standards for Sunrise Campus (campus_id = 9)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 9, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 9, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 9, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 9, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 9, NOW(), NOW(), 0, NULL);
+
+-- Standards for Maple Campus (campus_id = 10)
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
+VALUES
+    ('1st Grade', 10, NOW(), NOW(), 0, NULL),
+    ('2nd Grade', 10, NOW(), NOW(), 0, NULL),
+    ('3rd Grade', 10, NOW(), NOW(), 0, NULL),
+    ('4th Grade', 10, NOW(), NOW(), 0, NULL),
+    ('5th Grade', 10, NOW(), NOW(), 0, NULL);
 
 
 -- sections TABLE

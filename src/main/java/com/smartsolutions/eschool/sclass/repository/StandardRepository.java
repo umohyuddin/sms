@@ -39,6 +39,16 @@ public interface StandardRepository extends JpaRepository<StandardEntity, Long> 
             "AND sec.deleted = false")
     List<StandardEntity> searchByKeyword(@Param("keyword") String keyword);
 
+    @Query("SELECT s FROM StandardEntity s " +
+            "JOIN FETCH s.campus c " +
+            "WHERE (:campusId IS NULL OR c.id = :campusId) " +
+            "AND (:search IS NULL OR LOWER(s.standardName) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "     OR LOWER(s.standardCode) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+            "AND s.deleted = false " +
+            "ORDER BY s.standardName ASC")
+    List<StandardEntity> searchStandards(@Param("campusId") Long campusId,
+                                         @Param("search") String search);
+
 
     @Modifying
     @Transactional
@@ -50,4 +60,5 @@ public interface StandardRepository extends JpaRepository<StandardEntity, Long> 
     @Transactional
     @Query("UPDATE StandardEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " +
             "WHERE s.campus.id = :campusId AND s.deleted = false")
-    int softDeleteByCampusId(@Param("campusId") Long campusId);}
+    int softDeleteByCampusId(@Param("campusId") Long campusId);
+}
