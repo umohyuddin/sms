@@ -15,4 +15,5 @@ public class SectionCreateRequestDTO {
 
     @NotNull(message = "Standard ID must not be null")
     private Long standardId;
+    private Long campusId;
 }

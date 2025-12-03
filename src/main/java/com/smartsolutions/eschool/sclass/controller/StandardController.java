@@ -39,11 +39,11 @@ public class StandardController {
         return ResponseEntity.ok(standardDTO);
     }
 
-    @GetMapping(value = "/campus/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getByCampusId(@PathVariable Long id) throws Exception {
-        log.info("Received request to fetch standards with Campus id: {}", id);
-        List<StandardDTO> standardDTOList = standardFacade.getByCampusId(id);
-        log.info("Returning standards successfully");
+    @GetMapping(value = "/campus/{campusId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getByCampusId(@PathVariable Long campusId) throws Exception {
+        log.info("Received request to fetch standards with Campus Id: {}", campusId);
+        List<StandardDTO> standardDTOList = standardFacade.getByCampusId(campusId);
+        log.info("Returning standards by campus by Id successfully");
         return ResponseEntity.ok(standardDTOList);
     }
 

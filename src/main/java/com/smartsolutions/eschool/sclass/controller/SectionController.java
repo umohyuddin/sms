@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 @RestController
-@RequestMapping("/api/sections")
+@RequestMapping("/api/institute/campuses/standards/sections")
 public class SectionController {
     @Autowired
     private SectionFacade sectionFacade;

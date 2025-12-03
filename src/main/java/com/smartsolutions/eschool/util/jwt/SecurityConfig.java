@@ -16,6 +16,9 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -25,43 +28,16 @@ public class SecurityConfig {
     private JwtUtil jwtUtil;
     @Autowired
     private UserDetailsService userDetailsService;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .cors(cors -> {})
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(HttpMethod.POST, "/api/auth/generateToken").permitAll()
-//                        .requestMatchers(
-//                                "/v3/api-docs/**",
-//                                "/swagger-ui/**",
-//                                "/swagger/index.html",
-//                                "/swagger-ui.html"
-//                        ).permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService),
-//                        UsernamePasswordAuthenticationFilter.class);
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .cors(cors -> cors.disable())
-//                .authorizeHttpRequests(auth -> auth
-//                        .anyRequest().permitAll()
-//                )
-//                .logout(logout -> logout.disable())
-//                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
-//
-//        return http.build();
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {
-                }) // <-- ENABLE CORS, use defaults to pick up WebConfig
+                .cors(cors -> {}) // this picks up WebConfig
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // allow preflight requests
                         .anyRequest().permitAll()
                 )
-                .logout(logout -> logout.disable())
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
+                .logout(logout -> logout.disable());
 
         return http.build();
     }
@@ -79,4 +55,16 @@ public class SecurityConfig {
     }
 
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:4200");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }
