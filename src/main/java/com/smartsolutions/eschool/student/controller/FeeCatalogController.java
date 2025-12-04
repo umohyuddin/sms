@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Transactional
 @RestController
-@RequestMapping("/api/fee/catalog")
+@RequestMapping("/api/fee/catalogs")
 @Slf4j
 public class FeeCatalogController {
     private final FeeCatelogFacade feeCatalogFacade;

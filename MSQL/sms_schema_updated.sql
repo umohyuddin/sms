@@ -277,93 +277,83 @@ CREATE TABLE standards
 );
 -- Standards for Downtown Campus (campus_id = 1)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 1, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 1, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 1, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 1, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 1, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 1, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 1, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 1, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 1, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 1, NOW(), NOW(), 0, NULL);
 
 -- Standards for Uptown Campus (campus_id = 2)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 2, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 2, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 2, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 2, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 2, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 2, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 2, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 2, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 2, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 2, NOW(), NOW(), 0, NULL);
 
 -- Standards for Riverside Campus (campus_id = 3)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 3, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 3, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 3, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 3, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 3, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 3, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 3, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 3, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 3, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 3, NOW(), NOW(), 0, NULL);
 
 -- Standards for Hilltop Campus (campus_id = 4)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 4, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 4, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 4, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 4, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 4, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 4, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 4, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 4, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 4, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 4, NOW(), NOW(), 0, NULL);
 
 -- Standards for Greenfield Campus (campus_id = 5)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 5, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 5, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 5, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 5, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 5, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 5, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 5, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 5, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 5, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 5, NOW(), NOW(), 0, NULL);
 
 -- Standards for Seaside Campus (campus_id = 6)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 6, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 6, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 6, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 6, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 6, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 6, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 6, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 6, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 6, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 6, NOW(), NOW(), 0, NULL);
 
 -- Standards for Central Campus (campus_id = 7)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 7, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 7, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 7, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 7, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 7, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 7, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 7, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 7, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 7, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 7, NOW(), NOW(), 0, NULL);
 
 -- Standards for Lakeside Campus (campus_id = 8)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 8, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 8, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 8, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 8, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 8, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 8, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 8, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 8, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 8, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 8, NOW(), NOW(), 0, NULL);
 
 -- Standards for Sunrise Campus (campus_id = 9)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 9, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 9, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 9, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 9, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 9, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 9, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 9, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 9, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 9, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 9, NOW(), NOW(), 0, NULL);
 
 -- Standards for Maple Campus (campus_id = 10)
 INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES
-    ('1st Grade', 10, NOW(), NOW(), 0, NULL),
-    ('2nd Grade', 10, NOW(), NOW(), 0, NULL),
-    ('3rd Grade', 10, NOW(), NOW(), 0, NULL),
-    ('4th Grade', 10, NOW(), NOW(), 0, NULL),
-    ('5th Grade', 10, NOW(), NOW(), 0, NULL);
+VALUES ('1st Grade', 10, NOW(), NOW(), 0, NULL),
+       ('2nd Grade', 10, NOW(), NOW(), 0, NULL),
+       ('3rd Grade', 10, NOW(), NOW(), 0, NULL),
+       ('4th Grade', 10, NOW(), NOW(), 0, NULL),
+       ('5th Grade', 10, NOW(), NOW(), 0, NULL);
 
 
 -- sections TABLE
@@ -483,73 +473,72 @@ VALUES (1, 1, 1, 'STU001', 'Ali Khan', 'Ali', 'Khan', '2008-05-15', 'Male', 'ali
 DROP TABLE IF EXISTS `fee_catalog`;
 CREATE TABLE fee_catalog
 (
-    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-    code             VARCHAR(50)  NOT NULL UNIQUE,
-    name             VARCHAR(100) NOT NULL,
-    description      VARCHAR(255),
-    charge_type      VARCHAR(50)  NOT NULL,
-    recurrence_rule  VARCHAR(50),
-    active           BOOLEAN      NOT NULL DEFAULT TRUE,
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code            VARCHAR(50)  NOT NULL UNIQUE,
+    name            VARCHAR(100) NOT NULL,
+    description     VARCHAR(255),
+    charge_type     VARCHAR(50)  NOT NULL,
+    recurrence_rule VARCHAR(50),
+    active          BOOLEAN      NOT NULL DEFAULT TRUE,
+    deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
 
-    campus_id        BIGINT       NOT NULL,
-    academic_year_id BIGINT       NOT NULL,
-
-    created_at       DATETIME              DEFAULT CURRENT_TIMESTAMP,
-    updated_at       DATETIME              DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted          BOOLEAN      NOT NULL DEFAULT FALSE,
-    deleted_at       DATETIME,
-    CONSTRAINT fk_fee_catalog_campus
-        FOREIGN KEY (campus_id) REFERENCES campuses (id),
-
-    CONSTRAINT fk_fee_catalog_academic_year
-        FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
+    created_at      DATETIME,
+    created_by      BIGINT,
+    updated_at      DATETIME,
+    updated_by      BIGINT,
+    deleted_at      DATETIME,
+    deleted_by      BIGINT
 );
 
 
 INSERT INTO fee_catalog
-(code, name, description, charge_type, recurrence_rule, active, academic_year_id, campus_id, deleted, deleted_at)
+(code, name, description, charge_type, recurrence_rule, active, deleted, created_at, created_by, updated_at, updated_by,
+ deleted_at, deleted_by)
 VALUES
--- General School Charges (Campus 1 – Main)
-('LIB-MAIN-001', 'Library Fee', 'Library maintenance and book renewal charges', 'FIXED', 'MONTHLY', TRUE, 1, 1, FALSE,
+-- Academic and Administrative Fees
+('LIB-001', 'Library Fee', 'Library maintenance and book renewal charges', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('CMP-001', 'Computer Lab Fee', 'Computer lab usage and maintenance charges', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('SCI-001', 'Science Lab Fee', 'Charges for science laboratory usage', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1, NOW(),
+ 1, NULL, NULL),
+('REG-001', 'Registration Fee', 'New student registration charges', 'FIXED', 'ONE_TIME', TRUE, FALSE, NOW(), 1, NOW(),
+ 1, NULL, NULL),
+('EXAM-001', 'Examination Fee', 'Charges for mid-term and final exams', 'FIXED', 'ONE_TIME', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('ID-001', 'Student ID Card Fee', 'Charges for issuing student ID card', 'FIXED', 'ONE_TIME', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('TRANS-001', 'Transportation Fee', 'Bus/transport charges for students', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('SPORT-001', 'Sports Fee', 'Sports activities and facilities fee', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1, NOW(), 1,
+ NULL, NULL),
+('HEALTH-001', 'Health & Medical Fee', 'Basic first-aid, medical checkup, and hygiene support', 'FIXED', 'YEARLY', TRUE,
+ FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+('SEC-001', 'Security Charges', 'Annual security and safety maintenance fee', 'FIXED', 'YEARLY', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('GEN-001', 'Generator Fuel Charges', 'Fuel cost for backup generator', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('DEV-001', 'Development Charges', 'School building and infrastructure development fund', 'FIXED', 'YEARLY', TRUE,
+ FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+('MAINT-001', 'Maintenance Charges', 'School maintenance and repair charges', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('ACT-001', 'Activity Fee', 'Co-curricular and extra-curricular activities', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('LAB-001', 'Lab Consumables Fee', 'Consumables for science or computer labs', 'VARIABLE', 'TERM_WISE', TRUE, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+('PER-001', 'Per Subject Fee', 'Charges applied per subject/course', 'PER_SUBJECT', 'TERM_WISE', TRUE, FALSE, NOW(), 1,
+ NOW(), 1, NULL, NULL),
+('CREDIT-001', 'Per Credit Fee', 'Charges applied per academic credit', 'PER_CREDIT', 'TERM_WISE', TRUE, FALSE, NOW(),
+ 1, NOW(), 1, NULL, NULL),
+('SCHOLAR-001', 'Scholarship Adjustment', 'Deduction/adjustment for scholarship', 'PERCENTAGE', 'ONE_TIME', TRUE, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+('HOSTEL-001', 'Hostel Fee', 'Boarding and lodging charges', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL,
  NULL),
-('CMP-MAIN-001', 'Computer Lab Fee', 'Computer lab usage and maintenance charges', 'FIXED', 'MONTHLY', TRUE, 1, 1,
- FALSE, NULL),
-('SCI-MAIN-001', 'Science Lab Fee', 'Charges for science laboratory usage', 'FIXED', 'MONTHLY', TRUE, 1, 1, FALSE,
- NULL),
-('REG-MAIN-001', 'Registration Fee', 'New student registration charges', 'FIXED', 'ONE_TIME', TRUE, 1, 1, FALSE, NULL),
-('SEC-MAIN-001', 'Security Charges', 'Annual security and safety maintenance fee', 'FIXED', 'YEARLY', TRUE, 1, 1, FALSE,
- NULL),
-('GEN-MAIN-001', 'Generator Fuel Charges', 'Fuel cost for backup generator', 'FIXED', 'MONTHLY', TRUE, 1, 1, FALSE,
- NULL),
-('DEV-MAIN-001', 'Development Charges', 'School building and infrastructure development fund', 'FIXED', 'YEARLY', TRUE,
- 1, 1, FALSE, NULL),
-('MAINT-MAIN-001', 'Maintenance Charges', 'School maintenance and repair charges', 'FIXED', 'MONTHLY', TRUE, 1, 1,
- FALSE, NULL),
-('SPORT-MAIN-001', 'Sports Fee', 'Sports activities and facilities fee', 'FIXED', 'MONTHLY', TRUE, 1, 1, FALSE, NULL),
-('ID-MAIN-001', 'Student ID Card Fee', 'Charges for issuing student ID card', 'FIXED', 'ONE_TIME', TRUE, 1, 1, FALSE,
- NULL),
+('HOSTEL-DEP-001', 'Hostel Security Deposit', 'Refundable hostel security deposit', 'FIXED', 'ONE_TIME', TRUE, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL);
 
-('HST-ANN-001', 'Hostel Security Deposit', 'Refundable hostel security deposit', 'FIXED', 'ONE_TIME', TRUE, 1, 1, FALSE,
- NULL),
 
--- Campus 2 (City Campus)
-('CMP-CITY-001', 'Computer Lab Fee', 'Charges for computer lab usage', 'FIXED', 'MONTHLY', TRUE, 1, 2, FALSE, NULL),
-('REG-CITY-001', 'Registration Fee', 'Student registration fee - City Campus', 'FIXED', 'ONE_TIME', TRUE, 1, 2, FALSE,
- NULL),
-('EXM-CITY-001', 'Exam Charges', 'Mid & final exam charges', 'FIXED', 'ONE_TIME', TRUE, 1, 2, FALSE, NULL),
-('DEV-CITY-001', 'Development Fee', 'Campus development & improvement fund', 'FIXED', 'YEARLY', TRUE, 1, 2, FALSE,
- NULL),
-
--- Campus 3 (Girls Campus)
-('CMP-GIRLS-001', 'Computer Lab Fee', 'Girls campus computer lab usage', 'FIXED', 'MONTHLY', TRUE, 1, 3, FALSE, NULL),
-('EXM-GIRLS-001', 'Examination Charges', 'Girls campus exam fee', 'FIXED', 'ONE_TIME', TRUE, 1, 3, FALSE, NULL),
-('REG-GIRLS-001', 'Registration Fee', 'Girls campus registration charges', 'FIXED', 'ONE_TIME', TRUE, 1, 3, FALSE,
- NULL),
-('ACT-GIRLS-001', 'Activity Fee', 'Co-curricular & extra activities fee', 'FIXED', 'MONTHLY', TRUE, 1, 3, FALSE, NULL),
-('HEALTH-GIRLS-001', 'Health & Medical Fee', 'Basic first-aid, medical checkup, and hygiene support', 'FIXED', 'YEARLY',
- TRUE, 1, 3, FALSE, NULL);
-
-
+DROP TABLE IF EXISTS `fee_component`;
 CREATE TABLE fee_component
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -559,8 +548,15 @@ CREATE TABLE fee_component
     component_name VARCHAR(100) NOT NULL,
     account_code   VARCHAR(50),
     taxable        BOOLEAN      NOT NULL DEFAULT FALSE,
+    active         BOOLEAN      NOT NULL DEFAULT TRUE,
     deleted        BOOLEAN      NOT NULL DEFAULT FALSE,
+
+    created_at     DATETIME,
+    created_by     BIGINT,
+    updated_at     DATETIME,
+    updated_by     BIGINT,
     deleted_at     DATETIME,
+    deleted_by     BIGINT,
     CONSTRAINT fk_fee_component_catalog
         FOREIGN KEY (fee_catalog_id) REFERENCES fee_catalog (id)
 );
@@ -641,30 +637,26 @@ DROP TABLE IF EXISTS fee_rates;
 CREATE TABLE fee_rates
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-
-    campus_id        BIGINT       NOT NULL,
-    standard_id      BIGINT       NOT NULL,
-    academic_year_id BIGINT       NOT NULL,
+    campus_id        BIGINT         NOT NULL,
+    standard_id      BIGINT         NOT NULL,
     fee_component_id BIGINT,
-
-    code             VARCHAR(50)  NOT NULL,
-    name             VARCHAR(100) NOT NULL,
+    academic_year_id BIGINT         NOT NULL,
+    code             VARCHAR(50)    NOT NULL UNIQUE,
+    name             VARCHAR(100)   NOT NULL,
     description      VARCHAR(255),
-
-    charge_type      VARCHAR(50),
-    recurrence_rule  VARCHAR(100),
-
-    active           BOOLEAN      NOT NULL DEFAULT TRUE,
-
-    amount           DECIMAL(10, 2),
-    effective_from   DATE,
+    amount           DECIMAL(10, 2) NOT NULL,
+    currency         VARCHAR(3),
+    effective_from   DATE           NOT NULL,
     effective_to     DATE,
-
-    created_at       DATETIME              DEFAULT CURRENT_TIMESTAMP,
-    updated_at       DATETIME              DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    deleted          BOOLEAN      NOT NULL DEFAULT FALSE,
+    active           BOOLEAN        NOT NULL DEFAULT TRUE,
+    deleted          BOOLEAN        NOT NULL DEFAULT FALSE,
+    created_at       DATETIME,
+    created_by       BIGINT,
+    updated_at       DATETIME,
+    updated_by       BIGINT,
     deleted_at       DATETIME,
+    deleted_by       BIGINT,
+
     CONSTRAINT fk_fee_rates_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
 
     CONSTRAINT fk_fee_rates_standard FOREIGN KEY (standard_id) REFERENCES standards (id),
@@ -673,67 +665,54 @@ CREATE TABLE fee_rates
     CONSTRAINT fk_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );
 
+-- ============================================================
+-- FEE RATES DATA
+-- ============================================================
 
 INSERT INTO fee_rates
-(campus_id, standard_id, fee_component_id, code, name, description, charge_type,
- recurrence_rule, active, amount, effective_from, effective_to, academic_year_id)
+(campus_id, standard_id, fee_component_id, academic_year_id, code, name, description, amount, currency, effective_from, effective_to, active, deleted)
 VALUES
--- Library Fee
-(1, 1, 11, 'LIB-MAIN-001-RATE', 'Library Fee – Basic', 'Monthly library charges', 'FIXED',
- 'MONTHLY', TRUE, 300.00, '2024-04-01', NULL, 3),
 
--- Computer Lab
-(1, 2, 2, 'CMP-MAIN-001-RATE', 'Computer Lab Fee', 'System usage + maintenance', 'FIXED',
- 'MONTHLY', TRUE, 500.00, '2024-04-01', NULL, 3),
+-- ============================================================
+-- MAIN CAMPUS — Admission Fees
+-- ============================================================
+(1, 1, 1, 1, 'FR-MAIN-ADM-FORM-001', 'Admission Form Fee Rate', 'Rate for Admission Form Fee', 5000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 2, 1, 'FR-MAIN-ADM-PROC-001', 'Admission Processing Fee Rate', 'Rate for Admission Processing', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 3, 1, 'FR-MAIN-ADM-TEST-001', 'Admission Test Fee Rate', 'Rate for Admission Test', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
--- Science Lab
-(1, 3, 3, 'SCI-MAIN-001-RATE', 'Science Lab Fee', 'Lab consumables fee', 'FIXED',
- 'MONTHLY', TRUE, 450.00, '2024-04-01', NULL, 3),
+-- ============================================================
+-- MAIN CAMPUS — Tuition Fees
+-- ============================================================
+(1, 1, 4, 1, 'FR-MAIN-TUI-BASIC-001', 'Basic Tuition Fee Rate', 'Rate for Basic Tuition', 20000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 5, 1, 'FR-MAIN-TUI-ACT-001', 'Activities Add-on Fee Rate', 'Rate for Activity Charges', 3000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 6, 1, 'FR-MAIN-TUI-LAB-001', 'Lab Access Fee Rate', 'Rate for Lab Access', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
--- Registration Fee (One-time)
-(1, 1, 4, 'REG-MAIN-001-RATE', 'Registration Fee', 'One-time student registration', 'FIXED',
- 'ONE_TIME', TRUE, 2000.00, '2024-04-01', NULL, 3),
+-- ============================================================
+-- MAIN CAMPUS — Transport Fees
+-- ============================================================
+(1, 1, 7, 1, 'FR-MAIN-TRN-FARE-001', 'Base Transport Fare Rate', 'Rate for Transport Base Fare', 8000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 8, 1, 'FR-MAIN-TRN-FUEL-001', 'Fuel Adjustment Fee Rate', 'Rate for Fuel Adjustment', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 9, 1, 'FR-MAIN-TRN-MAINT-001', 'Vehicle Maintenance Fee Rate', 'Rate for Vehicle Maintenance', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
--- Security Charges (Annual)
-(1, 4, 5, 'SEC-MAIN-001-RATE', 'Security Charges', 'Annual security management fee', 'FIXED',
- 'YEARLY', TRUE, 1200.00, '2024-04-01', NULL, 3);
+-- ============================================================
+-- CITY CAMPUS — Admission Fees
+-- ============================================================
+(2, 1, 10, 1, 'FR-CITY-ADM-FORM-001', 'Admission Form Fee Rate', 'Rate for City Admission Form Fee', 4000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(2, 1, 11, 1, 'FR-CITY-ADM-PROC-001', 'Admission Processing Fee Rate', 'Rate for City Admission Processing', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
-INSERT INTO fee_rates
-(campus_id, standard_id, fee_component_id, code, name, description, charge_type,
- recurrence_rule, active, amount, effective_from, effective_to, academic_year_id)
-VALUES
--- Computer Lab Fee
-(2, 1, 14, 'CMP-CITY-001-RATE', 'Computer Lab Fee – City', 'City campus lab charges', 'FIXED',
- 'MONTHLY', TRUE, 400.00, '2024-04-01', NULL, 3),
+-- ============================================================
+-- GIRLS CAMPUS — Tuition Fees
+-- ============================================================
+(3, 1, 14, 1, 'FR-GIRLS-TUI-BASIC-001', 'Girls Basic Tuition Fee Rate', 'Rate for Girls Basic Tuition', 18000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 15, 1, 'FR-GIRLS-TUI-ACT-001', 'Girls Activity Add-on Rate', 'Rate for Girls Activities', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 16, 1, 'FR-GIRLS-TUI-SCI-001', 'Science Material Fee Rate', 'Rate for Science Materials', 1200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
--- Registration Fee
-(2, 2, 16, 'REG-CITY-001-RATE', 'Registration Fee – City', 'One-time fee', 'FIXED',
- 'ONE_TIME', TRUE, 1800.00, '2024-04-01', NULL, 3),
-
--- Exam Fee
-(2, 3, 17, 'EXM-CITY-001-RATE', 'Examination Charges', 'Mid/Final exam charges', 'FIXED',
- 'ONE_TIME', TRUE, 1500.00, '2024-04-01', NULL, 3);
-
-
-INSERT INTO fee_rates
-(campus_id, standard_id, fee_component_id, code, name, description, charge_type,
- recurrence_rule, active, amount, effective_from, effective_to, academic_year_id)
-VALUES
--- Computer Lab Fee
-(3, 1, 20, 'CMP-GIRLS-001-RATE', 'Computer Lab Fee – Girls', 'Lab maintenance (girls campus)', 'FIXED',
- 'MONTHLY', TRUE, 350.00, '2024-04-01', NULL, 3),
-
--- Exam Fee
-(3, 2, 22, 'EXM-GIRLS-001-RATE', 'Examination Fee – Girls', 'Annual exam charges', 'FIXED',
- 'ONE_TIME', TRUE, 1400.00, '2024-04-01', NULL, 3),
-
--- Activity Fee
-(3, 3, 23, 'ACT-GIRLS-001-RATE', 'Activity Fee', 'Extracurricular activities', 'FIXED',
- 'MONTHLY', TRUE, 250.00, '2024-04-01', NULL, 3),
-
--- Health Fee
-(3, 4, 24, 'HEALTH-GIRLS-001-RATE', 'Health & Medical Fee', 'Medical aid & hygiene', 'FIXED',
- 'YEARLY', TRUE, 1000.00, '2024-04-01', NULL, 3);
+-- ============================================================
+-- GIRLS CAMPUS — Library Fees
+-- ============================================================
+(3, 1, 17, 1, 'FR-GIRLS-LIB-BOOK-001', 'Book Rental Fee Rate', 'Rate for Book Rental', 500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 18, 1, 'FR-GIRLS-LIB-MAINT-001', 'Library Maintenance Fee Rate', 'Rate for Library Maintenance', 800.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 19, 1, 'FR-GIRLS-LIB-CARD-001', 'Library Card Fee Rate', 'Rate for Library Card', 200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE);
 
 DROP TABLE IF EXISTS student_fee_assignments;
 

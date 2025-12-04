@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.service;
 
+import com.smartsolutions.eschool.global.configs.FeeConfig;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
 import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
@@ -12,11 +13,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class FeeCatalogService {
-    private FeeCatalogRepository feeCatalogRepository;
+    private final FeeCatalogRepository feeCatalogRepository;
+    private final FeeConfig feeConfig;
+
+    public FeeCatalogService(FeeCatalogRepository feeCatalogRepository, FeeConfig feeConfig) {
+        this.feeCatalogRepository = feeCatalogRepository;
+        this.feeConfig = feeConfig;
+    }
 
     public List<FeeCatalogDTO> searchFeeCatalog(String keyword) {
         try {
@@ -57,9 +65,26 @@ public class FeeCatalogService {
             log.info("Fetching all FeeCatalog from database");
             List<FeeCatalogEntity> result = feeCatalogRepository.findByDeletedFalse();
             log.info("Successfully fetched {} FeeCatalog", result.size());
-            List<FeeCatalogDTO> feeCatalogDTOList = MapperUtil.mapList(result, FeeCatalogDTO.class);
-            log.info("Successfully fetched FeeCatalog");
-            return feeCatalogDTOList;
+            return result.stream().map(entity -> {
+                FeeCatalogDTO dto = new FeeCatalogDTO();
+
+                // --- Manual field mapping ---
+                dto.setId(entity.getId());
+                dto.setCode(entity.getCode());
+                dto.setName(entity.getName());
+                dto.setDescription(entity.getDescription());
+                dto.setActive(entity.isActive());
+
+                dto.setChargeType(entity.getChargeType());
+                dto.setChargeTypeLabel(getChargeTypeLabel(entity.getChargeType()));
+
+                dto.setRecurrenceRule(entity.getRecurrenceRule());
+                dto.setRecurrenceRuleLabel(getRecurrenceRuleLabel(entity.getRecurrenceRule()));
+
+                // Add campus/academicYear if needed
+                return dto;
+            }).collect(Collectors.toList());
+
         } catch (DataAccessException dae) {
             log.error("Database error while fetching FeeCatalog", dae);
             //throw new CustomServiceException("Unable to fetch students from database", dae);
@@ -73,4 +98,11 @@ public class FeeCatalogService {
         return Collections.emptyList();
     }
 
+    private String getChargeTypeLabel(String chargeType) {
+        return feeConfig.getChargeTypes().getOrDefault(chargeType, chargeType);
+    }
+
+    private String getRecurrenceRuleLabel(String recurrenceRule) {
+        return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
+    }
 }

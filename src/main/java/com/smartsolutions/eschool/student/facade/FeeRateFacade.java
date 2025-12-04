@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.facade;
 
+import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeRateDTO;
 import com.smartsolutions.eschool.student.service.FeeRateService;
 import org.springframework.context.annotation.Scope;
@@ -18,18 +19,18 @@ public class FeeRateFacade {
         this.feeRateService = feeRateService;
     }
 
-    public List<FeeRateDTO> getAll() {
+    public List<FeeRatesResponseDTO> getAll() {
         return feeRateService.getAll();
     }
-    public FeeRateDTO getById(Long id) {
+    public FeeRatesResponseDTO getById(Long id) {
         return feeRateService.getById(id);
     }
 
-    public  List<FeeRateDTO> searchFeeRates(String keyword){
+    public  List<FeeRatesResponseDTO> searchFeeRates(String keyword){
         return feeRateService.searchFeeRates(keyword);
     }
 
-    public  List<FeeRateDTO> getByFeeComponentId(Long feeComponentId){
+    public  List<FeeRatesResponseDTO> getByFeeComponentId(Long feeComponentId){
         return feeRateService.getByFeeComponentId(feeComponentId);
     }
 }

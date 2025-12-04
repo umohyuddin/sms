@@ -14,22 +14,9 @@ public class FeeCatalogDTO {
     private String code;
     private String name;
     private String description;
-    private String chargeType;
-    private String recurrenceRule;
     private boolean active;
-
-    // Relations (exposed as IDs + optional basic info)
-    private Long campusId;
-    private String campusName;
-    private Long academicYearId;
-    private String academicYearName;  // "2024-2025"
-
-    private LocalDateTime createdAt;
-
-
-    private boolean deleted = false;
-
-    private LocalDateTime deletedAt;
-
-//    private List<FeeComponentResponseDTO> components;
+    private String chargeType;          // raw value
+    private String chargeTypeLabel;     // human-readable
+    private String recurrenceRule;      // raw value
+    private String recurrenceRuleLabel; // human-readable
 }

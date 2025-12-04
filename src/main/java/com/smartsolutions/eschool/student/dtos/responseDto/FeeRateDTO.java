@@ -19,8 +19,8 @@ public class FeeRateDTO {
     private String code;
     private String name;
     private String description;
-    private String chargeType;       // e.g., FIXED, PERCENTAGE
-    private String recurrenceRule;   // e.g., MONTHLY, YEARLY
+    //private String chargeType;       // e.g., FIXED, PERCENTAGE
+    //private String recurrenceRule;   // e.g., MONTHLY, YEARLY
     private boolean active = true;
 
     private String academicYear;     // e.g., "2024-2025"

@@ -13,7 +13,7 @@ import java.util.List;
 
 @Transactional
 @RestController
-@RequestMapping("/api/students")
+@RequestMapping("/api/institute/students")
 @Slf4j
 public class StudentController {
 

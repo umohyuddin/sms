@@ -1,11 +1,9 @@
 package com.smartsolutions.eschool.student.service;
 
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
+import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeRateDTO;
-import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import com.smartsolutions.eschool.student.model.FeeRateEntity;
-import com.smartsolutions.eschool.student.repository.FeeComponentRepository;
 import com.smartsolutions.eschool.student.repository.FeeRateRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -27,14 +25,14 @@ public class FeeRateService {
     }
 
 
-    public List<FeeRateDTO> searchFeeRates(String keyword) {
+    public List<FeeRatesResponseDTO> searchFeeRates(String keyword) {
         try {
             log.info("Fetching all Fee Rates based on keyword from database");
             List<FeeRateEntity> result = feeRateRepository.searchFeeComponent(keyword);
             log.info("Successfully fetched {} FeeRates based on keyword", result.size());
-            List<FeeRateDTO> FeeComponentDTOList = MapperUtil.mapList(result, FeeRateDTO.class);
+            List<FeeRatesResponseDTO> feeRatesResponseDTOS = MapperUtil.mapList(result, FeeRatesResponseDTO.class);
             log.info("Successfully fetched FeeRates based on keyword");
-            return FeeComponentDTOList;
+            return feeRatesResponseDTOS;
         } catch (DataAccessException dae) {
             log.error("Database error while fetching FeeRates based on keyword", dae);
             //throw new CustomServiceException("Unable to fetch students from database", dae);
@@ -49,24 +47,24 @@ public class FeeRateService {
     }
 
 
-    public FeeRateDTO getById(Long id) {
+    public FeeRatesResponseDTO getById(Long id) {
         log.info("Fetching FeeRate with id: {}", id);
         FeeRateEntity feeRateEntity = feeRateRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
             log.info("Fetching FeeRate with id: {}", id);
             return new ResourceNotFoundException("FeeRate not found with id: " + id);
         });
 
-        FeeRateDTO feeRateDTO = MapperUtil.mapObject(feeRateEntity, FeeRateDTO.class);
+        FeeRatesResponseDTO feeRateDTO = MapperUtil.mapObject(feeRateEntity, FeeRatesResponseDTO.class);
         log.info("Successfully fetched FeeRate: id={}", feeRateDTO.getId());
         return feeRateDTO;
     }
 
-    public List<FeeRateDTO> getAll() {
+    public List<FeeRatesResponseDTO> getAll() {
         try {
             log.info("Fetching all FeeRates from database");
             List<FeeRateEntity> result = feeRateRepository.findByDeletedFalse();
             log.info("Successfully fetched {} FeeRates", result.size());
-            List<FeeRateDTO> feeRateDTOS = MapperUtil.mapList(result, FeeRateDTO.class);
+            List<FeeRatesResponseDTO> feeRateDTOS = MapperUtil.mapList(result, FeeRatesResponseDTO.class);
             log.info("Successfully fetched FeeRates");
             return feeRateDTOS;
         } catch (DataAccessException dae) {
@@ -82,12 +80,12 @@ public class FeeRateService {
         return Collections.emptyList();
     }
 
-    public List<FeeRateDTO> getByFeeComponentId(Long id) {
+    public List<FeeRatesResponseDTO> getByFeeComponentId(Long id) {
         try {
             log.info("Fetching all Fee Rates by fee component from database");
             List<FeeRateEntity> result = feeRateRepository.findByFeeComponentId(id);
             log.info("Successfully fetched {} FeeRates by fee component", result.size());
-            List<FeeRateDTO> FeeComponentDTOList = MapperUtil.mapList(result, FeeRateDTO.class);
+            List<FeeRatesResponseDTO> FeeComponentDTOList = MapperUtil.mapList(result, FeeRatesResponseDTO.class);
             log.info("Successfully fetched FeeRates by fee component");
             return FeeComponentDTOList;
         } catch (DataAccessException dae) {

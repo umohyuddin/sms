@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import jakarta.persistence.*;
@@ -20,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class FeeCatalogEntity {
+public class FeeCatalogEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,30 +47,11 @@ public class FeeCatalogEntity {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    // ---------- TIMESTAMPS ----------
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-
     // ---------- RELATIONS ----------
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "campus_id", nullable = false)
-    private CampusEntity campus;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "academic_year_id", nullable = false)
-    private AcademicYearEntity academicYear;
 
     // One catalog can have multiple components
     @OneToMany(mappedBy = "feeCatalog", cascade = CascadeType.ALL, orphanRemoval = true)

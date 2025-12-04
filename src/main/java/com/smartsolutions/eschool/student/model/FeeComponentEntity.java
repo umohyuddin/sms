@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FeeComponentEntity {
+public class FeeComponentEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,13 +38,11 @@ public class FeeComponentEntity {
     @Column(name = "taxable", nullable = false)
     private boolean taxable = false;
 
-    @Column(name = "deleted", nullable = false)
+    @Column(name = "deleted")
     private boolean deleted = false;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-
+    @Column(name = "active", nullable = false)
+    private boolean active = true;
 
     @OneToMany(mappedBy = "feeComponent", fetch = FetchType.LAZY)
     private List<FeeRateEntity> feeRates;

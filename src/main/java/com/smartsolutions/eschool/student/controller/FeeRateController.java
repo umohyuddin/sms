@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.controller;
 
+import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeRateDTO;
 import com.smartsolutions.eschool.student.facade.FeeRateFacade;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ public class FeeRateController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() throws Exception {
         log.info("GET /api/fee/rates called");
-        List<FeeRateDTO> resources = feeRateFacade.getAll();
+        List<FeeRatesResponseDTO> resources = feeRateFacade.getAll();
         log.info("GET /api/fee/rates succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
@@ -36,7 +37,7 @@ public class FeeRateController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable Long id) throws Exception {
         log.info("Received request to fetch Fee rate with id: {}", id);
-        FeeRateDTO feeRateDTO = feeRateFacade.getById(id);
+        FeeRatesResponseDTO feeRateDTO = feeRateFacade.getById(id);
         log.info("Returning Fee rate: id={}", feeRateDTO.getId());
         return ResponseEntity.ok(feeRateDTO);
     }
@@ -44,7 +45,7 @@ public class FeeRateController {
     @GetMapping(value = "/search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getSearch(@PathVariable String keyword) {
         log.info("GET /api/fee/rates by keyword called");
-        List<FeeRateDTO> resources = feeRateFacade.searchFeeRates(keyword);
+        List<FeeRatesResponseDTO> resources = feeRateFacade.searchFeeRates(keyword);
         log.info("GET /api/fee/rates by keyword succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok(resources);
     }
@@ -52,7 +53,7 @@ public class FeeRateController {
     @GetMapping(value = "/component/{componentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByFeeComponentId(@PathVariable Long componentId) {
         log.info("GET /api/fee/rates by componentId called");
-        List<FeeRateDTO> resources = feeRateFacade.getByFeeComponentId(componentId);
+        List<FeeRatesResponseDTO> resources = feeRateFacade.getByFeeComponentId(componentId);
         log.info("GET /api/fee/rates by  succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok(resources);
     }

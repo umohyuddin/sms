@@ -67,8 +67,4 @@ public class CampusEntity extends AuditableEntity {
 
     @OneToMany(mappedBy = "campus", fetch = FetchType.LAZY)
     private List<StudentEntity> students;
-
-    @OneToMany(mappedBy = "campus", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<FeeCatalogEntity> feeCatalogs;
-
 }

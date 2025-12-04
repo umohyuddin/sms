@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.student.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
@@ -11,7 +12,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.domain.Auditable;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,13 +26,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FeeRateEntity {
+public class FeeRateEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-    @Column(name = "code", length = 50, nullable = false)
+    @Column(name = "code", length = 50, nullable = false, unique = true)
     private String code;
 
     @Column(name = "name", length = 100, nullable = false)
@@ -38,37 +40,23 @@ public class FeeRateEntity {
     @Column(name = "description", length = 255)
     private String description;
 
-    @Column(name = "charge_type", length = 50)
-    private String chargeType;
-
-    @Column(name = "recurrence_rule", length = 100)
-    private String recurrenceRule;
-
-    @Column(name = "active", nullable = false)
-    private boolean active = true;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "amount", precision = 10, scale = 2)
+    @Column(name = "amount", precision = 10, scale = 2, nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "effective_from")
+    @Column(name = "currency", length = 3) // optional
+    private String currency;
+
+    @Column(name = "effective_from", nullable = false)
     private LocalDate effectiveFrom;
 
     @Column(name = "effective_to")
     private LocalDate effectiveTo;
 
+    @Column(name = "active", nullable = false)
+    private boolean active = true;
+
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
 
     @OneToMany(mappedBy = "feeRate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

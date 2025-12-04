@@ -4,6 +4,7 @@ package com.smartsolutions.eschool.lookups.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
+import com.smartsolutions.eschool.global.configs.FeeConfig;
 import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.facade.CityFacade;
@@ -31,11 +32,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LookUpController {
 
-
+    private final FeeConfig feeConfig;
     private final ProvinceFacade provinceFacade;
     private final CityFacade cityFacade;
 
-    public LookUpController(ProvinceFacade provinceFacade, CityFacade cityFacade) {
+    public LookUpController(FeeConfig feeConfig, ProvinceFacade provinceFacade, CityFacade cityFacade) {
+        this.feeConfig = feeConfig;
         this.provinceFacade = provinceFacade;
         this.cityFacade = cityFacade;
     }
@@ -87,4 +89,13 @@ public class LookUpController {
         log.info("GET /api/lookup/cities/search/{} succeeded, returned {} results", keyword, resources.size());
         return ResponseEntity.ok(resources);
     }
+
+    @GetMapping("/fee-catalog/metadata")
+    public Map<String, Map<String, String>> getFeeMeta() {
+        return Map.of(
+                "chargeTypes", feeConfig.getChargeTypes(),
+                "recurrenceRules", feeConfig.getRecurrenceRules()
+        );
+    }
 }
+

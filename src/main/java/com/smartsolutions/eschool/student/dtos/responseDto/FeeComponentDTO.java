@@ -14,6 +14,8 @@ public class FeeComponentDTO {
     private String componentName;
     private String accountCode;
     private boolean taxable;
+    private boolean active;
+    private FeeCatalogDTO feeCatalog;
 
     // Optionally, include fee rates IDs (or a separate FeeRateDTO if needed)
 //    private List<Long> feeRateIds;
