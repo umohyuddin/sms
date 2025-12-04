@@ -74,6 +74,25 @@ public class FeeRatesResponseDTO {
         private String componentName;
         private String accountCode;
         private boolean taxable;
+
+        // Add FeeCatalog here
+        private FeeCatalogDTO feeCatalog;
+
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class FeeCatalogDTO {
+            private Long id;
+            private String code;
+            private String name;
+            private String description;
+            private boolean active;
+            private String chargeType;
+            private String chargeTypeLabel;
+            private String recurrenceRule;
+            private String recurrenceRuleLabel;
+        }
     }
 
     // =======================

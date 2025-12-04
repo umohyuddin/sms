@@ -16,13 +16,14 @@ import java.util.Optional;
 public interface FeeRateRepository extends JpaRepository<FeeComponentEntity, Long> {
 
     @Query("""
-                SELECT fr FROM FeeRateEntity fr
-                LEFT JOIN FETCH fr.campus c
-                LEFT JOIN FETCH fr.standard s
-                LEFT JOIN FETCH fr.feeComponent fc
-                LEFT JOIN FETCH fr.academicYear ay
-                WHERE fr.deleted = false
-            """)
+    SELECT fr FROM FeeRateEntity fr
+    LEFT JOIN FETCH fr.campus c
+    LEFT JOIN FETCH fr.standard s
+    LEFT JOIN FETCH fr.feeComponent fc
+    LEFT JOIN FETCH fc.feeCatalog fcat
+    LEFT JOIN FETCH fr.academicYear ay
+    WHERE fr.deleted = false
+""")
     List<FeeRateEntity> findByDeletedFalse();
 
     @Query("SELECT fr FROM FeeRateEntity fr " +
