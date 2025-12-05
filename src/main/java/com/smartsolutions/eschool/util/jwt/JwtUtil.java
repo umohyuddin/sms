@@ -1,27 +1,92 @@
 package com.smartsolutions.eschool.util.jwt;
 
+import com.smartsolutions.eschool.auth.dtos.auth.responseDto.LoginResponseDTO;
+import com.smartsolutions.eschool.global.props.jwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 
 @Component
+@Slf4j
 public class JwtUtil {
+    private final jwtProperties jwtProperties;
+
+
+    public JwtUtil(jwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+    }
+
+    public String createToken(Map<String,Object> claims) {
+        log.info("jwt private key {}", jwtProperties.getPrivateKey());
+        log.info("jwt audience {}", jwtProperties.getAudience());
+        log.info("jwt issuer {}", jwtProperties.getIssuer());
+        log.info("jwt expiry {}", jwtProperties.getExpiry());
+        long expire  = (jwtProperties.getExpiry())/1000*60*60;
+        String jwtToken = Jwts.builder()
+                .setId(UUID.randomUUID().toString())
+                .setClaims(claims)
+                .setAudience(jwtProperties.getAudience())
+                .setIssuer(jwtProperties.getIssuer())
+                .setExpiration(new Date((new Date()).getTime() + expire))
+                .signWith(SignatureAlgorithm.HS512, jwtProperties.getPrivateKey())
+                .compact();
+        log.info("jwt token - {}", jwtToken);
+
+//        String refreshToken = Jwts.builder()
+//                .setId(UUID.randomUUID().toString())
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshTokenExpiry()))
+//                .signWith(SignatureAlgorithm.HS512, jwtProperties.getPrivateKey())
+//                .compact();
+
+        return jwtToken;
+    }
+
+
+    public boolean validateJwtToken(String authToken, HttpServletResponse response) throws IOException {
+        try {
+            Jwts.parser().setSigningKey(jwtProperties.getPrivateKey()).parseClaimsJws(authToken);
+            return true;
+        } catch (SignatureException e) {
+            log.error("Invalid JWT signature: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty: {}", e.getMessage());
+        }
+
+        return false;
+    }
+
+    public Claims extractClaims(String token) {
+
+        return Jwts.parser()
+                .setSigningKey(jwtProperties.getPrivateKey())
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     @Value("${jwt.secret}")
     private String secret;
     @Value("${jwt.expirationTime}")
     private String expirationTimeInMs;
     private Key key;
+
 
     @PostConstruct
     public void init() {

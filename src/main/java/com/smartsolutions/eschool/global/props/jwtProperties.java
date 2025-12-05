@@ -1,0 +1,39 @@
+package com.smartsolutions.eschool.global.props;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class jwtProperties {
+    @Getter
+    @Setter
+    @Value("${jwt.private.key}")
+    private String privateKey;
+
+    @Getter
+    @Setter
+    @Value("${jwt.audience}")
+    private String audience;
+
+    @Getter
+    @Setter
+    @Value("${jwt.issuer}")
+    private String issuer;
+
+    @Getter
+    @Setter
+    @Value("${jwt.expiry}")
+    private Long expiry;
+    @Getter
+    @Setter
+    @Value("${jwt.refresh.token.expiry}")
+    private Integer refreshTokenExpiry;
+
+
+    @Getter
+    @Setter
+    @Value("${jwt.cookie.name}")
+    private String cookieName;
+}

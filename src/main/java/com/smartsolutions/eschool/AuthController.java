@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200") // allow Vite dev server
+//@RestController
+//@RequestMapping("/api/auth")
+//@CrossOrigin(origins = "http://localhost:4200") // allow Vite dev server
 public class AuthController {
 
     private final JwtUtil jwtUtil;
@@ -36,7 +36,7 @@ public class AuthController {
     }
 
 
-    @PostMapping("/generateToken")
+    @PostMapping("/login")
     public SingleResourceSuccessResponseObject signIn(@Valid @RequestBody HashMap<String, String> request) {
         String email = request.get("email");
         String password = request.get("password");
