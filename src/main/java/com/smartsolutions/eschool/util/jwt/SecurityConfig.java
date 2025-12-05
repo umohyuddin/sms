@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> {}) // this picks up WebConfig
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("sms/auth/login").permitAll()
+                        .requestMatchers("sms/auth").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
