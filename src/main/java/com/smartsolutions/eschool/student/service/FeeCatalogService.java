@@ -31,9 +31,11 @@ public class FeeCatalogService {
             log.info("Fetching all FeeCatalog based on keyword from database");
             List<FeeCatalogEntity> result = feeCatalogRepository.searchFeeCatalog(keyword);
             log.info("Successfully fetched {} FeeCatalog based on keyword", result.size());
-            List<FeeCatalogDTO> feeCatalogDTOList = MapperUtil.mapList(result, FeeCatalogDTO.class);
-            log.info("Successfully fetched FeeCatalog based on keyword");
-            return feeCatalogDTOList;
+
+//            List<FeeCatalogDTO> feeCatalogDTOList = MapperUtil.mapList(result, FeeCatalogDTO.class);
+            return result.stream().map(this::toDto).collect(Collectors.toList());
+            //log.info("Successfully fetched FeeCatalog based on keyword");
+            // return feeCatalogDTOList;
         } catch (DataAccessException dae) {
             log.error("Database error while fetching FeeCatalog based on keyword", dae);
             //throw new CustomServiceException("Unable to fetch students from database", dae);
@@ -65,26 +67,7 @@ public class FeeCatalogService {
             log.info("Fetching all FeeCatalog from database");
             List<FeeCatalogEntity> result = feeCatalogRepository.findByDeletedFalse();
             log.info("Successfully fetched {} FeeCatalog", result.size());
-            return result.stream().map(entity -> {
-                FeeCatalogDTO dto = new FeeCatalogDTO();
-
-                // --- Manual field mapping ---
-                dto.setId(entity.getId());
-                dto.setCode(entity.getCode());
-                dto.setName(entity.getName());
-                dto.setDescription(entity.getDescription());
-                dto.setActive(entity.isActive());
-
-                dto.setChargeType(entity.getChargeType());
-                dto.setChargeTypeLabel(getChargeTypeLabel(entity.getChargeType()));
-
-                dto.setRecurrenceRule(entity.getRecurrenceRule());
-                dto.setRecurrenceRuleLabel(getRecurrenceRuleLabel(entity.getRecurrenceRule()));
-
-                // Add campus/academicYear if needed
-                return dto;
-            }).collect(Collectors.toList());
-
+            return result.stream().map(this::toDto).collect(Collectors.toList());
         } catch (DataAccessException dae) {
             log.error("Database error while fetching FeeCatalog", dae);
             //throw new CustomServiceException("Unable to fetch students from database", dae);
@@ -104,5 +87,23 @@ public class FeeCatalogService {
 
     private String getRecurrenceRuleLabel(String recurrenceRule) {
         return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
+    }
+
+    private FeeCatalogDTO toDto(FeeCatalogEntity entity) {
+        FeeCatalogDTO dto = new FeeCatalogDTO();
+
+        dto.setId(entity.getId());
+        dto.setCode(entity.getCode());
+        dto.setName(entity.getName());
+        dto.setDescription(entity.getDescription());
+        dto.setActive(entity.isActive());
+
+        dto.setChargeType(entity.getChargeType());
+        dto.setChargeTypeLabel(getChargeTypeLabel(entity.getChargeType()));
+
+        dto.setRecurrenceRule(entity.getRecurrenceRule());
+        dto.setRecurrenceRuleLabel(getRecurrenceRuleLabel(entity.getRecurrenceRule()));
+
+        return dto;
     }
 }
