@@ -57,7 +57,9 @@ public class FeeCatalogService {
             return new ResourceNotFoundException("FeeCatalog not found with id: " + id);
         });
 
-        FeeCatalogDTO feeCatalogDTO = MapperUtil.mapObject(feeCatalogEntity, FeeCatalogDTO.class);
+
+        FeeCatalogDTO feeCatalogDTO = toDto(feeCatalogEntity);
+        //FeeCatalogDTO feeCatalogDTO = MapperUtil.mapObject(feeCatalogEntity, FeeCatalogDTO.class);
         log.info("Successfully fetched FeeCatalog: id={}", feeCatalogDTO.getId());
         return feeCatalogDTO;
     }
