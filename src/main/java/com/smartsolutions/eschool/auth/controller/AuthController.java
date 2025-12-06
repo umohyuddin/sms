@@ -30,7 +30,7 @@ public class AuthController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO requestDTO) {
         log.info("Received request to login {}", requestDTO );
-        LoginResponseDTO responseDTO = authFacade.createAcademicYear(requestDTO);
+        LoginResponseDTO responseDTO = authFacade.authenticateUser(requestDTO);
         return new ResponseEntity<>(responseDTO,HttpStatus.OK);
     }
 }

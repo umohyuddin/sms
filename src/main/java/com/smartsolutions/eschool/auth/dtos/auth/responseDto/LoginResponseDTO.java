@@ -19,7 +19,6 @@ public class LoginResponseDTO {
     private String tokenType = "Bearer";
     private Long expiresIn; // in seconds
     private String userId;
-    private String username;
-    private String fullName;
+    private String email;
 //    private List<String> roles;
 }

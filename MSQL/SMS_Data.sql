@@ -815,3 +815,15 @@ VALUES (15.00, TRUE, '2024-04-01', '2025-03-31', TRUE, FALSE, 1, 1, 1, 1),
        (5000.00, FALSE, '2024-05-01', '2025-05-01', TRUE, FALSE, 4, 1, 4, 1),
        (15.00, TRUE, '2024-06-01', '2025-06-01', TRUE, FALSE, 5, 3, 5, 1);
 
+
+
+INSERT INTO system_users (username, email, phone, password_hash, is_active, is_verified)
+VALUES
+    ('admin.user', 'admin@example.com', '03001234567',
+     '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, TRUE),
+
+    ('teacher.user', 'teacher@example.com', '03007654321',
+     '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE),
+
+    ('student.user', 'student@example.com', '03111223344',
+     '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE);

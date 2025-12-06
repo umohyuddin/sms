@@ -18,6 +18,7 @@ import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -165,19 +166,19 @@ public class StandardService {
     }
 
     public int sofDeleteByCampusId(Long campusId) {
-            log.info("Delete requested for Standard under Campus ID: {}", campusId);
-            try {
-                int rows = standardRepository.softDeleteByCampusId(campusId);
-                if (rows == 0) {
-                    log.warn("No Standard found for Campus ID {}. Nothing was updated.", campusId);
-                } else {
-                    log.info("delete succeeded. {} Standards deleted for Campus ID {}", rows, campusId);
-                }
-                return rows;
-            } catch (Exception e) {
-                log.error("Error while deleting Standards for Campus ID {}", campusId, e);
-                throw e;
+        log.info("Delete requested for Standard under Campus ID: {}", campusId);
+        try {
+            int rows = standardRepository.softDeleteByCampusId(campusId);
+            if (rows == 0) {
+                log.warn("No Standard found for Campus ID {}. Nothing was updated.", campusId);
+            } else {
+                log.info("delete succeeded. {} Standards deleted for Campus ID {}", rows, campusId);
             }
+            return rows;
+        } catch (Exception e) {
+            log.error("Error while deleting Standards for Campus ID {}", campusId, e);
+            throw e;
+        }
     }
 
     public List<StandardDTO> getStandardByFilter(Long campusId, String keyword) {
@@ -188,10 +189,11 @@ public class StandardService {
             List<StandardEntity> result = standardRepository.searchStandards(campusId, search);
             if (result.isEmpty()) {
                 log.warn("No Standards found for campusId={} with keyword='{}'", campusId, keyword);
-                throw new ResourceNotFoundException("No Standards found matching the criteria");
+//                throw new ResourceNotFoundException("No Standards found matching the criteria");
+                return Collections.emptyList();
             }
             List<StandardDTO> standardDTOS = MapperUtil.mapList(result, StandardDTO.class);
-            log.info("Successfully fetched {} Standards", standardDTOS.size());
+            log.info("Successfully fetched {} Standards by filter", standardDTOS.size());
             return standardDTOS;
 
         } catch (Exception e) {

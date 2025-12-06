@@ -42,14 +42,6 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.getPrivateKey())
                 .compact();
         log.info("jwt token - {}", jwtToken);
-
-//        String refreshToken = Jwts.builder()
-//                .setId(UUID.randomUUID().toString())
-//                .setIssuedAt(new Date())
-//                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getRefreshTokenExpiry()))
-//                .signWith(SignatureAlgorithm.HS512, jwtProperties.getPrivateKey())
-//                .compact();
-
         return jwtToken;
     }
 

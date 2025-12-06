@@ -23,11 +23,9 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public LoginResponseDTO auth(@Valid LoginRequestDTO requestDTO) {
+    public String auth(@Valid LoginRequestDTO requestDTO) {
         Map<String, Object> claims = new HashMap<>();
          String jwtToken = jwtUtil.createToken(claims);
-        LoginResponseDTO responseDTO = new LoginResponseDTO();
-        responseDTO.setAccessToken(jwtToken);
-        return  responseDTO;
+        return  jwtToken;
     }
 }

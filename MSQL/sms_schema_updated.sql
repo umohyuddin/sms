@@ -415,3 +415,23 @@ CREATE TABLE student_discount_assignment
     CONSTRAINT fk_sda_rate FOREIGN KEY (discount_rate_id) REFERENCES discount_rate (id),
     CONSTRAINT fk_sda_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );
+
+
+CREATE TABLE system_users
+(
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    -- Authentication
+    username      VARCHAR(50)  NOT NULL UNIQUE,
+    email         VARCHAR(150) NOT NULL UNIQUE,
+    phone         VARCHAR(20) UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+
+    -- Status
+    is_active     BOOLEAN  DEFAULT TRUE,
+    is_verified   BOOLEAN  DEFAULT FALSE,
+
+    -- Audit
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
