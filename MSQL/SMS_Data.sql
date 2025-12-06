@@ -185,85 +185,78 @@ VALUES
 -- and fees. The 'deleted' column is FALSE (0) for active records.
 -- ============================================================
 
--- Standards for Downtown Campus (campus_id = 1)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 1, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 1, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 1, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 1, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 1, NOW(), NOW(), 0, NULL);
+-- Sample standards for 10 campuses
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at)
+VALUES
+-- Downtown Campus (campus_id = 1)
+('1st Grade', 1, NOW(), NOW()),
+('2nd Grade', 1, NOW(), NOW()),
+('3rd Grade', 1, NOW(), NOW()),
+('4th Grade', 1, NOW(), NOW()),
+('5th Grade', 1, NOW(), NOW()),
 
--- Standards for Uptown Campus (campus_id = 2)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 2, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 2, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 2, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 2, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 2, NOW(), NOW(), 0, NULL);
+-- Uptown Campus (campus_id = 2)
+('1st Grade', 2, NOW(), NOW()),
+('2nd Grade', 2, NOW(), NOW()),
+('3rd Grade', 2, NOW(), NOW()),
+('4th Grade', 2, NOW(), NOW()),
+('5th Grade', 2, NOW(), NOW()),
 
--- Standards for Riverside Campus (campus_id = 3)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 3, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 3, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 3, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 3, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 3, NOW(), NOW(), 0, NULL);
+-- Riverside Campus (campus_id = 3)
+('1st Grade', 3, NOW(), NOW()),
+('2nd Grade', 3, NOW(), NOW()),
+('3rd Grade', 3, NOW(), NOW()),
+('4th Grade', 3, NOW(), NOW()),
+('5th Grade', 3, NOW(), NOW()),
 
--- Standards for Hilltop Campus (campus_id = 4)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 4, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 4, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 4, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 4, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 4, NOW(), NOW(), 0, NULL);
+-- Hilltop Campus (campus_id = 4)
+('1st Grade', 4, NOW(), NOW()),
+('2nd Grade', 4, NOW(), NOW()),
+('3rd Grade', 4, NOW(), NOW()),
+('4th Grade', 4, NOW(), NOW()),
+('5th Grade', 4, NOW(), NOW()),
 
--- Standards for Greenfield Campus (campus_id = 5)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 5, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 5, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 5, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 5, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 5, NOW(), NOW(), 0, NULL);
+-- Greenfield Campus (campus_id = 5)
+('1st Grade', 5, NOW(), NOW()),
+('2nd Grade', 5, NOW(), NOW()),
+('3rd Grade', 5, NOW(), NOW()),
+('4th Grade', 5, NOW(), NOW()),
+('5th Grade', 5, NOW(), NOW()),
 
--- Standards for Seaside Campus (campus_id = 6)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 6, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 6, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 6, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 6, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 6, NOW(), NOW(), 0, NULL);
+-- Seaside Campus (campus_id = 6)
+('1st Grade', 6, NOW(), NOW()),
+('2nd Grade', 6, NOW(), NOW()),
+('3rd Grade', 6, NOW(), NOW()),
+('4th Grade', 6, NOW(), NOW()),
+('5th Grade', 6, NOW(), NOW()),
 
--- Standards for Central Campus (campus_id = 7)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 7, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 7, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 7, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 7, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 7, NOW(), NOW(), 0, NULL);
+-- Central Campus (campus_id = 7)
+('1st Grade', 7, NOW(), NOW()),
+('2nd Grade', 7, NOW(), NOW()),
+('3rd Grade', 7, NOW(), NOW()),
+('4th Grade', 7, NOW(), NOW()),
+('5th Grade', 7, NOW(), NOW()),
 
--- Standards for Lakeside Campus (campus_id = 8)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 8, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 8, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 8, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 8, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 8, NOW(), NOW(), 0, NULL);
+-- Lakeside Campus (campus_id = 8)
+('1st Grade', 8, NOW(), NOW()),
+('2nd Grade', 8, NOW(), NOW()),
+('3rd Grade', 8, NOW(), NOW()),
+('4th Grade', 8, NOW(), NOW()),
+('5th Grade', 8, NOW(), NOW()),
 
--- Standards for Sunrise Campus (campus_id = 9)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 9, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 9, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 9, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 9, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 9, NOW(), NOW(), 0, NULL);
+-- Sunrise Campus (campus_id = 9)
+('1st Grade', 9, NOW(), NOW()),
+('2nd Grade', 9, NOW(), NOW()),
+('3rd Grade', 9, NOW(), NOW()),
+('4th Grade', 9, NOW(), NOW()),
+('5th Grade', 9, NOW(), NOW()),
 
--- Standards for Maple Campus (campus_id = 10)
-INSERT INTO standards (standard_name, campus_id, created_at, updated_at, deleted, deleted_at)
-VALUES ('1st Grade', 10, NOW(), NOW(), 0, NULL),
-       ('2nd Grade', 10, NOW(), NOW(), 0, NULL),
-       ('3rd Grade', 10, NOW(), NOW(), 0, NULL),
-       ('4th Grade', 10, NOW(), NOW(), 0, NULL),
-       ('5th Grade', 10, NOW(), NOW(), 0, NULL);
+-- Maple Campus (campus_id = 10)
+('1st Grade', 10, NOW(), NOW()),
+('2nd Grade', 10, NOW(), NOW()),
+('3rd Grade', 10, NOW(), NOW()),
+('4th Grade', 10, NOW(), NOW()),
+('5th Grade', 10, NOW(), NOW());
 
 
 -- ============================================================

@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.sclass.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.student.model.FeeRateEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
@@ -18,14 +19,14 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class StandardEntity {
+public class StandardEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "standard_name")
+    @Column(name = "standard_name",nullable = false)
     private String standardName;
 
     @Column(name = "standard_code")
@@ -33,19 +34,10 @@ public class StandardEntity {
 
     @Column(name = "description")
     private String description;
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "standard", cascade = CascadeType.ALL)
     private List<SectionEntity> sections;

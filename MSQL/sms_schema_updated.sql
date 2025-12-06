@@ -122,14 +122,19 @@ DROP TABLE IF EXISTS standards;
 CREATE TABLE standards
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    campus_id     BIGINT      NOT NULL,
     standard_name VARCHAR(50) NOT NULL,
     standard_code VARCHAR(50),
     description   VARCHAR(500),
-    campus_id     BIGINT      NOT NULL,
-    created_at    DATETIME             DEFAULT CURRENT_TIMESTAMP,
-    updated_at    DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
     deleted       BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at    DATETIME,
+    created_by    BIGINT,
+    updated_at    DATETIME,
+    updated_by    BIGINT,
     deleted_at    DATETIME,
+    deleted_by    BIGINT,
+
     FOREIGN KEY (campus_id) REFERENCES campuses (id)
 );
 

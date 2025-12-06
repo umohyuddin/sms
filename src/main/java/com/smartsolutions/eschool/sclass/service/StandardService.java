@@ -89,8 +89,6 @@ public class StandardService {
             StandardEntity entity = MapperUtil.mapObject(standardDTO, StandardEntity.class);
             entity.setId(null);
             entity.getCampus().setId(standardDTO.getCampusId());
-            entity.setDeleted(false);
-            entity.setDeletedAt(null);
 
             StandardEntity saved = standardRepository.save(entity);
             StandardCreateRequestDTO responseDTO = MapperUtil.mapObject(saved, StandardCreateRequestDTO.class);
