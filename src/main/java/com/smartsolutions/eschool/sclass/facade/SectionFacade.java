@@ -2,7 +2,6 @@ package com.smartsolutions.eschool.sclass.facade;
 
 import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.service.SectionService;
 import jakarta.validation.Valid;
 import org.apache.commons.logging.Log;
@@ -44,8 +43,8 @@ public class SectionFacade {
         return nSectionService.softDeleteAll();
     }
 
-    public List<SectionDTO> searchByKeyword(String keyword) {
-        return nSectionService.searchByKeyword(keyword);
+    public List<SectionDTO> searchSections(Long campusId, Long standardId, String keyword) {
+        return nSectionService.searchSections(campusId,standardId,keyword);
     }
 
     public SectionCreateRequestDTO createSection(@Valid SectionCreateRequestDTO dto) {

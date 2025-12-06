@@ -1,10 +1,8 @@
 package com.smartsolutions.eschool.sclass.service;
 
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.sclass.repository.SectionRepository;
@@ -99,13 +97,13 @@ public class SectionService {
         }
     }
 
-    public List<SectionDTO> searchByKeyword(String keyword) {
+    public List<SectionDTO> searchSections(Long campusId, Long standardId, String keyword) {
         log.info("Fetching all sections by keyword: {}", keyword);
         if (keyword == null || keyword.trim().isEmpty()) {
             log.error("Keyword is null or empty");
             throw new ValidationException("Keyword must not be empty");
         }
-        List<SectionEntity> result = sectionRepository.searchByKeyword(keyword);
+        List<SectionEntity> result = sectionRepository.searchSections(campusId, standardId, keyword);
         if (result.isEmpty()) {
             log.warn("No sections found for keyword: {}", keyword);
             throw new ResourceNotFoundException("No sections found matching: " + keyword);

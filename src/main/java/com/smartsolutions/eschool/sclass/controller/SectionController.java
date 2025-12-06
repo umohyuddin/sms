@@ -2,7 +2,6 @@ package com.smartsolutions.eschool.sclass.controller;
 
 import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.facade.SectionFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -47,10 +46,10 @@ public class SectionController {
         return ResponseEntity.ok().body(sectionDTO);
     }
 
-    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
+    @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBySearch(@RequestParam(required = false) Long campusId,@RequestParam(required = false) Long standardId,@RequestParam(required = false) String keyword) {
         log.info("GET /api/sections/search by keyword called");
-        List<SectionDTO> sectionDTO = sectionFacade.searchByKeyword(keyword);
+        List<SectionDTO> sectionDTO = sectionFacade.searchSections(campusId,standardId,keyword);
         log.info("GET /api/sections/search by keyword succeeded");
         return ResponseEntity.ok().body(sectionDTO);
     }

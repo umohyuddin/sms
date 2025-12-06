@@ -1,7 +1,6 @@
 package com.smartsolutions.eschool.sclass.repository;
 
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
-import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -58,5 +57,26 @@ public interface SectionRepository extends JpaRepository<SectionEntity, Long> {
             "WHERE (sec.sectionName LIKE %:keyword% OR sec.sectionCode LIKE %:keyword%) " +
             "AND sec.deleted = false")
     List<SectionEntity> searchByKeyword(@Param("keyword") String keyword);
+
+
+    @Query("""
+            SELECT s FROM SectionEntity s
+            JOIN FETCH s.standard st
+            JOIN FETCH st.campus c
+            WHERE (:campusId IS NULL OR c.id = :campusId)
+              AND (:standardId IS NULL OR st.id = :standardId)
+              AND (
+                    :search IS NULL
+                    OR LOWER(s.sectionName) LIKE LOWER(CONCAT('%', :search, '%'))
+                    OR LOWER(s.sectionCode) LIKE LOWER(CONCAT('%', :search, '%'))
+                  )
+              AND s.deleted = false
+            ORDER BY s.sectionName ASC
+            """)
+    List<SectionEntity> searchSections(
+            @Param("campusId") Long campusId,
+            @Param("standardId") Long standardId,
+            @Param("search") String search
+    );
 }
 

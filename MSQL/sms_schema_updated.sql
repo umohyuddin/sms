@@ -146,10 +146,14 @@ CREATE TABLE sections
     standard_id  BIGINT      NOT NULL,
     section_name VARCHAR(10) NOT NULL,
     section_code VARCHAR(15),
-    created_at   DATETIME             DEFAULT CURRENT_TIMESTAMP,
-    updated_at   DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted      BOOLEAN     NOT NULL DEFAULT FALSE,
-    deleted_at   DATETIME,
+    deleted       BOOLEAN     NOT NULL DEFAULT FALSE,
+
+    created_at    DATETIME,
+    created_by    BIGINT,
+    updated_at    DATETIME,
+    updated_by    BIGINT,
+    deleted_at    DATETIME,
+    deleted_by    BIGINT,
     FOREIGN KEY (standard_id) REFERENCES standards (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE

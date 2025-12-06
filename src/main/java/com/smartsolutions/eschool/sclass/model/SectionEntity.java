@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.sclass.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,33 +17,21 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SectionEntity {
+public class SectionEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "section_name")
+    @Column(name = "section_name",nullable = false)
     private String sectionName;
 
     @Column(name = "section_code")
     private String sectionCode;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
