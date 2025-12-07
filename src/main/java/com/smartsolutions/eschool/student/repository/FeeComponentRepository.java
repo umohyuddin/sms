@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.student.repository;
 
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
+import com.smartsolutions.eschool.student.model.FeeRateEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,6 +40,10 @@ public interface FeeComponentRepository extends JpaRepository<FeeComponentEntity
             "WHERE fc.feeCatalog.id = :catalogId " +
             "AND fc.feeCatalog.deleted = false")
     List<FeeComponentEntity> findFeeComponentsByCatalogId(@Param("catalogId") Long catalogId);
+
+    @Query("SELECT f FROM FeeComponentEntity f WHERE f.feeCatalog.id = :catalogId AND f.deleted = false")
+    List<FeeComponentEntity> getByFeeCatalogId(@Param("catalogId") Long catalogId);
+
 }
 
 

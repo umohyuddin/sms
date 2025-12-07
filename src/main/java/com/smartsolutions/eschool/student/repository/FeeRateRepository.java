@@ -58,6 +58,16 @@ public interface FeeRateRepository extends JpaRepository<FeeComponentEntity, Lon
             @Param("standardId") Long standardId,
             @Param("academicYearId") Long academicYearId
     );
+
+    @Query("""
+    SELECT fr 
+    FROM FeeRateEntity fr
+    JOIN fr.feeComponent fc
+    JOIN fc.feeCatalog fcat
+    WHERE fcat.id = :feeCatalogId
+      AND fr.deleted = false
+""")
+    List<FeeRateEntity> getByFeeCatalogId(@Param("feeCatalogId") Long feeCatalogId);
 }
 
 

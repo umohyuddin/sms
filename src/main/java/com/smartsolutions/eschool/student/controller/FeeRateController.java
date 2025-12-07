@@ -41,6 +41,13 @@ public class FeeRateController {
         log.info("Returning Fee rate: id={}", feeRateDTO.getId());
         return ResponseEntity.ok(feeRateDTO);
     }
+    @GetMapping(value = "catalog/{catalogId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getByFeeCatalogId(@PathVariable Long catalogId) throws Exception {
+        log.info("Received request to fetch  Fee rate with id: {}", catalogId);
+        FeeRatesResponseDTO feeRateDTO = feeRateFacade.getById(catalogId);
+        log.info("Returning Fee rate : id={}", feeRateDTO.getId());
+        return ResponseEntity.ok(feeRateDTO);
+    }
 
     @GetMapping(value = "/search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getSearch(@PathVariable String keyword) {

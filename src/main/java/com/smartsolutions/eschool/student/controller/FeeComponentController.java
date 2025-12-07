@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.student.controller;
 import com.smartsolutions.eschool.sclass.dtos.requestDto.StandardCreateRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.requestDto.FeeCatalogComponentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
+import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.facade.FeeComponentFacade;
 import jakarta.validation.Valid;
@@ -77,5 +78,12 @@ public class FeeComponentController {
             log.error("Failed to create standard", e);
             return ResponseEntity.internalServerError().body("Failed to create standard");
         }
+    }
+
+    @GetMapping(value = "catalog/{catalogId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getByFeeCatalogId(@PathVariable Long catalogId) throws Exception {
+        log.info("Received request to fetch  Fee rate with id: {}", catalogId);
+        List<FeeComponentResponseDTO> feeRateDTO = feeComponentFacade.getByFeeCatalogId(catalogId);
+        return ResponseEntity.ok(feeRateDTO);
     }
 }

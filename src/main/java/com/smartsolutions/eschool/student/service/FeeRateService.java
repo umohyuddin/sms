@@ -80,6 +80,8 @@ public class FeeRateService {
         return Collections.emptyList();
     }
 
+
+
     public List<FeeRatesResponseDTO> getByFeeComponentId(Long id) {
         try {
             log.info("Fetching all Fee Rates by fee component from database");

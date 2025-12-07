@@ -22,6 +22,7 @@ public class FeeRateFacade {
     public List<FeeRatesResponseDTO> getAll() {
         return feeRateService.getAll();
     }
+
     public FeeRatesResponseDTO getById(Long id) {
         return feeRateService.getById(id);
     }

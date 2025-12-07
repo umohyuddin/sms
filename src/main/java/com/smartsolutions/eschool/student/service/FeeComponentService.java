@@ -8,9 +8,11 @@ import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.requestDto.FeeCatalogComponentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
+import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
+import com.smartsolutions.eschool.student.model.FeeRateEntity;
 import com.smartsolutions.eschool.student.repository.FeeCatalogRepository;
 import com.smartsolutions.eschool.student.repository.FeeComponentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
@@ -159,4 +161,27 @@ public class FeeComponentService {
             throw ex;
         }
     }
+
+
+    public List<FeeComponentResponseDTO> getByFeeCatalogId(Long feeCatalogId) {
+        try {
+            log.info("Fetching all FeeRates from database");
+            List<FeeComponentEntity> result = feeComponentRepository.getByFeeCatalogId(feeCatalogId);
+            log.info("Successfully fetched {} FeeRates", result.size());
+            List<FeeComponentResponseDTO> feeRateDTOS = MapperUtil.mapList(result, FeeComponentResponseDTO.class);
+            log.info("Successfully fetched FeeRates");
+            return feeRateDTOS;
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching FeeRates", dae);
+            //throw new CustomServiceException("Unable to fetch students from database", dae);
+        } catch (MappingException me) {
+            log.error("Error mapping StudentEntity to FeeRates", me);
+            //throw new CustomServiceException("Error converting student data", me);
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching FeeRates", e);
+            //throw new ("Unexpected error occurred", e);
+        }
+        return Collections.emptyList();
+    }
+
 }

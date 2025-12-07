@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.student.facade;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.requestDto.FeeCatalogComponentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
+import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.service.FeeCatalogService;
@@ -42,4 +43,9 @@ public class FeeComponentFacade {
     public FeeComponentResponseDTO updateFeeComponent(Long id, @Valid FeeCatalogComponentRequestDTO dto) {
         return feeComponentService.updateFeeComponent(id, dto);
     }
+
+    public List<FeeComponentResponseDTO> getByFeeCatalogId(Long feeCatalogId) {
+        return feeComponentService.getByFeeCatalogId(feeCatalogId);
+    }
+
 }
