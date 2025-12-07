@@ -6,11 +6,16 @@ import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.requestDto.FeeCatalogComponentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
+import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
+import com.smartsolutions.eschool.student.repository.FeeCatalogRepository;
 import com.smartsolutions.eschool.student.repository.FeeComponentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
@@ -25,10 +30,12 @@ import java.util.List;
 public class FeeComponentService {
 
     private final FeeComponentRepository feeComponentRepository;
+    private final FeeCatalogRepository  feeCatalogRepository;
 
-    public FeeComponentService(FeeComponentRepository feeComponentRepository) {
+    public FeeComponentService(FeeComponentRepository feeComponentRepository, FeeCatalogRepository feeCatalogRepository) {
 
         this.feeComponentRepository = feeComponentRepository;
+        this.feeCatalogRepository = feeCatalogRepository;
     }
 
 
@@ -84,7 +91,72 @@ public class FeeComponentService {
             log.error("Error fetching Standards for campusId={} with keyword='{}'", feeCatalogId, keyword, e);
             throw new CustomServiceException("Failed to fetch Standards", e);
         }
+    }
+
+
+    @Transactional
+    public FeeComponentResponseDTO updateFeeComponent(Long id, FeeCatalogComponentRequestDTO dto) {
+        log.info("Updating Fee Component with id {} using DTO {}", id, dto);
+
+        // Fetch existing component
+        FeeComponentEntity entity = feeComponentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Fee Component not found with id: " + id));
+
+        // Update fields if they are provided
+        if (dto.getComponentName() != null && !dto.getComponentName().isBlank()) {
+            entity.setComponentName(dto.getComponentName());
+        }
+        if (dto.getComponentCode() != null) {
+            entity.setComponentCode(dto.getComponentCode());
+        }
+//        if (dto.getDescription() != null) {
+//            entity.setDescription(dto.getDescription());
+//        }
+
+        // Update active status
+        if (dto.getActive() != null) {
+            entity.setActive(dto.getActive());
         }
 
+        // Update Fee Catalog association if provided
+        if (dto.getFeeCatalogId() != null && (entity.getFeeCatalog() == null || !entity.getFeeCatalog().getId().equals(dto.getFeeCatalogId()))) {
+            FeeCatalogEntity feeCatalog = feeCatalogRepository.findById(dto.getFeeCatalogId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Fee Catalog not found with id: " + dto.getFeeCatalogId()));
+            entity.setFeeCatalog(feeCatalog);
+        }
 
+        // Save updated entity
+        FeeComponentEntity updated = feeComponentRepository.save(entity);
+
+        // Map to response DTO
+        FeeComponentResponseDTO response = MapperUtil.mapObject(updated, FeeComponentResponseDTO.class);
+
+        log.info("Fee Component updated successfully: {}", response.getId());
+        return response;
+    }
+
+
+
+    public FeeComponentResponseDTO create(@Valid FeeCatalogComponentRequestDTO requestDTO) {
+        log.info("Creating new Fee Component: {}", requestDTO);
+        try {
+            FeeComponentEntity entity = MapperUtil.mapObject(requestDTO, FeeComponentEntity.class);
+            entity.setId(null);
+            // Fetch managed FeeCatalogEntity
+            FeeCatalogEntity feeCatalog = feeCatalogRepository.findById(requestDTO.getFeeCatalogId())
+                    .orElseThrow(() -> new ResourceNotFoundException("FeeCatalog not found with id: " + requestDTO.getFeeCatalogId()));
+            entity.setFeeCatalog(feeCatalog);
+
+            FeeComponentEntity saved = feeComponentRepository.save(entity);
+            FeeComponentResponseDTO responseDTO = MapperUtil.mapObject(saved, FeeComponentResponseDTO.class);
+            log.info("Fee Component created successfully with ID: {}", responseDTO.getId());
+            return responseDTO;
+        } catch (DataAccessException dae) {
+            log.error("Database error while creating Fee Component", dae);
+            throw dae;
+        } catch (Exception ex) {
+            log.error("Unexpected error creating Fee Component", ex);
+            throw ex;
+        }
+    }
 }

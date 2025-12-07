@@ -47,16 +47,6 @@ public class StandardController {
         return ResponseEntity.ok(standardDTOList);
     }
 
-
-//    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
-//        log.info("GET /api/sections/search by keyword called");
-//        List<StandardDTO> sectionDTO = standardFacade.searchByKeyword(keyword);
-//        log.info("GET /api/sections/search by keyword succeeded");
-//        return ResponseEntity.ok().body(sectionDTO);
-//    }
-
-    // Search standards by campus and keyword
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getStandardsByFilter(@RequestParam(required = false) Long campusId,@RequestParam(required = false) String keyword) {
         log.info("GET /api/institute/campuses/standards/search called with campusId={} and keyword={}", campusId, keyword);

@@ -1,11 +1,13 @@
 package com.smartsolutions.eschool.student.facade;
 
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.requestDto.FeeCatalogComponentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.service.FeeCatalogService;
 import com.smartsolutions.eschool.student.service.FeeComponentService;
+import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -31,5 +33,13 @@ public class FeeComponentFacade {
 
     public List<FeeComponentResponseDTO> searchFeeCatalogComponents(Long feeCatalogId, String keyword) {
         return feeComponentService.searchFeeCatalogComponents(feeCatalogId,keyword);
+    }
+
+    public FeeComponentResponseDTO create(@Valid FeeCatalogComponentRequestDTO requestDTO) {
+    return feeComponentService.create(requestDTO);
+    }
+
+    public FeeComponentResponseDTO updateFeeComponent(Long id, @Valid FeeCatalogComponentRequestDTO dto) {
+        return feeComponentService.updateFeeComponent(id, dto);
     }
 }
