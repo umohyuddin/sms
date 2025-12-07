@@ -1,5 +1,7 @@
 package com.smartsolutions.eschool.student.controller;
 
+import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.facade.FeeCatelogFacade;
@@ -8,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -43,12 +42,13 @@ public class FeeComponentController {
         return ResponseEntity.ok(feeComponentDTO);
     }
 
-    @GetMapping(value = "/search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getStudentName(@PathVariable String keyword) {
-        log.info("GET /api/fee/component by keyword called");
-        List<FeeComponentDTO> resources = feeComponentFacade.searchFeeCatalog(keyword);
-        log.info("GET /api/fee/component by keyword succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok(resources);
+
+    @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBySearch(@RequestParam(required = false) Long feeCatalogId, @RequestParam(required = false) String keyword) {
+        log.info("GET /api/fee/component/search by keyword called");
+        List<FeeComponentResponseDTO> responseDTOS = feeComponentFacade.searchFeeCatalogComponents(feeCatalogId,keyword);
+        log.info("GET /api/fee/component/search by keyword succeeded");
+        return ResponseEntity.ok().body(responseDTOS);
     }
 
 

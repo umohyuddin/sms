@@ -1,5 +1,7 @@
 package com.smartsolutions.eschool.student.facade;
 
+import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.service.FeeCatalogService;
@@ -27,7 +29,7 @@ public class FeeComponentFacade {
         return feeComponentService.getById(id);
     }
 
-    public  List<FeeComponentDTO> searchFeeCatalog(String keyword){
-        return feeComponentService.searchFeeComponent(keyword);
+    public List<FeeComponentResponseDTO> searchFeeCatalogComponents(Long feeCatalogId, String keyword) {
+        return feeComponentService.searchFeeCatalogComponents(feeCatalogId,keyword);
     }
 }

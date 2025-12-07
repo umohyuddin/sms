@@ -1,10 +1,17 @@
 package com.smartsolutions.eschool.student.service;
 
+import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
+import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
+import com.smartsolutions.eschool.sclass.model.SectionEntity;
+import com.smartsolutions.eschool.sclass.model.StandardEntity;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import com.smartsolutions.eschool.student.repository.FeeComponentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
@@ -22,27 +29,6 @@ public class FeeComponentService {
     public FeeComponentService(FeeComponentRepository feeComponentRepository) {
 
         this.feeComponentRepository = feeComponentRepository;
-    }
-
-    public List<FeeComponentDTO> searchFeeComponent(String keyword) {
-        try {
-            log.info("Fetching all FeeComponent based on keyword from database");
-            List<FeeComponentEntity> result = feeComponentRepository.searchFeeComponent(keyword);
-            log.info("Successfully fetched {} FeeComponent based on keyword", result.size());
-            List<FeeComponentDTO> FeeComponentDTOList = MapperUtil.mapList(result, FeeComponentDTO.class);
-            log.info("Successfully fetched FeeComponent based on keyword");
-            return FeeComponentDTOList;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching FeeComponent based on keyword", dae);
-            //throw new CustomServiceException("Unable to fetch students from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to FeeComponent based on keyword", me);
-            //throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching FeeComponent based on keyword", e);
-            //throw new ("Unexpected error occurred", e);
-        }
-        return Collections.emptyList();
     }
 
 
@@ -78,5 +64,27 @@ public class FeeComponentService {
         }
         return Collections.emptyList();
     }
+
+    public List<FeeComponentResponseDTO> searchFeeCatalogComponents(Long feeCatalogId, String keyword) {
+        log.info("Fetching Standards for campusId={} with keyword='{}'", feeCatalogId, keyword);
+
+        try {
+            String search = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+            List<FeeComponentEntity> result = feeComponentRepository.searchFeeComponent(feeCatalogId, search);
+            if (result.isEmpty()) {
+                log.warn("No Standards found for campusId={} with keyword='{}'", feeCatalogId, keyword);
+//                throw new ResourceNotFoundException("No Standards found matching the criteria");
+                return Collections.emptyList();
+            }
+            List<FeeComponentResponseDTO> standardDTOS = MapperUtil.mapList(result, FeeComponentResponseDTO.class);
+            log.info("Successfully fetched {} Standards by filter", standardDTOS.size());
+            return standardDTOS;
+
+        } catch (Exception e) {
+            log.error("Error fetching Standards for campusId={} with keyword='{}'", feeCatalogId, keyword, e);
+            throw new CustomServiceException("Failed to fetch Standards", e);
+        }
+        }
+
 
 }

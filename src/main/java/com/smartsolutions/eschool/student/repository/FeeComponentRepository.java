@@ -24,11 +24,15 @@ public interface FeeComponentRepository extends JpaRepository<FeeComponentEntity
 
 
     @Query("SELECT f FROM FeeComponentEntity f " +
-            "WHERE (" +
-            "LOWER(f.componentName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(f.componentCode) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
-            ") AND f.deleted = false")
-    List<FeeComponentEntity> searchFeeComponent(@Param("keyword") String keyword);
+            "JOIN FETCH f.feeCatalog fc " +
+            "WHERE (:feeCatalogId IS NULL OR fc.id = :feeCatalogId) " +
+            "AND (:keyword IS NULL OR :keyword = '' OR LOWER(f.componentName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "     OR LOWER(f.componentCode) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND f.deleted = false " +
+            "ORDER BY f.componentName ASC")
+    List<FeeComponentEntity> searchFeeComponent(@Param("feeCatalogId") Long feeCatalogId,
+                                                @Param("keyword") String keyword);
+
 
 
     @Query("SELECT fc FROM FeeComponentEntity fc " +

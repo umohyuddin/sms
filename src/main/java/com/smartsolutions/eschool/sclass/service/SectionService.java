@@ -99,10 +99,6 @@ public class SectionService {
 
     public List<SectionDTO> searchSections(Long campusId, Long standardId, String keyword) {
         log.info("Fetching all sections by keyword: {}", keyword);
-        if (keyword == null || keyword.trim().isEmpty()) {
-            log.error("Keyword is null or empty");
-            throw new ValidationException("Keyword must not be empty");
-        }
         List<SectionEntity> result = sectionRepository.searchSections(campusId, standardId, keyword);
         if (result.isEmpty()) {
             log.warn("No sections found for keyword: {}", keyword);
