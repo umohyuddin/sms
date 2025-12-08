@@ -78,7 +78,6 @@ public class DiscountTypeController {
         }
         log.info("DiscountType deleted successfully: {}", discountTypeId);
         return ResponseEntity.ok("DiscountType deleted successfully");
-
     }
 
 
@@ -89,4 +88,20 @@ public class DiscountTypeController {
         log.info("GET /api/school/discounts/types/search by keyword succeeded");
         return ResponseEntity.ok().body(sectionDTO);
     }
+
+    @PutMapping(value = "/{discountTypeId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateDiscountType(@PathVariable Long discountTypeId, @RequestBody @Valid DiscountTypeRequestDTO requestDTO) {
+
+        log.info("Received request to update Discount Type with id: {}", discountTypeId);
+
+        DiscountTypeResponseDTO updatedDiscountType = discountTypeFacade.updateDiscountType(discountTypeId, requestDTO);
+
+        if (updatedDiscountType == null) {
+            log.warn("Discount Type not found for id: {}", discountTypeId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Discount Type not found with id: " + discountTypeId);
+        }
+        log.info("Discount Type updated successfully with id: {}", updatedDiscountType.getId());
+        return ResponseEntity.ok(updatedDiscountType);
+    }
+
 }

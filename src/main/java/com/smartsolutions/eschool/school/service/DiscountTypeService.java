@@ -26,6 +26,7 @@ public class DiscountTypeService {
     private final DiscountTypeRepository discountTypeRepository;
 
     private final FeeConfig feeConfig;
+
     public DiscountTypeService(DiscountTypeRepository discountTypeRepository, FeeConfig feeConfig) {
         this.discountTypeRepository = discountTypeRepository;
         this.feeConfig = feeConfig;
@@ -181,5 +182,38 @@ public class DiscountTypeService {
     private String getRecurrenceRuleLabel(String recurrenceRule) {
         return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
     }
+
+    public DiscountTypeResponseDTO updateDiscountType(Long discountTypeId, @Valid DiscountTypeRequestDTO requestDTO) {
+        log.info("Update request received for DiscountType ID: {}", discountTypeId);
+
+        try {
+            // Fetch existing entity
+            DiscountTypeEntity existingEntity = discountTypeRepository.findByIdAndDeletedFalse(discountTypeId).orElseThrow(() -> {
+                log.warn("DiscountType not found with ID: {}", discountTypeId);
+                return new ResourceNotFoundException("Discount Type not found with id: " + discountTypeId);
+            });
+
+            existingEntity.setName(requestDTO.getName());
+            existingEntity.setDescription(requestDTO.getDescription());
+            existingEntity.setIsActive(requestDTO.getIsActive());
+            existingEntity.setChargeType(requestDTO.getChargeType());
+            existingEntity.setRecurrenceRule(requestDTO.getRecurrenceRule());
+
+            // Save the updated entity
+            discountTypeRepository.save(existingEntity);
+            log.info("DiscountType updated successfully with ID: {}", existingEntity.getId());
+
+            // Map to Response DTO
+            return MapperUtil.mapObject(existingEntity, DiscountTypeResponseDTO.class);
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while updating DiscountType with ID: {}", discountTypeId, dae);
+            throw new CustomServiceException("Failed to update Discount Type due to database error", dae);
+        } catch (Exception e) {
+            log.error("Unexpected error while updating DiscountType with ID: {}", discountTypeId, e);
+            throw new CustomServiceException("Unexpected error occurred while updating Discount Type", e);
+        }
+    }
+
 }
 

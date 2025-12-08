@@ -48,4 +48,8 @@ private final DiscountTypeService discountTypeService;
     public List<DiscountTypeResponseDTO> searchByKeyword(String keyword) {
         return discountTypeService.searchByKeyword(keyword);
     }
+
+    public DiscountTypeResponseDTO updateDiscountType(Long discountTypeId, @Valid DiscountTypeRequestDTO requestDTO) {
+        return discountTypeService.updateDiscountType(discountTypeId,requestDTO);
+    }
 }
