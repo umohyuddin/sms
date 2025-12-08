@@ -33,7 +33,8 @@ public class FeeRateCreateRequestDTO {
     @NotNull(message = "Standard is required")
     private Long standardId;
 
-    private Long feeComponentId;  // nullable
+    @NotNull(message = "Fee Component is Required")
+    private Long feeComponentId;
 
     @NotNull(message = "Academic Year is required")
     private Long academicYearId;

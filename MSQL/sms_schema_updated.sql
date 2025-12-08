@@ -242,8 +242,6 @@ CREATE TABLE fee_rates
     standard_id      BIGINT         NOT NULL,
     fee_component_id BIGINT,
     academic_year_id BIGINT         NOT NULL,
-    code             VARCHAR(50)    NOT NULL UNIQUE,
-    name             VARCHAR(100)   NOT NULL,
     description      VARCHAR(255),
     amount           DECIMAL(10, 2) NOT NULL,
     currency         VARCHAR(3),

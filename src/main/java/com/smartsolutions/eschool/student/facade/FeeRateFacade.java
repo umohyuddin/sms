@@ -1,8 +1,10 @@
 package com.smartsolutions.eschool.student.facade;
 
+import com.smartsolutions.eschool.student.dtos.feeRates.requestDto.FeeRateCreateRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeRateDTO;
 import com.smartsolutions.eschool.student.service.FeeRateService;
+import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -27,11 +29,19 @@ public class FeeRateFacade {
         return feeRateService.getById(id);
     }
 
-    public  List<FeeRatesResponseDTO> searchFeeRates(String keyword){
-        return feeRateService.searchFeeRates(keyword);
+//    public  List<FeeRatesResponseDTO> searchFeeRates(String keyword){
+//        return feeRateService.searchFeeRates(keyword);
+//    }
+
+    public List<FeeRatesResponseDTO> getByFeeComponentId(Long feeComponentId) {
+        return feeRateService.getByFeeComponentId(feeComponentId);
     }
 
-    public  List<FeeRatesResponseDTO> getByFeeComponentId(Long feeComponentId){
-        return feeRateService.getByFeeComponentId(feeComponentId);
+    public FeeRatesResponseDTO create(FeeRateCreateRequestDTO requestDTO) {
+        return feeRateService.createFeeRate(requestDTO);
+    }
+
+    public FeeRatesResponseDTO update(Long id, @Valid FeeRateCreateRequestDTO dto) {
+        return  feeRateService.updateFeeRate(id, dto);
     }
 }

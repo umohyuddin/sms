@@ -511,67 +511,50 @@ VALUES
 -- ============================================================
 
 INSERT INTO fee_rates
-(campus_id, standard_id, fee_component_id, academic_year_id, code, name, description, amount, currency, effective_from,
- effective_to, active, deleted)
+(campus_id, standard_id, fee_component_id, academic_year_id, description,
+ amount, currency, effective_from, effective_to, active, deleted)
 VALUES
 
 -- ============================================================
 -- MAIN CAMPUS — Admission Fees
 -- ============================================================
-(1, 1, 1, 1, 'FR-MAIN-ADM-FORM-001', 'Admission Form Fee Rate', 'Rate for Admission Form Fee', 5000.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 2, 1, 'FR-MAIN-ADM-PROC-001', 'Admission Processing Fee Rate', 'Rate for Admission Processing', 2000.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 3, 1, 'FR-MAIN-ADM-TEST-001', 'Admission Test Fee Rate', 'Rate for Admission Test', 1500.00, 'PKR', '2025-01-01',
- NULL, TRUE, FALSE),
+(1, 1, 1, 1, 'Rate for Admission Form Fee', 5000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 2, 1, 'Rate for Admission Processing', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 3, 1, 'Rate for Admission Test', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
 -- MAIN CAMPUS — Tuition Fees
 -- ============================================================
-(1, 1, 4, 1, 'FR-MAIN-TUI-BASIC-001', 'Basic Tuition Fee Rate', 'Rate for Basic Tuition', 20000.00, 'PKR', '2025-01-01',
- NULL, TRUE, FALSE),
-(1, 1, 5, 1, 'FR-MAIN-TUI-ACT-001', 'Activities Add-on Fee Rate', 'Rate for Activity Charges', 3000.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 6, 1, 'FR-MAIN-TUI-LAB-001', 'Lab Access Fee Rate', 'Rate for Lab Access', 2500.00, 'PKR', '2025-01-01', NULL,
- TRUE, FALSE),
+(1, 1, 4, 1, 'Rate for Basic Tuition', 20000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 5, 1, 'Rate for Activity Charges', 3000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 6, 1, 'Rate for Lab Access', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
 -- MAIN CAMPUS — Transport Fees
 -- ============================================================
-(1, 1, 7, 1, 'FR-MAIN-TRN-FARE-001', 'Base Transport Fare Rate', 'Rate for Transport Base Fare', 8000.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 8, 1, 'FR-MAIN-TRN-FUEL-001', 'Fuel Adjustment Fee Rate', 'Rate for Fuel Adjustment', 1500.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 9, 1, 'FR-MAIN-TRN-MAINT-001', 'Vehicle Maintenance Fee Rate', 'Rate for Vehicle Maintenance', 2000.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 7, 1, 'Rate for Transport Base Fare', 8000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 8, 1, 'Rate for Fuel Adjustment', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 9, 1, 'Rate for Vehicle Maintenance', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
 -- CITY CAMPUS — Admission Fees
 -- ============================================================
-(2, 1, 10, 1, 'FR-CITY-ADM-FORM-001', 'Admission Form Fee Rate', 'Rate for City Admission Form Fee', 4000.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
-(2, 1, 11, 1, 'FR-CITY-ADM-PROC-001', 'Admission Processing Fee Rate', 'Rate for City Admission Processing', 1500.00,
- 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(2, 1, 10, 1, 'Rate for City Admission Form Fee', 4000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(2, 1, 11, 1, 'Rate for City Admission Processing', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
 -- GIRLS CAMPUS — Tuition Fees
 -- ============================================================
-(3, 1, 14, 1, 'FR-GIRLS-TUI-BASIC-001', 'Girls Basic Tuition Fee Rate', 'Rate for Girls Basic Tuition', 18000.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 15, 1, 'FR-GIRLS-TUI-ACT-001', 'Girls Activity Add-on Rate', 'Rate for Girls Activities', 2500.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 16, 1, 'FR-GIRLS-TUI-SCI-001', 'Science Material Fee Rate', 'Rate for Science Materials', 1200.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 14, 1, 'Rate for Girls Basic Tuition', 18000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 15, 1, 'Rate for Girls Activities', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 16, 1, 'Rate for Science Materials', 1200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
 -- GIRLS CAMPUS — Library Fees
 -- ============================================================
-(3, 1, 17, 1, 'FR-GIRLS-LIB-BOOK-001', 'Book Rental Fee Rate', 'Rate for Book Rental', 500.00, 'PKR', '2025-01-01',
- NULL, TRUE, FALSE),
-(3, 1, 18, 1, 'FR-GIRLS-LIB-MAINT-001', 'Library Maintenance Fee Rate', 'Rate for Library Maintenance', 800.00, 'PKR',
- '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 19, 1, 'FR-GIRLS-LIB-CARD-001', 'Library Card Fee Rate', 'Rate for Library Card', 200.00, 'PKR', '2025-01-01',
- NULL, TRUE, FALSE);
+(3, 1, 17, 1, 'Rate for Book Rental', 500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 18, 1, 'Rate for Library Maintenance', 800.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 19, 1, 'Rate for Library Card', 200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE);
 
 
 -- ============================================================

@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Transactional
 @Repository
-public interface FeeRateRepository extends JpaRepository<FeeComponentEntity, Long> {
+public interface FeeRateRepository extends JpaRepository<FeeRateEntity, Long> {
 
     @Query("""
     SELECT fr FROM FeeRateEntity fr
@@ -31,13 +31,13 @@ public interface FeeRateRepository extends JpaRepository<FeeComponentEntity, Lon
     Optional<FeeRateEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
 
-    @Query("SELECT f FROM FeeRateEntity f " +
-            "WHERE (" +
-            "LOWER(f.code) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(f.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(f.name) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
-            ") AND f.deleted = false")
-    List<FeeRateEntity> searchFeeComponent(@Param("keyword") String keyword);
+//    @Query("SELECT f FROM FeeRateEntity f " +
+//            "WHERE (" +
+//            "LOWER(f.code) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+//            "LOWER(f.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+//            "LOWER(f.name) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
+//            ") AND f.deleted = false")
+//    List<FeeRateEntity> searchFeeComponent(@Param("keyword") String keyword);
 
 
     @Query("SELECT fr FROM FeeRateEntity fr " +
@@ -68,6 +68,18 @@ public interface FeeRateRepository extends JpaRepository<FeeComponentEntity, Lon
       AND fr.deleted = false
 """)
     List<FeeRateEntity> getByFeeCatalogId(@Param("feeCatalogId") Long feeCatalogId);
+
+
+    @Query("SELECT f FROM FeeRateEntity f " +
+            "WHERE f.campus.id = :campusId " +
+            "AND f.standard.id = :standardId " +
+            "AND f.academicYear.id = :academicYearId " +
+            "AND f.deleted = false")
+    List<FeeRateEntity> findActiveFeeRates(
+            @Param("campusId") Long campusId,
+            @Param("standardId") Long standardId,
+            @Param("academicYearId") Long academicYearId
+    );
 }
 
 

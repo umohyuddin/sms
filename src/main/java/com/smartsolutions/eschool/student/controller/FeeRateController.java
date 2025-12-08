@@ -1,16 +1,15 @@
 package com.smartsolutions.eschool.student.controller;
 
+import com.smartsolutions.eschool.student.dtos.feeRates.requestDto.FeeRateCreateRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeRateDTO;
 import com.smartsolutions.eschool.student.facade.FeeRateFacade;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,13 +48,13 @@ public class FeeRateController {
         return ResponseEntity.ok(feeRateDTO);
     }
 
-    @GetMapping(value = "/search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getSearch(@PathVariable String keyword) {
-        log.info("GET /api/fee/rates by keyword called");
-        List<FeeRatesResponseDTO> resources = feeRateFacade.searchFeeRates(keyword);
-        log.info("GET /api/fee/rates by keyword succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok(resources);
-    }
+//    @GetMapping(value = "/search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<?> getSearch(@PathVariable String keyword) {
+//        log.info("GET /api/fee/rates by keyword called");
+//        List<FeeRatesResponseDTO> resources = feeRateFacade.searchFeeRates(keyword);
+//        log.info("GET /api/fee/rates by keyword succeeded, returned {} resources", resources.size());
+//        return ResponseEntity.ok(resources);
+//    }
 
     @GetMapping(value = "/component/{componentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByFeeComponentId(@PathVariable Long componentId) {
@@ -65,73 +64,23 @@ public class FeeRateController {
         return ResponseEntity.ok(resources);
     }
 
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<FeeRatesResponseDTO> createFeeRate(@Valid @RequestBody FeeRateCreateRequestDTO dto) {
+        log.info("POST /api/fee/rates called with payload: {}", dto);
+        FeeRatesResponseDTO createdFeeRate = feeRateFacade.create(dto);
+        log.info("FeeRate created successfully: id={}", createdFeeRate.getId());
+        return ResponseEntity.ok(createdFeeRate);
+    }
 
-//    @GetMapping(value = "/getbystudent/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject getByStudent(@PathVariable Long id) throws Exception {
-//
-//        return new MultiResourceSuccessResponseObject(
-//                feeFacade.getByStudent(id)
-//                        .stream()
-//                        .map(entity -> {
-//                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-//                            return new ResourceObject(
-//                                    String.valueOf(entity.getStudentId()),
-//                                    "Fee",
-//                                    resourceAttributes
-//                            );
-//                        })
-//                        .collect(Collectors.toList()));
-//    }
-//
-//    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject create(
-//            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-//        if (!requestBody.containsKey("data")) {
-//            throw new ValidationException("The request body did not contain a data attribute");
-//        }
-//        Map<String, Object> resourceMap = requestBody.get("data");
-//        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-//        FeeEntity nFeeEntity = objectMapper.convertValue(attributes, FeeEntity.class);
-//        Map<String, Object> resourceAttributes = Map.of("message", feeFacade.create(nFeeEntity));
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                String.valueOf(nFeeEntity.getId()),
-//                "Fee",
-//                resourceAttributes
-//        ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
-//
-//    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject update(
-//            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-//        if (!requestBody.containsKey("data")) {
-//            throw new ValidationException("The request body did not contain a data attribute");
-//        }
-//        Map<String, Object> resourceMap = requestBody.get("data");
-//        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-//        FeeEntity nFeeEntity = objectMapper.convertValue(attributes, FeeEntity.class);
-//        Map<String, Object> resourceAttributes = Map.of("message", feeFacade.update(nFeeEntity));
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                String.valueOf(nFeeEntity.getId()),
-//                "Fee",
-//                resourceAttributes
-//        ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
-//
-//    @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject delete(
-//            @PathVariable Long id
-//    ) throws Exception {
-//        Map<String, Object> resourceAttributes = Map.of("message", feeFacade.delete(id));
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                String.valueOf(id),
-//                "Fee",
-//                resourceAttributes
-//        ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-    //}
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<FeeRatesResponseDTO> updateFeeRate(
+            @PathVariable Long id,
+            @Valid @RequestBody FeeRateCreateRequestDTO dto) {
+        log.info("PUT /api/fee/rates/{} called with payload: {}", id, dto);
+
+        FeeRatesResponseDTO updatedFeeRate = feeRateFacade.update(id, dto);
+
+        log.info("FeeRate updated successfully: id={}", updatedFeeRate.getId());
+        return ResponseEntity.ok(updatedFeeRate);
+    }
 }

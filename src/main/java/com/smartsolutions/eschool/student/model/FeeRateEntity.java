@@ -31,11 +31,11 @@ public class FeeRateEntity extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "code", length = 50, nullable = false, unique = true)
-    private String code;
-
-    @Column(name = "name", length = 100, nullable = false)
-    private String name;
+//    @Column(name = "code", length = 50, nullable = false, unique = true)
+//    private String code;
+//
+//    @Column(name = "name", length = 100, nullable = false)
+//    private String name;
 
     @Column(name = "description", length = 255)
     private String description;
