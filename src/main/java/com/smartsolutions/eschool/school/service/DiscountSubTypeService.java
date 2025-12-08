@@ -9,6 +9,7 @@ import com.smartsolutions.eschool.school.model.DiscountSubTypeEntity;
 import com.smartsolutions.eschool.school.model.DiscountTypeEntity;
 import com.smartsolutions.eschool.school.repository.DiscountSubTypeRepository;
 import com.smartsolutions.eschool.school.repository.DiscountTypeRepository;
+import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -208,5 +210,25 @@ public class DiscountSubTypeService {
         }
     }
 
+    public List<DiscountSubTypeResponseDTO> searchDiscountComponents(Long discountTypeId, String keyword) {
+        log.info("Fetching Standards for campusId={} with keyword='{}'", discountTypeId, keyword);
+        try {
+            String search = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+            List<DiscountSubTypeEntity> result = discountSubTypeRepository.searchDiscountComponents(discountTypeId, search);
+            if (result.isEmpty()) {
+                log.warn("No Standards found for campusId={} with keyword='{}'", discountTypeId, keyword);
+//                throw new ResourceNotFoundException("No Standards found matching the criteria");
+                return Collections.emptyList();
+            }
+            List<DiscountSubTypeResponseDTO> responseDTOS = MapperUtil.mapList(result, DiscountSubTypeResponseDTO.class);
+            log.info("Successfully fetched {} Standards by filter", responseDTOS.size());
+            return responseDTOS;
+
+        } catch (Exception e) {
+            log.error("Error fetching Standards for campusId={} with keyword='{}'", discountTypeId  , keyword, e);
+            throw new CustomServiceException("Failed to fetch Standards", e);
+        }
+    }
 }
+
 

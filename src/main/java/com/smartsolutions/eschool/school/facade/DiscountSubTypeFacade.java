@@ -57,4 +57,8 @@ private final DiscountSubTypeService discountSubTypeService;
     public int markAsInactive(Long discountSubTypeId) {
         return discountSubTypeService.markAsInactive(discountSubTypeId);
     }
+
+    public List<DiscountSubTypeResponseDTO> searchDiscountComponents(Long discountTypeId, String keyword) {
+        return discountSubTypeService.searchDiscountComponents(discountTypeId,keyword);
+    }
 }

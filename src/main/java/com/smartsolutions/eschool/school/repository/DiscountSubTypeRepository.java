@@ -1,7 +1,7 @@
 package com.smartsolutions.eschool.school.repository;
 
 import com.smartsolutions.eschool.school.model.DiscountSubTypeEntity;
-import com.smartsolutions.eschool.school.model.DiscountTypeEntity;
+import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -142,6 +142,18 @@ public interface DiscountSubTypeRepository extends JpaRepository<DiscountSubType
             ORDER BY ds.displayOrder ASC
             """)
     List<DiscountSubTypeEntity> findAllByDiscountType(@Param("typeId") Long typeId);
+
+
+
+    @Query("SELECT f FROM DiscountSubTypeEntity f " +
+            "JOIN FETCH f.discountType fc " +
+            "WHERE (:discountTypeId IS NULL OR fc.id = :discountTypeId) " +
+            "AND (:keyword IS NULL OR :keyword = '' OR LOWER(f.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "     OR LOWER(f.code) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND f.deleted = false " +
+            "ORDER BY f.name ASC")
+    List<DiscountSubTypeEntity> searchDiscountComponents(@Param("discountTypeId") Long discountTypeId,
+                                                @Param("keyword") String keyword);
 }
 
 

@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.school.controller;
 import com.smartsolutions.eschool.school.dtos.discountSubType.requestDto.DiscountSubTypeRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountSubType.responseDto.DiscountSubTypeResponseDTO;
 import com.smartsolutions.eschool.school.facade.DiscountSubTypeFacade;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -94,13 +95,13 @@ public class DiscountSubTypeController {
         }
     }
 
-    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
-        log.info("GET /api/school/discounts/subtypes/search by keyword called");
-        List<DiscountSubTypeResponseDTO> sectionDTO = discountSubTypeFacade.searchByKeyword(keyword);
-        log.info("GET /api/school/discounts/subtypes/search by keyword succeeded");
-        return ResponseEntity.ok().body(sectionDTO);
-    }
+//    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
+//        log.info("GET /api/school/discounts/subtypes/search by keyword called");
+//        List<DiscountSubTypeResponseDTO> sectionDTO = discountSubTypeFacade.searchByKeyword(keyword);
+//        log.info("GET /api/school/discounts/subtypes/search by keyword succeeded");
+//        return ResponseEntity.ok().body(sectionDTO);
+//    }
 
     @PatchMapping(value = "/{discountSubTypeId}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> markAsActive(@PathVariable Long discountSubTypeId) {
@@ -116,5 +117,13 @@ public class DiscountSubTypeController {
         int updatedCount = discountSubTypeFacade.markAsInactive(discountSubTypeId);
         log.info("DiscountSubType marked as inactive successfully: {}", discountSubTypeId);
         return ResponseEntity.ok("DiscountSubType marked as inactive successfully");
+    }
+
+    @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBySearch(@RequestParam(required = false) Long discountTypeId, @RequestParam(required = false) String keyword) {
+        log.info("GET /api/fee/component/search by keyword called");
+        List<DiscountSubTypeResponseDTO> responseDTOS = discountSubTypeFacade.searchDiscountComponents(discountTypeId,keyword);
+        log.info("GET /api/fee/component/search by keyword succeeded");
+        return ResponseEntity.ok().body(responseDTOS);
     }
 }
