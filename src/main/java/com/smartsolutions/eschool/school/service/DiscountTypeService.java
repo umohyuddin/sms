@@ -1,12 +1,15 @@
 package com.smartsolutions.eschool.school.service;
 
 
+import com.smartsolutions.eschool.global.configs.FeeConfig;
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.dtos.discountType.requestDto.DiscountTypeRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.model.DiscountTypeEntity;
 import com.smartsolutions.eschool.school.repository.DiscountTypeRepository;
+import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
+import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -15,14 +18,17 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class DiscountTypeService {
     private final DiscountTypeRepository discountTypeRepository;
 
-    public DiscountTypeService(DiscountTypeRepository discountTypeRepository) {
+    private final FeeConfig feeConfig;
+    public DiscountTypeService(DiscountTypeRepository discountTypeRepository, FeeConfig feeConfig) {
         this.discountTypeRepository = discountTypeRepository;
+        this.feeConfig = feeConfig;
     }
 
     public DiscountTypeResponseDTO createDiscountType(@Valid DiscountTypeRequestDTO requestDTO) {
@@ -45,9 +51,10 @@ public class DiscountTypeService {
         try {
             log.info("Fetching all Discount Types from database");
             List<DiscountTypeEntity> result = discountTypeRepository.findAll();
-            List<DiscountTypeResponseDTO> responseDTOS = MapperUtil.mapList(result, DiscountTypeResponseDTO.class);
-            log.info("Successfully fetched {} Discount Types", responseDTOS.size());
-            return responseDTOS;
+            //List<DiscountTypeResponseDTO> responseDTOS = MapperUtil.mapList(result, DiscountTypeResponseDTO.class);
+            return result.stream().map(this::toDto).collect(Collectors.toList());
+            //log.info("Successfully fetched {} Discount Types", responseDTOS.size());
+            //return responseDTOS;
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Discount Types", dae);
             throw new CustomServiceException("Unable to fetch Discount Types from database", dae);
@@ -147,6 +154,32 @@ public class DiscountTypeService {
             log.error("Unexpected error while fetching Discount Types based on search", e);
             throw new CustomServiceException("Unexpected error occurred", e);
         }
+    }
+
+    private DiscountTypeResponseDTO toDto(DiscountTypeEntity entity) {
+        DiscountTypeResponseDTO dto = new DiscountTypeResponseDTO();
+
+        dto.setId(entity.getId());
+        dto.setCode(entity.getCode());
+        dto.setName(entity.getName());
+        dto.setDescription(entity.getDescription());
+        dto.setIsActive(entity.getIsActive());
+
+        dto.setChargeType(entity.getChargeType());
+        dto.setChargeTypeLabel(getChargeTypeLabel(entity.getChargeType()));
+
+        dto.setRecurrenceRule(entity.getRecurrenceRule());
+        dto.setRecurrenceRuleLabel(getRecurrenceRuleLabel(entity.getRecurrenceRule()));
+
+        return dto;
+    }
+
+    private String getChargeTypeLabel(String chargeType) {
+        return feeConfig.getChargeTypes().getOrDefault(chargeType, chargeType);
+    }
+
+    private String getRecurrenceRuleLabel(String recurrenceRule) {
+        return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
     }
 }
 

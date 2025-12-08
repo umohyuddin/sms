@@ -146,14 +146,14 @@ CREATE TABLE sections
     standard_id  BIGINT      NOT NULL,
     section_name VARCHAR(10) NOT NULL,
     section_code VARCHAR(15),
-    deleted       BOOLEAN     NOT NULL DEFAULT FALSE,
+    deleted      BOOLEAN     NOT NULL DEFAULT FALSE,
 
-    created_at    DATETIME,
-    created_by    BIGINT,
-    updated_at    DATETIME,
-    updated_by    BIGINT,
-    deleted_at    DATETIME,
-    deleted_by    BIGINT,
+    created_at   DATETIME,
+    created_by   BIGINT,
+    updated_at   DATETIME,
+    updated_by   BIGINT,
+    deleted_at   DATETIME,
+    deleted_by   BIGINT,
     FOREIGN KEY (standard_id) REFERENCES standards (id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
@@ -322,22 +322,23 @@ CREATE TABLE student_fee_summary
 DROP TABLE IF EXISTS discount_type;
 CREATE TABLE discount_type
 (
-    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
-    code          VARCHAR(50) UNIQUE NOT NULL,
-    name          VARCHAR(150)       NOT NULL,
-    description   VARCHAR(500),
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code            VARCHAR(50) UNIQUE NOT NULL,
+    name            VARCHAR(150)       NOT NULL,
+    description     VARCHAR(500),
+    charge_type     VARCHAR(50),
+    recurrence_rule VARCHAR(50),
+    is_active       BOOLEAN            NOT NULL DEFAULT TRUE,
+    priority        INT                         DEFAULT 0,
+    display_order   INT                         DEFAULT 0,
 
-    is_active     BOOLEAN            NOT NULL DEFAULT TRUE,
-    priority      INT                         DEFAULT 0,
-    display_order INT                         DEFAULT 0,
-
-    created_by    BIGINT,
-    created_at    TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
-    updated_by    BIGINT,
-    updated_at    TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
-    deleted       BOOLEAN            NOT NULL DEFAULT FALSE,
-    deleted_at    DATETIME,
-    deleted_by    BIGINT
+    created_by      BIGINT,
+    created_at      TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+    updated_by      BIGINT,
+    updated_at      TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+    deleted         BOOLEAN            NOT NULL DEFAULT FALSE,
+    deleted_at      DATETIME,
+    deleted_by      BIGINT
 );
 
 

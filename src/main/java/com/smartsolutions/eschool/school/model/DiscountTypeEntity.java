@@ -29,6 +29,13 @@ public class DiscountTypeEntity  extends AuditableEntity {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+    @Column(name = "charge_type", nullable = false, length = 50)
+    private String chargeType;
+    // You can convert to ENUM later: FIXED, PERCENTAGE, PER_CREDIT, etc.
+
+    @Column(name = "recurrence_rule", length = 50)
+    private String recurrenceRule;
+
     @Column(name = "priority")
     private Integer priority = 0;
 
@@ -37,6 +44,5 @@ public class DiscountTypeEntity  extends AuditableEntity {
 
     @Column(name = "deleted", nullable = false)
     private Boolean deleted = false;
-
 
 }

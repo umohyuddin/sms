@@ -22,6 +22,10 @@ public class DiscountTypeResponseDTO {
     private String description;
 
     private Boolean isActive;
+    private String chargeType;          // raw value
+    private String chargeTypeLabel;     // human-readable
+    private String recurrenceRule;      // raw value
+    private String recurrenceRuleLabel; // human-readable
     //private Integer priority;
     //private Integer displayOrder;
 
