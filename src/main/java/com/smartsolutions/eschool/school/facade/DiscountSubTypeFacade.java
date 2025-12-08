@@ -3,6 +3,8 @@ package com.smartsolutions.eschool.school.facade;
 import com.smartsolutions.eschool.school.dtos.discountSubType.requestDto.DiscountSubTypeRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountSubType.responseDto.DiscountSubTypeResponseDTO;
 import com.smartsolutions.eschool.school.service.DiscountSubTypeService;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.requestDto.FeeCatalogComponentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -60,5 +62,9 @@ private final DiscountSubTypeService discountSubTypeService;
 
     public List<DiscountSubTypeResponseDTO> searchDiscountComponents(Long discountTypeId, String keyword) {
         return discountSubTypeService.searchDiscountComponents(discountTypeId,keyword);
+    }
+
+    public DiscountSubTypeResponseDTO update(Long id, @Valid DiscountSubTypeRequestDTO requestDTO) {
+        return discountSubTypeService.update(id,requestDTO);
     }
 }

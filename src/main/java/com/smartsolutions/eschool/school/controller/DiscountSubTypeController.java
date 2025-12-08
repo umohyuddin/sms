@@ -3,7 +3,9 @@ package com.smartsolutions.eschool.school.controller;
 import com.smartsolutions.eschool.school.dtos.discountSubType.requestDto.DiscountSubTypeRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountSubType.responseDto.DiscountSubTypeResponseDTO;
 import com.smartsolutions.eschool.school.facade.DiscountSubTypeFacade;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.requestDto.FeeCatalogComponentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -122,8 +124,34 @@ public class DiscountSubTypeController {
     @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getBySearch(@RequestParam(required = false) Long discountTypeId, @RequestParam(required = false) String keyword) {
         log.info("GET /api/fee/component/search by keyword called");
-        List<DiscountSubTypeResponseDTO> responseDTOS = discountSubTypeFacade.searchDiscountComponents(discountTypeId,keyword);
+        List<DiscountSubTypeResponseDTO> responseDTOS = discountSubTypeFacade.searchDiscountComponents(discountTypeId, keyword);
         log.info("GET /api/fee/component/search by keyword succeeded");
         return ResponseEntity.ok().body(responseDTOS);
     }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateDiscountComponent(
+            @PathVariable Long id,
+            @Valid @RequestBody DiscountSubTypeRequestDTO requestDTO) {
+
+        log.info("PUT /api/discount-components/{} - Updating discount component: {}", id, requestDTO);
+
+        try {
+            DiscountSubTypeResponseDTO updated = discountSubTypeFacade.update(id, requestDTO);
+
+            log.info("Discount component updated successfully with ID: {}", updated.getId());
+
+            return ResponseEntity.ok(updated);
+
+        } catch (EntityNotFoundException e) {
+            log.warn("Discount component not found for ID: {}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Discount component not found");
+        } catch (Exception e) {
+            log.error("Failed to update discount component", e);
+            return ResponseEntity.internalServerError()
+                    .body("Failed to update discount component");
+        }
+    }
+
 }

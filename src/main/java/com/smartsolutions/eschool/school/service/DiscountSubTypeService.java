@@ -9,6 +9,8 @@ import com.smartsolutions.eschool.school.model.DiscountSubTypeEntity;
 import com.smartsolutions.eschool.school.model.DiscountTypeEntity;
 import com.smartsolutions.eschool.school.repository.DiscountSubTypeRepository;
 import com.smartsolutions.eschool.school.repository.DiscountTypeRepository;
+import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
+import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.validation.Valid;
@@ -225,10 +227,44 @@ public class DiscountSubTypeService {
             return responseDTOS;
 
         } catch (Exception e) {
-            log.error("Error fetching Standards for campusId={} with keyword='{}'", discountTypeId  , keyword, e);
+            log.error("Error fetching Standards for campusId={} with keyword='{}'", discountTypeId, keyword, e);
             throw new CustomServiceException("Failed to fetch Standards", e);
         }
     }
+
+    public DiscountSubTypeResponseDTO update(Long id, @Valid DiscountSubTypeRequestDTO requestDTO) {
+
+        log.info("Updating Discount SubType with ID: {} and data: {}", id, requestDTO);
+
+        try {
+            DiscountSubTypeEntity existing = discountSubTypeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Discount SubType not found with id: " + id));
+
+            existing.setName(requestDTO.getName());
+            existing.setCode(requestDTO.getCode());
+            existing.setDescription(requestDTO.getDescription());
+            existing.setIsActive(requestDTO.getIsActive());
+
+            DiscountTypeEntity discountType = discountTypeRepository.findById(requestDTO.getDiscountTypeId()).orElseThrow(() -> new ResourceNotFoundException("DiscountType not found with id: " + requestDTO.getDiscountTypeId()));
+
+            existing.setDiscountType(discountType);
+
+            DiscountSubTypeEntity updated = discountSubTypeRepository.save(existing);
+
+            DiscountSubTypeResponseDTO responseDTO = MapperUtil.mapObject(updated, DiscountSubTypeResponseDTO.class);
+
+            log.info("Discount SubType updated successfully with ID: {}", responseDTO.getId());
+
+            return responseDTO;
+        } catch (DataAccessException dae) {
+            log.error("Database error while updating Discount SubType", dae);
+            throw dae;
+        } catch (Exception ex) {
+            log.error("Unexpected error updating Discount SubType", ex);
+            throw ex;
+        }
+    }
+
 }
+
 
 
