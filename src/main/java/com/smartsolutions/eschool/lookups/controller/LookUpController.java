@@ -4,7 +4,10 @@ package com.smartsolutions.eschool.lookups.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
+import com.smartsolutions.eschool.global.configs.BloodGroupConfig;
 import com.smartsolutions.eschool.global.configs.FeeConfig;
+import com.smartsolutions.eschool.global.configs.NationalityConfig;
+import com.smartsolutions.eschool.global.configs.ReligionConfig;
 import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.facade.CityFacade;
@@ -21,9 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -32,14 +33,21 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LookUpController {
 
+    private final ReligionConfig religionConfig;
     private final FeeConfig feeConfig;
+    private final BloodGroupConfig bloodGroupConfig;
     private final ProvinceFacade provinceFacade;
     private final CityFacade cityFacade;
+    private final NationalityConfig nationalityConfig;
 
-    public LookUpController(FeeConfig feeConfig, ProvinceFacade provinceFacade, CityFacade cityFacade) {
+
+    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig) {
+        this.religionConfig = religionConfig;
         this.feeConfig = feeConfig;
+        this.bloodGroupConfig = bloodGroupConfig;
         this.provinceFacade = provinceFacade;
         this.cityFacade = cityFacade;
+        this.nationalityConfig = nationalityConfig;
     }
 
     // ---------------------- Province Endpoints ----------------------
@@ -95,6 +103,25 @@ public class LookUpController {
         return Map.of(
                 "chargeTypes", feeConfig.getChargeTypes(),
                 "recurrenceRules", feeConfig.getRecurrenceRules()
+        );
+    }
+
+    @GetMapping("/admission/metadata")
+    public Map<String, Map<String, String>> getAdmissionMeta() {
+        List<ProvinceResponseDTO> provincesList = provinceFacade.getAll();
+
+
+        Map<String, String> provinces = provincesList.stream()
+                .collect(Collectors.toMap(
+                        province -> String.valueOf(province.getId()), // convert Long to String
+                        ProvinceResponseDTO::getName
+                ));
+
+        return Map.of(
+                "bloodGroup", bloodGroupConfig.getGroup(),
+                "religions", religionConfig.getList(),
+                "nationalities", nationalityConfig.getMap(),
+                "provinces", provinces
         );
     }
 }
