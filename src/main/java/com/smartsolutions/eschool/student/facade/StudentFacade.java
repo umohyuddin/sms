@@ -1,6 +1,8 @@
 package com.smartsolutions.eschool.student.facade;
 
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.service.StudentService;
 import org.apache.commons.logging.Log;
@@ -46,9 +48,9 @@ public class StudentFacade {
         return studentService.getByStudentCode(studentCode);
     }
 
-
-
-
+    public StudentResponseDTO createStudent(StudentRequestDTO studentDTO) {
+        return studentService.createStudent(studentDTO);
+    }
 
 
 //    public List<StudentEntity> getByInstitute(Long inst_id) {

@@ -26,6 +26,21 @@ public class AcademicYearService {
         this.academicYearRepository = academicYearRepository;
     }
 
+
+    public AcademicYearResponseDTO getCurrentAcademicYear() {
+        try {
+            log.info("Fetching current Academic Year...");
+            AcademicYearEntity current = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> new RuntimeException("No active academic year found"));
+            return MapperUtil.mapObject(current, AcademicYearResponseDTO.class);
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching current academic year", dae);
+            throw new RuntimeException("Failed to fetch current academic year due to database issue");
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching current academic year", e);
+            throw new RuntimeException("Failed to fetch current academic year");
+        }
+    }
+
     public AcademicYearRequestDTO createAcademicYear(@Valid AcademicYearRequestDTO requestDTO) {
         log.info("Creating new Academic Year: {}", requestDTO.getName());
 
@@ -98,6 +113,8 @@ public class AcademicYearService {
     private long calculateMonths(LocalDate start, LocalDate end) {
         return java.time.temporal.ChronoUnit.MONTHS.between(start, end) + 1;
     }
+
+
 }
 
 

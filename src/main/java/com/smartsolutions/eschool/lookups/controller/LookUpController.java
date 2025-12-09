@@ -4,10 +4,7 @@ package com.smartsolutions.eschool.lookups.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
-import com.smartsolutions.eschool.global.configs.BloodGroupConfig;
-import com.smartsolutions.eschool.global.configs.FeeConfig;
-import com.smartsolutions.eschool.global.configs.NationalityConfig;
-import com.smartsolutions.eschool.global.configs.ReligionConfig;
+import com.smartsolutions.eschool.global.configs.*;
 import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.facade.CityFacade;
@@ -39,15 +36,17 @@ public class LookUpController {
     private final ProvinceFacade provinceFacade;
     private final CityFacade cityFacade;
     private final NationalityConfig nationalityConfig;
+    private final GenderConfig genderConfig;
 
 
-    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig) {
+    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig) {
         this.religionConfig = religionConfig;
         this.feeConfig = feeConfig;
         this.bloodGroupConfig = bloodGroupConfig;
         this.provinceFacade = provinceFacade;
         this.cityFacade = cityFacade;
         this.nationalityConfig = nationalityConfig;
+        this.genderConfig = genderConfig;
     }
 
     // ---------------------- Province Endpoints ----------------------
@@ -121,6 +120,7 @@ public class LookUpController {
                 "bloodGroup", bloodGroupConfig.getGroup(),
                 "religions", religionConfig.getList(),
                 "nationalities", nationalityConfig.getMap(),
+                "gender", genderConfig.getList(),
                 "provinces", provinces
         );
     }

@@ -27,4 +27,8 @@ public class AcademicYearFacade {
     public List<AcademicYearResponseDTO> getAll() {
         return academicYearService.getAll();
     }
+
+    public AcademicYearResponseDTO getCurrentAcademicYear() {
+        return academicYearService.getCurrentAcademicYear();
+    }
 }

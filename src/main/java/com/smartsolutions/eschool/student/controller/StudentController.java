@@ -1,6 +1,8 @@
 package com.smartsolutions.eschool.student.controller;
 
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.facade.StudentFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,17 @@ public class StudentController {
         log.info("GET /api/student/getall succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createStudent(@RequestBody StudentRequestDTO studentDTO) {
+        log.info("POST /api/institute/students called to create new student: {}", studentDTO);
+
+        StudentResponseDTO createdStudent = studentFacade.createStudent(studentDTO);
+
+        log.info("Student created successfully with id: {}", createdStudent.getId());
+        return ResponseEntity.ok(createdStudent);
+    }
+
 
     @GetMapping(value = "/campus/{campusId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<StudentDTO> getStudentsByCampus(@PathVariable Long campusId) {

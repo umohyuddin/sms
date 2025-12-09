@@ -39,4 +39,12 @@ public class AcademicYearController {
         log.info("GET /api/school/academic succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
+
+    @GetMapping(value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getCurrentAcademicYear() throws Exception {
+        log.info("GET /api/school/academic/current called");
+        AcademicYearResponseDTO resources = academicYearFacade.getCurrentAcademicYear();
+        log.info("GET /api/school/academic/current succeeded, returned {} resources", resources.getId());
+        return ResponseEntity.ok().body(resources);
+    }
 }

@@ -3,18 +3,31 @@ package com.smartsolutions.eschool.student.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.school.model.AcademicYearEntity;
+import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
+import com.smartsolutions.eschool.school.repository.CampusRepository;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
+import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
+import com.smartsolutions.eschool.sclass.repository.SectionRepository;
+import com.smartsolutions.eschool.sclass.repository.StandardRepository;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.mapper.StudentMapper;
+import com.smartsolutions.eschool.student.model.AdmissionTypeEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
+import com.smartsolutions.eschool.student.repository.AdmissionTypeRepository;
 import com.smartsolutions.eschool.student.repository.StudentDao;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
 import com.smartsolutions.eschool.util.ResourceObject;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -31,8 +44,22 @@ public class StudentService {
     @Autowired
     private StudentMapper studentMapper;
 
-    @Autowired
-    StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
+    private final CampusRepository campusRepository;
+    private final StandardRepository standardRepository;
+    private final SectionRepository sectionRepository;
+    private final AcademicYearRepository academicYearRepository;
+    private final AdmissionTypeRepository admissionTypeRepository;
+
+
+    public StudentService(StudentRepository studentRepository, CampusRepository campusRepository, StandardRepository standardRepository, SectionRepository sectionRepository, AcademicYearRepository academicYearRepository, AdmissionTypeRepository admissionTypeRepository) {
+        this.studentRepository = studentRepository;
+        this.campusRepository = campusRepository;
+        this.standardRepository = standardRepository;
+        this.sectionRepository = sectionRepository;
+        this.academicYearRepository = academicYearRepository;
+        this.admissionTypeRepository = admissionTypeRepository;
+    }
 
     public List<StudentDTO> getAll() {
         try {
@@ -164,4 +191,89 @@ public class StudentService {
         log.info("Successfully fetched student: id={}", studentDTO.getStudentCode());
         return studentDTO;
     }
+
+    @Transactional
+    public StudentResponseDTO createStudent(StudentRequestDTO studentDTO) {
+        log.info("Creating new Student: {}", studentDTO);
+
+        // Fetch related entities from DB
+        CampusEntity campus = campusRepository.findById(studentDTO.getCampusId())
+                .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + studentDTO.getCampusId()));
+
+        StandardEntity standard = standardRepository.findById(studentDTO.getStandardId())
+                .orElseThrow(() -> new ResourceNotFoundException("Standard not found with id: " + studentDTO.getStandardId()));
+
+        SectionEntity section = sectionRepository.findById(studentDTO.getSectionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + studentDTO.getSectionId()));
+
+        AdmissionTypeEntity admissionType = admissionTypeRepository.findById(studentDTO.getAdmissionTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Admission Type not found with id: " + studentDTO.getAdmissionTypeId()));
+
+        AcademicYearEntity academicYear = academicYearRepository.findById(studentDTO.getAcademicYearId())
+                .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id: " + studentDTO.getAcademicYearId()));
+
+        // Manual mapping from DTO to Entity
+        StudentEntity studentEntity = new StudentEntity();
+        studentEntity.setFirstName(studentDTO.getFirstName());
+        studentEntity.setLastName(studentDTO.getLastName());
+        studentEntity.setFullName(studentDTO.getFullName());
+        studentEntity.setStudentCode(studentDTO.getStudentCode());
+        studentEntity.setDateOfBirth(studentDTO.getDateOfBirth());
+        studentEntity.setGender(studentDTO.getGender());
+        studentEntity.setEmail(studentDTO.getEmail());
+        studentEntity.setPhone(studentDTO.getPhone());
+        studentEntity.setAddress(studentDTO.getAddress());
+        studentEntity.setCnic(studentDTO.getCnic());
+        studentEntity.setPassportNumber(studentDTO.getPassportNumber());
+        studentEntity.setReligion(studentDTO.getReligion());
+        studentEntity.setNationality(studentDTO.getNationality());
+        studentEntity.setBloodGroup(studentDTO.getBloodGroup());
+        studentEntity.setEnrollmentDate(studentDTO.getEnrollmentDate());
+        studentEntity.setIsActive(studentDTO.getIsActive() != null ? studentDTO.getIsActive() : true);
+        studentEntity.setStatus(studentDTO.getStatus());
+        studentEntity.setDeleted(false);
+
+        // Assign existing related entities
+        studentEntity.setCampus(campus);
+        studentEntity.setStandard(standard);
+        studentEntity.setSection(section);
+        studentEntity.setAdmissionType(admissionType);
+        studentEntity.setAcademicYear(academicYear);
+
+        // Save entity
+        StudentEntity savedStudent = studentRepository.save(studentEntity);
+
+        // Map back to DTO for response
+        StudentResponseDTO responseDTO = new StudentResponseDTO();
+        responseDTO.setId(savedStudent.getId());
+        responseDTO.setFirstName(savedStudent.getFirstName());
+        responseDTO.setLastName(savedStudent.getLastName());
+        responseDTO.setFullName(savedStudent.getFullName());
+        responseDTO.setStudentCode(savedStudent.getStudentCode());
+        responseDTO.setDateOfBirth(savedStudent.getDateOfBirth());
+        responseDTO.setGender(savedStudent.getGender());
+        responseDTO.setEmail(savedStudent.getEmail());
+        responseDTO.setPhone(savedStudent.getPhone());
+        responseDTO.setAddress(savedStudent.getAddress());
+        responseDTO.setCnic(savedStudent.getCnic());
+        responseDTO.setPassportNumber(savedStudent.getPassportNumber());
+        responseDTO.setReligion(savedStudent.getReligion());
+        responseDTO.setNationality(savedStudent.getNationality());
+        responseDTO.setBloodGroup(savedStudent.getBloodGroup());
+        responseDTO.setEnrollmentDate(savedStudent.getEnrollmentDate());
+        responseDTO.setIsActive(savedStudent.getIsActive());
+        responseDTO.setStatus(savedStudent.getStatus());
+
+        // Include FK info if needed
+        responseDTO.setCampusId(savedStudent.getCampus().getId());
+        responseDTO.setStandardId(savedStudent.getStandard().getId());
+        responseDTO.setSectionId(savedStudent.getSection().getId());
+        responseDTO.setAdmissionTypeId(savedStudent.getAdmissionType().getId());
+        responseDTO.setAcademicYearId(savedStudent.getAcademicYear().getId());
+        responseDTO.setAcademicYearName(savedStudent.getAcademicYear().getName());
+
+        log.info("Successfully created Student: {}", responseDTO);
+        return responseDTO;
+    }
+
 }
