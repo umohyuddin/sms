@@ -73,4 +73,24 @@ public interface StudentRepository extends JpaRepository<StudentEntity,Long> {
     List<StudentEntity> findByCampusAndStandard(@Param("campusId") Long campusId,
                                                 @Param("standardId") Long standardId);
 
+
+    // Total active students (not deleted)
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false")
+    Long countAllActiveStudents();
+
+    // Total students by campus
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.campus.id = :campusId")
+    Long countByCampus(@Param("campusId") Long campusId);
+
+    // Total students by standard
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.standard.id = :standardId")
+    Long countByStandard(@Param("standardId") Long standardId);
+
+    // Total students by section
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.section.id = :sectionId")
+    Long countBySection(@Param("sectionId") Long sectionId);
+
+    // Optional: total students by gender
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.gender = :gender")
+    Long countByGender(@Param("gender") String gender);
 }
