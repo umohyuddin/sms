@@ -116,6 +116,24 @@ CREATE TABLE academic_years
     updated_at   DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE admission_type
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code        VARCHAR(50)  NOT NULL UNIQUE,
+    name        VARCHAR(150) NOT NULL,
+    description VARCHAR(500),
+    is_active   BOOLEAN      NOT NULL DEFAULT TRUE,
+
+    deleted      BOOLEAN      NOT NULL DEFAULT FALSE,
+
+    created_at   DATETIME,
+    created_by   BIGINT,
+    updated_at   DATETIME,
+    updated_by   BIGINT,
+    deleted_at   DATETIME,
+    deleted_by   BIGINT
+
+);
 
 -- standards TABLE
 DROP TABLE IF EXISTS standards;
@@ -163,29 +181,31 @@ CREATE TABLE sections
 DROP TABLE IF EXISTS `students`;
 CREATE TABLE students
 (
-    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    campus_id       BIGINT       NOT NULL,
-    standard_id     BIGINT       NOT NULL,
-    section_id      BIGINT       NOT NULL,
-    student_code    VARCHAR(20)  NOT NULL UNIQUE,
-    full_name       VARCHAR(100) NOT NULL,
-    first_name      VARCHAR(50)  NOT NULL,
-    last_name       VARCHAR(50)  NOT NULL,
-    date_of_birth   DATE         NOT NULL,
-    gender          VARCHAR(10)  NOT NULL,
-    email           VARCHAR(100) UNIQUE,
-    phone           VARCHAR(20),
-    address         VARCHAR(500),
-    is_active       TINYINT (1) DEFAULT 1,
-    status          VARCHAR(50),
-    enrollment_date DATE         NOT NULL,
-    deleted         TINYINT (1) DEFAULT 0,
-    deleted_at      DATETIME,
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    campus_id           BIGINT       NOT NULL,
+    standard_id         BIGINT       NOT NULL,
+    section_id          BIGINT       NOT NULL,
+    admission_type_id   BIGINT, -- New foreign key to admission_type
+    student_code        VARCHAR(20)  NOT NULL UNIQUE,
+    full_name           VARCHAR(100) NOT NULL,
+    first_name          VARCHAR(50)  NOT NULL,
+    last_name           VARCHAR(50)  NOT NULL,
+    date_of_birth       DATE         NOT NULL,
+    gender              VARCHAR(10)  NOT NULL,
+    email               VARCHAR(100) UNIQUE,
+    phone               VARCHAR(20),
+    address             VARCHAR(500),
+    is_active           TINYINT (1) DEFAULT 1,
+    status              VARCHAR(50),
+    enrollment_date     DATE         NOT NULL,
+    deleted             TINYINT (1) DEFAULT 0,
+    deleted_at          DATETIME,
+    created_at          DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at          DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (campus_id) REFERENCES campuses (id),
     FOREIGN KEY (standard_id) REFERENCES standards (id),
-    FOREIGN KEY (section_id) REFERENCES sections (id)
+    FOREIGN KEY (section_id) REFERENCES sections (id),
+    FOREIGN KEY (admission_type_id) REFERENCES admission_type (id)
 );
 
 

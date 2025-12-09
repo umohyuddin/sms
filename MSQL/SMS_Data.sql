@@ -1,13 +1,35 @@
+-- ============================================================
+-- Sample Data: Admission Types
+-- This section populates the 'admission_type' table with a
+-- predefined list of admission categories typically used in
+-- school management systems. These records are intended to
+-- standardize the process of student enrollment, fee
+-- management, and reporting across different modules such as
+-- student registration, class assignment, scholarship
+-- management, and special programs.
+-- ============================================================
 
 
--- ============================================================
--- Sample Data: Academic Years
--- This section populates the 'academic_years' table with a
--- predefined list of academic sessions typically used in
--- schools/colleges across Pakistan (Aug–July cycle).
--- These records support admission, fee structure, attendance,
--- exams, and class scheduling modules.
--- ============================================================
+INSERT INTO admission_type (code, name, description, is_active)
+VALUES ('NEW_ADMISSION', 'New Admission / Fresh Admission', 'Student joining the school for the first time.', TRUE),
+       ('TRANSFER', 'Transfer Admission', 'Student transferring from another school.', TRUE),
+       ('READMISSION', 'Re-admission / Returning Student', 'Student returning after leaving the school.', TRUE),
+       ('LATERAL_ENTRY', 'Lateral Entry / Direct Admission', 'Student joining a higher grade directly.', TRUE),
+       ('SCHOLARSHIP', 'Scholarship / Concession Admission', 'Admission with full or partial fee waiver.', TRUE),
+       ('MANAGEMENT', 'Management / Special Admission', 'Admission under management quota.', TRUE),
+       ('EARLY', 'Early Admission', 'Admission before the academic session starts.', TRUE),
+       ('LATE', 'Late Admission', 'Admission after the academic session has started.', TRUE),
+       ('INTERNATIONAL', 'International / Expat Admission', 'Students from foreign countries.', TRUE),
+       ('SPECIAL_NEEDS', 'Special Needs Admission', 'Students requiring special assistance.', TRUE),
+       ('ONLINE', 'Online / Distance Learning Admission', 'Admission for online programs.', TRUE),
+       ('SIBLING', 'Sibling Admission', 'Admission given when a sibling is already enrolled.', TRUE),
+       ('STAFF_WARD', 'Staff / Employee Ward Admission', 'Children of school staff may get special consideration.',
+        TRUE),
+       ('MERIT', 'Merit-based Admission', 'Admission based purely on exam/test performance.', TRUE),
+       ('MID_YEAR', 'Late Entry Mid-Year', 'Students joining mid-session due to relocation or other reasons.', TRUE);
+
+
+
 
 
 INSERT INTO academic_years (name, start_date, end_date, total_months, is_current, created_at, updated_at)
@@ -82,7 +104,6 @@ VALUES (7, 'Muzaffarabad', 'MZD', TRUE, 1, 1, NOW()),
        (7, 'Mirpur', 'MIR', TRUE, 1, 1, NOW()),
        (7, 'Kotli', 'KOT', TRUE, 1, 1,
         NOW());
-
 
 
 
@@ -322,29 +343,38 @@ VALUES
 
 
 INSERT INTO students
-(campus_id, standard_id, section_id, student_code, full_name, first_name, last_name, date_of_birth, gender, email,
+(campus_id, standard_id, section_id, admission_type_id, student_code, full_name, first_name, last_name, date_of_birth, gender, email,
  phone, address, is_active, status, enrollment_date, deleted)
-VALUES (1, 1, 1, 'STU001', 'Ali Khan', 'Ali', 'Khan', '2008-05-15', 'Male', 'ali.khan@example.com', '03001234567',
-        'Gulshan-e-Iqbal, Karachi', 1, 'Enrolled', '2024-04-02', 0),
-       (1, 1, 2, 'STU002', 'Ayesha Malik', 'Ayesha', 'Malik', '2009-03-21', 'Female', 'ayesha.malik@example.com',
-        '03015678900', 'Model Town, Lahore', 1, 'Enrolled', '2024-04-03', 0),
-       (1, 2, 3, 'STU003', 'Hassan Ali', 'Hassan', 'Ali', '2007-10-11', 'Male', 'hassan.ali@example.com', '03007894561',
-        'Cantt Road, Rawalpindi', 1, 'Enrolled', '2024-04-05', 0),
-       (2, 2, 4, 'STU004', 'Fatima Shah', 'Fatima', 'Shah', '2008-12-01', 'Female', 'fatima.shah@example.com',
-        '03112233445', 'North Nazimabad, Karachi', 1, 'Enrolled', '2024-04-06', 0),
-       (2, 3, 5, 'STU005', 'Saad Ahmed', 'Saad', 'Ahmed', '2010-06-18', 'Male', 'saad.ahmed@example.com', '03214567890',
-        'F-8 Sector, Islamabad', 1, 'Enrolled', '2024-04-06', 0),
-       (1, 3, 6, 'STU006', 'Zainab Raza', 'Zainab', 'Raza', '2011-01-09', 'Female', 'zainab.raza@example.com',
-        '03023456781', 'Johar Town, Lahore', 1, 'Enrolled', '2024-04-07', 0),
-       (1, 4, 7, 'STU007', 'Ahmed Farooq', 'Ahmed', 'Farooq', '2009-07-19', 'Male', 'ahmed.farooq@example.com',
-        '03002345890', 'Garden West, Karachi', 1, 'Enrolled', '2024-04-10', 0),
-       (2, 4, 8, 'STU008', 'Maryam Iqbal', 'Maryam', 'Iqbal', '2010-11-25', 'Female', 'maryam.iqbal@example.com',
-        '03113335566', 'Bahria Town, Lahore', 1, 'Enrolled', '2024-04-11', 0),
-       (1, 5, 9, 'STU009', 'Usman Tariq', 'Usman', 'Tariq', '2008-09-02', 'Male', 'usman.tariq@example.com',
-        '03029876543', 'Satellite Town, Rawalpindi', 1, 'Enrolled', '2024-04-12', 0),
-       (2, 5, 10, 'STU010', 'Hiba Rehman', 'Hiba', 'Rehman', '2011-02-14', 'Female', 'hiba.rehman@example.com',
-        '03440011223', 'Defence Phase 2, Karachi', 1, 'Enrolled', '2024-04-12', 0);
+VALUES
+    (1, 1, 1, 1, 'STU001', 'Ali Khan', 'Ali', 'Khan', '2008-05-15', 'Male', 'ali.khan@example.com', '03001234567',
+     'Gulshan-e-Iqbal, Karachi', 1, 'Enrolled', '2024-04-02', 0),
 
+    (1, 1, 2, 2, 'STU002', 'Ayesha Malik', 'Ayesha', 'Malik', '2009-03-21', 'Female', 'ayesha.malik@example.com',
+     '03015678900', 'Model Town, Lahore', 1, 'Enrolled', '2024-04-03', 0),
+
+    (1, 2, 3, 1, 'STU003', 'Hassan Ali', 'Hassan', 'Ali', '2007-10-11', 'Male', 'hassan.ali@example.com', '03007894561',
+     'Cantt Road, Rawalpindi', 1, 'Enrolled', '2024-04-05', 0),
+
+    (2, 2, 4, 3, 'STU004', 'Fatima Shah', 'Fatima', 'Shah', '2008-12-01', 'Female', 'fatima.shah@example.com',
+     '03112233445', 'North Nazimabad, Karachi', 1, 'Enrolled', '2024-04-06', 0),
+
+    (2, 3, 5, 4, 'STU005', 'Saad Ahmed', 'Saad', 'Ahmed', '2010-06-18', 'Male', 'saad.ahmed@example.com', '03214567890',
+     'F-8 Sector, Islamabad', 1, 'Enrolled', '2024-04-06', 0),
+
+    (1, 3, 6, 1, 'STU006', 'Zainab Raza', 'Zainab', 'Raza', '2011-01-09', 'Female', 'zainab.raza@example.com', '03023456781',
+     'Johar Town, Lahore', 1, 'Enrolled', '2024-04-07', 0),
+
+    (1, 4, 7, 2, 'STU007', 'Ahmed Farooq', 'Ahmed', 'Farooq', '2009-07-19', 'Male', 'ahmed.farooq@example.com', '03002345890',
+     'Garden West, Karachi', 1, 'Enrolled', '2024-04-10', 0),
+
+    (2, 4, 8, 3, 'STU008', 'Maryam Iqbal', 'Maryam', 'Iqbal', '2010-11-25', 'Female', 'maryam.iqbal@example.com', '03113335566',
+     'Bahria Town, Lahore', 1, 'Enrolled', '2024-04-11', 0),
+
+    (1, 5, 9, 4, 'STU009', 'Usman Tariq', 'Usman', 'Tariq', '2008-09-02', 'Male', 'usman.tariq@example.com', '03029876543',
+     'Satellite Town, Rawalpindi', 1, 'Enrolled', '2024-04-12', 0),
+
+    (2, 5, 10, 1, 'STU010', 'Hiba Rehman', 'Hiba', 'Rehman', '2011-02-14', 'Female', 'hiba.rehman@example.com', '03440011223',
+     'Defence Phase 2, Karachi', 1, 'Enrolled', '2024-04-12', 0);
 
 
 -- ============================================================
@@ -794,12 +824,11 @@ VALUES (15.00, TRUE, '2024-04-01', '2025-03-31', TRUE, FALSE, 1, 1, 1, 1),
 
 
 INSERT INTO system_users (username, email, phone, password_hash, is_active, is_verified)
-VALUES
-    ('admin.user', 'admin@example.com', '03001234567',
-     '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, TRUE),
+VALUES ('admin.user', 'admin@example.com', '03001234567',
+        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, TRUE),
 
-    ('teacher.user', 'teacher@example.com', '03007654321',
-     '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE),
+       ('teacher.user', 'teacher@example.com', '03007654321',
+        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE),
 
-    ('student.user', 'student@example.com', '03111223344',
-     '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE);
+       ('student.user', 'student@example.com', '03111223344',
+        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE);

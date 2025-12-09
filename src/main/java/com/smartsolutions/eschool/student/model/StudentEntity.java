@@ -68,7 +68,7 @@ public class StudentEntity {
     private String status;
 
     @Column(name = "enrollment_date", nullable = false)
-    private LocalDate enrollmentDate;
+        private LocalDate enrollmentDate;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -109,5 +109,10 @@ public class StudentEntity {
     // --- Fee Summary (total per academic year) ---
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<StudentFeeSummaryEntity> feeSummaries;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admission_type_id") // FK column in students table
+    private AdmissionTypeEntity admissionType;
 
 }

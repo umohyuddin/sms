@@ -17,12 +17,12 @@ import java.util.List;
 @Slf4j
 @Transactional
 @RestController
-@RequestMapping("/api/institute/campuses/standards/sections")
+@RequestMapping("/api/institute/campuses/standards")
 public class SectionController {
     @Autowired
     private SectionFacade sectionFacade;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/sections", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() {
         log.info("GET /api/sections called");
         List<SectionDTO> resources = sectionFacade.getAll();
@@ -30,7 +30,7 @@ public class SectionController {
         return ResponseEntity.ok().body(resources);
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/sections/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable Long id) {
         log.info("GET /api/sections by id called");
         SectionDTO sectionDTO = sectionFacade.getById(id);
@@ -38,7 +38,7 @@ public class SectionController {
         return ResponseEntity.ok().body(sectionDTO);
     }
 
-    @GetMapping(value = "standard/{standardId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{standardId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByStandardId(@PathVariable Long standardId) {
         log.info("GET /api/sections by standard id called");
         List<SectionDTO> sectionDTO = sectionFacade.getByStandardId(standardId);
@@ -46,7 +46,7 @@ public class SectionController {
         return ResponseEntity.ok().body(sectionDTO);
     }
 
-    @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/sections/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getBySearch(@RequestParam(required = false) Long campusId,@RequestParam(required = false) Long standardId,@RequestParam(required = false) String keyword) {
         log.info("GET /api/sections/search by keyword called");
         List<SectionDTO> sectionDTO = sectionFacade.searchSections(campusId,standardId,keyword);
@@ -55,7 +55,7 @@ public class SectionController {
     }
 
 
-    @DeleteMapping("/{sectionId}")
+    @DeleteMapping("/sections/{sectionId}")
     public ResponseEntity<?> softDeleteById(@PathVariable Long sectionId) {
         log.info("API Request: Soft delete Section ID: {}", sectionId);
         try {
@@ -72,7 +72,7 @@ public class SectionController {
         }
     }
 
-    @DeleteMapping("/standard/{standardId}")
+    @DeleteMapping("/{standardId}/sections")
     public ResponseEntity<?> softDeleteByStandardId(@PathVariable Long standardId) {
         log.info("API Request: delete Sections by Standard ID: {}", standardId);
         try {
@@ -89,7 +89,7 @@ public class SectionController {
         }
     }
 
-    @DeleteMapping("/all")
+    @DeleteMapping("/sections/all")
     public ResponseEntity<?> softDeleteAll() {
         log.info("API Request: Soft delete ALL sections");
         try {
@@ -102,7 +102,7 @@ public class SectionController {
         }
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/sections", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SectionCreateRequestDTO> createSection(@Valid @RequestBody SectionCreateRequestDTO dto) {
 
         log.info("Received request to create new Section: {}", dto.getSectionName());
@@ -111,7 +111,7 @@ public class SectionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSection);
     }
 
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "sections/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SectionDTO> updateSection(@PathVariable Long id, @Valid @RequestBody SectionCreateRequestDTO dto) {
 
         log.info("Received request to update Section with id: {}", id);
@@ -119,9 +119,4 @@ public class SectionController {
         log.info("Returning updated Section: id={}", updatedStandard.getId());
         return ResponseEntity.ok(updatedStandard);
     }
-
-
-
-
-
 }
