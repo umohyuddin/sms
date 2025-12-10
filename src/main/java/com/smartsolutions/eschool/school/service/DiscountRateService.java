@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.school.service;
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.dtos.discountRate.requestDto.DiscountRateRequestDTO;
+import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateFullResponseDTO;
 import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateResponseDTO;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
@@ -86,6 +87,26 @@ public class DiscountRateService {
         } catch (MappingException me) {
             log.error("Mapping error while fetching Discount Rates", me);
             throw new CustomServiceException("Error converting Discount Rate data", me);
+        }
+    }
+
+
+    public List<DiscountRateFullResponseDTO> getDiscountRatesByCampusAndAcademicYear(Long campusId, Long academicYearId) {
+        try {
+            log.info("Fetching Discount Rates for campusId: {} and academicYearId: {}", campusId, academicYearId);
+
+            // Fetch from repository
+            List<DiscountRateEntity> discountRates = discountRateRepository.findDiscountRatesByCampusAndAcademicYear(campusId, academicYearId);
+
+            // Map entities to response DTOs
+            return MapperUtil.mapList(discountRates, DiscountRateFullResponseDTO.class);
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching Discount Rates for campusId: {} and academicYearId: {}", campusId, academicYearId, dae);
+            throw new CustomServiceException("Failed to fetch Discount Rates due to database error");
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Discount Rates for campusId: {} and academicYearId: {}", campusId, academicYearId, e);
+            throw new CustomServiceException("Failed to fetch Discount Rates");
         }
     }
 

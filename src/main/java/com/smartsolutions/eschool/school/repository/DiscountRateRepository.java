@@ -145,6 +145,24 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRateEntity
             ORDER BY dr.id ASC
             """)
     List<DiscountRateEntity> findAllByAcademicYear(@Param("academicYearId") Long academicYearId);
+
+
+    @Query("""
+                SELECT dr 
+                FROM DiscountRateEntity dr
+                JOIN dr.discountSubType dst
+                JOIN dst.discountType dt
+                WHERE dr.deleted = false
+                  AND dst.deleted = false
+                  AND dt.deleted = false
+                  AND dr.campus.id = :campusId
+                  AND dr.academicYear.id = :academicYearId
+            """)
+    List<DiscountRateEntity> findDiscountRatesByCampusAndAcademicYear(
+            @Param("campusId") Long campusId,
+            @Param("academicYearId") Long academicYearId
+    );
+
 }
 
 

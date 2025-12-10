@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.facade;
 
 import com.smartsolutions.eschool.school.dtos.discountRate.requestDto.DiscountRateRequestDTO;
+import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateFullResponseDTO;
 import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateResponseDTO;
 import com.smartsolutions.eschool.school.service.DiscountRateService;
 import jakarta.validation.Valid;
@@ -27,6 +28,10 @@ public class DiscountRateFacade {
     // ---------------- Get All ----------------
     public List<DiscountRateResponseDTO> getAll() {
         return discountRateService.getAll();
+    }
+
+    public List<DiscountRateFullResponseDTO> getDiscountRatesByCampusAndAcademicYear(Long campusId, Long academicYearId) {
+        return discountRateService.getDiscountRatesByCampusAndAcademicYear(campusId,academicYearId);
     }
 
     // ---------------- Get by ID ----------------

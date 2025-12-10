@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.controller;
 
 import com.smartsolutions.eschool.school.dtos.discountRate.requestDto.DiscountRateRequestDTO;
+import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateFullResponseDTO;
 import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateResponseDTO;
 import com.smartsolutions.eschool.school.facade.DiscountRateFacade;
 import jakarta.validation.Valid;
@@ -47,6 +48,17 @@ public class DiscountRateController {
         return ResponseEntity.ok().body(list);
     }
 
+
+
+    @GetMapping(value = "/byCampusYear", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getDiscountRatesByCampusAndAcademicYear(
+            @RequestParam Long campusId,
+            @RequestParam Long academicYearId) {
+        log.info("GET /api/school/discounts/rates/byCampusYear called with campusId={} and academicYearId={}", campusId, academicYearId);
+        List<DiscountRateFullResponseDTO> list = discountRateFacade.getDiscountRatesByCampusAndAcademicYear(campusId, academicYearId);
+        log.info("GET /api/school/discounts/rates/byCampusYear succeeded, returned {} resources", list.size());
+        return ResponseEntity.ok().body(list);
+    }
 //    // -------------------------------------------------------------------------
 //    // GET ACTIVE
 //    // -------------------------------------------------------------------------
@@ -108,17 +120,6 @@ public class DiscountRateController {
         log.info("Deleted ALL DiscountRates. Count: {}", count);
         return ResponseEntity.ok(count + " DiscountRates deleted");
     }
-
-//    // -------------------------------------------------------------------------
-//    // SEARCH
-//    // -------------------------------------------------------------------------
-//    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> search(@PathVariable String keyword) {
-//        log.info("GET /api/school/discounts/rates/search/{} called", keyword);
-//        List<DiscountRateResponseDTO> list = discountRateFacade.search(keyword);
-//        log.info("Search succeeded, returned {} results", list.size());
-//        return ResponseEntity.ok().body(list);
-//    }
 
     // -------------------------------------------------------------------------
     // ACTIVATE
