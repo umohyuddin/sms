@@ -15,22 +15,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class StudentDiscountAssignmentResponseDTO {
     private Long id;
-    private Long studentId;
-    private String studentName;
-
-    private Long discountRateId;
-    private String discountSubTypeName;
-    private Boolean isPercentage;
-    private BigDecimal value;
-
-    private Long academicYearId;
-    private String academicYearName;
-
-    private BigDecimal appliedAmount;
-    private BigDecimal appliedPercentage;
-
-    private Boolean isActive;
-    private String reason;
-
-    private LocalDateTime createdAt;
+//    private Long studentId;
+//    private String studentName;
+//
+//    private Long discountRateId;
+//    private String discountSubTypeName;
+//    private Boolean isPercentage;
+//    private BigDecimal value;
+//
+//    private Long academicYearId;
+//    private String academicYearName;
+//
+//    private BigDecimal appliedAmount;
+//    private BigDecimal appliedPercentage;
+//
+//    private Boolean isActive;
+//    private String reason;
+//
+//    private LocalDateTime createdAt;
 }

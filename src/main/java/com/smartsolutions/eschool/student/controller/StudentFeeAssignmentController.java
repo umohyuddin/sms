@@ -32,7 +32,7 @@ private final StudentFeeAssignmentFacade studentFeeAssignmentFacade;
     }
 
     @PostMapping( value = "/{studentId}/fees/assign",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createSection(@PathVariable Long studentId, @RequestBody @Valid StudentFeeAssignmentRequestDTO requestDTO) {
+    public ResponseEntity<?> createAssignStudentFee(@PathVariable Long studentId, @RequestBody @Valid StudentFeeAssignmentRequestDTO requestDTO) {
 
         log.info("Received request to Student Fee Assignment for student Id: {}", studentId);
         StudentFeeSummaryDTO studentFeeSummaryDTO = studentFeeAssignmentFacade.assignStudentFee(studentId,requestDTO);

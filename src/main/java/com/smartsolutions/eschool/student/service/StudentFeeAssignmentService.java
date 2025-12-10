@@ -8,14 +8,12 @@ import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeAssignmentD
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.byStudentId.FeeAssignmentDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.byStudentId.StudentFeeAssignmentsResponseDTO;
+import com.smartsolutions.eschool.student.dtos.studentDiscountAssignment.requestDto.StudentDiscountAssignmentRequestDTO;
 import com.smartsolutions.eschool.student.model.FeeRateEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeAssignmentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeSummaryEntity;
-import com.smartsolutions.eschool.student.repository.FeeRateRepository;
-import com.smartsolutions.eschool.student.repository.StudentFeeAssignmentRepository;
-import com.smartsolutions.eschool.student.repository.StudentFeeSummaryRepository;
-import com.smartsolutions.eschool.student.repository.StudentRepository;
+import com.smartsolutions.eschool.student.repository.*;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -39,14 +37,16 @@ public class StudentFeeAssignmentService {
     private final StudentFeeAssignmentRepository studentFeeAssignmentRepository;
     private final StudentFeeSummaryRepository studentFeeSummaryRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final StudentDiscountAssignmentService studentDiscountAssignmentService;
 
-
-    public StudentFeeAssignmentService(StudentRepository studentRepository, FeeRateRepository feeRateRepository, StudentFeeAssignmentRepository studentFeeAssignmentRepository, StudentFeeSummaryRepository studentFeeSummaryRepository, AcademicYearRepository academicYearRepository) {
+    public StudentFeeAssignmentService(StudentRepository studentRepository, FeeRateRepository feeRateRepository, StudentFeeAssignmentRepository studentFeeAssignmentRepository, StudentFeeSummaryRepository studentFeeSummaryRepository, AcademicYearRepository academicYearRepository, StudentDiscountAssignmentService studentDiscountAssignmentService) {
         this.studentRepository = studentRepository;
         this.feeRateRepository = feeRateRepository;
         this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
         this.studentFeeSummaryRepository = studentFeeSummaryRepository;
         this.academicYearRepository = academicYearRepository;
+
+        this.studentDiscountAssignmentService = studentDiscountAssignmentService;
     }
 
     @Transactional
@@ -106,6 +106,15 @@ public class StudentFeeAssignmentService {
             StudentFeeSummaryEntity savedSummary = studentFeeSummaryRepository.save(summary);
             log.info("Saved StudentFeeSummaryEntity for studentId={} with totalAssignedFee={}", studentId, savedSummary.getTotalAssignedFee());
 
+            StudentDiscountAssignmentRequestDTO requestDTO = new StudentDiscountAssignmentRequestDTO();
+            requestDTO.setStudentId(studentId);
+            requestDTO.setCampusId(dto.getCampusId());
+            requestDTO.setDiscountRateId(dto.getDiscountComponentId());
+            requestDTO.setAcademicYearId(dto.getAcademicYearId());
+            if(dto.getDiscountComponentId() != null) {
+                studentDiscountAssignmentService.assignDiscount(requestDTO);
+            }
+
             return MapperUtil.mapObject(savedSummary, StudentFeeSummaryDTO.class);
 
         } catch (ResourceNotFoundException e) {
@@ -124,7 +133,7 @@ public class StudentFeeAssignmentService {
 
             if (assignments.isEmpty()) {
                 log.warn("No fee assignments found for studentId={} and academicYearId={}", studentId, academicYearId);
-                throw  new ResourceNotFoundException("No fee assignments found for studentId={"+studentId+"} and academicYearId={"+academicYearId+"}");
+                throw new ResourceNotFoundException("No fee assignments found for studentId={" + studentId + "} and academicYearId={" + academicYearId + "}");
             }
 
 //            // Map to DTO

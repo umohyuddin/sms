@@ -18,6 +18,7 @@ public class StudentFeeAssignmentRequestDTO {
     private Long campusId;
     private Long standardId;
     private Long academicYearId;
+    private Long discountComponentId;
     private List<Long> componentIds;  // FeeComponent IDs
     private LocalDate dueDate;
     private LocalDate assignedDate;

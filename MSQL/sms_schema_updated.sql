@@ -432,6 +432,7 @@ CREATE TABLE student_discount_assignment
     id                 BIGINT PRIMARY KEY AUTO_INCREMENT,
 
     student_id         BIGINT NOT NULL,
+    campus_id          BIGINT NOT NULL,
     discount_rate_id   BIGINT NOT NULL,
     academic_year_id   BIGINT NOT NULL,
 
@@ -449,8 +450,8 @@ CREATE TABLE student_discount_assignment
     deleted_at         DATETIME,
     deleted_by         BIGINT,
 
-
     CONSTRAINT fk_sda_student FOREIGN KEY (student_id) REFERENCES students (id),
+    CONSTRAINT fk_sda_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
     CONSTRAINT fk_sda_rate FOREIGN KEY (discount_rate_id) REFERENCES discount_rate (id),
     CONSTRAINT fk_sda_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );

@@ -16,6 +16,7 @@ import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
+import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +33,7 @@ public class StudentDiscountAssignmentService {
     private final CampusRepository campusRepository;
     private final AcademicYearRepository academicYearRepository;
 
-    public StudentDiscountAssignmentService(StudentDiscountAssignmentRepository assignmentRepository,
-                                            StudentRepository studentRepository,
-                                            DiscountRateRepository discountRateRepository,
-                                            CampusRepository campusRepository,
-                                            AcademicYearRepository academicYearRepository) {
+    public StudentDiscountAssignmentService(StudentDiscountAssignmentRepository assignmentRepository, StudentRepository studentRepository, DiscountRateRepository discountRateRepository, CampusRepository campusRepository, AcademicYearRepository academicYearRepository) {
         this.assignmentRepository = assignmentRepository;
         this.studentRepository = studentRepository;
         this.discountRateRepository = discountRateRepository;
@@ -51,30 +48,50 @@ public class StudentDiscountAssignmentService {
     public StudentDiscountAssignmentResponseDTO assignDiscount(@Valid StudentDiscountAssignmentRequestDTO requestDTO) {
         log.info("Assigning discount to student: {}", requestDTO.getStudentId());
         try {
-            StudentEntity student = studentRepository.findByIdAndDeletedFalse(requestDTO.getStudentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + requestDTO.getStudentId()));
+            StudentEntity student = studentRepository.findByIdAndDeletedFalse(requestDTO.getStudentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + requestDTO.getStudentId()));
 
-            DiscountRateEntity discountRate = discountRateRepository.findById(requestDTO.getDiscountRateId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Discount rate not found with id: " + requestDTO.getDiscountRateId()));
+            DiscountRateEntity discountRate = discountRateRepository.findById(requestDTO.getDiscountRateId()).orElseThrow(() -> new ResourceNotFoundException("Discount rate not found with id: " + requestDTO.getDiscountRateId()));
 
             CampusEntity campus = null;
             if (requestDTO.getCampusId() != null) {
-                campus = campusRepository.findById(requestDTO.getCampusId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + requestDTO.getCampusId()));
+                campus = campusRepository.findById(requestDTO.getCampusId()).orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + requestDTO.getCampusId()));
             }
 
-            AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Academic year not found with id: " + requestDTO.getAcademicYearId()));
+            AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId()).orElseThrow(() -> new ResourceNotFoundException("Academic year not found with id: " + requestDTO.getAcademicYearId()));
 
-            StudentDiscountAssignmentEntity entity = MapperUtil.mapObject(requestDTO, StudentDiscountAssignmentEntity.class);
+
+            StudentDiscountAssignmentEntity entity = new StudentDiscountAssignmentEntity();
             entity.setStudent(student);
             entity.setDiscountRate(discountRate);
             entity.setCampus(campus);
             entity.setAcademicYear(academicYear);
+            entity.setAppliedAmount(requestDTO.getAppliedAmount());
+            entity.setAppliedPercentage(requestDTO.getAppliedPercentage());
+            entity.setReason(requestDTO.getReason());
+            entity.setIsActive(true);
+            entity.setDeleted(false);
             entity.setId(null);
             assignmentRepository.save(entity);
 
+
+//            ModelMapper modelMapper = new ModelMapper();
+//
+//// Skip mapping nested objects that you handle manually
+//            modelMapper.typeMap(StudentDiscountAssignmentRequestDTO.class, StudentDiscountAssignmentEntity.class).addMappings(mapper -> {
+//                mapper.skip(StudentDiscountAssignmentEntity::setStudent);
+//                mapper.skip(StudentDiscountAssignmentEntity::setCampus);
+//                mapper.skip(StudentDiscountAssignmentEntity::setAcademicYear);
+//                mapper.skip(StudentDiscountAssignmentEntity::setDiscountRate);
+//            });
+//            StudentDiscountAssignmentEntity entity = modelMapper.map(requestDTO, StudentDiscountAssignmentEntity.class);
+//
+//            entity.setStudent(student);
+//            entity.setDiscountRate(discountRate);
+//            entity.setCampus(campus);
+//            entity.setAcademicYear(academicYear);
+
             log.info("Successfully assigned discount, id: {}", entity.getId());
+
             return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while assigning discount", dae);
@@ -105,8 +122,7 @@ public class StudentDiscountAssignmentService {
     // GET BY ID
     // -------------------------------------------------------------------------
     public StudentDiscountAssignmentResponseDTO getById(Long assignmentId) {
-        StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
+        StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId).orElseThrow(() -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
         return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
     }
 
@@ -123,8 +139,7 @@ public class StudentDiscountAssignmentService {
     // -------------------------------------------------------------------------
     @Transactional
     public StudentDiscountAssignmentResponseDTO updateAssignment(Long assignmentId, @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
-        StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
+        StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId).orElseThrow(() -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
         //MapperUtil.mapObject(requestDTO, entity); // update fields from DTO
         assignmentRepository.save(entity);
         return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
