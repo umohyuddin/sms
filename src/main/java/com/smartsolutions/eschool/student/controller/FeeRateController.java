@@ -40,6 +40,7 @@ public class FeeRateController {
         log.info("Returning Fee rate: id={}", feeRateDTO.getId());
         return ResponseEntity.ok(feeRateDTO);
     }
+
     @GetMapping(value = "catalog/{catalogId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByFeeCatalogId(@PathVariable Long catalogId) throws Exception {
         log.info("Received request to fetch  Fee rate with id: {}", catalogId);
@@ -48,13 +49,6 @@ public class FeeRateController {
         return ResponseEntity.ok(feeRateDTO);
     }
 
-//    @GetMapping(value = "/search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> getSearch(@PathVariable String keyword) {
-//        log.info("GET /api/fee/rates by keyword called");
-//        List<FeeRatesResponseDTO> resources = feeRateFacade.searchFeeRates(keyword);
-//        log.info("GET /api/fee/rates by keyword succeeded, returned {} resources", resources.size());
-//        return ResponseEntity.ok(resources);
-//    }
 
     @GetMapping(value = "/component/{componentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByFeeComponentId(@PathVariable Long componentId) {
@@ -63,6 +57,15 @@ public class FeeRateController {
         log.info("GET /api/fee/rates by  succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok(resources);
     }
+
+    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> findActiveFeeRates(@RequestParam Long campusId, @RequestParam Long standardId, @RequestParam Long academicYearId) {
+        log.info("GET /api/fee/rates/active called with campus={}, standard={}, year={}", campusId, standardId, academicYearId);
+        List<FeeRatesResponseDTO> resources = feeRateFacade.findActiveFeeRates(campusId, standardId, academicYearId);
+        log.info("Active Fee Rates returned: {}", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FeeRatesResponseDTO> createFeeRate(@Valid @RequestBody FeeRateCreateRequestDTO dto) {
@@ -73,9 +76,7 @@ public class FeeRateController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<FeeRatesResponseDTO> updateFeeRate(
-            @PathVariable Long id,
-            @Valid @RequestBody FeeRateCreateRequestDTO dto) {
+    public ResponseEntity<FeeRatesResponseDTO> updateFeeRate(@PathVariable Long id, @Valid @RequestBody FeeRateCreateRequestDTO dto) {
         log.info("PUT /api/fee/rates/{} called with payload: {}", id, dto);
 
         FeeRatesResponseDTO updatedFeeRate = feeRateFacade.update(id, dto);

@@ -534,46 +534,45 @@ INSERT INTO fee_rates
 VALUES
 
 -- ============================================================
--- MAIN CAMPUS — Admission Fees
+-- MAIN CAMPUS — Admission Fees (Academic Year 3)
 -- ============================================================
-(1, 1, 1, 1, 'Rate for Admission Form Fee', 5000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 2, 1, 'Rate for Admission Processing', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 3, 1, 'Rate for Admission Test', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 1, 3, 'Rate for Admission Form Fee', 5000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 2, 3, 'Rate for Admission Processing', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 3, 3, 'Rate for Admission Test', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
--- MAIN CAMPUS — Tuition Fees
+-- MAIN CAMPUS — Tuition Fees (Academic Year 3)
 -- ============================================================
-(1, 1, 4, 1, 'Rate for Basic Tuition', 20000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 5, 1, 'Rate for Activity Charges', 3000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 6, 1, 'Rate for Lab Access', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 4, 3, 'Rate for Basic Tuition', 20000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 5, 3, 'Rate for Activity Charges', 3000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 6, 3, 'Rate for Lab Access', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
--- MAIN CAMPUS — Transport Fees
+-- MAIN CAMPUS — Transport Fees (Academic Year 3)
 -- ============================================================
-(1, 1, 7, 1, 'Rate for Transport Base Fare', 8000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 8, 1, 'Rate for Fuel Adjustment', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 9, 1, 'Rate for Vehicle Maintenance', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 7, 3, 'Rate for Transport Base Fare', 8000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 8, 3, 'Rate for Fuel Adjustment', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(1, 1, 9, 3, 'Rate for Vehicle Maintenance', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
--- CITY CAMPUS — Admission Fees
+-- CITY CAMPUS — Admission Fees (Academic Year 3)
 -- ============================================================
-(2, 1, 10, 1, 'Rate for City Admission Form Fee', 4000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(2, 1, 11, 1, 'Rate for City Admission Processing', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(2, 1, 10, 3, 'Rate for City Admission Form Fee', 4000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(2, 1, 11, 3, 'Rate for City Admission Processing', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
--- GIRLS CAMPUS — Tuition Fees
+-- GIRLS CAMPUS — Tuition Fees (Academic Year 3)
 -- ============================================================
-(3, 1, 14, 1, 'Rate for Girls Basic Tuition', 18000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 15, 1, 'Rate for Girls Activities', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 16, 1, 'Rate for Science Materials', 1200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 14, 3, 'Rate for Girls Basic Tuition', 18000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 15, 3, 'Rate for Girls Activities', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 16, 3, 'Rate for Science Materials', 1200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
 
 -- ============================================================
--- GIRLS CAMPUS — Library Fees
+-- GIRLS CAMPUS — Library Fees (Academic Year 3)
 -- ============================================================
-(3, 1, 17, 1, 'Rate for Book Rental', 500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 18, 1, 'Rate for Library Maintenance', 800.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 19, 1, 'Rate for Library Card', 200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE);
-
+(3, 1, 17, 3, 'Rate for Book Rental', 500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 18, 3, 'Rate for Library Maintenance', 800.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+(3, 1, 19, 3, 'Rate for Library Card', 200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE);
 
 -- ============================================================
 

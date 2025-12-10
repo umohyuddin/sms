@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -31,9 +32,10 @@ public class FeeRateService {
 
     private final FeeRateRepository feeRateRepository;
     private final CampusRepository campusRepository;
-    private final StandardRepository  standardRepository;
+    private final StandardRepository standardRepository;
     private final AcademicYearRepository academicYearRepository;
-    private final FeeComponentRepository  feeComponentRepository;
+    private final FeeComponentRepository feeComponentRepository;
+
     public FeeRateService(FeeRateRepository feeRateRepository, CampusRepository campusRepository, StandardRepository standardRepository, AcademicYearRepository academicYearRepository, FeeComponentRepository feeComponentRepository) {
         this.feeRateRepository = feeRateRepository;
         this.campusRepository = campusRepository;
@@ -41,29 +43,8 @@ public class FeeRateService {
 
         this.academicYearRepository = academicYearRepository;
         this.feeComponentRepository = feeComponentRepository;
+
     }
-
-
-//    public List<FeeRatesResponseDTO> searchFeeRates(String keyword) {
-//        try {
-//            log.info("Fetching all Fee Rates based on keyword from database");
-//            List<FeeRateEntity> result = feeRateRepository.searchFeeComponent(keyword);
-//            log.info("Successfully fetched {} FeeRates based on keyword", result.size());
-//            List<FeeRatesResponseDTO> feeRatesResponseDTOS = MapperUtil.mapList(result, FeeRatesResponseDTO.class);
-//            log.info("Successfully fetched FeeRates based on keyword");
-//            return feeRatesResponseDTOS;
-//        } catch (DataAccessException dae) {
-//            log.error("Database error while fetching FeeRates based on keyword", dae);
-//            //throw new CustomServiceException("Unable to fetch students from database", dae);
-//        } catch (MappingException me) {
-//            log.error("Error mapping FeeRateEntity to FeeRates based on keyword", me);
-//            //throw new CustomServiceException("Error converting student data", me);
-//        } catch (Exception e) {
-//            log.error("Unexpected error while fetching FeeRates based on keyword", e);
-//            //throw new ("Unexpected error occurred", e);
-//        }
-//        return Collections.emptyList();
-//    }
 
 
     public FeeRatesResponseDTO getById(Long id) {
@@ -121,6 +102,29 @@ public class FeeRateService {
         return Collections.emptyList();
     }
 
+
+    public List<FeeRatesResponseDTO> findActiveFeeRates(Long campusId,
+                                                        Long standardId,
+                                                        Long academicYearId) {
+        try {
+            log.info("Fetching all Fee Rates by fee component from database");
+            List<FeeRateEntity> result = feeRateRepository.findActiveFeeRates(campusId,standardId,academicYearId);
+            log.info("Successfully fetched {} FeeRates by fee component", result.size());
+            List<FeeRatesResponseDTO> FeeComponentDTOList = MapperUtil.mapList(result, FeeRatesResponseDTO.class);
+            log.info("Successfully fetched FeeRates by fee component");
+            return FeeComponentDTOList;
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching FeeRates by fee component", dae);
+            //throw new CustomServiceException("Unable to fetch students from database", dae);
+        } catch (MappingException me) {
+            log.error("Error mapping FeeRateEntity to FeeRates by fee component", me);
+            //throw new CustomServiceException("Error converting student data", me);
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching FeeRates by fee component", e);
+            //throw new ("Unexpected error occurred", e);
+        }
+        return Collections.emptyList();
+    }
 
 
     @Transactional
@@ -252,7 +256,7 @@ public class FeeRateService {
         existingFeeRate.setActive(dto.isActive());
 
         //  Save updated FeeRate
-        FeeRateEntity feeRateEntity =  feeRateRepository.save(existingFeeRate);
+        FeeRateEntity feeRateEntity = feeRateRepository.save(existingFeeRate);
         return MapperUtil.mapObject(feeRateEntity, FeeRatesResponseDTO.class);
     }
 }

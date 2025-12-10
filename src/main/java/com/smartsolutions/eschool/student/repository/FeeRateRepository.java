@@ -31,15 +31,6 @@ public interface FeeRateRepository extends JpaRepository<FeeRateEntity, Long> {
     Optional<FeeRateEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
 
-//    @Query("SELECT f FROM FeeRateEntity f " +
-//            "WHERE (" +
-//            "LOWER(f.code) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-//            "LOWER(f.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-//            "LOWER(f.name) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
-//            ") AND f.deleted = false")
-//    List<FeeRateEntity> searchFeeComponent(@Param("keyword") String keyword);
-
-
     @Query("SELECT fr FROM FeeRateEntity fr " +
             "WHERE fr.feeComponent.id = :componentId " +
             "AND fr.active = true")

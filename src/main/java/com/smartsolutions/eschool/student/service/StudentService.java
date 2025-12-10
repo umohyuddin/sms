@@ -276,4 +276,24 @@ public class StudentService {
         return responseDTO;
     }
 
+
+    public Long getTotalStudents() {
+        return studentRepository.countAllActiveStudents();
+    }
+
+    public Long getTotalStudentsByCampus(Long campusId) {
+        return studentRepository.countByCampus(campusId);
+    }
+
+    public Long getTotalStudentsByStandard(Long standardId) {
+        return studentRepository.countByStandard(standardId);
+    }
+
+    public Long getTotalStudentsBySection(Long sectionId) {
+        return studentRepository.countBySection(sectionId);
+    }
+
+    public Long getTotalStudentsByGender(String gender) {
+        return studentRepository.countByGender(gender);
+    }
 }

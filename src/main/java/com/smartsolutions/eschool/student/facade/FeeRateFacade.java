@@ -37,11 +37,16 @@ public class FeeRateFacade {
         return feeRateService.getByFeeComponentId(feeComponentId);
     }
 
+    public List<FeeRatesResponseDTO> findActiveFeeRates(Long campusId, Long standardId, Long academicYearId) {
+        return feeRateService.findActiveFeeRates(campusId, standardId, academicYearId);
+    }
+
+
     public FeeRatesResponseDTO create(FeeRateCreateRequestDTO requestDTO) {
         return feeRateService.createFeeRate(requestDTO);
     }
 
     public FeeRatesResponseDTO update(Long id, @Valid FeeRateCreateRequestDTO dto) {
-        return  feeRateService.updateFeeRate(id, dto);
+        return feeRateService.updateFeeRate(id, dto);
     }
 }
