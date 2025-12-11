@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.student.controller;
 
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.facade.StudentFacade;
 import lombok.extern.slf4j.Slf4j;
@@ -87,5 +88,20 @@ public class StudentController {
         StudentDTO studentDTO = studentFacade.getByStudentCode(studentCode);
         log.info("Returning Student: code={}", studentDTO.getStudentCode());
         return ResponseEntity.ok(studentDTO);
+    }
+
+    @GetMapping(value = "/dashboard", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getStudentDashboard(
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId,
+            @RequestParam(required = false) Long sectionId,
+            @RequestParam(required = false) String gender) {
+
+        log.info("GET /api/institute/students/dashboard called");
+
+        StudentDashboardDTO dashboard = studentFacade.getStudentDashboardInfo(campusId, standardId, sectionId, gender);
+
+        log.info("Returning dashboard counts: {}", dashboard);
+        return ResponseEntity.ok(dashboard);
     }
 }

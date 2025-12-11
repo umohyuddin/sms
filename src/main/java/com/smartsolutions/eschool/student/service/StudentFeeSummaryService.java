@@ -65,7 +65,7 @@ public class StudentFeeSummaryService {
             log.info("Fetching all Student fee summary from database");
             List<StudentFeeSummaryEntity> result = studentFeeSummaryRepository.findAllStudentFeeSummary();
             log.info("Successfully fetched {} Students fee summary", result.size());
-            List<StudentFeeSummaryDTO> studentFeeSummaryDTOS   = MapperUtil.mapList(result, StudentFeeSummaryDTO.class);
+            List<StudentFeeSummaryDTO> studentFeeSummaryDTOS = MapperUtil.mapList(result, StudentFeeSummaryDTO.class);
             log.info("Successfully fetched Student fee summary");
             return studentFeeSummaryDTOS;
         } catch (DataAccessException dae) {
@@ -81,4 +81,14 @@ public class StudentFeeSummaryService {
         return Collections.emptyList();
     }
 
+    public StudentFeeSummaryDTO getByStudentFeeSummaryAcademicYear(Long studentId, Long academicYearId) {
+        log.info("Fetching Student Fee Summary for studentId={} and academicYearId={}", studentId, academicYearId);
+        StudentFeeSummaryEntity studentFeeSummaryEntity = studentFeeSummaryRepository.findByStudentIdAndAcademicYearId(studentId, academicYearId).orElseThrow(() -> {
+            log.error("Student Fee Summary not found for studentId={} and academicYearId={}", studentId, academicYearId);
+            return new ResourceNotFoundException("Fee Summary not found for studentId: " + studentId + " and academicYearId: " + academicYearId);
+        });
+        StudentFeeSummaryDTO studentFeeSummaryDTO = MapperUtil.mapObject(studentFeeSummaryEntity, StudentFeeSummaryDTO.class);
+        log.info("Successfully fetched Student Fee Summary for studentId={} and academicYearId={}", studentId, academicYearId);
+        return studentFeeSummaryDTO;
+    }
 }

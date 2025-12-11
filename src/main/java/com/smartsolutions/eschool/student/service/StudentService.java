@@ -32,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -295,5 +297,14 @@ public class StudentService {
 
     public Long getTotalStudentsByGender(String gender) {
         return studentRepository.countByGender(gender);
+    }
+
+
+    public Long getStudentsRegisteredThisMonth() {
+        YearMonth currentMonth = YearMonth.now();
+        LocalDate start = currentMonth.atDay(1);
+        LocalDate end = currentMonth.atEndOfMonth();
+
+        return studentRepository.countStudentsRegisteredBetween(start, end);
     }
 }

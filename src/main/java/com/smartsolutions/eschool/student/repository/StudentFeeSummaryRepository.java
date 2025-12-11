@@ -23,6 +23,16 @@ public interface StudentFeeSummaryRepository extends JpaRepository<StudentFeeSum
     @Query("SELECT s FROM StudentFeeSummaryEntity s " +
             "JOIN FETCH s.student st ")
     List<StudentFeeSummaryEntity> findAllStudentFeeSummary();
+
+    @Query("SELECT s FROM StudentFeeSummaryEntity s " +
+            "WHERE s.student.id = :studentId AND s.academicYear.id = :academicYearId")
+    Optional<StudentFeeSummaryEntity> findByStudentIdAndAcademicYearId(
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId
+    );
+
 }
+
+
 
 

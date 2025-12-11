@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,7 +91,13 @@ public interface StudentRepository extends JpaRepository<StudentEntity,Long> {
     @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.section.id = :sectionId")
     Long countBySection(@Param("sectionId") Long sectionId);
 
-    // Optional: total students by gender
+    // total students by gender
     @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.gender = :gender")
     Long countByGender(@Param("gender") String gender);
+
+
+    @Query("SELECT COUNT(s) FROM StudentEntity s " +
+            "WHERE s.enrollmentDate BETWEEN :startDate AND :endDate")
+    Long countStudentsRegisteredBetween(@Param("startDate") LocalDate startDate,
+                                        @Param("endDate") LocalDate endDate);
 }

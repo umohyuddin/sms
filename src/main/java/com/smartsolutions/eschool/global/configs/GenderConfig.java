@@ -10,14 +10,10 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "gender")
 @Component
 public class GenderConfig {
-
-    // This will bind properties like blood.group.A_POSITIVE=A+
     private Map<String, String> list;
-
     public Map<String, String> getList() {
         return list;
     }
-
     public void setList(Map<String, String> list) {
         this.list = list;
     }

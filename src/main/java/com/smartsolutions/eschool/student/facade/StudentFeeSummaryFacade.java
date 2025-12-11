@@ -30,5 +30,8 @@ public class StudentFeeSummaryFacade {
         return studentFeeSummaryService.getAll();
     }
 
+    public StudentFeeSummaryDTO getByStudentFeeSummaryAcademicYear(Long studentId, Long academicYearId) {
+        return studentFeeSummaryService.getByStudentFeeSummaryAcademicYear(studentId,academicYearId);
+    }
 }
 

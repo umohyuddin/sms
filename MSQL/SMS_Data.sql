@@ -342,28 +342,58 @@ VALUES
 -- ============================================================
 
 
+
 INSERT INTO students
 (first_name, full_name, last_name, student_code, date_of_birth, gender, email, phone, address, cnic, passport_number, religion, nationality, blood_group, is_active, status, enrollment_date, deleted, campus_id, standard_id, section_id, admission_type_id, academic_year_id)
 VALUES
-    ('Ali', 'Ali Khan', 'Khan', 'STU001', '2008-05-15', 'Male', 'ali.khan@example.com', '03001234567', 'Gulshan-e-Iqbal, Karachi', '42101-1234567-1', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2024-04-02', 0, 1, 1, 1, 1, 3),
-
-    ('Ayesha', 'Ayesha Malik', 'Malik', 'STU002', '2009-03-21', 'Female', 'ayesha.malik@example.com', '03015678900', 'Model Town, Lahore', '42201-2345678-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2024-04-03', 0, 1, 1, 2, 2, 3),
-
-    ('Hassan', 'Hassan Ali', 'Ali', 'STU003', '2007-10-11', 'Male', 'hassan.ali@example.com', '03007894561', 'Cantt Road, Rawalpindi', '42301-3456789-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2024-04-05', 0, 1, 2, 3, 1, 3),
-
-    ('Fatima', 'Fatima Shah', 'Shah', 'STU004', '2008-12-01', 'Female', 'fatima.shah@example.com', '03112233445', 'North Nazimabad, Karachi', '42401-4567890-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2024-04-06', 0, 2, 2, 4, 3, 3),
-
-    ('Saad', 'Saad Ahmed', 'Ahmed', 'STU005', '2010-06-18', 'Male', 'saad.ahmed@example.com', '03214567890', 'F-8 Sector, Islamabad', '42501-5678901-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2024-04-06', 0, 2, 3, 5, 4, 3),
-
-    ('Zainab', 'Zainab Raza', 'Raza', 'STU006', '2011-01-09', 'Female', 'zainab.raza@example.com', '03023456781', 'Johar Town, Lahore', '42601-6789012-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2024-04-07', 0, 1, 3, 6, 1, 3),
-
-    ('Ahmed', 'Ahmed Farooq', 'Farooq', 'STU007', '2009-07-19', 'Male', 'ahmed.farooq@example.com', '03002345890', 'Garden West, Karachi', '42701-7890123-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2024-04-10', 0, 1, 4, 7, 2, 3),
-
-    ('Maryam', 'Maryam Iqbal', 'Iqbal', 'STU008', '2010-11-25', 'Female', 'maryam.iqbal@example.com', '03113335566', 'Bahria Town, Lahore', '42801-8901234-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2024-04-11', 0, 2, 4, 8, 3, 3),
-
-    ('Usman', 'Usman Tariq', 'Tariq', 'STU009', '2008-09-02', 'Male', 'usman.tariq@example.com', '03029876543', 'Satellite Town, Rawalpindi', '42901-9012345-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2024-04-12', 0, 1, 5, 9, 4, 3),
-
-    ('Hiba', 'Hiba Rehman', 'Rehman', 'STU010', '2011-02-14', 'Female', 'hiba.rehman@example.com', '03440011223', 'Defence Phase 2, Karachi', '43001-0123456-0', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2024-04-12', 0, 2, 5, 10, 1, 3);
+    ('Ali', 'Ali Khan', 'Khan', 'STU001', '2008-05-15', 'MALE', 'ali.khan1@example.com', '03001234501', 'Gulshan-e-Iqbal, Karachi', '42101-1234501-1', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-01-02', 0, 1, 1, 1, 1, 3),
+    ('Ayesha', 'Ayesha Malik', 'Malik', 'STU002', '2009-03-21', 'FEMALE', 'ayesha.malik2@example.com', '03001234502', 'Model Town, Lahore', '42201-2345602-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-01-04', 0, 1, 1, 2, 2, 3),
+    ('Hassan', 'Hassan Ali', 'Ali', 'STU003', '2007-10-11', 'MALE', 'hassan.ali3@example.com', '03001234503', 'Cantt Road, Rawalpindi', '42301-3456703-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-01-06', 0, 1, 2, 3, 1, 3),
+    ('Fatima', 'Fatima Shah', 'Shah', 'STU004', '2008-12-01', 'FEMALE', 'fatima.shah4@example.com', '03001234504', 'North Nazimabad, Karachi', '42401-4567804-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-01-08', 0, 2, 2, 4, 3, 3),
+    ('Saad', 'Saad Ahmed', 'Ahmed', 'STU005', '2010-06-18', 'MALE', 'saad.ahmed5@example.com', '03001234505', 'F-8 Sector, Islamabad', '42501-5678905-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-01-10', 0, 2, 3, 5, 4, 3),
+    ('Zainab', 'Zainab Raza', 'Raza', 'STU006', '2011-01-09', 'FEMALE', 'zainab.raza6@example.com', '03001234506', 'Johar Town, Lahore', '42601-6789016-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-01-12', 0, 1, 3, 6, 1, 3),
+    ('Ahmed', 'Ahmed Farooq', 'Farooq', 'STU007', '2009-07-19', 'MALE', 'ahmed.farooq7@example.com', '03001234507', 'Garden West, Karachi', '42701-7890127-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2025-01-14', 0, 1, 4, 7, 2, 3),
+    ('Maryam', 'Maryam Iqbal', 'Iqbal', 'STU008', '2010-11-25', 'FEMALE', 'maryam.iqbal8@example.com', '03001234508', 'Bahria Town, Lahore', '42801-8901238-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2025-01-16', 0, 2, 4, 8, 3, 3),
+    ('Usman', 'Usman Tariq', 'Tariq', 'STU009', '2008-09-02', 'MALE', 'usman.tariq9@example.com', '03001234509', 'Satellite Town, Rawalpindi', '42901-9012349-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-01-18', 0, 1, 5, 9, 4, 3),
+    ('Hiba', 'Hiba Rehman', 'Rehman', 'STU010', '2011-02-14', 'FEMALE', 'hiba.rehman10@example.com', '03001234510', 'Defence Phase 2, Karachi', '43001-0123420-0', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-01-20', 0, 2, 5, 10, 1, 3),
+    ('Bilal', 'Bilal Ahmed', 'Ahmed', 'STU011', '2009-08-05', 'MALE', 'bilal.ahmed11@example.com', '03001234511', 'Gulberg, Lahore', '43101-1234511-1', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-01-22', 0, 1, 1, 1, 1, 3),
+    ('Sana', 'Sana Tariq', 'Tariq', 'STU012', '2010-03-12', 'FEMALE', 'sana.tariq12@example.com', '03001234512', 'Model Town, Lahore', '43201-2345612-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-01-24', 0, 1, 1, 2, 2, 3),
+    ('Omar', 'Omar Farooq', 'Farooq', 'STU013', '2008-07-19', 'MALE', 'omar.farooq13@example.com', '03001234513', 'Cantt Road, Rawalpindi', '43301-3456713-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-01-26', 0, 1, 2, 3, 1, 3),
+    ('Areeba', 'Areeba Shah', 'Shah', 'STU014', '2011-12-25', 'FEMALE', 'areeba.shah14@example.com', '03001234514', 'North Nazimabad, Karachi', '43401-4567814-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-01-28', 0, 2, 2, 4, 3, 3),
+    ('Hamza', 'Hamza Ali', 'Ali', 'STU015', '2009-05-21', 'MALE', 'hamza.ali15@example.com', '03001234515', 'F-8 Sector, Islamabad', '43501-5678915-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-01-30', 0, 2, 3, 5, 4, 3),
+    ('Sadia', 'Sadia Raza', 'Raza', 'STU016', '2010-09-14', 'FEMALE', 'sadia.raza16@example.com', '03001234516', 'Johar Town, Lahore', '43601-6789016-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-02-01', 0, 1, 3, 6, 1, 3),
+    ('Imran', 'Imran Farooq', 'Farooq', 'STU017', '2008-11-11', 'MALE', 'imran.farooq17@example.com', '03001234517', 'Garden West, Karachi', '43701-7890117-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2025-02-03', 0, 1, 4, 7, 2, 3),
+    ('Huma', 'Huma Iqbal', 'Iqbal', 'STU018', '2010-06-23', 'FEMALE', 'huma.iqbal18@example.com', '03001234518', 'Bahria Town, Lahore', '43801-8901218-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2025-02-05', 0, 2, 4, 8, 3, 3),
+    ('Naveed', 'Naveed Tariq', 'Tariq', 'STU019', '2009-09-17', 'MALE', 'naveed.tariq19@example.com', '03001234519', 'Satellite Town, Rawalpindi', '43901-9012319-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-02-07', 0, 1, 5, 9, 4, 3),
+    ('Iram', 'Iram Rehman', 'Rehman', 'STU020', '2011-02-10', 'FEMALE', 'iram.rehman20@example.com', '03001234520', 'Defence Phase 2, Karachi', '44001-0123420-0', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-02-09', 0, 2, 5, 10, 1, 3),
+    ('Ali', 'Ali Raza', 'Raza', 'STU021', '2008-04-12', 'MALE', 'ali.raza21@example.com', '03001234521', 'Gulshan-e-Iqbal, Karachi', '44101-1234521-1', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-02-11', 0, 1, 1, 1, 1, 3),
+    ('Sara', 'Sara Ahmed', 'Ahmed', 'STU022', '2009-05-09', 'FEMALE', 'sara.ahmed22@example.com', '03001234522', 'Model Town, Lahore', '44201-2345622-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-02-13', 0, 1, 1, 2, 2, 3),
+    ('Bilal', 'Bilal Khan', 'Khan', 'STU023', '2007-08-17', 'MALE', 'bilal.khan23@example.com', '03001234523', 'Cantt Road, Rawalpindi', '44301-3456723-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-02-15', 0, 1, 2, 3, 1, 3),
+    ('Fiza', 'Fiza Shah', 'Shah', 'STU024', '2010-11-20', 'FEMALE', 'fiza.shah24@example.com', '03001234524', 'North Nazimabad, Karachi', '44401-4567824-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-02-17', 0, 2, 2, 4, 3, 3),
+    ('Owais', 'Owais Farooq', 'Farooq', 'STU025', '2009-02-14', 'MALE', 'owais.farooq25@example.com', '03001234525', 'F-8 Sector, Islamabad', '44501-5678925-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-02-19', 0, 2, 3, 5, 4, 3),
+    ('Zoya', 'Zoya Iqbal', 'Iqbal', 'STU026', '2011-01-11', 'FEMALE', 'zoya.iqbal26@example.com', '03001234526', 'Johar Town, Lahore', '44601-6789026-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-02-21', 0, 1, 3, 6, 1, 3),
+    ('Hamza', 'Hamza Tariq', 'Tariq', 'STU027', '2008-03-25', 'MALE', 'hamza.tariq27@example.com', '03001234527', 'Garden West, Karachi', '44701-7890127-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2025-02-23', 0, 1, 4, 7, 2, 3),
+    ('Aimen', 'Aimen Rehman', 'Rehman', 'STU028', '2010-08-17', 'FEMALE', 'aimen.rehman28@example.com', '03001234528', 'Bahria Town, Lahore', '44801-8901228-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2025-02-25', 0, 2, 4, 8, 3, 3),
+    ('Shahid', 'Shahid Ali', 'Ali', 'STU029', '2009-09-10', 'MALE', 'shahid.ali29@example.com', '03001234529', 'Satellite Town, Rawalpindi', '44901-9012329-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-02-27', 0, 1, 5, 9, 4, 3),
+    ('Saba', 'Saba Tariq', 'Tariq', 'STU032', '2009-07-12', 'FEMALE', 'saba.tariq32@example.com', '03001234532', 'Model Town, Lahore', '45201-2345632-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-03-04', 0, 1, 1, 2, 2, 3),
+    ('Rehan', 'Rehan Khan', 'Khan', 'STU033', '2007-08-25', 'MALE', 'rehan.khan33@example.com', '03001234533', 'Cantt Road, Rawalpindi', '45301-3456733-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-03-06', 0, 1, 2, 3, 1, 3),
+    ('Nida', 'Nida Shah', 'Shah', 'STU034', '2010-12-18', 'FEMALE', 'nida.shah34@example.com', '03001234534', 'North Nazimabad, Karachi', '45401-4567834-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-03-08', 0, 2, 2, 4, 3, 3),
+    ('Danish', 'Danish Ahmed', 'Ahmed', 'STU035', '2009-06-05', 'MALE', 'danish.ahmed35@example.com', '03001234535', 'F-8 Sector, Islamabad', '45501-5678935-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-03-10', 0, 2, 3, 5, 4, 3),
+    ('Maryam', 'Maryam Raza', 'Raza', 'STU036', '2011-04-12', 'FEMALE', 'maryam.raza36@example.com', '03001234536', 'Johar Town, Lahore', '45601-6789036-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-03-12', 0, 1, 3, 6, 1, 3),
+    ('Farhan', 'Farhan Farooq', 'Farooq', 'STU037', '2008-11-11', 'MALE', 'farhan.farooq37@example.com', '03001234537', 'Garden West, Karachi', '45701-7890137-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2025-03-14', 0, 1, 4, 7, 2, 3),
+    ('Sofia', 'Sofia Iqbal', 'Iqbal', 'STU038', '2010-02-14', 'FEMALE', 'sofia.iqbal38@example.com', '03001234538', 'Bahria Town, Lahore', '45801-8901238-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2025-03-16', 0, 2, 4, 8, 3, 3),
+    ('Asad', 'Asad Tariq', 'Tariq', 'STU039', '2009-09-19', 'MALE', 'asad.tariq39@example.com', '03001234539', 'Satellite Town, Rawalpindi', '45901-9012339-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-03-18', 0, 1, 5, 9, 4, 3),
+    ('Hina', 'Hina Rehman', 'Rehman', 'STU040', '2011-06-22', 'FEMALE', 'hina.rehman40@example.com', '03001234540', 'Defence Phase 2, Karachi', '46001-0123440-0', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-03-20', 0, 2, 5, 10, 1, 3),
+    ('Omar', 'Omar Raza', 'Raza', 'STU041', '2008-04-05', 'MALE', 'omar.raza41@example.com', '03001234541', 'Gulshan-e-Iqbal, Karachi', '46101-1234541-1', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-03-22', 0, 1, 1, 1, 1, 3),
+    ('Ayesha', 'Ayesha Farooq', 'Farooq', 'STU042', '2009-08-14', 'FEMALE', 'ayesha.farooq42@example.com', '03001234542', 'Model Town, Lahore', '46201-2345642-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-03-24', 0, 1, 1, 2, 2, 3),
+    ('Ali', 'Ali Shah', 'Shah', 'STU043', '2007-09-23', 'MALE', 'ali.shah43@example.com', '03001234543', 'Cantt Road, Rawalpindi', '46301-3456743-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-03-26', 0, 1, 2, 3, 1, 3),
+    ('Sadia', 'Sadia Ahmed', 'Ahmed', 'STU044', '2010-12-05', 'FEMALE', 'sadia.ahmed44@example.com', '03001234544', 'North Nazimabad, Karachi', '46401-4567844-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-03-28', 0, 2, 2, 4, 3, 3),
+    ('Saad', 'Saad Farooq', 'Farooq', 'STU045', '2009-05-11', 'MALE', 'saad.farooq45@example.com', '03001234545', 'F-8 Sector, Islamabad', '46501-5678945-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-03-30', 0, 2, 3, 5, 4, 3),
+    ('Zoya', 'Zoya Khan', 'Khan', 'STU046', '2011-01-17', 'FEMALE', 'zoya.khan46@example.com', '03001234546', 'Johar Town, Lahore', '46601-6789046-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-04-01', 0, 1, 3, 6, 1, 3),
+    ('Bilal', 'Bilal Tariq', 'Tariq', 'STU047', '2008-03-20', 'MALE', 'bilal.tariq47@example.com', '03001234547', 'Garden West, Karachi', '46701-7890147-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2025-04-03', 0, 1, 4, 7, 2, 3),
+    ('Hina', 'Hina Iqbal', 'Iqbal', 'STU048', '2010-07-22', 'FEMALE', 'hina.iqbal48@example.com', '03001234548', 'Bahria Town, Lahore', '46801-8901248-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2025-04-05', 0, 2, 4, 8, 3, 3),
+    ('Owais', 'Owais Rehman', 'Rehman', 'STU049', '2009-09-14', 'MALE', 'owais.rehman49@example.com', '03001234549', 'Satellite Town, Rawalpindi', '46901-9012349-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-04-07', 0, 1, 5, 9, 4, 3),
+    ('Iram', 'Iram Shah', 'Shah', 'STU050', '2011-02-18', 'FEMALE', 'iram.shah50@example.com', '03001234550', 'Defence Phase 2, Karachi', '47001-0123450-0', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-04-09', 0, 2, 5, 10, 1, 3);
 
 -- ============================================================
 -- Fee Catalog Sample Data

@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/students")
 @Slf4j
 public class StudentFeeSummaryController {
-   private final StudentFeeSummaryFacade studentFeeSummaryFacade;
+    private final StudentFeeSummaryFacade studentFeeSummaryFacade;
 
     public StudentFeeSummaryController(StudentFeeSummaryFacade studentFeeSummaryFacade) {
         this.studentFeeSummaryFacade = studentFeeSummaryFacade;
@@ -47,4 +47,13 @@ public class StudentFeeSummaryController {
         log.info("Returning Fee rate: id={}", studentFeeSummaryDTO.getStudentId());
         return ResponseEntity.ok(studentFeeSummaryDTO);
     }
+
+    @GetMapping(value = "/fee/summary/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getFeeSummary(@RequestParam Long studentId, @RequestParam Long academicYearId) throws Exception {
+        log.info("Received request to fetch Fee summary for studentId: {} and academicYearId: {}", studentId, academicYearId);
+        StudentFeeSummaryDTO studentFeeSummaryDTO = studentFeeSummaryFacade.getByStudentFeeSummaryAcademicYear(studentId, academicYearId);
+        log.info("Returning Fee summary for studentId={} and academicYearId={}", studentId, academicYearId);
+        return ResponseEntity.ok(studentFeeSummaryDTO);
+    }
+
 }
