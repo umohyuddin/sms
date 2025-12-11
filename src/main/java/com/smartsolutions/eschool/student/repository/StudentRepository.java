@@ -100,4 +100,25 @@ public interface StudentRepository extends JpaRepository<StudentEntity,Long> {
             "WHERE s.enrollmentDate BETWEEN :startDate AND :endDate")
     Long countStudentsRegisteredBetween(@Param("startDate") LocalDate startDate,
                                         @Param("endDate") LocalDate endDate);
+
+
+    @Query("""
+    SELECT s FROM StudentEntity s
+    LEFT JOIN FETCH s.campus c
+    LEFT JOIN FETCH s.standard st
+    LEFT JOIN FETCH s.section sec
+    LEFT JOIN FETCH s.academicYear ay
+    WHERE s.deleted = false
+      AND (:campusId IS NULL OR c.id = :campusId)
+      AND (:standardId IS NULL OR st.id = :standardId)
+      AND (:studentId IS NULL OR s.id = :studentId)
+      AND (:academicYearId IS NULL OR ay.id = :academicYearId)
+""")
+    List<StudentEntity> searchStudents(
+            @Param("campusId") Long campusId,
+            @Param("standardId") Long standardId,
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId
+    );
+
 }

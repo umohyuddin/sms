@@ -199,20 +199,15 @@ public class StudentService {
         log.info("Creating new Student: {}", studentDTO);
 
         // Fetch related entities from DB
-        CampusEntity campus = campusRepository.findById(studentDTO.getCampusId())
-                .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + studentDTO.getCampusId()));
+        CampusEntity campus = campusRepository.findById(studentDTO.getCampusId()).orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + studentDTO.getCampusId()));
 
-        StandardEntity standard = standardRepository.findById(studentDTO.getStandardId())
-                .orElseThrow(() -> new ResourceNotFoundException("Standard not found with id: " + studentDTO.getStandardId()));
+        StandardEntity standard = standardRepository.findById(studentDTO.getStandardId()).orElseThrow(() -> new ResourceNotFoundException("Standard not found with id: " + studentDTO.getStandardId()));
 
-        SectionEntity section = sectionRepository.findById(studentDTO.getSectionId())
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + studentDTO.getSectionId()));
+        SectionEntity section = sectionRepository.findById(studentDTO.getSectionId()).orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + studentDTO.getSectionId()));
 
-        AdmissionTypeEntity admissionType = admissionTypeRepository.findById(studentDTO.getAdmissionTypeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Admission Type not found with id: " + studentDTO.getAdmissionTypeId()));
+        AdmissionTypeEntity admissionType = admissionTypeRepository.findById(studentDTO.getAdmissionTypeId()).orElseThrow(() -> new ResourceNotFoundException("Admission Type not found with id: " + studentDTO.getAdmissionTypeId()));
 
-        AcademicYearEntity academicYear = academicYearRepository.findById(studentDTO.getAcademicYearId())
-                .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id: " + studentDTO.getAcademicYearId()));
+        AcademicYearEntity academicYear = academicYearRepository.findById(studentDTO.getAcademicYearId()).orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id: " + studentDTO.getAcademicYearId()));
 
         // Manual mapping from DTO to Entity
         StudentEntity studentEntity = new StudentEntity();
@@ -306,5 +301,22 @@ public class StudentService {
         LocalDate end = currentMonth.atEndOfMonth();
 
         return studentRepository.countStudentsRegisteredBetween(start, end);
+    }
+
+    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long studentId, Long academicYearId) {
+        try {
+            log.info("Searching students with filters → campusId={}, standardId={}, studentId={}, academicYearId={}", campusId, standardId, studentId, academicYearId);
+
+            List<StudentEntity> result = studentRepository.searchStudents(campusId, standardId, studentId, academicYearId);
+
+            log.info("Student search returned {} results", result.size());
+
+            // Convert entity → DTO
+            return MapperUtil.mapList(result, StudentDTO.class);
+
+        } catch (Exception e) {
+            log.error("Error searching students", e);
+            return Collections.emptyList();
+        }
     }
 }

@@ -50,13 +50,14 @@ public class StudentController {
         return resources;
     }
 
-    @GetMapping(value = "/search/name/{studentName}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<StudentDTO> getStudentName(@PathVariable String studentName) {
-        log.info("GET /api/students/by-name called");
-        List<StudentDTO> resources = studentFacade.getStudentsByName(studentName);
-        log.info("GET /api/student/by-name succeeded, returned {} resources", resources.size());
-        return resources;
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<StudentDTO> searchStudents(@RequestParam(required = false) Long campusId, @RequestParam(required = false) Long standardId, @RequestParam(required = false) Long studentId, @RequestParam(required = false) Long academicYearId) {
+        log.info("GET /api/students/search called with " + "campusId={}, standardId={}, studentId={}, academicYearId={}", campusId, standardId, studentId, academicYearId);
+        List<StudentDTO> students = studentFacade.searchStudents(campusId, standardId, studentId, academicYearId);
+        log.info("GET /api/students/search returned {} students", students.size());
+        return students;
     }
+
 
     @GetMapping(value = "/standard/{standardId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<StudentDTO> getStudentsByStandard(@PathVariable Long standardId) {
@@ -91,11 +92,7 @@ public class StudentController {
     }
 
     @GetMapping(value = "/dashboard", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getStudentDashboard(
-            @RequestParam(required = false) Long campusId,
-            @RequestParam(required = false) Long standardId,
-            @RequestParam(required = false) Long sectionId,
-            @RequestParam(required = false) String gender) {
+    public ResponseEntity<?> getStudentDashboard(@RequestParam(required = false) Long campusId, @RequestParam(required = false) Long standardId, @RequestParam(required = false) Long sectionId, @RequestParam(required = false) String gender) {
 
         log.info("GET /api/institute/students/dashboard called");
 

@@ -108,6 +108,10 @@ public class StudentFacade {
         studentDashboardDTO.setStudentsRegisteredThisMonth(totalStudentByMonth);
         return studentDashboardDTO;
     }
+
+    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long studentId, Long academicYearId) {
+        return  studentService.searchStudents(campusId,standardId,studentId,academicYearId);
+    }
 }
 
 
