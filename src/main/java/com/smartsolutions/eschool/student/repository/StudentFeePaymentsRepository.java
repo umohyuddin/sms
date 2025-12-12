@@ -16,26 +16,11 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
 
 
     @Query("""
-                SELECT COALESCE(SUM(a.totalAmount), 0)
-                FROM StudentFeeAssignmentEntity a
-                WHERE a.student.id = :studentId
-                  AND a.feeRate.academicYear.id = :academicYearId
+            SELECT p FROM StudentFeePaymentEntity p
+                        WHERE p.student.id = :studentId
+                        AND p.academicYear.id = :academicYearId
             """)
-    Double findTotalAssignedFee(
-            @Param("studentId") Long studentId,
-            @Param("academicYearId") Long academicYearId
-    );
-
-    @Query("""
-            SELECT sf
-            FROM StudentFeeAssignmentEntity sf
-            JOIN FETCH sf.student s
-            JOIN FETCH sf.feeRate fr
-            JOIN FETCH sf.feeRate.feeComponent c
-            WHERE s.id = :studentId
-              AND fr.academicYear.id = :academicYearId
-            """)
-    List<StudentFeeAssignmentEntity> findAllByStudentAndAcademicYear(
+    List<StudentFeePaymentEntity> findPaymentsByStudentAndAcademicYear(
             @Param("studentId") Long studentId,
             @Param("academicYearId") Long academicYearId
     );

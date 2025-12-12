@@ -15,16 +15,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AcademicYearResponseDTO {
-
     private Long id;
-    @NotBlank(message = "Academic year name cannot be empty")
     private String name; // e.g., "2024-2025"
-
-    @NotNull(message = "Start date is required")
     private LocalDate startDate;
-
-    @NotNull(message = "End date is required")
     private LocalDate endDate;
-
+    private  long totalMonths;
     private Boolean isCurrent;
 }

@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
 import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeePaymentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.studentFeePayment.responseDto.StudentFeePaymentResponseDTO;
 import com.smartsolutions.eschool.student.model.*;
 import com.smartsolutions.eschool.student.repository.*;
 import com.smartsolutions.eschool.util.MapperUtil;
@@ -56,8 +57,7 @@ public class StudentFeePaymentsService {
             //validate fee assignment
             //StudentFeeAssignmentEntity assignment = studentFeeAssignmentRepository.findById(requestDTO.getAssignmentId()).orElseThrow(() -> new ResourceNotFoundException("Fee Assignment not found"));
 
-            List<StudentFeeAssignmentEntity> assignments =
-                    studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, currentYear.getId());
+            List<StudentFeeAssignmentEntity> assignments = studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, currentYear.getId());
 
             if (assignments.isEmpty()) {
                 throw new ResourceNotFoundException("No fee assignments found for this student");
@@ -130,4 +130,22 @@ public class StudentFeePaymentsService {
             throw new RuntimeException("Failed to assign fees. Transaction rolled back.", e);
         }
     }
+
+    public List<StudentFeePaymentResponseDTO> getStudentPaymentsByAcademicYear(Long studentId, Long academicYearId) {
+
+        log.info("Fetching payments for studentId={}, academicYearId={}", studentId, academicYearId);
+        StudentEntity student = studentRepository.findByIdAndDeletedFalse(studentId).orElseThrow(() -> new ResourceNotFoundException("Student not found with id " + studentId));
+        AcademicYearEntity academicYear = academicYearRepository.findById(academicYearId).orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id " + academicYearId));
+        List<StudentFeePaymentEntity> payments = studentFeePaymentsRepository.findPaymentsByStudentAndAcademicYear(studentId, academicYearId);
+        if (payments.isEmpty()) {
+            log.warn("No payments found for studentId={} and academicYearId={}", studentId, academicYearId);
+        } else {
+            log.info("Found {} payments for studentId={} and year={}", payments.size(), studentId, academicYear.getName());
+        }
+        List<StudentFeePaymentResponseDTO> responseDTOS = MapperUtil.mapList(payments, StudentFeePaymentResponseDTO.class);
+
+
+        return responseDTOS;
+    }
+
 }

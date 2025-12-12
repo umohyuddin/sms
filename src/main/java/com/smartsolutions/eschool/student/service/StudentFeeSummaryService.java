@@ -5,6 +5,7 @@ import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeSummaryEntity;
+import com.smartsolutions.eschool.student.repository.StudentFeePaymentsRepository;
 import com.smartsolutions.eschool.student.repository.StudentFeeSummaryRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import java.util.List;
 public class StudentFeeSummaryService {
 
     private final StudentFeeSummaryRepository studentFeeSummaryRepository;
+
 
     public StudentFeeSummaryService(StudentFeeSummaryRepository studentFeeSummaryRepository) {
 
