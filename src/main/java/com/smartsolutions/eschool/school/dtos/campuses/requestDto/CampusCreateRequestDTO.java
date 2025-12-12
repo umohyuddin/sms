@@ -15,7 +15,7 @@ public class CampusCreateRequestDTO {
     @NotNull
     private String campusName;
     private String campusCode;
-    private boolean isActive;
+    private boolean active;
     private String contactNumber;
     private String email;
     private String website;

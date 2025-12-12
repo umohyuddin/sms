@@ -2,7 +2,6 @@ package com.smartsolutions.eschool.school.controller;
 
 import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
-import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.facade.CampusFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -91,9 +90,9 @@ public class CampusController {
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CampusResponseDTO> updateStandard(@PathVariable Long id, @Valid @RequestBody CampusCreateRequestDTO dto) {
+    public ResponseEntity<CampusResponseDTO> updateCampus(@PathVariable Long id, @Valid @RequestBody CampusCreateRequestDTO dto) {
         log.info("Received request to update Campus with id: {}", id);
-        CampusResponseDTO updatedCampus = nCampusFacade.updateStandard(id, dto);
+        CampusResponseDTO updatedCampus = nCampusFacade.updateCampus(id, dto);
         log.info("Returning updated Campus: id={}", updatedCampus.getId());
         return ResponseEntity.ok(updatedCampus);
     }

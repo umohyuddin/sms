@@ -2,7 +2,6 @@ package com.smartsolutions.eschool.school.facade;
 
 import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
-import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.service.CampusService;
 
 import java.util.List;
@@ -43,8 +42,8 @@ public class CampusFacade {
     return nCampusService.createCampus(dto);
     }
 
-    public CampusResponseDTO updateStandard(Long id, @Valid CampusCreateRequestDTO dto) {
-        return nCampusService.updateSection(id,dto);
+    public CampusResponseDTO updateCampus(Long id, @Valid CampusCreateRequestDTO dto) {
+        return nCampusService.updateCampus(id,dto);
     }
 
     public List<CampusResponseDTO> searchByKeyword(String keyword) {

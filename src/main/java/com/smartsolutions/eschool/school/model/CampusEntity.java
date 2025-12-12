@@ -44,8 +44,8 @@ public class CampusEntity extends AuditableEntity {
 
     @Column(name = "address", length = 255)
     private String address;
-    @Column(name = "is_active")
-    private boolean isActive = true;
+    @Column(name = "active")
+    private boolean active = true;
     @Lob
     @Column(name = "logo", nullable = true, columnDefinition = "LONGBLOB")
     private byte[] logo;

@@ -10,24 +10,19 @@ import com.smartsolutions.eschool.lookups.repository.CityRepository;
 import com.smartsolutions.eschool.lookups.repository.ProvinceRepository;
 import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
-import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.model.CampusEntity;
-import com.smartsolutions.eschool.school.model.DiscountTypeEntity;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
-import com.smartsolutions.eschool.school.repository.CampusDao;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
 import com.smartsolutions.eschool.school.repository.InstituteDaoImp;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -162,15 +157,16 @@ public class CampusService {
     }
 
 
-    public CampusResponseDTO updateSection(Long id, @Valid CampusCreateRequestDTO requestDTO) {
+    public CampusResponseDTO updateCampus(Long id, @Valid CampusCreateRequestDTO requestDTO) {
         log.info("Updating Campus with id {} using DTO {}", id, requestDTO);
 
-        CampusEntity entity = campusRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + id));
+        CampusEntity entity = campusRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + id));
 
+        entity.setActive(requestDTO.isActive());
         if (requestDTO.getCampusName() != null && !requestDTO.getCampusName().isBlank()) {
             entity.setCampusName(requestDTO.getCampusName());
         }
+
 
         if (requestDTO.getContactNumber() != null) {
             entity.setContactNumber(requestDTO.getContactNumber());
@@ -188,22 +184,10 @@ public class CampusService {
             entity.setAddress(requestDTO.getAddress());
         }
 
-//        // Province (String)
-//        if (requestDTO.getProvinceName() != null) {
-//            entity.setProvince(requestDTO.getProvinceName());
-//        }
-//
-//        // City (String)
-//        if (requestDTO.getCityName() != null) {
-//            entity.setCity(requestDTO.getCityName());
-//        }
-
-        // Province Id
         if (requestDTO.getProvinceId() != null) {
             entity.setProvinceId(requestDTO.getProvinceId());
         }
 
-        // City Id
         if (requestDTO.getCityId() != null) {
             entity.setCityId(requestDTO.getCityId());
         }
@@ -212,13 +196,9 @@ public class CampusService {
             entity.setLogo(requestDTO.getLogo());
         }
 
-
-        if (requestDTO.getInstituteId() != null &&
-                (entity.getInstitute() == null || !entity.getInstitute().getId().equals(requestDTO.getInstituteId()))) {
-
+        if (requestDTO.getInstituteId() != null && (entity.getInstitute() == null || !entity.getInstitute().getId().equals(requestDTO.getInstituteId()))) {
             InstituteEntity institute = instituteDaoImp.findById(requestDTO.getInstituteId());
 //                    .orElseThrow(() -> new ResourceNotFoundException("Institute not found with id: " + requestDTO.getInstituteId()));
-
             entity.setInstitute(institute);
         }
 

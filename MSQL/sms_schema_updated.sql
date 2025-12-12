@@ -82,12 +82,12 @@ CREATE TABLE campuses
     province_id  BIGINT,
     city_id      BIGINT,
     campus_name  VARCHAR(100) NOT NULL,
-    campus_code  VARCHAR(100),
-    contact      VARCHAR(20),
-    email        VARCHAR(100),
+    campus_code  VARCHAR(100) UNIQUE,
+    contact      VARCHAR(15),
+    email        VARCHAR(100) UNIQUE,
     website      VARCHAR(100),
     address      VARCHAR(255),
-    is_active    BOOLEAN      NOT NULL DEFAULT TRUE,
+    active       BOOLEAN      NOT NULL DEFAULT TRUE,
     logo         LONGBLOB,
     deleted      BOOLEAN      NOT NULL DEFAULT FALSE,
 
@@ -98,8 +98,16 @@ CREATE TABLE campuses
     deleted_at   DATETIME,
     deleted_by   BIGINT,
 
-    CONSTRAINT fk_campuses_institute FOREIGN KEY (institute_id) REFERENCES institutes (id) ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT fk_campuses_institute FOREIGN KEY (institute_id) REFERENCES institutes (id) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_campuses_province FOREIGN KEY (province_id) REFERENCES provinces(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_campuses_city FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT chk_active CHECK (active IN (0, 1)),
+    CONSTRAINT chk_deleted CHECK (deleted IN (0, 1))
 );
+CREATE INDEX idx_campus_institute ON campuses (institute_id);
+CREATE INDEX idx_campus_province ON campuses (province_id);
+CREATE INDEX idx_campus_city ON campuses (city_id);
+CREATE INDEX idx_campus_name ON campuses (campus_name);
 
 
 
