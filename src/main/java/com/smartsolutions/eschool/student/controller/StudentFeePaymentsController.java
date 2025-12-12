@@ -23,11 +23,11 @@ private final StudentFeePaymentsFacade studentFeePaymentsFacade;
         this.studentFeePaymentsFacade = studentFeePaymentsFacade;
     }
 
-    @PostMapping( value = "/{studentId}/payments",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> studentFeePayment(@PathVariable Long studentId, @RequestBody @Valid StudentFeePaymentRequestDTO requestDTO) {
+    @PostMapping( value = "/fee/payments",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> studentFeePayment(@RequestBody @Valid StudentFeePaymentRequestDTO requestDTO) {
 
-        log.info("Received request to Student Fee payment for student Id: {}", studentId);
-        StudentFeePaymentRequestDTO studentFeePayment = studentFeePaymentsFacade.studentFeePayment(studentId,requestDTO);
+        log.info("Received request to Student Fee payment for student Id: {}", requestDTO.getStudentId());
+        StudentFeePaymentRequestDTO studentFeePayment = studentFeePaymentsFacade.studentFeePayment(requestDTO.getStudentId(),requestDTO);
         log.info("Student Fee Assignment created successfully with id: {}", studentFeePayment.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(studentFeePayment);
     }

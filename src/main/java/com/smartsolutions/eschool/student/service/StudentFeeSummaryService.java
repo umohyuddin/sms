@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.student.service;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
+import com.smartsolutions.eschool.student.dtos.studentFeeSummary.responseDto.StudentFeeSummaryResponseDto;
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeSummaryEntity;
 import com.smartsolutions.eschool.student.repository.StudentFeePaymentsRepository;
@@ -83,13 +84,13 @@ public class StudentFeeSummaryService {
         return Collections.emptyList();
     }
 
-    public StudentFeeSummaryDTO getByStudentFeeSummaryAcademicYear(Long studentId, Long academicYearId) {
+    public StudentFeeSummaryResponseDto getByStudentFeeSummaryAcademicYear(Long studentId, Long academicYearId) {
         log.info("Fetching Student Fee Summary for studentId={} and academicYearId={}", studentId, academicYearId);
         StudentFeeSummaryEntity studentFeeSummaryEntity = studentFeeSummaryRepository.findByStudentIdAndAcademicYearId(studentId, academicYearId).orElseThrow(() -> {
             log.error("Student Fee Summary not found for studentId={} and academicYearId={}", studentId, academicYearId);
             return new ResourceNotFoundException("Fee Summary not found for studentId: " + studentId + " and academicYearId: " + academicYearId);
         });
-        StudentFeeSummaryDTO studentFeeSummaryDTO = MapperUtil.mapObject(studentFeeSummaryEntity, StudentFeeSummaryDTO.class);
+        StudentFeeSummaryResponseDto studentFeeSummaryDTO = MapperUtil.mapObject(studentFeeSummaryEntity, StudentFeeSummaryResponseDto.class);
         log.info("Successfully fetched Student Fee Summary for studentId={} and academicYearId={}", studentId, academicYearId);
         return studentFeeSummaryDTO;
     }

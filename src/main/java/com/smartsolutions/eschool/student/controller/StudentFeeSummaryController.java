@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.student.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeRateDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
+import com.smartsolutions.eschool.student.dtos.studentFeeSummary.responseDto.StudentFeeSummaryResponseDto;
 import com.smartsolutions.eschool.student.facade.FeeParticularsFacade;
 import com.smartsolutions.eschool.student.facade.StudentFeeSummaryFacade;
 import com.smartsolutions.eschool.student.model.FeeParticularsEntity;
@@ -51,7 +52,7 @@ public class StudentFeeSummaryController {
     @GetMapping(value = "/fee/summary/filter", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getFeeSummary(@RequestParam Long studentId, @RequestParam Long academicYearId) throws Exception {
         log.info("Received request to fetch Fee summary for studentId: {} and academicYearId: {}", studentId, academicYearId);
-        StudentFeeSummaryDTO studentFeeSummaryDTO = studentFeeSummaryFacade.getByStudentFeeSummaryAcademicYear(studentId, academicYearId);
+        StudentFeeSummaryResponseDto studentFeeSummaryDTO = studentFeeSummaryFacade.getByStudentFeeSummaryAcademicYear(studentId, academicYearId);
         log.info("Returning Fee summary for studentId={} and academicYearId={}", studentId, academicYearId);
         return ResponseEntity.ok(studentFeeSummaryDTO);
     }
