@@ -26,8 +26,8 @@ public class DiscountTypeEntity  extends AuditableEntity {
     @Column(name = "description", length = 500)
     private String description;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 
     @Column(name = "charge_type", nullable = false, length = 50)
     private String chargeType;

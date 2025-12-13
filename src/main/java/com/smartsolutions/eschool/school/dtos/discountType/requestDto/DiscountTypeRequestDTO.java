@@ -16,7 +16,7 @@ public class DiscountTypeRequestDTO {
     private String code;
     private String name;
     private String description;
-    private Boolean isActive;
+    private Boolean active;
     private String chargeType;          // raw value
     private String recurrenceRule;      // raw value
 }

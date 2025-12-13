@@ -711,21 +711,21 @@ VALUES
 --   created_by    : User ID who created the record
 -- ============================================================
 
-INSERT INTO discount_type
-(code, name, description, is_active, priority, display_order, created_by)
+INSERT INTO discount_type (code, name, description, charge_type, recurrence_rule, active, priority, display_order,
+                           created_by)
 VALUES ('MERIT', 'Academic / Merit-Based Discounts',
-        'Scholarships and awards based on academic excellence or subject performance.', TRUE, 100, 1, 1),
-       ('FAMILY', 'Family-Based Discounts', 'Discounts for siblings, staff children, or alumni children.', TRUE, 80, 2,
-        1),
-       ('FINANCIAL', 'Financial / Social Support', 'Need-based, government, or NGO-sponsored tuition support.', TRUE,
-        90, 3, 1),
+        'Scholarships and awards based on academic excellence or subject performance.', 'PERCENTAGE', 'TERM_WISE', TRUE,
+        100, 1, 1),
+       ('FAMILY', 'Family-Based Discounts', 'Discounts for siblings, staff children, or alumni children.', 'PERCENTAGE',
+        'MONTHLY', TRUE, 80, 2, 1),
+       ('FINANCIAL', 'Financial / Social Support', 'Need-based, government, or NGO-sponsored tuition support.', 'FIXED',
+        'MONTHLY', TRUE, 90, 3, 1),
        ('PERFORMANCE', 'Performance / Extra-Curricular',
-        'Discounts for sports, cultural achievements, leadership roles.', TRUE, 70, 4, 1),
-       ('ATTENDANCE', 'Attendance / Behavior-Based', 'Rewards for perfect attendance or exemplary behavior.', TRUE, 60,
-        5, 1),
+        'Discounts for sports, cultural achievements, leadership roles.', 'PERCENTAGE', 'TERM_WISE', TRUE, 70, 4, 1),
+       ('ATTENDANCE', 'Attendance / Behavior-Based', 'Rewards for perfect attendance or exemplary behavior.',
+        'PERCENTAGE', 'MONTHLY', TRUE, 60, 5, 1),
        ('SPECIAL', 'One-Time / Special Case Discounts',
-        'Medical, emergency, transfer, or custom administrative discounts.', TRUE, 50, 6, 1);
-
+        'Medical, emergency, transfer, or custom administrative discounts.', 'FIXED', 'ONE_TIME', TRUE, 50, 6, 1);
 
 -- ============================================================
 

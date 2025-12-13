@@ -28,7 +28,7 @@ public interface DiscountTypeRepository extends JpaRepository<DiscountTypeEntity
     @Query("""
         SELECT d
         FROM DiscountTypeEntity d
-        WHERE d.isActive = true
+        WHERE d.active = true
           AND d.deleted = false
         """)
     List<DiscountTypeEntity> findAllActive();
@@ -37,7 +37,7 @@ public interface DiscountTypeRepository extends JpaRepository<DiscountTypeEntity
     @Query("""
            SELECT d
            FROM DiscountTypeEntity d
-           WHERE d.isActive = false
+           WHERE d.active = false
              AND d.deleted = false
            """)
     List<DiscountTypeEntity> findAllNonActive();

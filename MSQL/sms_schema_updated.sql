@@ -99,8 +99,8 @@ CREATE TABLE campuses
     deleted_by   BIGINT,
 
     CONSTRAINT fk_campuses_institute FOREIGN KEY (institute_id) REFERENCES institutes (id) ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT fk_campuses_province FOREIGN KEY (province_id) REFERENCES provinces(id) ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT fk_campuses_city FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_campuses_province FOREIGN KEY (province_id) REFERENCES provinces (id) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_campuses_city FOREIGN KEY (city_id) REFERENCES cities (id) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_active CHECK (active IN (0, 1)),
     CONSTRAINT chk_deleted CHECK (deleted IN (0, 1))
 );
@@ -160,8 +160,13 @@ CREATE TABLE standards
     updated_by    BIGINT,
     deleted_at    DATETIME,
     deleted_by    BIGINT,
-
+    UNIQUE (campus_id, standard_name), -- Standard name unique per campus
+    UNIQUE (campus_id, standard_code), -- Standard code unique per campus
+    CHECK (LENGTH(standard_name) > 0), -- Name cannot be empty
+    CHECK (LENGTH(standard_code) > 0), -- Code cannot be empty
     FOREIGN KEY (campus_id) REFERENCES campuses (id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
 );
 
 -- sections TABLE
@@ -180,9 +185,15 @@ CREATE TABLE sections
     updated_by   BIGINT,
     deleted_at   DATETIME,
     deleted_by   BIGINT,
-    FOREIGN KEY (standard_id) REFERENCES standards (id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+-- Unique constraints: a section name/code must be unique within a standard
+    UNIQUE KEY uq_standard_section_name (standard_id, section_name),
+    UNIQUE KEY uq_standard_section_code (standard_id, section_code),
+
+    -- Foreign key with cascading update and delete
+    CONSTRAINT fk_sections_standard
+        FOREIGN KEY (standard_id) REFERENCES standards (id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
 );
 
 -- students TABLE
@@ -361,23 +372,54 @@ CREATE TABLE student_fee_summary
 DROP TABLE IF EXISTS discount_type;
 CREATE TABLE discount_type
 (
-    id              BIGINT PRIMARY KEY AUTO_INCREMENT,
-    code            VARCHAR(50) UNIQUE NOT NULL,
-    name            VARCHAR(150)       NOT NULL,
-    description     VARCHAR(500),
-    charge_type     VARCHAR(50),
-    recurrence_rule VARCHAR(50),
-    is_active       BOOLEAN            NOT NULL DEFAULT TRUE,
-    priority        INT                         DEFAULT 0,
-    display_order   INT                         DEFAULT 0,
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
 
+    code            VARCHAR(50)  NOT NULL,
+    name            VARCHAR(150) NOT NULL,
+    description     VARCHAR(500),
+
+    charge_type     VARCHAR(30)  NOT NULL,
+    recurrence_rule VARCHAR(30),
+
+    priority        INT          NOT NULL DEFAULT 0,
+    display_order   INT          NOT NULL DEFAULT 0,
+    active          BOOLEAN      NOT NULL DEFAULT TRUE,
+    deleted         BOOLEAN      NOT NULL DEFAULT FALSE,
+
+    created_at      DATETIME,
     created_by      BIGINT,
-    created_at      TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME,
     updated_by      BIGINT,
-    updated_at      TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
-    deleted         BOOLEAN            NOT NULL DEFAULT FALSE,
     deleted_at      DATETIME,
-    deleted_by      BIGINT
+    deleted_by      BIGINT,
+    CONSTRAINT uq_discount_type_code UNIQUE (code),
+
+    CONSTRAINT chk_charge_type CHECK (
+        charge_type IN (
+                        'FIXED',
+                        'PERCENTAGE',
+                        'PER_CREDIT',
+                        'PER_SUBJECT',
+                        'VARIABLE',
+                        'SLAB_BASED',
+                        'USAGE_BASED',
+                        'DISCOUNTED'
+            )
+        ),
+
+    CONSTRAINT chk_recurrence_rule CHECK (
+        recurrence_rule IN (
+                            'ONE_TIME',
+                            'MONTHLY',
+                            'QUARTERLY',
+                            'BI_MONTHLY',
+                            'HALF_YEARLY',
+                            'YEARLY',
+                            'TERM_WISE',
+                            'SEMESTER_WISE'
+            )
+            OR recurrence_rule IS NULL
+        )
 );
 
 

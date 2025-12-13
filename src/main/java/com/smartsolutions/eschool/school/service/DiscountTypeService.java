@@ -52,10 +52,7 @@ public class DiscountTypeService {
         try {
             log.info("Fetching all Discount Types from database");
             List<DiscountTypeEntity> result = discountTypeRepository.findAll();
-            //List<DiscountTypeResponseDTO> responseDTOS = MapperUtil.mapList(result, DiscountTypeResponseDTO.class);
             return result.stream().map(this::toDto).collect(Collectors.toList());
-            //log.info("Successfully fetched {} Discount Types", responseDTOS.size());
-            //return responseDTOS;
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Discount Types", dae);
             throw new CustomServiceException("Unable to fetch Discount Types from database", dae);
@@ -69,23 +66,16 @@ public class DiscountTypeService {
     }
 
     public DiscountTypeResponseDTO getById(Long discountTypeId) {
-        log.info("Fetching DiscountType with id: {}", discountTypeId);
-        DiscountTypeEntity discountTypeEntity = discountTypeRepository.findByIdAndDeletedFalse(discountTypeId).orElseThrow(() -> {
-            log.info("Fetching Discount Type with id: {}", discountTypeId);
+        log.info("Request to fetch DiscountType with id={}", discountTypeId);
+        DiscountTypeEntity entity = discountTypeRepository.findByIdAndDeletedFalse(discountTypeId).orElseThrow(() -> {
+            log.warn("DiscountType not found for id={}", discountTypeId);
             return new ResourceNotFoundException("Discount Type not found with id: " + discountTypeId);
         });
-        DiscountTypeResponseDTO responseDTO;
-        try {
-            responseDTO = MapperUtil.mapObject(discountTypeEntity, DiscountTypeResponseDTO.class);
-        } catch (Exception e) {
-            log.error("Error mapping DiscountType entity to DTO for id={}", discountTypeId, e);
-            throw new CustomServiceException("Failed to map Discount Type");
-        }
-
-        log.info("Successfully fetched DiscountType: id={}", responseDTO.getId());
+        DiscountTypeResponseDTO responseDTO = toDto(entity);
+        log.info("Successfully fetched DiscountType with id={}", responseDTO.getId());
         return responseDTO;
-
     }
+
 
     public List<DiscountTypeResponseDTO> getAllActive() {
         try {
@@ -157,31 +147,6 @@ public class DiscountTypeService {
         }
     }
 
-    private DiscountTypeResponseDTO toDto(DiscountTypeEntity entity) {
-        DiscountTypeResponseDTO dto = new DiscountTypeResponseDTO();
-
-        dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
-        dto.setIsActive(entity.getIsActive());
-
-        dto.setChargeType(entity.getChargeType());
-        dto.setChargeTypeLabel(getChargeTypeLabel(entity.getChargeType()));
-
-        dto.setRecurrenceRule(entity.getRecurrenceRule());
-        dto.setRecurrenceRuleLabel(getRecurrenceRuleLabel(entity.getRecurrenceRule()));
-
-        return dto;
-    }
-
-    private String getChargeTypeLabel(String chargeType) {
-        return feeConfig.getChargeTypes().getOrDefault(chargeType, chargeType);
-    }
-
-    private String getRecurrenceRuleLabel(String recurrenceRule) {
-        return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
-    }
 
     public DiscountTypeResponseDTO updateDiscountType(Long discountTypeId, @Valid DiscountTypeRequestDTO requestDTO) {
         log.info("Update request received for DiscountType ID: {}", discountTypeId);
@@ -195,7 +160,7 @@ public class DiscountTypeService {
 
             existingEntity.setName(requestDTO.getName());
             existingEntity.setDescription(requestDTO.getDescription());
-            existingEntity.setIsActive(requestDTO.getIsActive());
+            existingEntity.setActive(requestDTO.getActive());
             existingEntity.setChargeType(requestDTO.getChargeType());
             existingEntity.setRecurrenceRule(requestDTO.getRecurrenceRule());
 
@@ -213,6 +178,33 @@ public class DiscountTypeService {
             log.error("Unexpected error while updating DiscountType with ID: {}", discountTypeId, e);
             throw new CustomServiceException("Unexpected error occurred while updating Discount Type", e);
         }
+    }
+
+
+    private DiscountTypeResponseDTO toDto(DiscountTypeEntity entity) {
+        DiscountTypeResponseDTO dto = new DiscountTypeResponseDTO();
+
+        dto.setId(entity.getId());
+        dto.setCode(entity.getCode());
+        dto.setName(entity.getName());
+        dto.setDescription(entity.getDescription());
+        dto.setActive(entity.getActive());
+
+        dto.setChargeType(entity.getChargeType());
+        dto.setChargeTypeLabel(getChargeTypeLabel(entity.getChargeType()));
+
+        dto.setRecurrenceRule(entity.getRecurrenceRule());
+        dto.setRecurrenceRuleLabel(getRecurrenceRuleLabel(entity.getRecurrenceRule()));
+
+        return dto;
+    }
+
+    private String getChargeTypeLabel(String chargeType) {
+        return feeConfig.getChargeTypes().getOrDefault(chargeType, chargeType);
+    }
+
+    private String getRecurrenceRuleLabel(String recurrenceRule) {
+        return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
     }
 
 }
