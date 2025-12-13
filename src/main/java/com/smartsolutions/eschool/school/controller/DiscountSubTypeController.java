@@ -130,28 +130,30 @@ public class DiscountSubTypeController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateDiscountComponent(
-            @PathVariable Long id,
-            @Valid @RequestBody DiscountSubTypeRequestDTO requestDTO) {
-
+    public ResponseEntity<?> updateDiscountComponent(@PathVariable Long id, @Valid @RequestBody DiscountSubTypeRequestDTO requestDTO) {
         log.info("PUT /api/discount-components/{} - Updating discount component: {}", id, requestDTO);
-
         try {
             DiscountSubTypeResponseDTO updated = discountSubTypeFacade.update(id, requestDTO);
-
             log.info("Discount component updated successfully with ID: {}", updated.getId());
-
             return ResponseEntity.ok(updated);
-
         } catch (EntityNotFoundException e) {
             log.warn("Discount component not found for ID: {}", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Discount component not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Discount component not found");
         } catch (Exception e) {
             log.error("Failed to update discount component", e);
-            return ResponseEntity.internalServerError()
-                    .body("Failed to update discount component");
+            return ResponseEntity.internalServerError().body("Failed to update discount component");
         }
     }
+
+    @GetMapping(value = "/byDiscountType/{discountTypeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getActiveByDiscountTypeId(@PathVariable Long discountTypeId) {
+        log.info("GET /api/school/discounts/subtypes/active/by-discount-type/{} called", discountTypeId);
+        List<DiscountSubTypeResponseDTO> responseDTOS =
+                discountSubTypeFacade.getActiveByDiscountTypeId(discountTypeId);
+        log.info("Fetched {} active Discount Sub Types for discountTypeId={}",
+                responseDTOS.size(), discountTypeId);
+        return ResponseEntity.ok(responseDTOS);
+    }
+
 
 }

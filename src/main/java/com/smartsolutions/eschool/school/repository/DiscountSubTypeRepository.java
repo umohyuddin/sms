@@ -22,10 +22,10 @@ public interface DiscountSubTypeRepository extends JpaRepository<DiscountSubType
     @Modifying
     @Transactional
     @Query("""
-        UPDATE DiscountSubTypeEntity ds
-        SET ds.isActive = true
-        WHERE ds.id = :id
-        """)
+            UPDATE DiscountSubTypeEntity ds
+            SET ds.isActive = true
+            WHERE ds.id = :id
+            """)
     int markAsActive(@Param("id") Long id);
 
     // ------------------------------------------------------------
@@ -34,10 +34,10 @@ public interface DiscountSubTypeRepository extends JpaRepository<DiscountSubType
     @Modifying
     @Transactional
     @Query("""
-        UPDATE DiscountSubTypeEntity ds
-        SET ds.isActive = false
-        WHERE ds.id = :id
-        """)
+            UPDATE DiscountSubTypeEntity ds
+            SET ds.isActive = false
+            WHERE ds.id = :id
+            """)
     int markAsInactive(@Param("id") Long id);
 
 
@@ -51,7 +51,6 @@ public interface DiscountSubTypeRepository extends JpaRepository<DiscountSubType
             WHERE ds.deleted = false
             """)
     List<DiscountSubTypeEntity> findAllDeletedFalse();
-
 
 
     // ------------------------------------------------------------
@@ -144,7 +143,6 @@ public interface DiscountSubTypeRepository extends JpaRepository<DiscountSubType
     List<DiscountSubTypeEntity> findAllByDiscountType(@Param("typeId") Long typeId);
 
 
-
     @Query("SELECT f FROM DiscountSubTypeEntity f " +
             "JOIN FETCH f.discountType fc " +
             "WHERE (:discountTypeId IS NULL OR fc.id = :discountTypeId) " +
@@ -153,7 +151,12 @@ public interface DiscountSubTypeRepository extends JpaRepository<DiscountSubType
             "AND f.deleted = false " +
             "ORDER BY f.name ASC")
     List<DiscountSubTypeEntity> searchDiscountComponents(@Param("discountTypeId") Long discountTypeId,
-                                                @Param("keyword") String keyword);
+                                                         @Param("keyword") String keyword);
+
+
+    @Query("SELECT d FROM DiscountSubTypeEntity d WHERE d.discountType.id = :discountTypeId AND d.deleted = false AND d.isActive = true")
+    List<DiscountSubTypeEntity> findActiveByDiscountTypeId(@Param("discountTypeId") Long discountTypeId);
+
 }
 
 

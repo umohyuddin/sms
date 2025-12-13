@@ -1,17 +1,16 @@
 package com.smartsolutions.eschool.school.service;
 
 
+import com.smartsolutions.eschool.global.configs.FeeConfig;
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.dtos.discountSubType.requestDto.DiscountSubTypeRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountSubType.responseDto.DiscountSubTypeResponseDTO;
+import com.smartsolutions.eschool.school.dtos.discountSubType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.model.DiscountSubTypeEntity;
 import com.smartsolutions.eschool.school.model.DiscountTypeEntity;
 import com.smartsolutions.eschool.school.repository.DiscountSubTypeRepository;
 import com.smartsolutions.eschool.school.repository.DiscountTypeRepository;
-import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
-import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
-import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +26,12 @@ import java.util.List;
 public class DiscountSubTypeService {
     private final DiscountSubTypeRepository discountSubTypeRepository;
     private final DiscountTypeRepository discountTypeRepository;
+    private final FeeConfig feeConfig;
 
-    public DiscountSubTypeService(DiscountSubTypeRepository discountSubTypeRepository, DiscountTypeRepository discountTypeRepository) {
+    public DiscountSubTypeService(DiscountSubTypeRepository discountSubTypeRepository, DiscountTypeRepository discountTypeRepository, FeeConfig feeConfig) {
         this.discountSubTypeRepository = discountSubTypeRepository;
         this.discountTypeRepository = discountTypeRepository;
+        this.feeConfig = feeConfig;
     }
 
     public DiscountSubTypeResponseDTO createDiscountSubType(@Valid DiscountSubTypeRequestDTO requestDTO) {
@@ -78,12 +79,15 @@ public class DiscountSubTypeService {
     public DiscountSubTypeResponseDTO getById(Long discountSubTypeId) {
         log.info("Fetching DiscountSubType with id: {}", discountSubTypeId);
         DiscountSubTypeEntity entity = discountSubTypeRepository.findByIdAndDeletedFalse(discountSubTypeId).orElseThrow(() -> {
+
             log.info("Fetching Discount Sub Type with id: {}", discountSubTypeId);
             return new ResourceNotFoundException("Discount Sub Type not found with id: " + discountSubTypeId);
         });
+
         DiscountSubTypeResponseDTO responseDTO;
         try {
             responseDTO = MapperUtil.mapObject(entity, DiscountSubTypeResponseDTO.class);
+            responseDTO.setDiscountType(toDto(entity.getDiscountType()));
         } catch (Exception e) {
             log.error("Error mapping DiscountSubType entity to DTO for id={}", discountSubTypeId, e);
             throw new CustomServiceException("Failed to map Discount Sub Type");
@@ -263,6 +267,51 @@ public class DiscountSubTypeService {
             throw ex;
         }
     }
+
+    public List<DiscountSubTypeResponseDTO> getActiveByDiscountTypeId(Long discountTypeId) {
+        log.info("Fetching active Discount Sub Types for DiscountTypeId={}", discountTypeId);
+        try {
+            List<DiscountSubTypeEntity> entities = discountSubTypeRepository.findActiveByDiscountTypeId(discountTypeId);
+            if (entities.isEmpty()) {
+                log.warn("No active Discount Sub Types found for DiscountTypeId={}", discountTypeId);
+                return Collections.emptyList();
+            }
+            return MapperUtil.mapList(entities, DiscountSubTypeResponseDTO.class);
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching Discount Sub Types for DiscountTypeId={}", discountTypeId, dae);
+            throw new CustomServiceException("Unable to fetch Discount Sub Types for given Discount Type", dae);
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Discount Sub Types for DiscountTypeId={}", discountTypeId, e);
+            throw new CustomServiceException("Unexpected error occurred", e);
+        }
+    }
+
+    private DiscountTypeResponseDTO toDto(DiscountTypeEntity entity) {
+        DiscountTypeResponseDTO dto = new DiscountTypeResponseDTO();
+
+        dto.setId(entity.getId());
+//        dto.setCode(entity.getCode());
+        dto.setName(entity.getName());
+//        dto.setDescription(entity.getDescription());
+//        dto.setActive(entity.getActive());
+
+        dto.setChargeType(entity.getChargeType());
+        dto.setChargeTypeLabel(getChargeTypeLabel(entity.getChargeType()));
+
+        dto.setRecurrenceRule(entity.getRecurrenceRule());
+        dto.setRecurrenceRuleLabel(getRecurrenceRuleLabel(entity.getRecurrenceRule()));
+
+        return dto;
+    }
+
+    private String getChargeTypeLabel(String chargeType) {
+        return feeConfig.getChargeTypes().getOrDefault(chargeType, chargeType);
+    }
+
+    private String getRecurrenceRuleLabel(String recurrenceRule) {
+        return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
+    }
+
 
 }
 

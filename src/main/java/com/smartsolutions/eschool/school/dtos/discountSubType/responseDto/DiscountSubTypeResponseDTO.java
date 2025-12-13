@@ -26,16 +26,3 @@ public class DiscountSubTypeResponseDTO {
 
 }
 
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-class DiscountTypeResponseDTO {
-    private Long Id;
-    private String Name;
-    private String chargeType;          // raw value
-    private String chargeTypeLabel;     // human-readable
-    private String recurrenceRule;      // raw value
-    private String recurrenceRuleLabel; // human-readable
-}

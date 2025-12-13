@@ -67,4 +67,8 @@ private final DiscountSubTypeService discountSubTypeService;
     public DiscountSubTypeResponseDTO update(Long id, @Valid DiscountSubTypeRequestDTO requestDTO) {
         return discountSubTypeService.update(id,requestDTO);
     }
+
+    public List<DiscountSubTypeResponseDTO> getActiveByDiscountTypeId(Long discountTypeId) {
+        return discountSubTypeService.getActiveByDiscountTypeId(discountTypeId);
+    }
 }

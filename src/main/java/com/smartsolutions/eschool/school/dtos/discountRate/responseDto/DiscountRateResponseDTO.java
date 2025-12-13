@@ -23,9 +23,7 @@ public class DiscountRateResponseDTO {
 
     private Long academicYearId;
     private String academicYearName; // optional, for display
-
-    private BigDecimal amount;
-    private BigDecimal percentage;
+    private BigDecimal value;
     private Boolean isPercentage;
 
     private LocalDate effectiveFrom;

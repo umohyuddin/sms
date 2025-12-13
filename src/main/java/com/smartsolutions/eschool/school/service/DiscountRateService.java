@@ -1,14 +1,15 @@
 package com.smartsolutions.eschool.school.service;
 
+import com.smartsolutions.eschool.global.configs.FeeConfig;
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.dtos.discountRate.requestDto.DiscountRateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateFullResponseDTO;
 import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateResponseDTO;
-import com.smartsolutions.eschool.school.model.AcademicYearEntity;
-import com.smartsolutions.eschool.school.model.CampusEntity;
-import com.smartsolutions.eschool.school.model.DiscountRateEntity;
-import com.smartsolutions.eschool.school.model.DiscountSubTypeEntity;
+
+import com.smartsolutions.eschool.school.dtos.discountSubType.responseDto.DiscountSubTypeResponseDTO;
+import com.smartsolutions.eschool.school.dtos.discountSubType.responseDto.DiscountTypeResponseDTO;
+import com.smartsolutions.eschool.school.model.*;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
 import com.smartsolutions.eschool.school.repository.DiscountRateRepository;
@@ -30,15 +31,17 @@ public class DiscountRateService {
     private final DiscountSubTypeRepository discountSubTypeRepository;
     private final CampusRepository campusRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final FeeConfig feeConfig;
 
     public DiscountRateService(DiscountRateRepository discountRateRepository,
                                DiscountSubTypeRepository discountSubTypeRepository,
                                CampusRepository campusRepository,
-                               AcademicYearRepository academicYearRepository) {
+                               AcademicYearRepository academicYearRepository, FeeConfig feeConfig) {
         this.discountRateRepository = discountRateRepository;
         this.discountSubTypeRepository = discountSubTypeRepository;
         this.campusRepository = campusRepository;
         this.academicYearRepository = academicYearRepository;
+        this.feeConfig = feeConfig;
     }
 
     public DiscountRateResponseDTO createDiscountRate(@Valid DiscountRateRequestDTO requestDTO) {
@@ -80,7 +83,17 @@ public class DiscountRateService {
         try {
             log.info("Fetching all Discount Rates");
             List<DiscountRateEntity> result = discountRateRepository.findAll();
-            return MapperUtil.mapList(result, DiscountRateResponseDTO.class);
+            List<DiscountRateResponseDTO> dtos = MapperUtil.mapList(result, DiscountRateResponseDTO.class);
+
+            dtos.forEach(dto -> {
+                DiscountSubTypeResponseDTO subType = dto.getDiscountSubType();
+                if (subType != null && subType.getDiscountType() != null) {
+                    DiscountTypeResponseDTO type = subType.getDiscountType();
+                    type.setChargeTypeLabel(getChargeTypeLabel(type.getChargeType()));
+                    type.setRecurrenceRuleLabel(getRecurrenceRuleLabel(type.getRecurrenceRule()));
+                }
+            });
+            return dtos;
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Discount Rates", dae);
             throw new CustomServiceException("Unable to fetch Discount Rates", dae);
@@ -194,4 +207,12 @@ public class DiscountRateService {
         }
     }
 
+
+    private String getChargeTypeLabel(String chargeType) {
+        return feeConfig.getChargeTypes().getOrDefault(chargeType, chargeType);
+    }
+
+    private String getRecurrenceRuleLabel(String recurrenceRule) {
+        return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
+    }
 }
