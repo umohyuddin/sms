@@ -271,7 +271,7 @@ CREATE TABLE fee_component
     taxable        BOOLEAN      NOT NULL DEFAULT FALSE,
     active         BOOLEAN      NOT NULL DEFAULT TRUE,
     deleted        BOOLEAN      NOT NULL DEFAULT FALSE,
-
+    discount_able    BOOLEAN        NOT NULL DEFAULT FALSE,
     created_at     DATETIME,
     created_by     BIGINT,
     updated_at     DATETIME,
@@ -299,6 +299,7 @@ CREATE TABLE fee_rates
     effective_to     DATE,
     active           BOOLEAN        NOT NULL DEFAULT TRUE,
     deleted          BOOLEAN        NOT NULL DEFAULT FALSE,
+
     created_at       DATETIME,
     created_by       BIGINT,
     updated_at       DATETIME,

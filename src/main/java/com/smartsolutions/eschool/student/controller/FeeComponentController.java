@@ -30,21 +30,15 @@ public class FeeComponentController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() throws Exception {
         log.info("GET /api/fee/component called");
-        List<FeeComponentDTO> resources = feeComponentFacade.getAll();
+        List<FeeComponentResponseDTO> resources = feeComponentFacade.getAll();
         log.info("GET /api/fee/component succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<FeeComponentResponseDTO> updateFeeComponent(
-            @PathVariable Long id,
-            @Valid @RequestBody FeeCatalogComponentRequestDTO dto) {
-
+    public ResponseEntity<FeeComponentResponseDTO> updateFeeComponent(@PathVariable Long id,@Valid @RequestBody FeeCatalogComponentRequestDTO dto) {
         log.info("Received request to update Fee Component with id: {}", id);
-
-        // Call the service/facade method to update
         FeeComponentResponseDTO updatedComponent = feeComponentFacade.updateFeeComponent(id, dto);
-
         log.info("Returning updated Fee Component: id={}", updatedComponent.getId());
         return ResponseEntity.ok(updatedComponent);
     }
@@ -53,7 +47,7 @@ public class FeeComponentController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable Long id) throws Exception {
         log.info("Received request to fetch Fee component with id: {}", id);
-        FeeComponentDTO feeComponentDTO = feeComponentFacade.getById(id);
+        FeeComponentResponseDTO feeComponentDTO = feeComponentFacade.getById(id);
         log.info("Returning Fee component: id={}", feeComponentDTO.getId());
         return ResponseEntity.ok(feeComponentDTO);
     }

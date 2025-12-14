@@ -41,24 +41,24 @@ public class FeeComponentService {
     }
 
 
-    public FeeComponentDTO getById(Long id) {
+    public FeeComponentResponseDTO getById(Long id) {
         log.info("Fetching FeeComponent with id: {}", id);
         FeeComponentEntity FeeComponentEntity = feeComponentRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
             log.info("Fetching FeeComponent with id: {}", id);
             return new ResourceNotFoundException("FeeComponent not found with id: " + id);
         });
 
-        FeeComponentDTO FeeComponentDTO = MapperUtil.mapObject(FeeComponentEntity, FeeComponentDTO.class);
+        FeeComponentResponseDTO FeeComponentDTO = MapperUtil.mapObject(FeeComponentEntity, FeeComponentResponseDTO.class);
         log.info("Successfully fetched FeeComponent: id={}", FeeComponentDTO.getId());
         return FeeComponentDTO;
     }
 
-    public List<FeeComponentDTO> getAll() {
+    public List<FeeComponentResponseDTO> getAll() {
         try {
             log.info("Fetching all FeeComponent from database");
             List<FeeComponentEntity> result = feeComponentRepository.findByDeletedFalse();
             log.info("Successfully fetched {} FeeComponent", result.size());
-            List<FeeComponentDTO> FeeComponentDTOList = MapperUtil.mapList(result, FeeComponentDTO.class);
+            List<FeeComponentResponseDTO> FeeComponentDTOList = MapperUtil.mapList(result, FeeComponentResponseDTO.class);
             log.info("Successfully fetched FeeComponent");
             return FeeComponentDTOList;
         } catch (DataAccessException dae) {
@@ -99,10 +99,8 @@ public class FeeComponentService {
     @Transactional
     public FeeComponentResponseDTO updateFeeComponent(Long id, FeeCatalogComponentRequestDTO dto) {
         log.info("Updating Fee Component with id {} using DTO {}", id, dto);
-
         // Fetch existing component
-        FeeComponentEntity entity = feeComponentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Fee Component not found with id: " + id));
+        FeeComponentEntity entity = feeComponentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Fee Component not found with id: " + id));
 
         // Update fields if they are provided
         if (dto.getComponentName() != null && !dto.getComponentName().isBlank()) {
@@ -118,6 +116,10 @@ public class FeeComponentService {
         // Update active status
         if (dto.getActive() != null) {
             entity.setActive(dto.getActive());
+        }
+
+        if (dto.getDiscountable() != null) {
+            entity.setActive(dto.getDiscountable());
         }
 
         // Update Fee Catalog association if provided

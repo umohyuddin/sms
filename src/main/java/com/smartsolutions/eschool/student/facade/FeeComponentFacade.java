@@ -25,10 +25,10 @@ public class FeeComponentFacade {
         this.feeComponentService = feeComponentService;
     }
 
-    public List<FeeComponentDTO> getAll() {
+    public List<FeeComponentResponseDTO> getAll() {
         return feeComponentService.getAll();
     }
-    public FeeComponentDTO getById(Long id) {
+    public FeeComponentResponseDTO getById(Long id) {
         return feeComponentService.getById(id);
     }
 

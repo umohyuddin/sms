@@ -26,5 +26,6 @@ public class FeeCatalogComponentRequestDTO {
 
     @NotNull(message = "Active flag is required")
     private Boolean active;
+    private Boolean discountable;
 
 }

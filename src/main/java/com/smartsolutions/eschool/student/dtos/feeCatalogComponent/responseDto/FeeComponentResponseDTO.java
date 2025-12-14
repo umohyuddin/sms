@@ -16,6 +16,7 @@ public class FeeComponentResponseDTO {
     private String accountCode;
     private boolean taxable;
     private boolean active;
+    private boolean discountable;
     private FeeCatalogDTO feeCatalog;
 
 }

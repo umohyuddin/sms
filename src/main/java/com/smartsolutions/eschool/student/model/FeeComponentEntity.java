@@ -44,6 +44,10 @@ public class FeeComponentEntity extends AuditableEntity {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
+    @Column(name = "discount_able", nullable = false)
+    private boolean discountable;
+
+
     @OneToMany(mappedBy = "feeComponent", fetch = FetchType.LAZY)
     private List<FeeRateEntity> feeRates;
 }
