@@ -78,9 +78,7 @@ public class FeeRateController {
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FeeRatesResponseDTO> updateFeeRate(@PathVariable Long id, @Valid @RequestBody FeeRateCreateRequestDTO dto) {
         log.info("PUT /api/fee/rates/{} called with payload: {}", id, dto);
-
         FeeRatesResponseDTO updatedFeeRate = feeRateFacade.update(id, dto);
-
         log.info("FeeRate updated successfully: id={}", updatedFeeRate.getId());
         return ResponseEntity.ok(updatedFeeRate);
     }

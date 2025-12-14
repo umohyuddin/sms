@@ -68,4 +68,8 @@ public class DiscountRateFacade {
     public int markAsInactive(Long id) {
         return discountRateService.markAsInactive(id);
     }
+
+    public List<DiscountRateResponseDTO> search(Long discountTypeId, Long discountSubTypeId, String chargeTypeId, String recurrenceRuleId, String keyword) {
+        return discountRateService.search(discountTypeId,discountSubTypeId,chargeTypeId,recurrenceRuleId,keyword);
+    }
 }

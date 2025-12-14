@@ -148,7 +148,7 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRateEntity
 
 
     @Query("""
-                SELECT dr 
+                SELECT dr
                 FROM DiscountRateEntity dr
                 JOIN dr.discountSubType dst
                 JOIN dst.discountType dt
@@ -158,11 +158,29 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRateEntity
                   AND dr.campus.id = :campusId
                   AND dr.academicYear.id = :academicYearId
             """)
-    List<DiscountRateEntity> findDiscountRatesByCampusAndAcademicYear(
-            @Param("campusId") Long campusId,
-            @Param("academicYearId") Long academicYearId
-    );
+    List<DiscountRateEntity> findDiscountRatesByCampusAndAcademicYear(@Param("campusId") Long campusId, @Param("academicYearId") Long academicYearId);
 
+    @Query("""
+                SELECT dr
+                FROM DiscountRateEntity dr
+                JOIN dr.discountSubType dst
+                JOIN dst.discountType dt
+                WHERE dr.deleted = false
+                  AND dst.deleted = false
+                  AND dt.deleted = false
+            
+                  AND (:discountTypeId IS NULL OR dt.id = :discountTypeId)
+                  AND (:discountSubTypeId IS NULL OR dst.id = :discountSubTypeId)
+                  AND (:chargeType IS NULL OR dt.chargeType = :chargeType)
+                  AND (:recurrenceRule IS NULL OR dt.recurrenceRule = :recurrenceRule)
+            
+                  AND (
+                        :keyword IS NULL OR
+                        LOWER(dst.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                        LOWER(dst.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                      )
+            """)
+    List<DiscountRateEntity> search(@Param("discountTypeId") Long discountTypeId, @Param("discountSubTypeId") Long discountSubTypeId, @Param("chargeType") String chargeType, @Param("recurrenceRule") String recurrenceRule, @Param("keyword") String keyword);
 }
 
 

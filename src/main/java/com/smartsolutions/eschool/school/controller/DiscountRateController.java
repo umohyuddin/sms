@@ -49,11 +49,8 @@ public class DiscountRateController {
     }
 
 
-
     @GetMapping(value = "/byCampusYear", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getDiscountRatesByCampusAndAcademicYear(
-            @RequestParam Long campusId,
-            @RequestParam Long academicYearId) {
+    public ResponseEntity<?> getDiscountRatesByCampusAndAcademicYear(@RequestParam Long campusId, @RequestParam Long academicYearId) {
         log.info("GET /api/school/discounts/rates/byCampusYear called with campusId={} and academicYearId={}", campusId, academicYearId);
         List<DiscountRateFullResponseDTO> list = discountRateFacade.getDiscountRatesByCampusAndAcademicYear(campusId, academicYearId);
         log.info("GET /api/school/discounts/rates/byCampusYear succeeded, returned {} resources", list.size());
@@ -139,5 +136,13 @@ public class DiscountRateController {
         log.info("PATCH /api/school/discounts/rates/{}/deactivate called", discountRateId);
         discountRateFacade.markAsInactive(discountRateId);
         return ResponseEntity.ok("DiscountRate marked as inactive successfully");
+    }
+
+
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> searchDiscountRates(@RequestParam(required = false) Long discountTypeId, @RequestParam(required = false) Long discountSubTypeId, @RequestParam(required = false) String chargeTypeId, @RequestParam(required = false) String recurrenceRuleId, @RequestParam(required = false) String keyword) {
+        log.info("SEARCH DiscountRates called with discountTypeId={}, discountSubTypeId={}, chargeTypeId={}, recurrenceRuleId={}, keyword={}", discountTypeId, discountSubTypeId, chargeTypeId, recurrenceRuleId, keyword);
+        List<DiscountRateResponseDTO> list = discountRateFacade.search(discountTypeId, discountSubTypeId, chargeTypeId, recurrenceRuleId, keyword);
+        return ResponseEntity.ok(list);
     }
 }

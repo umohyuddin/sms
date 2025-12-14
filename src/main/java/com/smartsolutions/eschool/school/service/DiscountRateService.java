@@ -33,10 +33,7 @@ public class DiscountRateService {
     private final AcademicYearRepository academicYearRepository;
     private final FeeConfig feeConfig;
 
-    public DiscountRateService(DiscountRateRepository discountRateRepository,
-                               DiscountSubTypeRepository discountSubTypeRepository,
-                               CampusRepository campusRepository,
-                               AcademicYearRepository academicYearRepository, FeeConfig feeConfig) {
+    public DiscountRateService(DiscountRateRepository discountRateRepository, DiscountSubTypeRepository discountSubTypeRepository, CampusRepository campusRepository, AcademicYearRepository academicYearRepository, FeeConfig feeConfig) {
         this.discountRateRepository = discountRateRepository;
         this.discountSubTypeRepository = discountSubTypeRepository;
         this.campusRepository = campusRepository;
@@ -47,18 +44,14 @@ public class DiscountRateService {
     public DiscountRateResponseDTO createDiscountRate(@Valid DiscountRateRequestDTO requestDTO) {
         log.info("Creating new Discount Rate for SubTypeId: {}", requestDTO.getDiscountSubTypeId());
         try {
-            DiscountSubTypeEntity subType = discountSubTypeRepository
-                    .findByIdAndDeletedFalse(requestDTO.getDiscountSubTypeId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Discount Sub Type not found with id: " + requestDTO.getDiscountSubTypeId()));
+            DiscountSubTypeEntity subType = discountSubTypeRepository.findByIdAndDeletedFalse(requestDTO.getDiscountSubTypeId()).orElseThrow(() -> new ResourceNotFoundException("Discount Sub Type not found with id: " + requestDTO.getDiscountSubTypeId()));
 
             CampusEntity campus = null;
             if (requestDTO.getCampusId() != null) {
-                campus = campusRepository.findById(requestDTO.getCampusId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + requestDTO.getCampusId()));
+                campus = campusRepository.findById(requestDTO.getCampusId()).orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + requestDTO.getCampusId()));
             }
 
-            AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id: " + requestDTO.getAcademicYearId()));
+            AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId()).orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id: " + requestDTO.getAcademicYearId()));
 
             DiscountRateEntity entity = MapperUtil.mapObject(requestDTO, DiscountRateEntity.class);
             entity.setId(null);
@@ -107,13 +100,10 @@ public class DiscountRateService {
     public List<DiscountRateFullResponseDTO> getDiscountRatesByCampusAndAcademicYear(Long campusId, Long academicYearId) {
         try {
             log.info("Fetching Discount Rates for campusId: {} and academicYearId: {}", campusId, academicYearId);
-
             // Fetch from repository
             List<DiscountRateEntity> discountRates = discountRateRepository.findDiscountRatesByCampusAndAcademicYear(campusId, academicYearId);
-
             // Map entities to response DTOs
             return MapperUtil.mapList(discountRates, DiscountRateFullResponseDTO.class);
-
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Discount Rates for campusId: {} and academicYearId: {}", campusId, academicYearId, dae);
             throw new CustomServiceException("Failed to fetch Discount Rates due to database error");
@@ -147,16 +137,14 @@ public class DiscountRateService {
 
     public DiscountRateResponseDTO getById(Long id) {
         log.info("Fetching Discount Rate with id: {}", id);
-        DiscountRateEntity entity = discountRateRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Discount Rate not found with id: " + id));
+        DiscountRateEntity entity = discountRateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Discount Rate not found with id: " + id));
         return MapperUtil.mapObject(entity, DiscountRateResponseDTO.class);
     }
 
     public int softDeleteById(Long id) {
         log.info("Soft deleting Discount Rate id: {}", id);
         try {
-            DiscountRateEntity entity = discountRateRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Discount Rate not found with id: " + id));
+            DiscountRateEntity entity = discountRateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Discount Rate not found with id: " + id));
             entity.setDeleted(true);
             discountRateRepository.save(entity);
             return 1;
@@ -182,8 +170,7 @@ public class DiscountRateService {
     public int markAsActive(Long id) {
         log.info("Marking Discount Rate as active with id: {}", id);
         try {
-            DiscountRateEntity entity = discountRateRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Discount Rate not found with id: " + id));
+            DiscountRateEntity entity = discountRateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Discount Rate not found with id: " + id));
             entity.setIsActive(true);
             discountRateRepository.save(entity);
             return 1;
@@ -196,8 +183,7 @@ public class DiscountRateService {
     public int markAsInactive(Long id) {
         log.info("Marking Discount Rate as inactive with id: {}", id);
         try {
-            DiscountRateEntity entity = discountRateRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Discount Rate not found with id: " + id));
+            DiscountRateEntity entity = discountRateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Discount Rate not found with id: " + id));
             entity.setIsActive(false);
             discountRateRepository.save(entity);
             return 1;
@@ -215,4 +201,28 @@ public class DiscountRateService {
     private String getRecurrenceRuleLabel(String recurrenceRule) {
         return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
     }
+
+    public List<DiscountRateResponseDTO> search(Long discountTypeId, Long discountSubTypeId, String chargeTypeId, String recurrenceRuleId, String keyword) {
+        log.info("SEARCH DiscountRates with discountTypeId={}, discountSubTypeId={}, chargeTypeId={}, recurrenceRuleId={}, keyword={}", discountTypeId, discountSubTypeId, chargeTypeId, recurrenceRuleId, keyword);
+        try {
+            List<DiscountRateEntity> entities = discountRateRepository.search(discountTypeId, discountSubTypeId, chargeTypeId, recurrenceRuleId, keyword == null || keyword.isBlank() ? null : keyword.trim());
+            List<DiscountRateResponseDTO> dtos = MapperUtil.mapList(entities, DiscountRateResponseDTO.class);
+            dtos.forEach(dto -> {
+                DiscountSubTypeResponseDTO subType = dto.getDiscountSubType();
+                if (subType != null && subType.getDiscountType() != null) {
+                    DiscountTypeResponseDTO type = subType.getDiscountType();
+                    type.setChargeTypeLabel(getChargeTypeLabel(type.getChargeType()));
+                    type.setRecurrenceRuleLabel(getRecurrenceRuleLabel(type.getRecurrenceRule()));
+                }
+            });
+            return dtos;
+        } catch (DataAccessException dae) {
+            log.error("Database error while searching Discount Rates", dae);
+            throw new CustomServiceException("Failed to search Discount Rates", dae);
+        } catch (Exception e) {
+            log.error("Unexpected error while searching Discount Rates", e);
+            throw new CustomServiceException("Failed to search Discount Rates", e);
+        }
+    }
+
 }
