@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.dtos.feeRates.responseDto;
 
+import jakarta.persistence.Column;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -74,7 +75,7 @@ public class FeeRatesResponseDTO {
         private String componentName;
         private String accountCode;
         private boolean taxable;
-
+        private boolean discountable;
         // Add FeeCatalog here
         private FeeCatalogDTO feeCatalog;
 

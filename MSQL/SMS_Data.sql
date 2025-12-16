@@ -502,201 +502,139 @@ VALUES ('Ali', 'Ali Khan', 'Khan', 'STU001', '2008-05-15', 'MALE', 'ali.khan1@ex
 --   deleted          : Soft-delete flag
 --   created_at/updated_at : Audit timestamps
 -- ============================================================
+/* =========================================================
+   FEE CATALOG (GENERAL – STABLE)
+   ========================================================= */
 
 INSERT INTO fee_catalog
-(code, name, description, charge_type, recurrence_rule, active, deleted, created_at, created_by, updated_at, updated_by,
+(code, name, description, charge_type, recurrence_rule,
+ active, deleted,
+ created_at, created_by, updated_at, updated_by,
  deleted_at, deleted_by)
-VALUES
--- Academic and Administrative Fees
-('LIB-001', 'Library Fee', 'Library maintenance and book renewal charges', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('CMP-001', 'Computer Lab Fee', 'Computer lab usage and maintenance charges', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('SCI-001', 'Science Lab Fee', 'Charges for science laboratory usage', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1, NOW(),
- 1, NULL, NULL),
-('REG-001', 'Registration Fee', 'New student registration charges', 'FIXED', 'ONE_TIME', TRUE, FALSE, NOW(), 1, NOW(),
- 1, NULL, NULL),
-('EXAM-001', 'Examination Fee', 'Charges for mid-term and final exams', 'FIXED', 'ONE_TIME', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('ID-001', 'Student ID Card Fee', 'Charges for issuing student ID card', 'FIXED', 'ONE_TIME', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('TRANS-001', 'Transportation Fee', 'Bus/transport charges for students', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('SPORT-001', 'Sports Fee', 'Sports activities and facilities fee', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1, NOW(), 1,
- NULL, NULL),
-('HEALTH-001', 'Health & Medical Fee', 'Basic first-aid, medical checkup, and hygiene support', 'FIXED', 'YEARLY', TRUE,
- FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-('SEC-001', 'Security Charges', 'Annual security and safety maintenance fee', 'FIXED', 'YEARLY', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('GEN-001', 'Generator Fuel Charges', 'Fuel cost for backup generator', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('DEV-001', 'Development Charges', 'School building and infrastructure development fund', 'FIXED', 'YEARLY', TRUE,
- FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-('MAINT-001', 'Maintenance Charges', 'School maintenance and repair charges', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('ACT-001', 'Activity Fee', 'Co-curricular and extra-curricular activities', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('LAB-001', 'Lab Consumables Fee', 'Consumables for science or computer labs', 'VARIABLE', 'TERM_WISE', TRUE, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-('PER-001', 'Per Subject Fee', 'Charges applied per subject/course', 'PER_SUBJECT', 'TERM_WISE', TRUE, FALSE, NOW(), 1,
- NOW(), 1, NULL, NULL),
-('CREDIT-001', 'Per Credit Fee', 'Charges applied per academic credit', 'PER_CREDIT', 'TERM_WISE', TRUE, FALSE, NOW(),
- 1, NOW(), 1, NULL, NULL),
-('SCHOLAR-001', 'Scholarship Adjustment', 'Deduction/adjustment for scholarship', 'PERCENTAGE', 'ONE_TIME', TRUE, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-('HOSTEL-001', 'Hostel Fee', 'Boarding and lodging charges', 'FIXED', 'MONTHLY', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL,
- NULL),
-('HOSTEL-DEP-001', 'Hostel Security Deposit', 'Refundable hostel security deposit', 'FIXED', 'ONE_TIME', TRUE, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL);
+VALUES ('ADMISSION', 'Admission Fee', 'One-time admission charges', 'FIXED', 'ONE_TIME',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('TUITION', 'Tuition Fee', 'Regular tuition charges', 'FIXED', 'MONTHLY',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('EXAM', 'Examination Fee', 'Examination related charges', 'FIXED', 'TERM_WISE',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('LAB', 'Laboratory Fee', 'Laboratory usage and consumables charges', 'VARIABLE', 'TERM_WISE',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('LIBRARY', 'Library Fee', 'Library services and resources', 'FIXED', 'YEARLY',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('TRANSPORT', 'Transport Fee', 'Student transportation charges', 'FIXED', 'MONTHLY',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('HOSTEL', 'Hostel Fee', 'Boarding and lodging charges', 'FIXED', 'MONTHLY',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('ANNUAL', 'Annual Charges', 'General annual school charges', 'FIXED', 'YEARLY',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('ACTIVITY', 'Activity Fee', 'Co-curricular and extra-curricular activities', 'FIXED', 'TERM_WISE',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('DISCOUNT', 'Discount / Scholarship', 'Fee discounts and scholarships', 'DISCOUNTED', 'TERM_WISE',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+       ('FINE', 'Late Fee / Penalty', 'Late payment fines or penalties', 'PERCENTAGE', 'MONTHLY',
+        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL);
 
 
-
--- ============================================================
--- Fee Components linked to Fee Catalog
--- Each fee_catalog entry (like Tuition Fee, Admission Fee) can have multiple components
--- Fields:
---   fee_catalog_id  : Reference to the fee_catalog table
---   component_code  : Unique code for the component
---   component_name  : Descriptive name
---   account_code    : Ledger/account code for accounting
---   taxable         : TRUE if taxable
--- ============================================================
+/* =========================================================
+   FEE COMPONENTS (WHAT IS CHARGED)
+   ========================================================= */
 
 INSERT INTO fee_component
-    (fee_catalog_id, component_code, component_name, account_code, taxable)
+(fee_catalog_id, component_code, component_name, account_code,
+ taxable, discount_able,
+ active, deleted, created_at, created_by)
 VALUES
 
--- ============================================================
--- MAIN CAMPUS
--- ============================================================
+-- Admission
+(1, 'ADM-FORM', 'Admission Form Fee', 'ACC-ADM-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 'ADM-PROC', 'Admission Processing Fee', 'ACC-ADM-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
 
--- 1. MAIN — Admission Fee (ID: 1)
-(1, 'ADM-MAIN-FORM', 'Admission Form Fee', 'AC-101', FALSE),
-(1, 'ADM-MAIN-PROC', 'Admission Processing', 'AC-102', FALSE),
-(1, 'ADM-MAIN-TEST', 'Admission Test Fee', 'AC-103', FALSE),
+-- Tuition
+(2, 'TUI-BASIC', 'Basic Tuition Fee', 'ACC-TUI-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
 
--- 2. MAIN — Tuition Fee (ID: 2)
-(2, 'TUI-MAIN-BASIC', 'Basic Tuition Fee', 'AC-201', FALSE),
-(2, 'TUI-MAIN-ACT', 'Activities Add-on', 'AC-202', FALSE),
-(2, 'TUI-MAIN-LAB', 'Lab Access Fee', 'AC-203', FALSE),
+-- Exam
+(3, 'EXAM-MID', 'Mid Term Exam Fee', 'ACC-EXM-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(3, 'EXAM-FINAL', 'Final Exam Fee', 'ACC-EXM-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
 
--- 3. MAIN — Transport Fee (ID: 3)
-(3, 'TRN-MAIN-FARE', 'Base Transport Fare', 'AC-301', FALSE),
-(3, 'TRN-MAIN-FUEL', 'Fuel Adjustment Fee', 'AC-302', TRUE),
-(3, 'TRN-MAIN-MAINT', 'Vehicle Maintenance Fee', 'AC-303', FALSE),
+-- Lab
+(4, 'LAB-COMP', 'Computer Lab Charges', 'ACC-LAB-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(4, 'LAB-SCI', 'Science Lab Charges', 'ACC-LAB-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
 
--- 4. MAIN — Annual Charges (ID: 4)
-(4, 'ANN-MAIN-MAINT', 'Annual Maintenance', 'AC-401', FALSE),
-(4, 'ANN-MAIN-ACT', 'Annual Activities Fee', 'AC-402', FALSE),
-(4, 'ANN-MAIN-DEV', 'School Development Fund', 'AC-403', FALSE),
+-- Library
+(5, 'LIB-USE', 'Library Usage Fee', 'ACC-LIB-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
 
--- 5. MAIN — Examination Fee (ID: 5)
-(5, 'EXM-MAIN-MID', 'Midterm Exam Fee', 'AC-501', FALSE),
-(5, 'EXM-MAIN-FINAL', 'Final Exam Fee', 'AC-502', FALSE),
-(5, 'EXM-MAIN-BOARD', 'Board Registration Fee', 'AC-503', FALSE),
+-- Transport
+(6, 'TRN-MON', 'Monthly Transport Charges', 'ACC-TRN-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
 
+-- Hostel
+(7, 'HOS-MON', 'Monthly Hostel Charges', 'ACC-HOS-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
 
--- ============================================================
--- CITY CAMPUS
--- ============================================================
+-- Annual
+(8, 'ANN-MAINT', 'Annual Maintenance Charges', 'ACC-ANN-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
 
--- 6. CITY — Admission Fee (ID: 6)
-(6, 'ADM-CITY-FORM', 'Admission Form Fee', 'AC-601', FALSE),
-(6, 'ADM-CITY-PROC', 'Admission Processing', 'AC-602', FALSE),
+-- Activity
+(9, 'ACT-SPORT', 'Sports & Activities Fee', 'ACC-ACT-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
 
--- 7. CITY — Tuition Fee (ID: 7)
-(7, 'TUI-CITY-BASIC', 'Basic Tuition Fee', 'AC-701', FALSE),
-(7, 'TUI-CITY-ACT', 'Activity Charges', 'AC-702', FALSE),
+-- Discount
+(10, 'DISC-SCH', 'Scholarship Discount', 'ACC-DISC-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
 
--- 8. CITY — Lab Charges (ID: 8)
-(8, 'LAB-CITY-COMP', 'Computer Lab Fee', 'AC-801', FALSE),
-(8, 'LAB-CITY-SCI', 'Science Lab Fee', 'AC-802', FALSE),
-(8, 'LAB-CITY-MAINT', 'Lab Maintenance Fee', 'AC-803', FALSE),
+-- Fine
+(11, 'FINE-LATE', 'Late Payment Fine', 'ACC-FINE-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
 
 
--- ============================================================
--- GIRLS CAMPUS
--- ============================================================
-
--- 9. GIRLS — Admission Fee (ID: 9)
-(9, 'ADM-GIRLS-FORM', 'Admission Form Fee', 'AC-901', FALSE),
-(9, 'ADM-GIRLS-PROC', 'Admission Processing', 'AC-902', FALSE),
-
--- 10. GIRLS — Tuition Fee (ID: 10)
-(10, 'TUI-GIRLS-BASIC', 'Basic Tuition Fee', 'AC-1001', FALSE),
-(10, 'TUI-GIRLS-ACT', 'Activities Add-on', 'AC-1002', FALSE),
-(10, 'TUI-GIRLS-SCI', 'Science Material Fee', 'AC-1003', FALSE),
-
--- 11. GIRLS — Library Fee (ID: 11)
-(11, 'LIB-GIRLS-BOOK', 'Book Rental Fee', 'AC-1101', FALSE),
-(11, 'LIB-GIRLS-MAINT', 'Library Maintenance Fee', 'AC-1102', FALSE),
-(11, 'LIB-GIRLS-CARD', 'Library Card Fee', 'AC-1103', FALSE);
-
-
--- ============================================================
--- Fee Rates
--- Each rate links a fee component to a campus, standard, and academic year.
--- Fields:
---   campus_id        : Reference to campuses table
---   standard_id      : Reference to standards table
---   fee_component_id : Reference to fee_component table
---   academic_year_id : Reference to academic_years table
---   code             : Unique code for this rate
---   name             : Descriptive name
---   description      : Details about the fee
---   amount           : Fee amount
---   currency         : Currency (e.g., PKR)
---   effective_from   : Start date of this fee rate
---   effective_to     : End date (NULL = open-ended)
---   active           : TRUE if rate is currently active
---   deleted          : FALSE if not deleted
--- ============================================================
+/* =========================================================
+   FEE RATES (HOW MUCH / WHERE / WHEN)
+   ========================================================= */
 
 INSERT INTO fee_rates
-(campus_id, standard_id, fee_component_id, academic_year_id, description,
- amount, currency, effective_from, effective_to, active, deleted)
+(campus_id, standard_id, fee_component_id, academic_year_id,
+ description, amount, currency,
+ effective_from, effective_to,
+ active, deleted, created_at, created_by)
 VALUES
 
--- ============================================================
--- MAIN CAMPUS — Admission Fees (Academic Year 3)
--- ============================================================
-(1, 1, 1, 3, 'Rate for Admission Form Fee', 5000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 2, 3, 'Rate for Admission Processing', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 3, 3, 'Rate for Admission Test', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+-- Admission (One Time)
+(1, 1, 1, 1, 'Admission form charges', 3000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 2, 1, 'Admission processing charges', 2000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
--- ============================================================
--- MAIN CAMPUS — Tuition Fees (Academic Year 3)
--- ============================================================
-(1, 1, 4, 3, 'Rate for Basic Tuition', 20000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 5, 3, 'Rate for Activity Charges', 3000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 6, 3, 'Rate for Lab Access', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+-- Tuition (Monthly)
+(1, 1, 3, 1, 'Monthly tuition fee', 15000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
--- ============================================================
--- MAIN CAMPUS — Transport Fees (Academic Year 3)
--- ============================================================
-(1, 1, 7, 3, 'Rate for Transport Base Fare', 8000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 8, 3, 'Rate for Fuel Adjustment', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(1, 1, 9, 3, 'Rate for Vehicle Maintenance', 2000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+-- Exam (Term Wise)
+(1, 1, 4, 1, 'Mid term exam fee', 2500.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 5, 1, 'Final term exam fee', 3000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
--- ============================================================
--- CITY CAMPUS — Admission Fees (Academic Year 3)
--- ============================================================
-(2, 1, 10, 3, 'Rate for City Admission Form Fee', 4000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(2, 1, 11, 3, 'Rate for City Admission Processing', 1500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+-- Lab
+(1, 1, 6, 1, 'Computer lab charges', 1200.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 7, 1, 'Science lab charges', 1500.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
--- ============================================================
--- GIRLS CAMPUS — Tuition Fees (Academic Year 3)
--- ============================================================
-(3, 1, 14, 3, 'Rate for Girls Basic Tuition', 18000.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 15, 3, 'Rate for Girls Activities', 2500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 16, 3, 'Rate for Science Materials', 1200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
+-- Library
+(1, 1, 8, 1, 'Annual library charges', 2000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
--- ============================================================
--- GIRLS CAMPUS — Library Fees (Academic Year 3)
--- ============================================================
-(3, 1, 17, 3, 'Rate for Book Rental', 500.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 18, 3, 'Rate for Library Maintenance', 800.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE),
-(3, 1, 19, 3, 'Rate for Library Card', 200.00, 'PKR', '2025-01-01', NULL, TRUE, FALSE);
+-- Transport
+(1, 1, 9, 1, 'Monthly transport charges', 5000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+
+-- Hostel
+(1, 1, 10, 1, 'Monthly hostel charges', 12000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+
+-- Annual
+(1, 1, 11, 1, 'Annual maintenance charges', 4000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+
+-- Activity
+(1, 1, 12, 1, 'Sports & activities charges', 1500.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+
+-- Fine (Percentage)
+(1, 1, 14, 1, 'Late payment fine (%)', 5.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1);
 
 -- ============================================================
 
@@ -711,227 +649,127 @@ VALUES
 --   created_by    : User ID who created the record
 -- ============================================================
 
-INSERT INTO discount_type (code, name, description, charge_type, recurrence_rule, active, priority, display_order,
-                           created_by)
-VALUES ('MERIT', 'Academic / Merit-Based Discounts',
-        'Scholarships and awards based on academic excellence or subject performance.', 'PERCENTAGE', 'TERM_WISE', TRUE,
-        100, 1, 1),
-       ('FAMILY', 'Family-Based Discounts', 'Discounts for siblings, staff children, or alumni children.', 'PERCENTAGE',
-        'MONTHLY', TRUE, 80, 2, 1),
-       ('FINANCIAL', 'Financial / Social Support', 'Need-based, government, or NGO-sponsored tuition support.', 'FIXED',
-        'MONTHLY', TRUE, 90, 3, 1),
-       ('PERFORMANCE', 'Performance / Extra-Curricular',
-        'Discounts for sports, cultural achievements, leadership roles.', 'PERCENTAGE', 'TERM_WISE', TRUE, 70, 4, 1),
-       ('ATTENDANCE', 'Attendance / Behavior-Based', 'Rewards for perfect attendance or exemplary behavior.',
-        'PERCENTAGE', 'MONTHLY', TRUE, 60, 5, 1),
-       ('SPECIAL', 'One-Time / Special Case Discounts',
-        'Medical, emergency, transfer, or custom administrative discounts.', 'FIXED', 'ONE_TIME', TRUE, 50, 6, 1);
+BEGIN;
 
 -- ============================================================
+-- 1️⃣ discount_type
+-- ============================================================
 
--- Table: discount_sub_type
--- Fields:
---   code            : Unique identifier for the sub-type
---   name            : Sub-type name
---   description     : Explains when/how the sub-type applies
---   discount_type_id: References discount_type(id)
---   is_active       : TRUE if currently applicable
---   display_order   : Order within the discount type
---   created_by      : User ID who created the record
+INSERT INTO discount_type
+(code, name, description, charge_type, recurrence_rule, active, priority, display_order, created_by)
+VALUES ('MERIT', 'Merit Based Discount',
+        'Academic excellence and result-based scholarships',
+        'PERCENTAGE', 'TERM_WISE', TRUE, 100, 1, 1),
+
+       ('FAMILY', 'Family & Sibling Discount',
+        'Sibling, staff child, alumni-based discounts',
+        'PERCENTAGE', 'MONTHLY', TRUE, 90, 2, 1),
+
+       ('FINANCIAL', 'Financial Assistance',
+        'Need-based and hardship financial support',
+        'FIXED', 'MONTHLY', TRUE, 95, 3, 1),
+
+       ('PERFORMANCE', 'Sports & Co-Curricular',
+        'Sports, leadership, and cultural achievements',
+        'PERCENTAGE', 'TERM_WISE', TRUE, 80, 4, 1),
+
+       ('ATTENDANCE', 'Attendance & Discipline',
+        'Attendance and behavior rewards',
+        'PERCENTAGE', 'MONTHLY', TRUE, 70, 5, 1),
+
+       ('SPECIAL', 'Special Case / Waiver',
+        'Medical, emergency and administrative cases',
+        'FIXED', 'ONE_TIME', TRUE, 60, 6, 1);
+
+-- ============================================================
+-- 2️⃣ discount_sub_type
 -- ============================================================
 
 INSERT INTO discount_sub_type
 (code, name, description, discount_type_id, is_active, display_order, created_by)
 VALUES
--- ============================
--- MERIT Sub-Types
--- ============================
-('MERIT_TOPPER', 'Class Topper Discount',
- 'Awarded to top-performing students in their class or grade.',
- 1, TRUE, 1, 1),
+-- MERIT
+('MERIT_TOPPER', 'Class Topper', 'Top position holder in class', 1, TRUE, 1, 1),
+('MERIT_POSITION', 'Board Position', 'Board or grade position holder', 1, TRUE, 2, 1),
+('MERIT_SUBJECT', 'Subject Excellence', 'Outstanding subject performance', 1, TRUE, 3, 1),
 
-('MERIT_POSITION', 'Position Holder Discount',
- 'Given to students securing 1st, 2nd, or 3rd position in exams.',
- 1, TRUE, 2, 1),
+-- FAMILY
+('FAMILY_SIBLING', 'Sibling Discount', 'More than one sibling enrolled', 2, TRUE, 1, 1),
+('FAMILY_STAFF', 'Staff Child', 'Child of school employee', 2, TRUE, 2, 1),
 
-('MERIT_SUBJECT', 'Subject Excellence Discount',
- 'For exceptional performance in specific subjects like Math, Science, English.',
- 1, TRUE, 3, 1),
+-- FINANCIAL
+('FINANCIAL_NEED', 'Need Based Support', 'Low income household support', 3, TRUE, 1, 1),
+('FINANCIAL_ORPHAN', 'Orphan Support', 'Orphan or single guardian case', 3, TRUE, 2, 1),
 
-('MERIT_OVERALL', 'Overall Academic Excellence',
- 'For consistent high academic performance throughout the year.',
- 1, TRUE, 4, 1),
+-- PERFORMANCE
+('SPORTS', 'Sports Achievement', 'District or national sports player', 4, TRUE, 1, 1),
+('LEADERSHIP', 'Leadership Role', 'Head boy / Head girl / prefect', 4, TRUE, 2, 1),
 
-('MERIT_BOARD', 'Board Exam Achievement',
- 'Discount for high marks in Federal/Board examinations.',
- 1, TRUE, 5, 1),
+-- ATTENDANCE
+('ATTEND_100', '100% Attendance', 'Perfect attendance', 5, TRUE, 1, 1),
+('GOOD_BEHAVIOR', 'Good Behavior', 'Excellent discipline record', 5, TRUE, 2, 1),
 
--- ============================
--- FAMILY Sub-Types
--- ============================
-('FAMILY_SIBLING', 'Sibling Discount',
- 'Given when multiple siblings are enrolled in the school.',
- 2, TRUE, 1, 1),
-
-('FAMILY_STAFF_CHILD', 'Staff Child Discount',
- 'Special discount for children of school employees and staff.',
- 2, TRUE, 2, 1),
-
-('FAMILY_ALUMNI', 'Alumni Child Discount',
- 'For children of former students (alumni).',
- 2, TRUE, 3, 1),
-
-('FAMILY_MULTI_CHILD', 'Multi-Child Scheme',
- 'For families with 3 or more children in the school.',
- 2, TRUE, 4, 1),
-
-('FAMILY_GUARDIAN', 'Guardian-Based Discount',
- 'Discount for students under the care of registered guardians.',
- 2, TRUE, 5, 1),
-
--- ============================
--- FINANCIAL Sub-Types
--- ============================
-('FINANCIAL_NEED', 'Low-Income Support',
- 'Need-based fee support for low-income households.',
- 3, TRUE, 1, 1),
-
-('FINANCIAL_GOVT', 'Government-Sponsored Support',
- 'Discounts applied through government assistance programs.',
- 3, TRUE, 2, 1),
-
-('FINANCIAL_NGO', 'NGO / Donor Sponsored Discount',
- 'Financial support provided through NGOs or private donors.',
- 3, TRUE, 3, 1),
-
-('FINANCIAL_ORPHAN', 'Orphan Support Program',
- 'Fee discount or waiver for orphan students.',
- 3, TRUE, 4, 1),
-
-('FINANCIAL_SPECIAL_CASE', 'Special Financial Hardship Discount',
- 'Temporary discount due to sudden hardship such as job loss or crisis.',
- 3, TRUE, 5, 1),
-
--- ============================
--- PERFORMANCE Sub-Types
--- ============================
-('PERF_SPORTS', 'Sports Achievement Discount',
- 'For achievements or participation in district, state, or national-level sports events.',
- 4, TRUE, 1, 1),
-
-('PERF_CULTURAL', 'Cultural Achievement Discount',
- 'For achievements in music, dance, art, or cultural competitions.',
- 4, TRUE, 2, 1),
-
-('PERF_LEADERSHIP', 'Leadership Role Discount',
- 'Given to student leaders such as Head Boy, Head Girl, or Prefects.',
- 4, TRUE, 3, 1),
-
-('PERF_COMPETITION', 'Inter-School Competition Award',
- 'For achievements in inter-school competitions (debate, quiz, science fair, etc.).',
- 4, TRUE, 4, 1),
-
-('PERF_ATTENDANCE', 'High Attendance with Performance',
- 'Given for consistent attendance combined with active performance.',
- 4, TRUE, 5, 1),
-
--- ============================
--- ATTENDANCE Sub-Types
--- ============================
-('ATTEND_100', '100% Attendance Discount',
- 'Awarded for perfect attendance throughout the academic year.',
- 5, TRUE, 1, 1),
-
-('ATTEND_95', '95% Attendance Discount',
- 'For students who maintain 95% or above attendance.',
- 5, TRUE, 2, 1),
-
-('ATTEND_BEHAVIOR', 'Good Behavior Discount',
- 'Awarded for maintaining discipline, manners, and positive behavior.',
- 5, TRUE, 3, 1),
-
-('ATTEND_CONDUCT', 'Conduct Excellence Discount',
- 'For exemplary conduct and overall discipline.',
- 5, TRUE, 4, 1),
-
--- ============================
--- SPECIAL Sub-Types
--- ============================
-('SPECIAL_MEDICAL', 'Medical Emergency Discount',
- 'Given due to critical medical issues in student or family.',
- 6, TRUE, 1, 1),
-
-('SPECIAL_TRANSFER', 'Transfer Case Support',
- 'For students admitted due to relocation or transfers.',
- 6, TRUE, 2, 1),
-
-('SPECIAL_COVID', 'Emergency Relief Discount',
- 'Emergency relief discount in crisis situations (pandemic, natural disasters).',
- 6, TRUE, 3, 1),
-
-('SPECIAL_ADMIN', 'Administrative Discount',
- 'Principal/Administrator approved discount for special cases.',
- 6, TRUE, 4, 1),
-
-('SPECIAL_FEE_WAIVER', 'Fee Waiver (Full/Partial)',
- 'One-time custom fee waiver based on case-by-case evaluation.',
- 6, TRUE, 5, 1);
-
+-- SPECIAL
+('MEDICAL', 'Medical Emergency', 'Serious medical case', 6, TRUE, 1, 1),
+('FULL_WAIVER', 'Full Fee Waiver', 'Approved full fee waiver', 6, TRUE, 2, 1);
 
 -- ============================================================
--- Table: discount_rate
--- Fields:
---   value               : Numeric value of the discount (amount or percentage)
---   is_percentage       : TRUE if the value is a percentage, FALSE if fixed amount
---   effective_from      : Start date when the discount is applicable
---   effective_to        : End date for discount applicability (nullable for ongoing)
---   is_active           : TRUE if discount is currently active
---   deleted             : TRUE if record is logically deleted
---   discount_sub_type_id: References discount_sub_type(id), specifies which sub-type this rate belongs to
---   campus_id           : References campus(id), NULL if global
---   academic_year_id    : References academic_year(id) for which this rate applies
---   created_by          : User ID who created the record
+-- 3️⃣ discount_rate (REALISTIC % & FIXED VALUES)
+-- Academic Year: 2024–2025 (id = 1)
+-- Campuses: NULL = global, 1 = Main, 2 = City
 -- ============================================================
-
 INSERT INTO discount_rate
-(value, is_percentage, effective_from, effective_to, is_active, deleted,
- discount_sub_type_id, campus_id, academic_year_id, created_by)
-VALUES (15.00, TRUE, '2024-04-01', '2025-03-31', TRUE, FALSE, 1, 1, 1, 1),
-       (10.00, TRUE, '2024-04-01', '2024-12-31', TRUE, FALSE, 2, 2, 1, 1),
-       (5000.00, FALSE, '2024-08-01', '2025-07-31', TRUE, FALSE, 3, NULL, 2, 1),
-       (20.00, TRUE, '2024-05-15', '2025-05-14', TRUE, FALSE, 4, 1, 2, 1),
-       (25.00, TRUE, '2024-06-01', '2024-12-31', TRUE, FALSE, 5, 3, 2, 1),
+(value, is_percentage, effective_from, effective_to,
+ is_active, deleted,
+ discount_sub_type_id,
+ campus_id, academic_year_id,
+ created_by)
+VALUES
 
-       (12.00, TRUE, '2024-04-01', '2025-03-31', TRUE, FALSE, 6, 1, 1, 1),
-       (3000.00, FALSE, '2024-09-01', '2025-08-31', TRUE, FALSE, 7, NULL, 2, 1),
-       (8.00, TRUE, '2024-08-01', '2025-02-01', TRUE, FALSE, 8, 3, 3, 1),
-       (10.00, TRUE, '2024-04-01', '2024-10-31', TRUE, FALSE, 9, 1, 3, 1),
-       (500.00, FALSE, '2024-07-15', '2025-01-15', TRUE, FALSE, 10, NULL, 1, 1),
+-- ====================================================
+-- MERIT (Term-wise %)
+-- ====================================================
+(30, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 1, 1, 3, 1),
+(40, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 2, 1, 3, 1),
+(20, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 1, 1, 3, 1),
+(60, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 2, 1, 3, 1),
+(80, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 3, 1, 3, 1),
 
-       (18.00, TRUE, '2024-04-01', '2025-03-31', TRUE, FALSE, 11, 2, 4, 1),
-       (7.00, TRUE, '2024-09-01', '2025-08-31', TRUE, FALSE, 12, NULL, 4, 1),
-       (6000.00, FALSE, '2024-06-01', '2025-05-31', TRUE, FALSE, 13, 1, 5, 1),
-       (5.00, TRUE, '2024-04-01', '2024-12-31', TRUE, FALSE, 14, 3, 5, 1),
-       (8000.00, FALSE, '2024-08-01', '2025-07-31', TRUE, FALSE, 15, 2, 4, 1),
+-- ====================================================
+-- FAMILY (Monthly %)
+-- ====================================================
+(10, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 4, 1, 3, 1),
+(15, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 4, 1, 3, 1),
+(20, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 5, 1, 3, 1),
 
-       (10.00, TRUE, '2024-05-01', '2025-04-30', TRUE, FALSE, 16, 1, 2, 1),
-       (9000.00, FALSE, '2024-07-01', '2025-06-30', TRUE, FALSE, 17, NULL, 3, 1),
-       (20.00, TRUE, '2024-04-01', '2025-03-31', TRUE, FALSE, 18, 2, 1, 1),
-       (14.00, TRUE, '2024-10-01', '2025-09-30', TRUE, FALSE, 19, 3, 2, 1),
-       (4500.00, FALSE, '2024-08-01', '2025-08-01', TRUE, FALSE, 20, 1, 4, 1),
+-- ====================================================
+-- FINANCIAL (Monthly FIXED)
+-- ====================================================
+(2000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 6, 1, 3, 1),
+(3000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 6, 1, 3, 1),
+(5000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 7, 1, 3, 1),
 
-       (5.00, TRUE, '2024-04-01', '2024-12-31', TRUE, FALSE, 21, NULL, 4, 1),
-       (30.00, TRUE, '2024-06-01', '2025-05-31', TRUE, FALSE, 22, 2, 5, 1),
-       (7000.00, FALSE, '2024-08-01', '2025-07-31', TRUE, FALSE, 23, 3, 1, 1),
-       (6.00, TRUE, '2024-05-01', '2024-11-01', TRUE, FALSE, 24, NULL, 3, 1),
-       (900.00, FALSE, '2024-07-01', '2025-01-01', TRUE, FALSE, 25, 1, 2, 1),
+-- ====================================================
+-- PERFORMANCE (Term-wise %)
+-- ====================================================
+(25, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 8, 1, 3, 1),
+(30, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 9, 1, 3, 1),
 
-       (17.00, TRUE, '2024-04-01', '2025-03-31', TRUE, FALSE, 1, 3, 1, 1),
-       (600.00, FALSE, '2024-09-01', '2025-02-01', TRUE, FALSE, 2, NULL, 2, 1),
-       (9.00, TRUE, '2024-10-01', '2025-03-01', TRUE, FALSE, 3, 2, 3, 1),
-       (5000.00, FALSE, '2024-05-01', '2025-05-01', TRUE, FALSE, 4, 1, 4, 1),
-       (15.00, TRUE, '2024-06-01', '2025-06-01', TRUE, FALSE, 5, 3, 5, 1);
+-- ====================================================
+-- ATTENDANCE (Monthly %)
+-- ====================================================
+(5, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 10, 1, 3, 1),
+(10, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 10, 1, 3, 1),
+(15, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 11, 1, 3, 1),
 
+-- ====================================================
+-- SPECIAL (One-time + Full Waiver)
+-- ====================================================
+(4000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 12, 1, 3, 1),
+(8000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 12, 1, 3, 1),
+(100, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 13, 1, 3, 1);
+
+COMMIT;
 
 
 INSERT INTO system_users (username, email, phone, password_hash, is_active, is_verified)
@@ -1010,3 +848,20 @@ VALUES
 
 -- Saad: Assigned 5000+20000 = 25000, Paid 2500, Balance 22500
 (5, 3, 25000.00, 2500.00, 22500.00);
+
+
+
+INSERT INTO employee_master
+(employee_code, first_name, last_name, full_name, gender, date_of_birth, marital_status, joining_date,
+ probation_end_date, primary_phone, secondary_phone, work_phone, profile_picture, bio, is_active, created_by,
+ created_at, updated_by, updated_at)
+VALUES ('EMP001', 'Uzair', 'Anwar', 'Uzair Anwar', 'MALE', '1990-05-12', 'SINGLE', '2022-01-10', '2022-07-10',
+        '03001234567', '03007654321', '0421234567', 'uzair.jpg', 'Software Engineer', TRUE, 1, NOW(), 1, NOW()),
+       ('EMP002', 'Ayesha', 'Khan', 'Ayesha Khan', 'FEMALE', '1988-11-25', 'MARRIED', '2021-06-15', '2021-12-15',
+        '03009876543', '03001239876', '0429876543', 'ayesha.jpg', 'HR Manager', TRUE, 1, NOW(), 1, NOW()),
+       ('EMP003', 'Ali', 'Raza', 'Ali Raza', 'MALE', '1992-03-30', 'SINGLE', '2023-03-01', '2023-09-01', '03004567890',
+        NULL, '0424567890', 'ali.jpg', 'Accountant', TRUE, 1, NOW(), 1, NOW()),
+       ('EMP004', 'Sana', 'Javed', 'Sana Javed', 'FEMALE', '1995-08-18', 'SINGLE', '2022-09-20', '2023-03-20',
+        '03006789012', '03009871234', '0425678901', 'sana.jpg', 'Marketing Executive', TRUE, 1, NOW(), 1, NOW()),
+       ('EMP005', 'Hamza', 'Shah', 'Hamza Shah', 'MALE', '1985-12-10', 'MARRIED', '2020-05-05', '2020-11-05',
+        '03003456789', '03007654321', '0426789012', 'hamza.jpg', 'Finance Manager', TRUE, 1, NOW(), 1, NOW());

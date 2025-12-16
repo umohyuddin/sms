@@ -271,7 +271,7 @@ CREATE TABLE fee_component
     taxable        BOOLEAN      NOT NULL DEFAULT FALSE,
     active         BOOLEAN      NOT NULL DEFAULT TRUE,
     deleted        BOOLEAN      NOT NULL DEFAULT FALSE,
-    discount_able    BOOLEAN        NOT NULL DEFAULT FALSE,
+    discount_able  BOOLEAN      NOT NULL DEFAULT FALSE,
     created_at     DATETIME,
     created_by     BIGINT,
     updated_at     DATETIME,
@@ -525,4 +525,37 @@ CREATE TABLE system_users
     -- Audit
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE employee_master
+(
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_code      VARCHAR(50)  NOT NULL UNIQUE,
+    first_name         VARCHAR(100) NOT NULL,
+    last_name          VARCHAR(100) NOT NULL,
+    full_name          VARCHAR(100) NOT NULL,
+    gender             VARCHAR(10),
+    date_of_birth      DATE,
+    marital_status     VARCHAR(20),
+    joining_date       DATE,
+    probation_end_date DATE,
+    primary_phone      VARCHAR(20),
+    secondary_phone    VARCHAR(20),
+    work_phone         VARCHAR(20),
+    profile_picture    VARCHAR(255),
+    bio                TEXT,
+    is_active          BOOLEAN      NOT NULL DEFAULT TRUE,
+
+    deleted            BOOLEAN               DEFAULT FALSE,
+    created_at         DATETIME,
+    created_by         BIGINT,
+    updated_at         DATETIME,
+    updated_by         BIGINT,
+    deleted_at         DATETIME,
+    deleted_by         BIGINT,
+
+
+    -- Constraints
+    CONSTRAINT uq_employee_code UNIQUE (employee_code)
 );
