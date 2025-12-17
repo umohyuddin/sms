@@ -44,7 +44,7 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEn
     // -------------------------
     // Filter by active status
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.isActive = :status")
+    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.active = :status")
     List<EmployeeMasterEntity> findByActiveStatus(@Param("status") Boolean status);
 
     // -------------------------
@@ -66,10 +66,10 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEn
     @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e")
     long countAllEmployees();
 
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.isActive = TRUE")
+    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = TRUE")
     long countActiveEmployees();
 
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.isActive = FALSE")
+    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = FALSE")
     long countInactiveEmployees();
 
     @Query("SELECT e.gender, COUNT(e) FROM EmployeeMasterEntity e GROUP BY e.gender")

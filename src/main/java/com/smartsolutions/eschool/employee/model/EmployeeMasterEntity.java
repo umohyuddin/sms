@@ -58,6 +58,9 @@ public class EmployeeMasterEntity extends AuditableEntity {
     @Column(length = 10)
     private String gender;
 
+    @Column(name = "email", nullable = false, length = 100)
+    private  String email;
+
     @Temporal(TemporalType.DATE)
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
@@ -131,6 +134,6 @@ public class EmployeeMasterEntity extends AuditableEntity {
     // =========================
     // Status & Lifecycle
     // =========================
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 }

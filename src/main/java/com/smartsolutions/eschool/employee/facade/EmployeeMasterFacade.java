@@ -72,5 +72,9 @@ import java.util.List;
         public long getTotalInactiveEmployees() {
             return employeeService.countInactiveEmployees();
         }
+
+        public String updateEmployeeProfile(Long employeeId, String file) {
+            return employeeService.saveProfilePhoto(employeeId, file);
+        }
     }
 

@@ -3,14 +3,24 @@ package com.smartsolutions.eschool.employee.controller;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
+import com.smartsolutions.eschool.global.utils.UploadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/institute/employees")
@@ -127,4 +137,28 @@ public class EmployeeMasterController {
         log.info("GET /api/institute/employees/count/inactive called");
         return ResponseEntity.ok(employeeFacade.getTotalInactiveEmployees());
     }
+
+
+    @PostMapping(value = "/update-profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> uploadProfilePhoto(@RequestParam("employeeId") Long employeeId, @RequestPart("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Profile photo is required");
+        }
+        String filePath = UploadUtil.saveProfilePhoto(employeeId, file);
+        filePath = employeeFacade.updateEmployeeProfile(employeeId, filePath);
+        return ResponseEntity.ok(Map.of("message", "Profile photo uploaded successfully", "filePath", filePath));
+    }
+
+
+    @GetMapping("/profile-photos/{fileName:.+}")
+    public ResponseEntity<Resource> getProfilePhoto(@PathVariable String fileName) throws IOException, MalformedURLException, FileNotFoundException {
+        // Optional: check if user has permission
+        Path file = Paths.get(UploadUtil.UPLOAD_DIR, fileName);
+        Resource resource = new UrlResource(file.toUri());
+        if (!resource.exists()) {
+            throw new FileNotFoundException("File not found");
+        }
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(resource);
+    }
+
 }

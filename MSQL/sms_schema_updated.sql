@@ -535,6 +535,7 @@ CREATE TABLE employee_master
     first_name         VARCHAR(100) NOT NULL,
     last_name          VARCHAR(100) NOT NULL,
     full_name          VARCHAR(100) NOT NULL,
+    email              VARCHAR(100) NOT NULL,
     gender             VARCHAR(10),
     date_of_birth      DATE,
     marital_status     VARCHAR(20),
@@ -545,7 +546,7 @@ CREATE TABLE employee_master
     work_phone         VARCHAR(20),
     profile_picture    VARCHAR(255),
     bio                TEXT,
-    is_active          BOOLEAN      NOT NULL DEFAULT TRUE,
+    active             BOOLEAN      NOT NULL DEFAULT TRUE,
 
     deleted            BOOLEAN               DEFAULT FALSE,
     created_at         DATETIME,

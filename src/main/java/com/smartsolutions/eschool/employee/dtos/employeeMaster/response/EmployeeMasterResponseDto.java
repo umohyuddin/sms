@@ -32,6 +32,7 @@ public class EmployeeMasterResponseDto  {
     private String primaryPhone;
     private String secondaryPhone;
     private String workPhone;
+    private Boolean active;
 
     // Profile
     private String profilePicture;

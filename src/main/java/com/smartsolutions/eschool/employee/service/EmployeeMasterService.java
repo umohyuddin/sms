@@ -139,6 +139,14 @@ public class EmployeeMasterService {
         return responseDTO;
     }
 
+
+    public String saveProfilePhoto(Long employeeId, String file) {
+        EmployeeMasterEntity employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+        employee.setProfilePicture(file);
+        employeeRepository.save(employee);
+        return employee.getProfilePicture();
+    }
     // -------------------------
     // Count / Metrics
     // -------------------------

@@ -853,15 +853,19 @@ VALUES
 
 INSERT INTO employee_master
 (employee_code, first_name, last_name, full_name, gender, date_of_birth, marital_status, joining_date,
- probation_end_date, primary_phone, secondary_phone, work_phone, profile_picture, bio, is_active, created_by,
+ probation_end_date, primary_phone, secondary_phone, work_phone, profile_picture, bio, email, active, created_by,
  created_at, updated_by, updated_at)
 VALUES ('EMP001', 'Uzair', 'Anwar', 'Uzair Anwar', 'MALE', '1990-05-12', 'SINGLE', '2022-01-10', '2022-07-10',
-        '03001234567', '03007654321', '0421234567', 'uzair.jpg', 'Software Engineer', TRUE, 1, NOW(), 1, NOW()),
+        '03001234567', '03007654321', '0421234567', 'uzair.jpg', 'Software Engineer', 'uzair.anwar@example.com', TRUE,
+        1, NOW(), 1, NOW()),
        ('EMP002', 'Ayesha', 'Khan', 'Ayesha Khan', 'FEMALE', '1988-11-25', 'MARRIED', '2021-06-15', '2021-12-15',
-        '03009876543', '03001239876', '0429876543', 'ayesha.jpg', 'HR Manager', TRUE, 1, NOW(), 1, NOW()),
+        '03009876543', '03001239876', '0429876543', 'ayesha.jpg', 'HR Manager', 'ayesha.khan@example.com', TRUE, 1,
+        NOW(), 1, NOW()),
        ('EMP003', 'Ali', 'Raza', 'Ali Raza', 'MALE', '1992-03-30', 'SINGLE', '2023-03-01', '2023-09-01', '03004567890',
-        NULL, '0424567890', 'ali.jpg', 'Accountant', TRUE, 1, NOW(), 1, NOW()),
+        NULL, '0424567890', 'ali.jpg', 'Accountant', 'ali.raza@example.com', TRUE, 1, NOW(), 1, NOW()),
        ('EMP004', 'Sana', 'Javed', 'Sana Javed', 'FEMALE', '1995-08-18', 'SINGLE', '2022-09-20', '2023-03-20',
-        '03006789012', '03009871234', '0425678901', 'sana.jpg', 'Marketing Executive', TRUE, 1, NOW(), 1, NOW()),
+        '03006789012', '03009871234', '0425678901', 'sana.jpg', 'Marketing Executive', 'sana.javed@example.com', TRUE,
+        1, NOW(), 1, NOW()),
        ('EMP005', 'Hamza', 'Shah', 'Hamza Shah', 'MALE', '1985-12-10', 'MARRIED', '2020-05-05', '2020-11-05',
-        '03003456789', '03007654321', '0426789012', 'hamza.jpg', 'Finance Manager', TRUE, 1, NOW(), 1, NOW());
+        '03003456789', '03007654321', '0426789012', 'hamza.jpg', 'Finance Manager', 'hamza.shah@example.com', TRUE, 1,
+        NOW(), 1, NOW());

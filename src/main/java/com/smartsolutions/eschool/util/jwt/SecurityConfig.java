@@ -32,9 +32,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // this picks up WebConfig
+                .cors(cors -> {
+                }) // this picks up WebConfig
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("sms/auth").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
@@ -48,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         //return NoOpPasswordEncoder.getInstance();
-       return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
