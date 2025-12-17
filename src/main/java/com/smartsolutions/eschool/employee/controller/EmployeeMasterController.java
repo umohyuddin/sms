@@ -161,4 +161,22 @@ public class EmployeeMasterController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(resource);
     }
 
+
+    @PostMapping(value = "/upload-document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> uploadEmployeeDocument(@RequestParam("employeeId") Long employeeId, @RequestParam("docKey") String docKey, @RequestPart("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "File is required"));
+        }
+        try {
+            // Save file to disk
+            String filePath = UploadUtil.saveEmployeeDocument(employeeId, docKey, file);
+            // Save record in database via facade
+            employeeFacade.saveEmployeeDocument(employeeId, docKey, file);
+            return ResponseEntity.ok(Map.of("message", "Document uploaded successfully", "filePath", filePath, "docKey", docKey));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Failed to upload document", "error", e.getMessage()));
+        }
+    }
+
+
 }

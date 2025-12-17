@@ -560,3 +560,23 @@ CREATE TABLE employee_master
     -- Constraints
     CONSTRAINT uq_employee_code UNIQUE (employee_code)
 );
+
+
+CREATE TABLE employee_document
+(
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id   BIGINT       NOT NULL, -- foreign key to Teacher
+    file_name     VARCHAR(255) NOT NULL,
+    file_path     VARCHAR(500) NOT NULL,
+    file_type     VARCHAR(50),
+    document_type VARCHAR(100) NOT NULL,
+
+    deleted       BOOLEAN DEFAULT FALSE,
+    created_at    DATETIME,
+    created_by    BIGINT,
+    updated_at    DATETIME,
+    updated_by    BIGINT,
+    deleted_at    DATETIME,
+    deleted_by    BIGINT,
+    CONSTRAINT fk_teacher FOREIGN KEY (employee_id) REFERENCES employee_master (id)
+);

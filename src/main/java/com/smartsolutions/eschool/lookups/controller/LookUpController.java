@@ -37,9 +37,10 @@ public class LookUpController {
     private final CityFacade cityFacade;
     private final NationalityConfig nationalityConfig;
     private final GenderConfig genderConfig;
+    private final EmployeeDocumentConfig employeeDocumentConfig;
 
 
-    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig) {
+    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig) {
         this.religionConfig = religionConfig;
         this.feeConfig = feeConfig;
         this.bloodGroupConfig = bloodGroupConfig;
@@ -47,6 +48,7 @@ public class LookUpController {
         this.cityFacade = cityFacade;
         this.nationalityConfig = nationalityConfig;
         this.genderConfig = genderConfig;
+        this.employeeDocumentConfig = employeeDocumentConfig;
     }
 
     // ---------------------- Province Endpoints ----------------------
@@ -99,30 +101,25 @@ public class LookUpController {
 
     @GetMapping("/fee-catalog/metadata")
     public Map<String, Map<String, String>> getFeeMeta() {
-        return Map.of(
-                "chargeTypes", feeConfig.getChargeTypes(),
-                "recurrenceRules", feeConfig.getRecurrenceRules()
-        );
+        return Map.of("chargeTypes", feeConfig.getChargeTypes(), "recurrenceRules", feeConfig.getRecurrenceRules());
     }
+
+
+    @GetMapping("/docs/metadata")
+    public Map<String, Map<String, String>> getDocsMeta() {
+        return Map.of("docs", employeeDocumentConfig.getDocumentTypes());
+    }
+
 
     @GetMapping("/admission/metadata")
     public Map<String, Map<String, String>> getAdmissionMeta() {
         List<ProvinceResponseDTO> provincesList = provinceFacade.getAll();
 
 
-        Map<String, String> provinces = provincesList.stream()
-                .collect(Collectors.toMap(
-                        province -> String.valueOf(province.getId()), // convert Long to String
-                        ProvinceResponseDTO::getName
-                ));
+        Map<String, String> provinces = provincesList.stream().collect(Collectors.toMap(province -> String.valueOf(province.getId()), // convert Long to String
+                ProvinceResponseDTO::getName));
 
-        return Map.of(
-                "bloodGroup", bloodGroupConfig.getGroup(),
-                "religions", religionConfig.getList(),
-                "nationalities", nationalityConfig.getMap(),
-                "gender", genderConfig.getList(),
-                "provinces", provinces
-        );
+        return Map.of("bloodGroup", bloodGroupConfig.getGroup(), "religions", religionConfig.getList(), "nationalities", nationalityConfig.getMap(), "gender", genderConfig.getList(), "provinces", provinces, "docs", employeeDocumentConfig.getDocumentTypes());
     }
 }
 

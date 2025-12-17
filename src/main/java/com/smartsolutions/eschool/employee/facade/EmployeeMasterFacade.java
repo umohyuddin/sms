@@ -5,7 +5,9 @@ import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.Employee
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -75,6 +77,13 @@ import java.util.List;
 
         public String updateEmployeeProfile(Long employeeId, String file) {
             return employeeService.saveProfilePhoto(employeeId, file);
+        }
+
+
+
+        public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
+
+            employeeService.saveEmployeeDocument(employeeId,docKey,file);
         }
     }
 
