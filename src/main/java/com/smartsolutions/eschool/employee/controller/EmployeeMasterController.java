@@ -1,11 +1,13 @@
 package com.smartsolutions.eschool.employee.controller;
 
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
 import com.smartsolutions.eschool.global.utils.UploadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -176,6 +185,29 @@ public class EmployeeMasterController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("message", "Failed to upload document", "error", e.getMessage()));
         }
+    }
+
+    @GetMapping(value = "/{employeeId}/documents", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getEmployeeDocuments(@PathVariable Long employeeId) {
+        log.info("GET /api/institute /employees/{}/documents called", employeeId);
+        try {
+            List<EmployeeDocumentResponseDto> documents = employeeFacade.getEmployeeDocuments(employeeId);
+            if (documents.isEmpty()) {
+                log.warn("No documents found for Employee with id: {}", employeeId);
+            } else {
+                log.info("Returned {} documents for Employee with id: {}", documents.size(), employeeId);
+            }
+            return ResponseEntity.ok(documents);
+        } catch (Exception e) {
+            log.error("Error fetching documents for Employee with id: {}", employeeId, e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/download-document/{documentId}")
+    public ResponseEntity<Resource> downloadEmployeeDocument(@PathVariable Long documentId, @RequestParam("employeeId") Long employeeId) throws IOException {
+        Resource document = employeeFacade.getDocumentById(documentId, employeeId);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getFilename() + "\"").body(document);
     }
 
 

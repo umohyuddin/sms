@@ -107,7 +107,11 @@ public class LookUpController {
 
     @GetMapping("/docs/metadata")
     public Map<String, Map<String, String>> getDocsMeta() {
-        return Map.of("docs", employeeDocumentConfig.getDocumentTypes());
+        return Map.of("docs", employeeDocumentConfig.getDocumentTypes(),
+                "addressType", employeeDocumentConfig.getAddressTypes(),
+                "relationshipType", employeeDocumentConfig.getEmergencyContactRelationships(),
+                "degree", employeeDocumentConfig.getDegrees(),
+                "subjects", employeeDocumentConfig.getSubjects());
     }
 
 

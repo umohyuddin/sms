@@ -1,18 +1,21 @@
 package com.smartsolutions.eschool.employee.facade;
 
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
-    @Component
+@Component
     @Scope("prototype")
     public class EmployeeMasterFacade {
 
@@ -82,8 +85,19 @@ import java.util.List;
 
 
         public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
-
             employeeService.saveEmployeeDocument(employeeId,docKey,file);
         }
+
+
+        public List<EmployeeDocumentResponseDto> getEmployeeDocuments(Long employeeId) {
+            return employeeService.getDocumentsByEmployeeId(employeeId);
+        }
+        public Map<String, List<EmployeeDocumentResponseDto>> getDocumentsByEmployeeId(Long employeeId) {
+            return employeeService.getGroupedDocuments(employeeId);
+        }
+
+    public Resource getDocumentById(Long documentId, Long employeeId) {
+            return employeeService.downloadDocument(documentId,employeeId);
     }
+}
 

@@ -1,11 +1,13 @@
 package com.smartsolutions.eschool.employee.service;
 
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.model.EmployeeDocumentEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.repository.EmployeeDocumentRepository;
 import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
+import com.smartsolutions.eschool.global.configs.EmployeeDocumentConfig;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.global.utils.UploadUtil;
 import com.smartsolutions.eschool.util.MapperUtil;
@@ -17,25 +19,30 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class EmployeeMasterService {
     private final EmployeeMasterRepository employeeRepository;
     private final EmployeeDocumentRepository employeeDocumentRepository;
+    private final EmployeeDocumentConfig feeConfig;
 
-    public EmployeeMasterService(EmployeeMasterRepository employeeRepository, EmployeeDocumentRepository employeeDocumentRepository) {
+    public EmployeeMasterService(EmployeeMasterRepository employeeRepository, EmployeeDocumentRepository employeeDocumentRepository, EmployeeDocumentConfig feeConfig) {
         this.employeeRepository = employeeRepository;
         this.employeeDocumentRepository = employeeDocumentRepository;
+        this.feeConfig = feeConfig;
     }
 
     // -------------------------
@@ -185,16 +192,61 @@ public class EmployeeMasterService {
         Path filePath = Paths.get(uploadDir, fileName);
         Files.write(filePath, file.getBytes());
 
-        EmployeeDocumentEntity document = EmployeeDocumentEntity.builder().
-                employeeId(employeeId).
-                documentType(docKey).
-                fileName(fileName).
-                filePath(filePath.toString()).
-                fileType(FilenameUtils.getExtension(fileName).toUpperCase()).
-                build();
+        EmployeeDocumentEntity document = EmployeeDocumentEntity.builder().employeeId(employeeId).documentType(docKey).fileName(fileName).filePath(filePath.toString()).fileType(FilenameUtils.getExtension(fileName).toUpperCase()).build();
         employeeDocumentRepository.save(document);
+    }
+
+    public List<EmployeeDocumentResponseDto> getDocumentsByEmployeeId(Long employeeId) {
+        try {
+            log.info("Fetching documents for Employee with id: {}", employeeId);
+            List<EmployeeDocumentEntity> documents = employeeDocumentRepository.findByEmployeeId(employeeId);
+            if (documents.isEmpty()) {
+                log.warn("No documents found for Employee with id: {}", employeeId);
+                return Collections.emptyList();
+            }
+            // Map entity list to DTO list
+            List<EmployeeDocumentResponseDto> dtoList = MapperUtil.mapList(documents, EmployeeDocumentResponseDto.class);
+            log.info("Found {} documents for Employee with id: {}", dtoList.size(), employeeId);
+            return dtoList;
+        } catch (Exception e) {
+            log.error("Error fetching documents for Employee with id: {}", employeeId, e);
+            return Collections.emptyList();
+        }
+    }
 
 
+    public Map<String, List<EmployeeDocumentResponseDto>> getGroupedDocuments(Long employeeId) {
+        List<EmployeeDocumentResponseDto> documents = getDocumentsByEmployeeId(employeeId);
+
+        if (documents.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        // Group documents by their human-readable type from config
+        Map<String, List<EmployeeDocumentResponseDto>> groupedDocuments = documents.stream()
+                .collect(Collectors.groupingBy(doc ->
+                        feeConfig.getDocumentTypes().getOrDefault(doc.getDocumentType(), "Other")
+                ));
+
+        return groupedDocuments;
+    }
+
+    public Resource downloadDocument(Long documentId, Long employeeId) {
+        // 1️⃣ Fetch document from database
+        EmployeeDocumentEntity document = employeeDocumentRepository
+                .findDocumentByIdAndEmployeeId(documentId, employeeId)
+                .orElseThrow(() -> new RuntimeException(
+                        "Document not found for employeeId=" + employeeId + " and documentId=" + documentId));
+        Path path = Paths.get(document.getFilePath());
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new FileNotFoundException("File not found or not readable: " + document.getFilePath());
+            }
+            return resource;
+        } catch (Exception e) {
+            throw new RuntimeException("Error while reading document file: " + e.getMessage(), e);
+        }
     }
 }
 

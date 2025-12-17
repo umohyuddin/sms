@@ -14,5 +14,11 @@ import java.util.Optional;
 @Repository
 public interface EmployeeDocumentRepository extends JpaRepository<EmployeeDocumentEntity, Long> {
 
+    List<EmployeeDocumentEntity> findByEmployeeId(Long employeeId);
 
+    @Query("SELECT e FROM EmployeeDocumentEntity e WHERE e.id = :id AND e.employeeId = :employeeId")
+    Optional<EmployeeDocumentEntity> findDocumentByIdAndEmployeeId(
+            @Param("id") Long id,
+            @Param("employeeId") Long employeeId
+    );
 }

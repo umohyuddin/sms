@@ -580,3 +580,73 @@ CREATE TABLE employee_document
     deleted_by    BIGINT,
     CONSTRAINT fk_teacher FOREIGN KEY (employee_id) REFERENCES employee_master (id)
 );
+
+
+CREATE TABLE employee_address
+(
+    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id  BIGINT       NOT NULL,
+    address_type VARCHAR(50)  NOT NULL,
+    line1        VARCHAR(255) NOT NULL,
+    line2        VARCHAR(255),
+    city         VARCHAR(100) NOT NULL,
+    state        VARCHAR(100),
+    postal_code  VARCHAR(20),
+    country      VARCHAR(100) NOT NULL,
+
+    deleted      BOOLEAN DEFAULT FALSE,
+    created_at   DATETIME,
+    created_by   BIGINT,
+    updated_at   DATETIME,
+    updated_by   BIGINT,
+    deleted_at   DATETIME,
+    deleted_by   BIGINT,
+
+    CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES employee_master (id)
+);
+
+
+CREATE TABLE employee_emergency_contact
+(
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id     BIGINT       NOT NULL,
+    contact_name    VARCHAR(255) NOT NULL,
+    relationship    VARCHAR(100) NOT NULL,
+    phone_primary   VARCHAR(20)  NOT NULL,
+    phone_secondary VARCHAR(20),
+    email           VARCHAR(255),
+    address         VARCHAR(500),
+
+    deleted         BOOLEAN DEFAULT FALSE,
+    created_at      DATETIME,
+    created_by      BIGINT,
+    updated_at      DATETIME,
+    updated_by      BIGINT,
+    deleted_at      DATETIME,
+    deleted_by      BIGINT,
+
+    CONSTRAINT fk_employee_emergency FOREIGN KEY (employee_id) REFERENCES employee_master (id)
+);
+
+
+CREATE TABLE employee_qualification
+(
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id     BIGINT       NOT NULL,
+    degree          VARCHAR(100) NOT NULL, -- e.g., B.Sc, M.Ed
+    major_subject   VARCHAR(100),          -- e.g., Mathematics, English
+    institute       VARCHAR(150),          -- University or College
+    year_of_passing INT,                   -- Year completed
+    grade           VARCHAR(20),           -- e.g., A, 3.5 GPA
+    certificate     VARCHAR(255),          -- Optional: path to scanned certificate file
+
+    deleted         BOOLEAN DEFAULT FALSE,
+    created_at      DATETIME,
+    created_by      BIGINT,
+    updated_at      DATETIME,
+    updated_by      BIGINT,
+    deleted_at      DATETIME,
+    deleted_by      BIGINT,
+
+    CONSTRAINT fk_employee_qualification FOREIGN KEY (employee_id) REFERENCES employee_master (id)
+);
