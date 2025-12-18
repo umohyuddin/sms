@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.repository;
 
+import com.smartsolutions.eschool.employee.model.EmployeeAddressEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -83,4 +84,7 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEn
 
     @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.dateOfBirth ASC")
     List<EmployeeMasterEntity> findAllOrderByDateOfBirthAsc();
+
+
+
 }

@@ -1,8 +1,10 @@
 package com.smartsolutions.eschool.employee.controller;
 
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeAddressResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
+import com.smartsolutions.eschool.employee.facade.EmployeeAddressFacade;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
 import com.smartsolutions.eschool.global.utils.UploadUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +37,15 @@ import java.util.Map;
 @RequestMapping("/api/institute/employees")
 @Slf4j
 public class EmployeeMasterController {
-    @Autowired
-    private EmployeeMasterFacade employeeFacade;
+    private final EmployeeMasterFacade employeeFacade;
+
+    private final EmployeeAddressFacade employeeAddressFacade;
+
+    public EmployeeMasterController(EmployeeMasterFacade employeeFacade, EmployeeAddressFacade employeeAddressFacade) {
+        this.employeeFacade = employeeFacade;
+        this.employeeAddressFacade = employeeAddressFacade;
+    }
+
 
     // -------------------------
     // Get all employees
@@ -224,4 +233,34 @@ public class EmployeeMasterController {
         }
     }
 
+
+    @GetMapping(value = "/{employeeId}/addresses", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EmployeeAddressResponseDto>> getEmployeeAddresses(@PathVariable Long employeeId) {
+        log.info("GET /api/institute/employees/{}/addresses called", employeeId);
+        try {
+            List<EmployeeAddressResponseDto> addresses = employeeAddressFacade.getEmployeeAddresses(employeeId);
+            log.info("Returned {} addresses for employeeId={}", addresses.size(), employeeId);
+            return ResponseEntity.ok(addresses);
+        } catch (Exception e) {
+            log.error("Failed to fetch addresses for employeeId={}", employeeId, e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping(value = "/addresses/{addressId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeAddressResponseDto> getEmployeeAddressById(@PathVariable Long addressId) {
+        log.info("GET /api/institute/employees/addresses/{} called", addressId);
+        try {
+            EmployeeAddressResponseDto address = employeeAddressFacade.getAddressById(addressId);
+            if (address == null) {
+                log.warn("Address not found with id={}", addressId);
+                return ResponseEntity.notFound().build();
+            }
+            log.info("Returning address with id={}", addressId);
+            return ResponseEntity.ok(address);
+        } catch (Exception e) {
+            log.error("Failed to fetch address with id={}", addressId, e);
+            return ResponseEntity.status(500).build();
+        }
+    }
 }
