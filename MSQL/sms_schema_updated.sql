@@ -530,22 +530,38 @@ CREATE TABLE system_users
 
 CREATE TABLE employee_master
 (
-    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id                 BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     employee_code      VARCHAR(50)  NOT NULL UNIQUE,
+
+    -- Personal Information
     first_name         VARCHAR(100) NOT NULL,
     last_name          VARCHAR(100) NOT NULL,
     full_name          VARCHAR(100) NOT NULL,
-    email              VARCHAR(100) NOT NULL,
+    middle_Name        VARCHAR(100),
     gender             VARCHAR(10),
     date_of_birth      DATE,
     marital_status     VARCHAR(20),
-    joining_date       DATE,
-    probation_end_date DATE,
+    cnic               VARCHAR(20),
+    passport_number    VARCHAR(20),
+    religion           VARCHAR(50),
+    nationality        VARCHAR(50),
+    blood_group        VARCHAR(10),
+
+    -- Contact Information
+    email              VARCHAR(100) NOT NULL,
     primary_phone      VARCHAR(20),
     secondary_phone    VARCHAR(20),
     work_phone         VARCHAR(20),
+
+    -- Employment Details
+    joining_date       DATE,
+    probation_end_date DATE,
+
+    -- Profile
     profile_picture    VARCHAR(255),
     bio                TEXT,
+
+    -- Status
     active             BOOLEAN      NOT NULL DEFAULT TRUE,
 
     deleted            BOOLEAN               DEFAULT FALSE,
@@ -556,10 +572,12 @@ CREATE TABLE employee_master
     deleted_at         DATETIME,
     deleted_by         BIGINT,
 
-
-    -- Constraints
-    CONSTRAINT uq_employee_code UNIQUE (employee_code)
+    UNIQUE KEY uq_employee_code (employee_code),
+    -- Indexes
+    INDEX              idx_employee_code (employee_code),
+    INDEX              idx_employee_active (active)
 );
+
 
 
 CREATE TABLE employee_document

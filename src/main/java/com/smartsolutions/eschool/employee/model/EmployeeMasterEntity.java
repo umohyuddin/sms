@@ -54,6 +54,8 @@ public class EmployeeMasterEntity extends AuditableEntity {
 
     @Column(name = "full_Name", nullable = false, length = 100)
     private String fullName;
+    @Column(name = "middle_Name", length = 100)
+    private String middleName;
 
     @Column(length = 10)
     private String gender;
@@ -67,6 +69,23 @@ public class EmployeeMasterEntity extends AuditableEntity {
 
     @Column(name = "marital_status", length = 20)
     private String maritalStatus;
+
+
+    @Column(name = "cnic", length = 20)
+    private String cnic;
+
+    @Column(name = "passport_number", length = 20)
+    private String passportNumber;
+
+    @Column(length = 50)
+    private String religion;
+
+    @Column(length = 50)
+    private String nationality;
+
+    @Column(name = "blood_group", length = 10)
+    private String bloodGroup;
+
 
     // =========================
     // Employment Details

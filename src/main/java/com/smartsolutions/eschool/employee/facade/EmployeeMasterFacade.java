@@ -99,5 +99,9 @@ import java.util.Map;
     public Resource getDocumentById(Long documentId, Long employeeId) {
             return employeeService.downloadDocument(documentId,employeeId);
     }
+
+    public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto requestDto) {
+            return employeeService.updateEmployee(id,requestDto);
+    }
 }
 

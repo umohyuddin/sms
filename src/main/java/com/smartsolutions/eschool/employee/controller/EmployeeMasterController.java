@@ -211,4 +211,17 @@ public class EmployeeMasterController {
     }
 
 
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeMasterResponseDto> updateEmployee(@PathVariable Long id, @RequestBody EmployeeMasterRequestDto requestDto) {
+        log.info("PUT /api/institute/employees/{} called to update employee: {}", id, requestDto);
+        try {
+            EmployeeMasterResponseDto updatedEmployee = employeeFacade.updateEmployee(id, requestDto);
+            log.info("Employee updated successfully with id: {}", updatedEmployee.getId());
+            return ResponseEntity.ok(updatedEmployee);
+        } catch (Exception e) {
+            log.error("Failed to update employee with id: {}", id, e);
+            return ResponseEntity.status(500).body(null); // or you can return a custom error DTO
+        }
+    }
+
 }

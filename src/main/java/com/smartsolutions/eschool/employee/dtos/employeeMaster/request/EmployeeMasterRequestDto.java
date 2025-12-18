@@ -12,15 +12,19 @@ public class EmployeeMasterRequestDto {
 
     // Employee Identification
     private String employeeCode = "SMS";
-
     // Personal Information
     private String firstName;
     private String lastName;
     private String fullName;
+    private String middleName;
     private String gender;
+    private String email;
     private Date dateOfBirth;
     private String maritalStatus;
-    private String email;
+    private String religion;
+    private String nationality;
+    private String bloodGroup;
+
     // Employment Details
     private Date joiningDate;
     private Date probationEndDate;
@@ -33,6 +37,9 @@ public class EmployeeMasterRequestDto {
     // Profile
     private String profilePicture;
     private String bio;
+
+    // Status
+    private Boolean active = true;
 
     // Relationships (by IDs)
 //    private Long departmentId;       // FK to Department

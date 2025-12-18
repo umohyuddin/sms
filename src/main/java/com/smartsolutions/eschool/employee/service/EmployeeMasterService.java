@@ -148,6 +148,7 @@ public class EmployeeMasterService {
 
 
         //TODO employee Code
+        //TODO Probation Date
         EmployeeMasterEntity employeeEntity = MapperUtil.mapObject(employeeDTO, EmployeeMasterEntity.class);
 
         employeeEntity.setId(null);
@@ -250,5 +251,82 @@ public class EmployeeMasterService {
             throw new RuntimeException("Error while reading document file: " + e.getMessage(), e);
         }
     }
+
+    @Transactional
+    public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto dto) {
+        log.info("Updating Employee with id {} using DTO {}", id, dto);
+
+        EmployeeMasterEntity entity = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
+
+        if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) {
+            entity.setFirstName(dto.getFirstName());
+        }
+//        if (dto.getMiddleName() != null) {
+//            entity.setMiddleName(dto.getMiddleName());
+//        }
+        if (dto.getLastName() != null && !dto.getLastName().isBlank()) {
+            entity.setLastName(dto.getLastName());
+        }
+        if (dto.getDateOfBirth() != null) {
+            entity.setDateOfBirth(dto.getDateOfBirth());
+        }
+        if (dto.getGender() != null) {
+            entity.setGender(dto.getGender());
+        }
+//        if (dto.getCnic() != null) {
+//            entity.setCnic(dto.getCnic());
+//        }
+//        if (dto.getPassportNumber() != null) {
+//            entity.setPassportNumber(dto.getPassportNumber());
+//        }
+        if (dto.getPrimaryPhone() != null) {
+            entity.setPrimaryPhone(dto.getPrimaryPhone());
+        }
+        if (dto.getSecondaryPhone() != null) {
+            entity.setSecondaryPhone(dto.getSecondaryPhone());
+        }
+        if (dto.getWorkPhone() != null) {
+            entity.setWorkPhone(dto.getWorkPhone());
+        }
+        if (dto.getEmail() != null) {
+            entity.setEmail(dto.getEmail());
+        }
+        if (dto.getReligion() != null) {
+            entity.setReligion(dto.getReligion());
+        }
+        if (dto.getNationality() != null) {
+            entity.setNationality(dto.getNationality());
+        }
+        if (dto.getMaritalStatus() != null) {
+            entity.setMaritalStatus(dto.getMaritalStatus());
+        }
+        if (dto.getBloodGroup() != null) {
+            entity.setBloodGroup(dto.getBloodGroup());
+        }
+        if (dto.getBio() != null) {
+            entity.setBio(dto.getBio());
+        }
+        if (dto.getJoiningDate() != null) {
+            entity.setJoiningDate(dto.getJoiningDate());
+        }
+
+        // Optional: recompute fullName
+        entity.setFullName(
+                (entity.getFirstName() != null ? entity.getFirstName() : "") + " " +
+                        (entity.getMiddleName() != null ? entity.getMiddleName() + " " : "") +
+                        (entity.getLastName() != null ? entity.getLastName() : "")
+        );
+
+        // 3️⃣ Save entity
+        EmployeeMasterEntity updated = employeeRepository.save(entity);
+
+        // 4️⃣ Map to response DTO
+        EmployeeMasterResponseDto response = MapperUtil.mapObject(updated, EmployeeMasterResponseDto.class);
+
+        log.info("Employee updated successfully: {}", response.getId());
+        return response;
+    }
+
 }
 
