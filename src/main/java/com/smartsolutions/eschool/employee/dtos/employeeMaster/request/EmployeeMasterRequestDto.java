@@ -11,7 +11,7 @@ import java.util.Date;
 public class EmployeeMasterRequestDto {
 
     // Employee Identification
-    private String employeeCode;
+    private String employeeCode = "SMS";
 
     // Personal Information
     private String firstName;
@@ -20,7 +20,7 @@ public class EmployeeMasterRequestDto {
     private String gender;
     private Date dateOfBirth;
     private String maritalStatus;
-
+    private String email;
     // Employment Details
     private Date joiningDate;
     private Date probationEndDate;

@@ -146,6 +146,8 @@ public class EmployeeMasterService {
     public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto employeeDTO) {
         log.info("Creating new Employee: {}", employeeDTO);
 
+
+        //TODO employee Code
         EmployeeMasterEntity employeeEntity = MapperUtil.mapObject(employeeDTO, EmployeeMasterEntity.class);
 
         employeeEntity.setId(null);

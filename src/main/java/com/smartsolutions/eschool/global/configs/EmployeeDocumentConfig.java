@@ -10,13 +10,23 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "employee")
 @Component
 public class EmployeeDocumentConfig {
+    private Integer probationPeriodMonths;
+
     private Map<String, String> documentTypes;
     private Map<String, String> addressTypes;
     private Map<String, String> emergencyContactRelationships;
-    private Map<String, String> degrees;
-    private Map<String, String> subjects;
+    private Map<String, String> qualificationDegrees;
+    private Map<String, String> qualificationSubjects;
+    private Map<String, String> maritalStatus;
 
-    // Document Types
+    public Integer getProbationPeriodMonths() {
+        return probationPeriodMonths;
+    }
+
+    public void setProbationPeriodMonths(Integer probationPeriodMonths) {
+        this.probationPeriodMonths = probationPeriodMonths;
+    }
+
     public Map<String, String> getDocumentTypes() {
         return documentTypes;
     }
@@ -25,7 +35,6 @@ public class EmployeeDocumentConfig {
         this.documentTypes = documentTypes;
     }
 
-    // Address Types
     public Map<String, String> getAddressTypes() {
         return addressTypes;
     }
@@ -34,7 +43,6 @@ public class EmployeeDocumentConfig {
         this.addressTypes = addressTypes;
     }
 
-    // Emergency Contact Relationships
     public Map<String, String> getEmergencyContactRelationships() {
         return emergencyContactRelationships;
     }
@@ -43,19 +51,60 @@ public class EmployeeDocumentConfig {
         this.emergencyContactRelationships = emergencyContactRelationships;
     }
 
-    public Map<String, String> getDegrees() {
-        return degrees;
+    public Map<String, String> getQualificationDegrees() {
+        return qualificationDegrees;
     }
 
-    public void setDegrees(Map<String, String> degrees) {
-        this.degrees = degrees;
+    public void setQualificationDegrees(Map<String, String> qualificationDegrees) {
+        this.qualificationDegrees = qualificationDegrees;
     }
 
-    public Map<String, String> getSubjects() {
-        return subjects;
+    public Map<String, String> getQualificationSubjects() {
+        return qualificationSubjects;
     }
 
-    public void setSubjects(Map<String, String> subjects) {
-        this.subjects = subjects;
+    public void setQualificationSubjects(Map<String, String> qualificationSubjects) {
+        this.qualificationSubjects = qualificationSubjects;
+    }
+
+    public Map<String, String> getMaritalStatus() {
+        return maritalStatus;
+    }
+
+    public void setMaritalStatus(Map<String, String> maritalStatus) {
+        this.maritalStatus = maritalStatus;
     }
 }
+
+
+
+/**
+ * ================================================================
+ * Employee Configuration Properties Mapping
+ * ================================================================
+ *
+ * application.properties key prefix: employee
+ *
+ * ---------------------------------------------------------------
+ * Property Key Pattern                           Java Field
+ * ---------------------------------------------------------------
+ * employee.document-types.*                      documentTypes
+ * employee.address-types.*                       addressTypes
+ * employee.emergency-contact-relationships.*     emergencyContactRelationships
+ * employee.qualification-degrees.*               qualificationDegrees
+ * employee.qualification-subjects.*              qualificationSubjects
+ * employee.marital-status.*                      maritalStatus
+ * employee.probation-period-months               probationPeriodMonths
+ * ---------------------------------------------------------------
+ *
+ * Usage:
+ * - All "*" entries are mapped as Map<String, String>
+ * - probationPeriodMonths is a single Integer value
+ *
+ * Example:
+ * employee.document-types.RESUME=Resume
+ * → documentTypes.get("RESUME") = "Resume"
+ *
+ * ================================================================
+ */
+
