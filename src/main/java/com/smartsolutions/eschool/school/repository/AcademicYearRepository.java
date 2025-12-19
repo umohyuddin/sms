@@ -26,6 +26,9 @@ public interface AcademicYearRepository extends JpaRepository<AcademicYearEntity
     @Query("UPDATE AcademicYearEntity a SET a.isCurrent = false WHERE a.isCurrent = true")
     void deactivateAllAcademicYears();
 
+    @Query("SELECT ar FROM AcademicYearEntity ar " +
+            "WHERE LOWER(ar.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<AcademicYearEntity> searchByName(@Param("keyword") String keyword);
 
 }
 

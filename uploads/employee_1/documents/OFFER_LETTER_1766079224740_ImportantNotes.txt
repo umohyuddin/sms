@@ -1,0 +1,365 @@
+http://localhost:8001/currency-exchange/from/USD/to/IND
+http://localhost:8100/currency-conversion-feign/from/USD/to/INR/quantity/10
+
+//api gateway
+http://localhost:8765/
+
+http://localhost:8765/CURRENCY-EXCHANGE-SERVICE/currency-exchange/from/USD/to/IND
+http://localhost:8765/CURRENCY-CONVERSION-SERVICE/currency-conversion-feign/from/USD/to/INR/quantity/10
+
+http://localhost:8765/CURRENCY-EXCHANGE-SERVICE/currency-exchange/from/USD/to/IND
+
+http://localhost:8765/currency-exchange-service/currency-exchange/from/USD/to/IND
+http://localhost:8765/currency-conversion-service/currency-conversion-feign/from/USD/to/INR/quantity/10
+-------------------------------------------------------------------------
+https://apps.mec1.pure.cloud/crm/index.html?enableFrameworkClientId=true&crm=embeddableframework
+-------------------------------------------------------------------------
+Content Negotiation
+Auto Configuration spring boot report
+-NamedParameterJdbcTemplate done
+Batch operations
+Transactions
+Stored procedures
+Externalize SQL
+Named Quary
+
+rest templete builder
+
+
+
+
+JPA constraints
+-------------------------------------------------------------------------
+For Calls Agents Detail:
+0015044147909
+
+haseeb.tahir@expertflow.com
+Expertflow@464
+
+uzair.anwar@expertflow.com
+Expertflow@464
+
+https://apps.mypurecloud.de
+-------------------------------------------------------------------------
+Project demo
+10.192.9.70
+Root
+Expertflow123
+-------------------------------------------------------------------------
+VPN UZAIR
+uzair.anwar
+G7v$kP@2zQm!Xy9#dTf
+
+-------------------------------------------------------------------------
+
+netstat -ano | findstr :8080
+taskkill /PID 12345 /F
+-------------------------------------------------------------------------
+
+SAPCIC
+
+https://drive.google.com/drive/folders/1gCPOMvuFrVa8aLP-RmizSZ4Vo3xm8PTW
+-------------------------------------------------------------------------
+Personal Token CDAS
+CJ3vmz4ksdwcayidQnNs
+
+
+SAP password Abcde12345!@ABCDEfghij67890!@@
+-------------------------------------------------------------------------
+
+k delete -f filename
+k apply -f filename
+k get pods -n expertflow
+
+netstat -ano | findstr :8080
+-------------------------------------------------------------------------
+
+epic.b5801750355746700@orgfarm.th.
+
+-------------------------------------------------------------------------
+sharjeel.akram@expertflow.com
+Msa.webex.8162
+
+User1: ss_husain+st@hotmail.com
+Expertflow@464
+
+User2: ss_husain+ST2@hotmail.com
+Expertflow@464
+
+User3: ss_husain+sup@hotmail.com
+Expertflow@464
+
+uzair.anwar@expertflow.com
+Expertflow@464
+
+haseeb.tahir@expertflow.com
+#Ht123#@!
+
+amr.muhammad@expertflow.com
+efWebex_agnet5
+
+Admin password ef webex cc - Msa.webex.8162
++14089798990
+
+----------------------------------------------------------------------------
+ef.confluence@expertflow.com
+EF_confluence464
+----------------------------------------------------------------------------
+
+
+
+Agent 
+
+Saadexpertflow@gmail.com
+
+!@#456Redhat
+
++441144940643
+
+PAT GITLAB - d_j55bWc8smHv6WndExs
+
+
+
+npm install --save-dev webpack webpack-cli
+
+-------------------------------------------
+hubspot account
+uzairanwar2299@gmail
+Ae1nr4c!Uzair
+-------------------------------------------
+
+User1: ss_husain+st@hotmail.com
+User2: ss_husain+ST2@hotmail.com
+User3: ss_husain+sup@hotmail.com
+
+
+
+npm install webpack-dev-server --save-dev
+https://projectsdemo.expertflow.com/sap-connector/index.html
+
+use git bash
+$ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout ./certs/key.pem \
+  -out ./certs/cert.pem \
+  -subj "//CN=localhost"
+
+
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/key.pem -out ./certs/cert.pem -subj "/CN=localhost"
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout localhost.key -out localhost.crt -subj "//CN=localhost"		
+
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout localhost.key -out localhost.crt -subj "//CN=localhost"		
+http-server . -p 443 --ssl --cert localhost.crt --key localhost.key
+
+
+http-server dist -p 443 --ssl --cert localhost.crt --key localhost.key
+http-server dist --port 443 --ssl --key ./certs/key.pem --cert ./certs/cert.pem
+---------------------
+
+
+# Rename the local branch from 'main' to 'master'
+git branch -m main master  
+
+# Push the new 'master' branch to the remote repository
+git push -u origin master  
+
+# Change the default branch in GitLab/GitHub settings (Manual Step)
+
+# Delete the old 'main' branch from the remote repository (Optional)
+git push origin --delete main  
+
+# Verify that 'master' is now the active branch
+git branch -a
+
+
+
+
+https://<your_tenant>/sap/c4c/odata/v1/c4codataapi
+https://<your_tenant>/sap/c4c/odata/v1/c4codataapi
+https://my1001333.de1.test.crm.cloud.sap/c4c/odata/v1/c4codataapi
+https://my1001333.de1.test.crm.cloud.sap/sap/c4c/odata/v1/c4codataapi
+
+
+https://my1001333.de1.test.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi/$metadata
+
+https://my1001333.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi/
+
+https://my1001333.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi
+https://my1001333.de1.test.crm.cloud.sap/c4c/odata/v1/c4codataapi
+
+https://my1001333.de1.test.crm.cloud.sap/sap/c4c/odata/v1/c4codataapi
+
+https://www.linkedin.com/feed/update/urn:li:activity:7346449068681826304
+https://my1001333.de1.test.crm.cloud.sap/sap/opu/odata/sap/Z_MY_SERVICE_SRV/$metadata
+curl -u UZAIR4:Expertflow4uzair.anwar@sap "https://my1001333.de1.test.crm.cloud.sap/sap/c4c/odata/v1/c4codataapi/$metadata"
+
+
+
+
+curl -u UZAIR4:Expertflow4uzair.anwar@sap "https://my1001333.de1.test.crm.cloud.sap/sap/c4c/odata/v1/c4codataapi/ContactCollection?\$filter=Phone eq '444444'"
+
+
+
+https://my1001333.de1.test.crm.cloud.sap/sap/c4c/odata/v1/c4codataapi/AccountCollection?$filter=Name eq 'ABC Corp'
+
+curl -X POST http://localhost:8081/hello -H "Content-Type: application/x-www-form-urlencoded" -d "username=Uzair"
+
+
+
+?$filter defaultCommunication.phoneFormattedNumber eq '92 3234545798'
+
+
+https://my1001333.de1.test.crm.cloud.sap/sap/c4c/uilib/html/Account_TI.html?ObjectID=0197ee38-57b5-7000-8151-39c3a7f10da6
+
+https://my1001333.de1.test.crm.cloud.sap/go/detail/lead?displayId=71
+https://my1001333.de1.test.crm.cloud.sap/go/detail/mdaccount?displayId=1000193
+
+
+https://my1001333.de1.test.crm.cloud.sap/sap/c4c/api/v1/account-service/accounts?$filter=displayId eq '1000152'
+https://my1001333.de1.test.crm.cloud.sap/sap/c4c/api/v1/account-service/accounts?$search='1000152'
+
+
+
+Deep links in SAP are designed to directly open the UI screen of a specific record in the browser. but load the whole screen not partial rendering/only specific component.
+Deep links are not APIs seems like only UI navigation point -  will only work in browser cnt consume via backend service or via postman
+
+
+
+
+
+
+src/
+└── main/
+    ├── java/
+    │   └── com/
+    │       └── yourcompany/
+    │           └── yourapp/
+    │               ├── YourAppApplication.java
+    │               ├── config/
+    │               │   ├── SecurityConfig.java
+    │               │   ├── SwaggerConfig.java
+    │               │   └── AppConfig.java
+    │               ├── controller/
+    │               │   ├── UserController.java
+    │               │   └── AdminController.java
+    │               ├── dto/
+    │               │   ├── request/
+    │               │   │   └── CreateUserRequest.java
+    │               │   └── response/
+    │               │       └── UserResponse.java
+    │               ├── entity/
+    │               │   └── User.java
+    │               ├── exception/
+    │               │   ├── GlobalExceptionHandler.java
+    │               │   ├── ResourceNotFoundException.java
+    │               │   └── ValidationException.java
+    │               ├── interceptor/
+    │               │   └── LoggingInterceptor.java
+    │               ├── repository/
+    │               │   └── UserRepository.java
+    │               ├── security/
+    │               │   ├── JwtTokenProvider.java
+    │               │   ├── JwtAuthenticationFilter.java
+    │               │   └── CustomUserDetailsService.java
+    │               ├── service/
+    │               │   ├── impl/
+    │               │   │   └── UserServiceImpl.java
+    │               │   └── UserService.java
+    │               ├── util/
+    │               │   └── DateUtil.java
+    │               └── filter/
+    │                   └── RequestResponseLoggingFilter.java
+    └── resources/
+        ├── application.yml
+        ├── logback-spring.xml
+        ├── messages.properties
+        └── static/
+            └── (for Swagger UI or static assets)
+
+
+
+
+
+docker run --detach --env MYSQL_ROOT_PASSWORD=dummypassword --env MYSQL_USER=social-media-user --env MYSQL_PASSWORD=dummypassword --env MYSQL_DATABASE=social-media-database --name mysql --publish 3306:3306 mysql:8
+
+1. Limits Microservice
+Ports: 8080, 8081, etc.
+
+2. Spring Cloud Config Server
+Port: 8888
+
+3. Currency Exchange Microservice
+Ports: 8000, 8001, 8002, etc.
+
+4. Currency Conversion Microservice
+Ports: 8100, 8101, 8102, etc.
+
+5. Netflix Eureka Naming Server
+Port: 8761
+
+6. API Gateway
+Port: 8765
+
+7. Zipkin Distributed Tracing Server
+Port: 9411
+
+
+http://localhost:8100/currency-conversion/from/USD/to/INR/quantity/10
+
+{
+  "id": 10001,
+  "from": "USD",
+  "to": "INR",
+  "conversionMultiple": 65.00,
+  "quantity": 10,
+  "totalCalculatedAmount": 650.00,
+  "environment": "8000 instance-id"
+
+
+https://projectsdemo.expertflow.com/zoho-webex/dist/EfCustomWebComponentBundle.js
+}
+
+
+
+
+
+
+Why Move to Parameterized BDD
+Currently, our BDD feature file contains many repeated scenarios with only small differences (channel type/expected action).
+This makes it:
+
+Harder to maintain – if a step changes, we must update it in multiple places.
+Longer to read – lots of duplication makes the file harder to follow.
+Error-prone – higher chance of inconsistent wording between similar cases.
+
+Benefits of Parameterization
+Reduces duplication – one Scenario Outline + Examples table can replace 30+ separate scenarios.
+Centralized changes – if a step changes (e.g., text in "no match" condition), we update it once.
+Easier to review – team members can quickly scan the table to see all possible test combinations.
+Future-proof – adding a new match type, channel, or direction is just adding a row in the table, not rewriting a full scenario.
+
+How It Works
+We identify variables (Channel, Direction, Match Condition, Identifier, Expected Actions).
+We replace hard-coded values in the steps with placeholders.
+We provide all combinations in an Examples table.
+
+I had a discussion with Hassan about this, and he suggested that if our scenarios can be grouped, we should encourage this approach.
+https://www.geeksforgeeks.org/software-testing/parameterization-and-data-tables-in-cucumber/
+
+
+
+
+
+<iframe src="https://apps.mypurecloud.de/crm/embeddableFramework.html?enableFrameworkClientId=true&ctiApplication=https://examplelocalhost.com/&clientID=c8bfa7df-1755-4cda-929c-505577c4b25a" width="100%" height="600px" style="border:1px solid #ccc;"
+        allow="microphone; camera; window-management; allow-top-navigation-by-user-activation; allow-top-navigation; "></iframe>
+
+
+sed -i 's/devops[0-9]*.ef.com/efcx44-qa.expertflow.com/g' zoho-generic-ingress.yaml
+export FQDN=efcx44-qa.expertflow.com
+
+openssl req -x509 \ -newkey rsa:4096 \ -sha256 \ -days 3650 \ -nodes \ -keyout ${FQDN}.key \ -out ${FQDN}.crt \ -subj "/CN=${FQDN}" \ -addext "subjectAltName=DNS:www.${FQDN},DNS:${FQDN}" 
+
+
+
+
+k get pods -n expertflow
+

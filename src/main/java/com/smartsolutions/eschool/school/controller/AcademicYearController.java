@@ -47,4 +47,12 @@ public class AcademicYearController {
         log.info("GET /api/school/academic/current succeeded, returned {} resources", resources.getId());
         return ResponseEntity.ok().body(resources);
     }
+
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> searchAcademicYears(@RequestParam(required = false) String keyword) {
+        log.info("GET /api/school/academic/search called with keyword: {}", keyword);
+        List<AcademicYearResponseDTO> resources = academicYearFacade.searchAcademicYears(keyword);
+        log.info("Search completed, returned {} resources", resources.size());
+        return ResponseEntity.ok().body(resources);
+    }
 }

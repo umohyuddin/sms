@@ -31,4 +31,8 @@ public class AcademicYearFacade {
     public AcademicYearResponseDTO getCurrentAcademicYear() {
         return academicYearService.getCurrentAcademicYear();
     }
+
+    public List<AcademicYearResponseDTO> searchAcademicYears(String keyword) {
+        return academicYearService.searchByKeyword(keyword);
+    }
 }

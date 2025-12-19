@@ -106,5 +106,8 @@ import java.util.Map;
     }
 
 
+    public Long countAll() {
+            return employeeService.countAllEmployees();
+    }
 }
 

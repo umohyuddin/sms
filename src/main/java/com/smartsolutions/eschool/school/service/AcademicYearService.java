@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.school.service;
 
+import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.school.dtos.academicYear.requestDto.AcademicYearRequestDTO;
 import com.smartsolutions.eschool.school.dtos.academicYear.responseDto.AcademicYearResponseDTO;
 
@@ -26,6 +27,32 @@ public class AcademicYearService {
         this.academicYearRepository = academicYearRepository;
     }
 
+    public List<AcademicYearResponseDTO> searchByKeyword(String keyword) {
+        try {
+            log.info("Searching Academic Years by keyword: {}", keyword);
+
+            List<AcademicYearEntity> result;
+            if (keyword == null || keyword.isBlank()) {
+                result = academicYearRepository.findAll();
+            } else {
+                result = academicYearRepository.searchByName(keyword); // <-- you'll add this query in repository
+            }
+
+            List<AcademicYearResponseDTO> responseDTOS = MapperUtil.mapList(result, AcademicYearResponseDTO.class);
+            log.info("Found {} academic years matching keyword", responseDTOS.size());
+            return responseDTOS;
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while searching academic years: {}", dae.getMessage());
+            throw new CustomServiceException("Unable to fetch Academic Years from database", dae);
+        } catch (MappingException me) {
+            log.error("Error mapping AcademicYear entity to DTO: {}", me.getMessage());
+            throw new CustomServiceException("Error converting Academic Years data", me);
+        } catch (Exception e) {
+            log.error("Unexpected error while searching academic years: {}", e.getMessage());
+            throw new CustomServiceException("Unexpected error occurred", e);
+        }
+    }
 
     public AcademicYearResponseDTO getCurrentAcademicYear() {
         try {

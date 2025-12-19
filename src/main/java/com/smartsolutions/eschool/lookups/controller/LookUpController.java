@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.lookups.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
+import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.global.configs.*;
 import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
@@ -38,9 +39,10 @@ public class LookUpController {
     private final NationalityConfig nationalityConfig;
     private final GenderConfig genderConfig;
     private final EmployeeDocumentConfig employeeDocumentConfig;
+    private final EmployeeMasterFacade employeeFacade;
 
 
-    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig) {
+    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade) {
         this.religionConfig = religionConfig;
         this.feeConfig = feeConfig;
         this.bloodGroupConfig = bloodGroupConfig;
@@ -49,6 +51,26 @@ public class LookUpController {
         this.nationalityConfig = nationalityConfig;
         this.genderConfig = genderConfig;
         this.employeeDocumentConfig = employeeDocumentConfig;
+        this.employeeFacade = employeeFacade;
+    }
+
+
+    @GetMapping("/dashboard/counts")
+    public ResponseEntity<?> getDashboardCounts() {
+        log.info("GET /api/lookup/dashboard/counts called");
+
+        Map<String, Long> counts = new HashMap<>();
+
+        try {
+            counts.put("employees", employeeFacade.countAll());
+
+        } catch (Exception e) {
+            log.error("Error fetching dashboard counts", e);
+            return ResponseEntity.status(500).body(Map.of("error", "Unable to fetch dashboard counts"));
+        }
+
+        log.info("Dashboard counts fetched successfully: {}", counts);
+        return ResponseEntity.ok(counts);
     }
 
     // ---------------------- Province Endpoints ----------------------
@@ -107,17 +129,7 @@ public class LookUpController {
 
     @GetMapping("/docs/metadata")
     public Map<String, Map<String, String>> getDocsMeta() {
-        return Map.of("docs", employeeDocumentConfig.getDocumentTypes(),
-                "addressType", employeeDocumentConfig.getAddressTypes(),
-                "relationshipType", employeeDocumentConfig.getEmergencyContactRelationships(),
-                "degree", employeeDocumentConfig.getQualificationDegrees(),
-                "subjects", employeeDocumentConfig.getQualificationSubjects(),
-                "gender", genderConfig.getList(),
-                "maritalStatus",employeeDocumentConfig.getMaritalStatus(),
-                "bloodGroup", bloodGroupConfig.getGroup(),
-                "religions", religionConfig.getList(),
-                "nationalities", nationalityConfig.getMap()
-                );
+        return Map.of("docs", employeeDocumentConfig.getDocumentTypes(), "addressType", employeeDocumentConfig.getAddressTypes(), "relationshipType", employeeDocumentConfig.getEmergencyContactRelationships(), "degree", employeeDocumentConfig.getQualificationDegrees(), "subjects", employeeDocumentConfig.getQualificationSubjects(), "gender", genderConfig.getList(), "maritalStatus", employeeDocumentConfig.getMaritalStatus(), "bloodGroup", bloodGroupConfig.getGroup(), "religions", religionConfig.getList(), "nationalities", nationalityConfig.getMap());
 
     }
 
