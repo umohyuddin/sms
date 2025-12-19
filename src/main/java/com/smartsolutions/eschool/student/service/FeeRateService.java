@@ -47,6 +47,24 @@ public class FeeRateService {
     }
 
 
+    public List<FeeRatesResponseDTO> searchFeeRates(Long feeCatalogId, Long feeComponentId, String keyword) {
+        try {
+            log.info("Searching FeeRates with filters → feeCatalogId={}, feeComponentId={}, keyword={}", feeCatalogId, feeComponentId, keyword);
+            String searchKeyword = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+            List<FeeRateEntity> results = feeRateRepository.searchFeeRates(feeCatalogId, feeComponentId, searchKeyword);
+            log.info("Search returned {} FeeRates", results.size());
+            return MapperUtil.mapList(results, FeeRatesResponseDTO.class);
+        } catch (DataAccessException dae) {
+            log.error("Database error while searching FeeRates", dae);
+        } catch (MappingException me) {
+            log.error("Error mapping FeeRateEntity to FeeRatesResponseDTO", me);
+        } catch (Exception e) {
+            log.error("Unexpected error while searching FeeRates", e);
+        }
+
+        return Collections.emptyList();
+    }
+
     public FeeRatesResponseDTO getById(Long id) {
         log.info("Fetching FeeRate with id: {}", id);
         FeeRateEntity feeRateEntity = feeRateRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
@@ -103,12 +121,10 @@ public class FeeRateService {
     }
 
 
-    public List<FeeRatesResponseDTO> findActiveFeeRates(Long campusId,
-                                                        Long standardId,
-                                                        Long academicYearId) {
+    public List<FeeRatesResponseDTO> findActiveFeeRates(Long campusId, Long standardId, Long academicYearId) {
         try {
             log.info("Fetching all Fee Rates by fee component from database");
-            List<FeeRateEntity> result = feeRateRepository.findActiveFeeRates(campusId,standardId,academicYearId);
+            List<FeeRateEntity> result = feeRateRepository.findActiveFeeRates(campusId, standardId, academicYearId);
             log.info("Successfully fetched {} FeeRates by fee component", result.size());
             List<FeeRatesResponseDTO> FeeComponentDTOList = MapperUtil.mapList(result, FeeRatesResponseDTO.class);
             log.info("Successfully fetched FeeRates by fee component");
@@ -130,19 +146,15 @@ public class FeeRateService {
     @Transactional
     public FeeRatesResponseDTO createFeeRate(FeeRateCreateRequestDTO dto) {
         // Fetch related entities
-        CampusEntity campus = campusRepository.findById(dto.getCampusId())
-                .orElseThrow(() -> new IllegalArgumentException("Campus not found with id: " + dto.getCampusId()));
+        CampusEntity campus = campusRepository.findById(dto.getCampusId()).orElseThrow(() -> new IllegalArgumentException("Campus not found with id: " + dto.getCampusId()));
 
-        StandardEntity standard = standardRepository.findById(dto.getStandardId())
-                .orElseThrow(() -> new IllegalArgumentException("Standard not found with id: " + dto.getStandardId()));
+        StandardEntity standard = standardRepository.findById(dto.getStandardId()).orElseThrow(() -> new IllegalArgumentException("Standard not found with id: " + dto.getStandardId()));
 
-        AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
-                .orElseThrow(() -> new IllegalArgumentException("Academic Year not found with id: " + dto.getAcademicYearId()));
+        AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId()).orElseThrow(() -> new IllegalArgumentException("Academic Year not found with id: " + dto.getAcademicYearId()));
 
         FeeComponentEntity feeComponent = null;
         if (dto.getFeeComponentId() != null) {
-            feeComponent = feeComponentRepository.findById(dto.getFeeComponentId())
-                    .orElseThrow(() -> new IllegalArgumentException("Fee Component not found with id: " + dto.getFeeComponentId()));
+            feeComponent = feeComponentRepository.findById(dto.getFeeComponentId()).orElseThrow(() -> new IllegalArgumentException("Fee Component not found with id: " + dto.getFeeComponentId()));
         }
 
         // Validate effective dates
@@ -154,11 +166,7 @@ public class FeeRateService {
         }
 
         // Check for overlapping FeeRates
-        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRates(
-                campus.getId(),
-                standard.getId(),
-                academicYear.getId()
-        );
+        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRates(campus.getId(), standard.getId(), academicYear.getId());
 
         if (!CollectionUtils.isEmpty(overlapping)) {
             for (FeeRateEntity fr : overlapping) {
@@ -203,15 +211,11 @@ public class FeeRateService {
         // Fetch related entities
         CampusEntity campus = campusRepository.findById(dto.getCampusId()).orElseThrow(() -> new IllegalArgumentException("Campus not found with id: " + dto.getCampusId()));
 
-        var standard = standardRepository.findById(dto.getStandardId())
-                .orElseThrow(() -> new IllegalArgumentException("Standard not found with id: " + dto.getStandardId()));
+        var standard = standardRepository.findById(dto.getStandardId()).orElseThrow(() -> new IllegalArgumentException("Standard not found with id: " + dto.getStandardId()));
 
-        var academicYear = academicYearRepository.findById(dto.getAcademicYearId())
-                .orElseThrow(() -> new IllegalArgumentException("Academic Year not found with id: " + dto.getAcademicYearId()));
+        var academicYear = academicYearRepository.findById(dto.getAcademicYearId()).orElseThrow(() -> new IllegalArgumentException("Academic Year not found with id: " + dto.getAcademicYearId()));
 
-        var feeComponent = dto.getFeeComponentId() != null ? feeComponentRepository.findById(dto.getFeeComponentId())
-                .orElseThrow(() -> new IllegalArgumentException("Fee Component not found with id: " + dto.getFeeComponentId()))
-                : null;
+        var feeComponent = dto.getFeeComponentId() != null ? feeComponentRepository.findById(dto.getFeeComponentId()).orElseThrow(() -> new IllegalArgumentException("Fee Component not found with id: " + dto.getFeeComponentId())) : null;
 
         // Validate effective dates
         LocalDate from = dto.getEffectiveFrom();
@@ -222,11 +226,7 @@ public class FeeRateService {
         }
 
         // Check for overlapping FeeRates (excluding the current record)
-        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRates(
-                campus.getId(),
-                standard.getId(),
-                academicYear.getId()
-        );
+        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRates(campus.getId(), standard.getId(), academicYear.getId());
 
         if (!CollectionUtils.isEmpty(overlapping)) {
             for (FeeRateEntity fr : overlapping) {

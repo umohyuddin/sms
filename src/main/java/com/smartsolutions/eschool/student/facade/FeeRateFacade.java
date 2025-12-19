@@ -49,4 +49,8 @@ public class FeeRateFacade {
     public FeeRatesResponseDTO update(Long id, @Valid FeeRateCreateRequestDTO dto) {
         return feeRateService.updateFeeRate(id, dto);
     }
+
+    public List<FeeRatesResponseDTO> searchFeeRates(Long feeCatalogId, Long feeComponentId, String keyword) {
+        return feeRateService.searchFeeRates(feeCatalogId, feeComponentId, keyword);
+    }
 }

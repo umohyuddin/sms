@@ -82,4 +82,16 @@ public class FeeRateController {
         log.info("FeeRate updated successfully: id={}", updatedFeeRate.getId());
         return ResponseEntity.ok(updatedFeeRate);
     }
+
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> searchFeeRates(@RequestParam(required = false) Long feeCatalogId, @RequestParam(required = false) Long feeComponentId, @RequestParam(required = false) String keyword) {
+        log.info("GET /api/fee/rates/search called with feeCatalogId={}, feeComponentId={}, keyword={}", feeCatalogId, feeComponentId, keyword);
+        List<FeeRatesResponseDTO> results = feeRateFacade.searchFeeRates(feeCatalogId, feeComponentId, keyword);
+        log.info("Search returned {} FeeRates", results.size());
+        if (results.isEmpty()) {
+            return ResponseEntity.ok().body("No Fee Rates found for the given criteria.");
+        }
+        return ResponseEntity.ok(results);
+    }
+
 }

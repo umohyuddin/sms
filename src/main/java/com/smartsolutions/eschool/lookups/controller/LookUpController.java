@@ -142,7 +142,12 @@ public class LookUpController {
         Map<String, String> provinces = provincesList.stream().collect(Collectors.toMap(province -> String.valueOf(province.getId()), // convert Long to String
                 ProvinceResponseDTO::getName));
 
-        return Map.of("bloodGroup", bloodGroupConfig.getGroup(), "religions", religionConfig.getList(), "nationalities", nationalityConfig.getMap(), "gender", genderConfig.getList(), "provinces", provinces, "docs", employeeDocumentConfig.getDocumentTypes());
+        return Map.of("bloodGroup", bloodGroupConfig.getGroup(),
+                "religions", religionConfig.getList(),
+                "nationalities", nationalityConfig.getMap(),
+                "gender", genderConfig.getList(),
+                "provinces", provinces,
+                "docs", employeeDocumentConfig.getDocumentTypes());
     }
 }
 
