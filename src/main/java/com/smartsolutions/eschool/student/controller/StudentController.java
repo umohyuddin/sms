@@ -51,9 +51,14 @@ public class StudentController {
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<StudentDTO> searchStudents(@RequestParam(required = false) Long campusId, @RequestParam(required = false) Long standardId, @RequestParam(required = false) Long studentId, @RequestParam(required = false) Long academicYearId) {
-        log.info("GET /api/students/search called with " + "campusId={}, standardId={}, studentId={}, academicYearId={}", campusId, standardId, studentId, academicYearId);
-        List<StudentDTO> students = studentFacade.searchStudents(campusId, standardId, studentId, academicYearId);
+    public List<StudentDTO> searchStudents(@RequestParam(required = false) String campusId, @RequestParam(required = false) String standardId, @RequestParam(required = false) String sectionId, @RequestParam(required = false) String studentId, @RequestParam(required = false) String academicYearId, @RequestParam(required = false) String keyword) {
+        Long campus = (campusId != null && !campusId.isBlank()) ? Long.valueOf(campusId) : null;
+        Long standard = (standardId != null && !standardId.isBlank()) ? Long.valueOf(standardId) : null;
+        Long section = (sectionId != null && !sectionId.isBlank()) ? Long.valueOf(sectionId) : null;
+        Long student = (studentId != null && !studentId.isBlank()) ? Long.valueOf(studentId) : null;
+        Long academicYear = (academicYearId != null && !academicYearId.isBlank()) ? Long.valueOf(academicYearId) : null;
+        String kw = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
+        List<StudentDTO> students = studentFacade.searchStudents(campus, standard, section, student,academicYear,kw);
         log.info("GET /api/students/search returned {} students", students.size());
         return students;
     }

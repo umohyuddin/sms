@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Transactional
 @Repository
-public interface StudentRepository extends JpaRepository<StudentEntity,Long> {
+public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
 
     @Query("SELECT s FROM StudentEntity s " +
             "LEFT JOIN FETCH s.campus " +
@@ -101,24 +101,49 @@ public interface StudentRepository extends JpaRepository<StudentEntity,Long> {
     Long countStudentsRegisteredBetween(@Param("startDate") LocalDate startDate,
                                         @Param("endDate") LocalDate endDate);
 
+//
+//    @Query("""
+//                SELECT s FROM StudentEntity s
+//                LEFT JOIN FETCH s.campus c
+//                LEFT JOIN FETCH s.standard st
+//                LEFT JOIN FETCH s.section sec
+//                LEFT JOIN FETCH s.academicYear ay
+//                WHERE s.deleted = false
+//                  AND (:campusId IS NULL OR c.id = :campusId)
+//                  AND (:standardId IS NULL OR st.id = :standardId)
+//                  AND (:studentId IS NULL OR s.id = :studentId)
+//                  AND (:academicYearId IS NULL OR ay.id = :academicYearId)
+//            """)
+//    List<StudentEntity> searchStudents(
+//            @Param("campusId") Long campusId,
+//            @Param("standardId") Long standardId,
+//            @Param("studentId") Long studentId,
+//            @Param("academicYearId") Long academicYearId
+//    );
 
     @Query("""
-    SELECT s FROM StudentEntity s
-    LEFT JOIN FETCH s.campus c
-    LEFT JOIN FETCH s.standard st
-    LEFT JOIN FETCH s.section sec
-    LEFT JOIN FETCH s.academicYear ay
-    WHERE s.deleted = false
-      AND (:campusId IS NULL OR c.id = :campusId)
-      AND (:standardId IS NULL OR st.id = :standardId)
-      AND (:studentId IS NULL OR s.id = :studentId)
-      AND (:academicYearId IS NULL OR ay.id = :academicYearId)
-""")
+            SELECT s FROM StudentEntity s
+            LEFT JOIN FETCH s.campus c
+            LEFT JOIN FETCH s.standard st
+            LEFT JOIN FETCH s.section sec
+            LEFT JOIN FETCH s.academicYear ay
+            WHERE s.deleted = false
+              AND (:campusId IS NULL OR c.id = :campusId)
+              AND (:standardId IS NULL OR st.id = :standardId)
+              AND (:sectionId IS NULL OR sec.id = :sectionId)
+              AND (:studentId IS NULL OR s.id = :studentId)
+              AND (:academicYearId IS NULL OR ay.id = :academicYearId)
+              AND (:keyword IS NULL OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                   OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                   OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            """)
     List<StudentEntity> searchStudents(
             @Param("campusId") Long campusId,
             @Param("standardId") Long standardId,
+            @Param("sectionId") Long sectionId,
             @Param("studentId") Long studentId,
-            @Param("academicYearId") Long academicYearId
+            @Param("academicYearId") Long academicYearId,
+            @Param("keyword") String keyword
     );
-
 }
+

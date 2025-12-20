@@ -35,7 +35,7 @@ public class StudentEntity {
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @Column(name = "student_code", nullable = false, length = 50)
+    @Column(name = "student_code", nullable = false, length = 50,unique = true)
     private String studentCode;
 
     @Column(name = "date_of_birth", nullable = false)

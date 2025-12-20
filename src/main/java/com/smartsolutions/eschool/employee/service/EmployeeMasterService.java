@@ -328,5 +328,16 @@ public class EmployeeMasterService {
         return response;
     }
 
+
+    public Map<String, Long> getEmployeeCountByGender() {
+        List<Object[]> results = employeeRepository.countEmployeesByGender();
+        Map<String, Long> genderCountMap = new HashMap<>();
+        for (Object[] row : results) {
+            String gender = (String) row[0];
+            Long count = (Long) row[1];  // cast to Long
+            genderCountMap.put(gender, count);
+        }
+        return genderCountMap;
+    }
 }
 

@@ -6,11 +6,14 @@ import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.global.configs.*;
+import com.smartsolutions.eschool.lookups.dtos.DashboardCountsDTO;
 import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.facade.CityFacade;
+import com.smartsolutions.eschool.lookups.facade.LookUpFacade;
 import com.smartsolutions.eschool.lookups.facade.ProvinceFacade;
 import com.smartsolutions.eschool.lookups.service.CityService;
+import com.smartsolutions.eschool.school.facade.DashboardFacade;
 import com.smartsolutions.eschool.school.facade.DiscountTypeFacade;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
@@ -40,9 +43,9 @@ public class LookUpController {
     private final GenderConfig genderConfig;
     private final EmployeeDocumentConfig employeeDocumentConfig;
     private final EmployeeMasterFacade employeeFacade;
+   private final LookUpFacade   lookUpFacade;
 
-
-    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade) {
+    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade, DashboardFacade dashboardFacade, LookUpFacade lookUpFacade) {
         this.religionConfig = religionConfig;
         this.feeConfig = feeConfig;
         this.bloodGroupConfig = bloodGroupConfig;
@@ -52,23 +55,14 @@ public class LookUpController {
         this.genderConfig = genderConfig;
         this.employeeDocumentConfig = employeeDocumentConfig;
         this.employeeFacade = employeeFacade;
+        this.lookUpFacade = lookUpFacade;
     }
 
 
     @GetMapping("/dashboard/counts")
     public ResponseEntity<?> getDashboardCounts() {
         log.info("GET /api/lookup/dashboard/counts called");
-
-        Map<String, Long> counts = new HashMap<>();
-
-        try {
-            counts.put("employees", employeeFacade.countAll());
-
-        } catch (Exception e) {
-            log.error("Error fetching dashboard counts", e);
-            return ResponseEntity.status(500).body(Map.of("error", "Unable to fetch dashboard counts"));
-        }
-
+        DashboardCountsDTO counts = lookUpFacade.DashboardCounts();
         log.info("Dashboard counts fetched successfully: {}", counts);
         return ResponseEntity.ok(counts);
     }

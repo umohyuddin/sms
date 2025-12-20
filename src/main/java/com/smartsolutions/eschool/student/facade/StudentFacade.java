@@ -109,8 +109,8 @@ public class StudentFacade {
         return studentDashboardDTO;
     }
 
-    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long studentId, Long academicYearId) {
-        return  studentService.searchStudents(campusId,standardId,studentId,academicYearId);
+    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long sectionId,Long studentId, Long academicYearId,String kw) {
+        return  studentService.searchStudents(campusId,standardId,sectionId,studentId,academicYearId,kw);
     }
 }
 

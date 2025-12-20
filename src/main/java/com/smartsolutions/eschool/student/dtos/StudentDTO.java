@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.student.dtos;
 import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentStandardDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,8 +36,7 @@ public class StudentDTO {
 
     // Relationships
     private CampusResponseDTO campus;
-    private StandardDTO standard;
-    private SectionDTO section;
+    private StudentStandardDTO standard;
 
     private Long campusId;
     private Long standardId;

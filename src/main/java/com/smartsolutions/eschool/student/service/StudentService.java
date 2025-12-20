@@ -1,14 +1,10 @@
 package com.smartsolutions.eschool.student.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.sclass.repository.SectionRepository;
@@ -20,24 +16,20 @@ import com.smartsolutions.eschool.student.mapper.StudentMapper;
 import com.smartsolutions.eschool.student.model.AdmissionTypeEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.repository.AdmissionTypeRepository;
-import com.smartsolutions.eschool.student.repository.StudentDao;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
-import com.smartsolutions.eschool.util.ResourceObject;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -240,6 +232,13 @@ public class StudentService {
         // Save entity
         StudentEntity savedStudent = studentRepository.save(studentEntity);
 
+        String year = String.valueOf(LocalDate.now().getYear());
+        String identity = "STU"; // default identity
+        String regNo = String.format("REG%s-%s-%03d", year, identity.toUpperCase(), savedStudent.getId());
+
+        savedStudent.setStudentCode(regNo);
+        savedStudent = studentRepository.save(studentEntity);
+
         // Map back to DTO for response
         StudentResponseDTO responseDTO = new StudentResponseDTO();
         responseDTO.setId(savedStudent.getId());
@@ -303,11 +302,11 @@ public class StudentService {
         return studentRepository.countStudentsRegisteredBetween(start, end);
     }
 
-    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long studentId, Long academicYearId) {
+    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long studentId, Long sectionId, Long academicYearId, String kw) {
         try {
-            log.info("Searching students with filters → campusId={}, standardId={}, studentId={}, academicYearId={}", campusId, standardId, studentId, academicYearId);
+            log.info("Searching students with filters → campusId={}, standardId={}, studentId={}, academicYearId={},kw={}", campusId, standardId, studentId, academicYearId,kw);
 
-            List<StudentEntity> result = studentRepository.searchStudents(campusId, standardId, studentId, academicYearId);
+            List<StudentEntity> result = studentRepository.searchStudents(campusId, standardId,sectionId, studentId, academicYearId,kw);
 
             log.info("Student search returned {} results", result.size());
 
