@@ -24,6 +24,14 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             @Param("studentId") Long studentId,
             @Param("academicYearId") Long academicYearId
     );
+
+
+    @Query("""
+                SELECT COALESCE(SUM(p.amountPaid), 0)
+                FROM StudentFeePaymentEntity p
+                WHERE p.academicYear.id = :academicYearId
+            """)
+    Double getTotalFeeCollected(@Param("academicYearId") Long academicYearId);
 }
 
 

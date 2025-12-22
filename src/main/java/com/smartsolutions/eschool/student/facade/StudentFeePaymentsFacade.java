@@ -21,5 +21,8 @@ public class StudentFeePaymentsFacade {
     public StudentFeePaymentRequestDTO studentFeePayment(Long studentId, @Valid StudentFeePaymentRequestDTO requestDTO) {
         return studentFeePaymentsService.studentFeePayment(studentId, requestDTO);
     }
+    public Double getTotalFeeCollected(Long academicYearId) {
+        return studentFeePaymentsService.getTotalFeeCollected(academicYearId);
+    }
 }
 

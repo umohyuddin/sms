@@ -7,6 +7,7 @@ import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.global.configs.*;
 import com.smartsolutions.eschool.lookups.dtos.DashboardCountsDTO;
+import com.smartsolutions.eschool.lookups.dtos.DashboardFinancialDTO;
 import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.facade.CityFacade;
@@ -67,6 +68,13 @@ public class LookUpController {
         return ResponseEntity.ok(counts);
     }
 
+    @GetMapping("/dashboard/financials")
+    public ResponseEntity<?> getDashboardFinancials() {
+        log.info("GET /api/lookup/dashboard/financials called");
+        DashboardFinancialDTO counts = lookUpFacade.DashboardFinancialCounts();
+        log.info("Dashboard financials fetched successfully: {}", counts);
+        return ResponseEntity.ok(counts);
+    }
     // ---------------------- Province Endpoints ----------------------
 
     @GetMapping(value = "/provinces", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -29,5 +29,9 @@ private StudentFeeAssignmentService studentFeeAssignmentService;
         return studentFeeAssignmentService.getFeeAssignmentByStudentId(studentId,academicYearId);
     }
 
+    public Double getTotalFeeAssigned(Long academicYearId) {
+        return studentFeeAssignmentService.getTotalFeeAssigned(academicYearId);
+    }
+
 }
 

@@ -148,4 +148,14 @@ public class StudentFeePaymentsService {
         return responseDTOS;
     }
 
+
+    public Double getTotalFeeCollected(Long academicYearId) {
+
+        if (academicYearId == null) {
+            AcademicYearEntity academicYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id "));
+            academicYearId = academicYear.getId();
+        }
+        Double totalCollected = studentFeePaymentsRepository.getTotalFeeCollected(academicYearId);
+        return totalCollected != null ? totalCollected : 0.0;
+    }
 }

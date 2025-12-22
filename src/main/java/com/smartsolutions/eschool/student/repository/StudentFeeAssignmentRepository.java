@@ -26,7 +26,6 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
     );
 
 
-
     @Query("""
             SELECT sf
             FROM StudentFeeAssignmentEntity sf
@@ -40,6 +39,43 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             @Param("studentId") Long studentId,
             @Param("academicYearId") Long academicYearId
     );
+
+
+    /**
+     * Calculates the total fee amount assigned to students for a specific academic year.
+     * This query sums the totalAmount from all Student Fee Assignments
+     * that belong to the given academic year via the associated Fee Rate.
+     * If no fee assignments exist for the specified academic year,
+     * the result will be 0 instead of NULL.
+     *
+     * @param academicYearId the ID of the academic year
+     * @return total fee amount assigned for the academic year
+     */
+
+    @Query("""
+                SELECT COALESCE(SUM(a.totalAmount), 0)
+                FROM StudentFeeAssignmentEntity a
+                WHERE a.feeRate.academicYear.id = :academicYearId
+            """)
+    Double getTotalFeeAssigned(@Param("academicYearId") Long academicYearId);
+
+
+    /**
+     * Calculates the total amount of fees that are overdue for a specific academic year.
+     * The query sums the `totalAmount` from all Student Fee Assignments where:
+     * 1. The due date has already passed (`dueDate < CURRENT_DATE`)
+     * 2. The fee assignment belongs to the specified academic year via the Fee Rate
+     * If no overdue fees exist, the method returns 0 instead of NULL.
+     * @param academicYearId the ID of the academic year
+     * @return the total overdue fee amount for the academic year
+     */
+    @Query("""
+                SELECT COALESCE(SUM(a.totalAmount), 0)
+                FROM StudentFeeAssignmentEntity a
+                WHERE a.dueDate < CURRENT_DATE
+                  AND a.feeRate.academicYear.id = :academicYearId
+            """)
+    Double getOverdueAmount(@Param("academicYearId") Long academicYearId);
 
 }
 
