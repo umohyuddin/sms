@@ -6,6 +6,15 @@ USE
 sms;
 
 
+
+
+CREATE TABLE country (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    country_code VARCHAR(5) NOT NULL UNIQUE,   -- PK, SA, US
+    country_name VARCHAR(100) NOT NULL,         -- Pakistan, Saudi Arabia
+    iso_code VARCHAR(3),                        -- ISO-3166 (PAK, SAU)
+    phone_code VARCHAR(10)
+);
 -- Table: provinces
 -- Purpose:
 --   Stores the list of provinces/states used across the school management system.
@@ -14,6 +23,7 @@ DROP TABLE IF EXISTS provinces;
 CREATE TABLE provinces
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+        country_id BIGINT NOT NULL,
     name       VARCHAR(100) NOT NULL UNIQUE,
     code       VARCHAR(10),
     is_active  BOOLEAN      NOT NULL DEFAULT TRUE,
@@ -23,7 +33,9 @@ CREATE TABLE provinces
     updated_by BIGINT,
     deleted_at DATETIME,
     deleted_by BIGINT,
-    deleted    BOOLEAN      NOT NULL DEFAULT FALSE
+    deleted    BOOLEAN      NOT NULL DEFAULT FALSE,
+CONSTRAINT fk_province_country FOREIGN KEY (country_id) REFERENCES country(id),
+     CONSTRAINT uq_country_province UNIQUE (country_id, name)
 );
 
 -- Table: cities

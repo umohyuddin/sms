@@ -9,11 +9,14 @@ import com.smartsolutions.eschool.global.configs.*;
 import com.smartsolutions.eschool.lookups.dtos.DashboardCountsDTO;
 import com.smartsolutions.eschool.lookups.dtos.DashboardFinancialDTO;
 import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
+import com.smartsolutions.eschool.lookups.dtos.country.response.CountryResponseDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.facade.CityFacade;
+import com.smartsolutions.eschool.lookups.facade.CountryFacade;
 import com.smartsolutions.eschool.lookups.facade.LookUpFacade;
 import com.smartsolutions.eschool.lookups.facade.ProvinceFacade;
 import com.smartsolutions.eschool.lookups.service.CityService;
+import com.smartsolutions.eschool.lookups.service.CountryService;
 import com.smartsolutions.eschool.school.facade.DashboardFacade;
 import com.smartsolutions.eschool.school.facade.DiscountTypeFacade;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LookUpController {
 
+    private final CountryFacade countryFacade;
     private final ReligionConfig religionConfig;
     private final FeeConfig feeConfig;
     private final BloodGroupConfig bloodGroupConfig;
@@ -44,9 +48,10 @@ public class LookUpController {
     private final GenderConfig genderConfig;
     private final EmployeeDocumentConfig employeeDocumentConfig;
     private final EmployeeMasterFacade employeeFacade;
-   private final LookUpFacade   lookUpFacade;
+    private final LookUpFacade lookUpFacade;
 
-    public LookUpController(ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade, DashboardFacade dashboardFacade, LookUpFacade lookUpFacade) {
+    public LookUpController(CountryFacade countryFacade, ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade, DashboardFacade dashboardFacade, LookUpFacade lookUpFacade) {
+        this.countryFacade = countryFacade;
         this.religionConfig = religionConfig;
         this.feeConfig = feeConfig;
         this.bloodGroupConfig = bloodGroupConfig;
@@ -82,6 +87,14 @@ public class LookUpController {
         log.info("GET /api/lookup/provinces called");
         List<ProvinceResponseDTO> resources = provinceFacade.getAll();
         log.info("GET /api/lookup/provinces succeeded, returned {} resources", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping(value = "/countries", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getAllCountries() {
+        log.info("GET /api/lookup/Countries called");
+        List<CountryResponseDTO> resources = countryFacade.getAll();
+        log.info("GET /api/lookup/Countries succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok(resources);
     }
 
@@ -130,15 +143,36 @@ public class LookUpController {
 
 
     @GetMapping("/docs/metadata")
-    public Map<String, Map<String, String>> getDocsMeta() {
-        return Map.of("docs", employeeDocumentConfig.getDocumentTypes(), "addressType", employeeDocumentConfig.getAddressTypes(), "relationshipType", employeeDocumentConfig.getEmergencyContactRelationships(), "degree", employeeDocumentConfig.getQualificationDegrees(), "subjects", employeeDocumentConfig.getQualificationSubjects(), "gender", genderConfig.getList(), "maritalStatus", employeeDocumentConfig.getMaritalStatus(), "bloodGroup", bloodGroupConfig.getGroup(), "religions", religionConfig.getList(), "nationalities", nationalityConfig.getMap());
+    public Map<String, Object> getDocsMeta() {
+        List<CountryResponseDTO> countriesList = countryFacade.getAll();
 
+        Map<String, String> countries = countriesList.stream()
+                .collect(Collectors.toMap(
+                        item -> String.valueOf(item.getId()),
+                        CountryResponseDTO::getCountryName
+                ));
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("docs", employeeDocumentConfig.getDocumentTypes());
+        result.put("addressType", employeeDocumentConfig.getAddressTypes());
+        result.put("relationshipType", employeeDocumentConfig.getEmergencyContactRelationships());
+        result.put("degree", employeeDocumentConfig.getQualificationDegrees());
+        result.put("subjects", employeeDocumentConfig.getQualificationSubjects());
+        result.put("gender", genderConfig.getList());
+        result.put("maritalStatus", employeeDocumentConfig.getMaritalStatus());
+        result.put("bloodGroup", bloodGroupConfig.getGroup());
+        result.put("religions", religionConfig.getList());
+        result.put("nationalities", nationalityConfig.getMap());
+        result.put("countries", countries);
+        return result;
     }
+
 
 
     @GetMapping("/admission/metadata")
     public Map<String, Map<String, String>> getAdmissionMeta() {
         List<ProvinceResponseDTO> provincesList = provinceFacade.getAll();
+
 
 
         Map<String, String> provinces = provincesList.stream().collect(Collectors.toMap(province -> String.valueOf(province.getId()), // convert Long to String
@@ -148,8 +182,7 @@ public class LookUpController {
                 "religions", religionConfig.getList(),
                 "nationalities", nationalityConfig.getMap(),
                 "gender", genderConfig.getList(),
-                "provinces", provinces,
-                "docs", employeeDocumentConfig.getDocumentTypes());
+                "provinces", provinces, "docs", employeeDocumentConfig.getDocumentTypes());
     }
 }
 
