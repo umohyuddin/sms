@@ -24,5 +24,9 @@ public class StudentFeePaymentsFacade {
     public Double getTotalFeeCollected(Long academicYearId) {
         return studentFeePaymentsService.getTotalFeeCollected(academicYearId);
     }
+
+    public Double getCollectedUpToCurrentMonth(){
+        return studentFeePaymentsService.getCollectedUpToCurrentMonth();
+    }
 }
 

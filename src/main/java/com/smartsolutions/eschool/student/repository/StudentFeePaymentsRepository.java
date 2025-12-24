@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Transactional
@@ -32,6 +33,13 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
                 WHERE p.academicYear.id = :academicYearId
             """)
     Double getTotalFeeCollected(@Param("academicYearId") Long academicYearId);
+
+
+    @Query("SELECT COALESCE(SUM(sfp.amountPaid), 0) " +
+            "FROM StudentFeePaymentEntity sfp " +
+            "WHERE sfp.academicYear.id = :academicYearId " +
+            "AND sfp.paymentDate <= :endOfMonth")
+    Double getTotalCollectedUpToMonth(Long academicYearId, LocalDate endOfMonth);
 }
 
 

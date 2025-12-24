@@ -13,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -157,5 +159,11 @@ public class StudentFeePaymentsService {
         }
         Double totalCollected = studentFeePaymentsRepository.getTotalFeeCollected(academicYearId);
         return totalCollected != null ? totalCollected : 0.0;
+    }
+
+    public Double getCollectedUpToCurrentMonth() {
+        AcademicYearEntity academicYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id "));
+        LocalDate endOfCurrentMonth = YearMonth.now().atEndOfMonth();
+        return studentFeePaymentsRepository.getTotalCollectedUpToMonth(academicYear.getId(), endOfCurrentMonth);
     }
 }

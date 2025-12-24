@@ -15,9 +15,11 @@ public class DashboardFinancialDTO {
     private double collectedMonthlyFee;
     private double outstandingMonthlyFee;
     private double collectionPercentageMonthlyFee;
+    private String monthName;
 
     private double assignedYearlyFee;
     private double collectedYearlyFee;
     private double outstandingYearlyFee;
     private double collectionPercentageYearlyFee;
+    private String academicYearName;
 }
