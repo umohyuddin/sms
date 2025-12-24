@@ -18,6 +18,8 @@ public class EmployeeDocumentConfig {
     private Map<String, String> qualificationDegrees;
     private Map<String, String> qualificationSubjects;
     private Map<String, String> maritalStatus;
+    private Map<String, String> employmentTypes;
+
 
     public Integer getProbationPeriodMonths() {
         return probationPeriodMonths;
@@ -73,6 +75,14 @@ public class EmployeeDocumentConfig {
 
     public void setMaritalStatus(Map<String, String> maritalStatus) {
         this.maritalStatus = maritalStatus;
+    }
+
+    public Map<String, String> getEmploymentTypes() {
+        return employmentTypes;
+    }
+
+    public void setEmploymentTypes(Map<String, String> employmentTypes) {
+        this.employmentTypes = employmentTypes;
     }
 }
 

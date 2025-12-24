@@ -682,3 +682,258 @@ CREATE TABLE employee_qualification
 
     CONSTRAINT fk_employee_qualification FOREIGN KEY (employee_id) REFERENCES employee_master (id)
 );
+
+CREATE TABLE departments (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    department_code VARCHAR(50)  NOT NULL UNIQUE,
+    department_name VARCHAR(150) NOT NULL,
+
+    description     VARCHAR(255),
+
+    -- Hierarchy (for large organizations)
+    parent_id       BIGINT NULL,
+
+    head_employee_id BIGINT NULL,
+
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+
+    deleted         BOOLEAN DEFAULT FALSE,
+    created_at      DATETIME,
+    created_by      BIGINT,
+    updated_at      DATETIME,
+    updated_by      BIGINT,
+    deleted_at      DATETIME,
+    deleted_by      BIGINT,
+    CONSTRAINT fk_department_parent
+        FOREIGN KEY (parent_id) REFERENCES departments(id),
+
+    CONSTRAINT fk_department_head
+        FOREIGN KEY (head_employee_id) REFERENCES employee_master(id)
+);
+
+
+
+
+CREATE TABLE employee_type (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255),
+  active          BOOLEAN NOT NULL DEFAULT TRUE,
+          deleted         BOOLEAN DEFAULT FALSE,
+          created_at      DATETIME,
+          created_by      BIGINT,
+          updated_at      DATETIME,
+          updated_by      BIGINT,
+          deleted_at      DATETIME,
+          deleted_by      BIGINT
+);
+
+
+
+
+CREATE TABLE designations (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    designation_code VARCHAR(50) NOT NULL UNIQUE,
+    designation_name VARCHAR(150) NOT NULL,
+    description VARCHAR(255),
+
+    -- Link to employee type (mandatory, for salary structure)
+    employee_type_id BIGINT NOT NULL,
+
+    -- Optional link to department (can be NULL for general roles)
+    department_id BIGINT NULL,
+
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+              deleted         BOOLEAN DEFAULT FALSE,
+              created_at      DATETIME,
+              created_by      BIGINT,
+              updated_at      DATETIME,
+              updated_by      BIGINT,
+              deleted_at      DATETIME,
+              deleted_by      BIGINT,
+
+    -- Foreign Key Constraints
+    CONSTRAINT fk_designation_employee_type
+        FOREIGN KEY (employee_type_id) REFERENCES employee_type(id),
+    CONSTRAINT fk_designation_department
+        FOREIGN KEY (department_id) REFERENCES departments(id)
+);
+
+
+CREATE TABLE salary_structure (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    employee_type_id BIGINT NOT NULL,
+    base_salary DECIMAL(12,2) NOT NULL,   -- Fixed base salary
+    effective_from DATE NOT NULL,
+    effective_to DATE,
+          deleted         BOOLEAN DEFAULT FALSE,
+          created_at      DATETIME,
+          created_by      BIGINT,
+          updated_at      DATETIME,
+          updated_by      BIGINT,
+          deleted_at      DATETIME,
+          deleted_by      BIGINT,
+    FOREIGN KEY (employee_type_id) REFERENCES employee_type(id)
+);
+
+
+CREATE TABLE salary_component (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,                   -- Full name of the component
+    type ENUM('EARNING','DEDUCTION') NOT NULL,    -- Earning or Deduction
+    is_percentage BOOLEAN NOT NULL DEFAULT TRUE, -- TRUE if % of base salary, FALSE if fixed amount
+          deleted         BOOLEAN DEFAULT FALSE,
+            created_at      DATETIME,
+            created_by      BIGINT,
+            updated_at      DATETIME,
+            updated_by      BIGINT,
+            deleted_at      DATETIME,
+            deleted_by      BIGINT
+);
+
+    CREATE TABLE salary_structure_component (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        salary_structure_id BIGINT NOT NULL,
+        component_id BIGINT NOT NULL,
+        value DECIMAL(12,2) NOT NULL,              -- % if is_percentage, fixed amount if not
+      deleted         BOOLEAN DEFAULT FALSE,
+                created_at      DATETIME,
+                created_by      BIGINT,
+                updated_at      DATETIME,
+                updated_by      BIGINT,
+                deleted_at      DATETIME,
+                deleted_by      BIGINT,
+        FOREIGN KEY (salary_structure_id) REFERENCES salary_structure(id),
+        FOREIGN KEY (component_id) REFERENCES salary_component(id)
+    );
+
+    CREATE TABLE employee_salary (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        employee_id BIGINT NOT NULL,
+        salary_structure_id BIGINT NOT NULL,
+        gross_salary DECIMAL(12,2) NOT NULL,
+        total_deductions DECIMAL(12,2) NOT NULL,
+        net_salary DECIMAL(12,2) NOT NULL,
+        effective_date DATE NOT NULL,             -- Payroll month
+deleted         BOOLEAN DEFAULT FALSE,
+                created_at      DATETIME,
+                created_by      BIGINT,
+                updated_at      DATETIME,
+                updated_by      BIGINT,
+                deleted_at      DATETIME,
+                deleted_by      BIGINT,
+        FOREIGN KEY (employee_id) REFERENCES employee_master(id),
+        FOREIGN KEY (salary_structure_id) REFERENCES salary_structure(id)
+    );
+
+
+    CREATE TABLE employee_deduction (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        employee_id BIGINT NOT NULL,
+        deduction_type VARCHAR(50) NOT NULL,   -- PF, Tax, Loan, etc.
+        amount DECIMAL(12,2) NOT NULL,
+        month DATE NOT NULL,                    -- Payroll month
+deleted         BOOLEAN DEFAULT FALSE,
+                created_at      DATETIME,
+                created_by      BIGINT,
+                updated_at      DATETIME,
+                updated_by      BIGINT,
+                deleted_at      DATETIME,
+                deleted_by      BIGINT,
+        FOREIGN KEY (employee_id) REFERENCES employee_master(id)
+    );
+
+
+CREATE TABLE salary_payment (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    employee_salary_id BIGINT NOT NULL,    -- Link to computed salary
+    payment_date DATE NOT NULL,            -- Date salary was paid
+    payment_mode ENUM('BANK_TRANSFER','CASH','CHEQUE','OTHER') NOT NULL,
+    transaction_reference VARCHAR(100),    -- Bank reference / cheque number / transaction ID
+    amount_paid DECIMAL(12,2) NOT NULL,   -- Actual amount paid
+    remarks VARCHAR(255),
+
+    deleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (employee_salary_id) REFERENCES employee_salary(id)
+);
+
+
+CREATE TABLE payroll_period (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status ENUM('PENDING','COMPLETED','CANCELLED') NOT NULL DEFAULT 'PENDING',
+    description VARCHAR(255),
+    deleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+CREATE TABLE employee_bonus (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    employee_id BIGINT NOT NULL,
+    bonus_type VARCHAR(50) NOT NULL,  -- e.g., Festival Bonus, Performance
+    amount DECIMAL(12,2) NOT NULL,
+    payroll_period_id BIGINT NOT NULL,
+    remarks VARCHAR(255),
+       deleted BOOLEAN DEFAULT FALSE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        created_by BIGINT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_by BIGINT,
+        deleted_at DATETIME,
+        deleted_by BIGINT,
+    FOREIGN KEY (employee_id) REFERENCES employee_master(id),
+    FOREIGN KEY (payroll_period_id) REFERENCES payroll_period(id)
+);
+
+
+CREATE TABLE employee_advance (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    employee_id BIGINT NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    repayment_months INT,
+    start_date DATE,
+    end_date DATE,
+    balance DECIMAL(12,2),
+           deleted BOOLEAN DEFAULT FALSE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_by BIGINT,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            updated_by BIGINT,
+            deleted_at DATETIME,
+            deleted_by BIGINT,
+    FOREIGN KEY (employee_id) REFERENCES employee_master(id)
+);
+
+
+CREATE TABLE salary_slip (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    employee_salary_id BIGINT NOT NULL,
+    payroll_period_id BIGINT NOT NULL,
+    slip_url VARCHAR(255),  -- PDF or file location
+             deleted BOOLEAN DEFAULT FALSE,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                created_by BIGINT,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                updated_by BIGINT,
+                deleted_at DATETIME,
+                deleted_by BIGINT,
+    FOREIGN KEY (employee_salary_id) REFERENCES employee_salary(id),
+    FOREIGN KEY (payroll_period_id) REFERENCES payroll_period(id)
+);

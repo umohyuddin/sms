@@ -1067,5 +1067,244 @@ VALUES ('EMP001', 'Uzair', 'Anwar', 'Uzair Anwar', 'MALE', '1990-05-12', 'SINGLE
         '03003456789', '03007654321', '0426789012', 'hamza.jpg', 'Finance Manager', 'hamza.shah@example.com', TRUE, 1,
         NOW(), 1, NOW());
 
+INSERT INTO departments (department_code, department_name, description, parent_id, head_employee_id, is_active)
+VALUES
+-- Top-level school departments
+('SCH01', 'School of Science', 'All science-related departments', NULL, 1, TRUE),
+('SCH02', 'School of Arts', 'All arts-related departments', NULL, 2, TRUE),
+('SCH03', 'School of Commerce', 'All commerce-related departments', NULL, 3, TRUE),
+
+-- Science Faculty (use existing employee IDs as heads)
+('SCI01', 'Department of Physics', 'Physics department', 1, 4, TRUE),
+('SCI02', 'Department of Chemistry', 'Chemistry department', 1, 5, TRUE),
+('SCI03', 'Department of Biology', 'Biology department', 1, 1, TRUE),  -- cycle back to employee 1
+-- Arts Faculty
+('ART01', 'Department of History', 'History department', 2, 2, TRUE),
+('ART02', 'Department of Literature', 'Literature department', 2, 3, TRUE),
+('ART03', 'Department of Fine Arts', 'Fine Arts department', 2, 4, TRUE),
+-- Commerce Faculty
+('COM01', 'Department of Accounting', 'Accounting department', 3, 5, TRUE),
+('COM02', 'Department of Business Administration', 'Business Admin dept', 3, 1, TRUE),
+('COM03', 'Department of Economics', 'Economics department', 3, 2, TRUE);
 
 
+
+
+
+
+INSERT INTO employee_type
+(name, description, active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES
+('Teacher', 'General teaching staff', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Head of Department', 'Leads a specific academic department', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Principal', 'Overall in charge of school administration', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Vice Principal', 'Assists the principal in administration', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Lab Instructor', 'Handles lab sessions and practical classes', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Special Education Teacher', 'Works with students requiring special education', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Sports Coach', 'Manages sports and physical activities', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Music Teacher', 'Handles music and arts subjects', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Art Teacher', 'Handles art-related subjects', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Librarian', 'Manages library operations', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Administrator', 'Handles general administration', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Accountant', 'Manages accounts, fees, and payroll', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Receptionist', 'First point of contact for visitors and parents', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('HR Officer', 'Handles recruitment, payroll, and employee welfare', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Clerk', 'General office work', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('IT Support', 'Maintains school IT infrastructure', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Counselor', 'Provides student counseling services', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Nurse', 'Handles student health needs', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Security Guard', 'Maintains school security', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Driver', 'For school transport vehicles', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Janitor', 'Handles cleaning and maintenance', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Cafeteria Staff', 'Manages school cafeteria operations', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Bus Attendant', 'Assists in student transport', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('School Board Member', 'Part of the school board or governing body', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('School Coordinator', 'Coordinates programs and school events', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+('Project Manager', 'Handles special projects and development activities', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL);
+
+
+INSERT INTO designations
+(designation_code, designation_name, description, department_id, employee_type_id, active)
+VALUES
+-- School level roles (Management)
+('DES001', 'Principal', 'Head of the school', NULL, 3, TRUE),
+('DES002', 'Vice Principal', 'Assistant head of school', NULL, 3, TRUE),
+('DES003', 'School Accountant', 'Handles school financials', 3, 2, TRUE),
+
+-- Science Faculty roles (Teachers)
+('DES004', 'Senior Physics Teacher', 'Experienced physics teacher', 4, 1, TRUE),
+('DES005', 'Junior Physics Teacher', 'Junior-level physics teacher', 4, 1, TRUE),
+('DES006', 'Senior Chemistry Teacher', 'Experienced chemistry teacher', 5, 1, TRUE),
+('DES007', 'Junior Chemistry Teacher', 'Junior-level chemistry teacher', 5, 1, TRUE),
+('DES008', 'Senior Biology Teacher', 'Experienced biology teacher', 6, 1, TRUE),
+('DES009', 'Junior Biology Teacher', 'Junior-level biology teacher', 6, 1, TRUE),
+
+-- Arts Faculty roles (Teachers)
+('DES010', 'History Teacher', 'Teaches history', 2, 1, TRUE),
+('DES011', 'Literature Teacher', 'Teaches literature', 2, 1, TRUE),
+('DES012', 'Fine Arts Teacher', 'Teaches arts', 2, 1, TRUE),
+
+-- Commerce Faculty roles (Teachers)
+('DES013', 'Accounting Teacher', 'Teaches accounting', 3, 1, TRUE),
+('DES014', 'Business Administration Teacher', 'Teaches business administration', 3, 1, TRUE),
+('DES015', 'Economics Teacher', 'Teaches economics', 3, 1, TRUE);
+
+
+INSERT INTO salary_structure
+(employee_type_id, base_salary, effective_from, effective_to, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES
+(1, 50000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Teacher
+(2, 70000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Head of Department
+(3, 120000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Principal
+(4, 100000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Vice Principal
+(5, 40000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Lab Instructor
+(6, 55000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Special Education Teacher
+(7, 45000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Sports Coach
+(8, 45000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Music Teacher
+(9, 45000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Art Teacher
+(10, 50000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Librarian
+(11, 60000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Administrator
+(12, 70000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Accountant
+(13, 35000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Receptionist
+(14, 65000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- HR Officer
+(15, 30000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Clerk
+(16, 60000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- IT Support
+(17, 50000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Counselor
+(18, 40000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Nurse
+(19, 30000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Security Guard
+(20, 25000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Driver
+(21, 25000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Janitor
+(22, 30000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Cafeteria Staff
+(23, 25000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Bus Attendant
+(24, 150000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),-- School Board Member
+(25, 70000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- School Coordinator
+(26, 80000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL); -- Project Manager
+
+
+
+INSERT INTO salary_component (name, type, is_percentage) VALUES
+-- Earnings
+('Basic Salary', 'EARNING', TRUE),
+('House Rent Allowance (HRA)', 'EARNING', TRUE),
+('Dearness Allowance (DA)', 'EARNING', TRUE),
+('Conveyance Allowance', 'EARNING', FALSE),
+('Medical Allowance', 'EARNING', FALSE),
+('Special Allowance', 'EARNING', TRUE),
+('Performance Bonus', 'EARNING', FALSE),
+('Travel Allowance', 'EARNING', FALSE),
+('Education Allowance', 'EARNING', FALSE),
+('Meal / Food Allowance', 'EARNING', FALSE),
+('Overtime Pay', 'EARNING', FALSE),
+('Telephone / Internet Allowance', 'EARNING', FALSE),
+('Leave Encashment', 'EARNING', FALSE),
+('Festival / Annual Bonus', 'EARNING', FALSE),
+('Project / Incentive Bonus', 'EARNING', FALSE),
+
+-- Deductions
+('Provident Fund (PF)', 'DEDUCTION', TRUE),
+('Employee State Insurance (ESI)', 'DEDUCTION', TRUE),
+('Professional Tax (PT)', 'DEDUCTION', FALSE),
+('Income Tax / TDS', 'DEDUCTION', TRUE),
+('Loan Deduction', 'DEDUCTION', FALSE),
+('Salary Advance Deduction', 'DEDUCTION', FALSE),
+('Absence / Leave Deduction', 'DEDUCTION', FALSE),
+('Insurance Premium Deduction', 'DEDUCTION', FALSE),
+('Union Fees / Membership', 'DEDUCTION', FALSE),
+('Other Voluntary Deductions', 'DEDUCTION', FALSE);
+
+
+
+INSERT INTO salary_structure_component
+(salary_structure_id, component_id, value, deleted, created_at, created_by) VALUES
+(1, 1, 50.00, FALSE, NOW(), 1),
+(1, 2, 20.00, FALSE, NOW(), 1),
+(1, 3, 5000.00, FALSE, NOW(), 1),
+(1, 4, 3000.00, FALSE, NOW(), 1),
+(1, 5, 10.00, FALSE, NOW(), 1),
+(1, 6, 12.00, FALSE, NOW(), 1),
+(1, 7, 5.00, FALSE, NOW(), 1),
+(1, 8, 200.00, FALSE, NOW(), 1);
+
+-- Admin Staff Salary Structure
+INSERT INTO salary_structure_component
+(salary_structure_id, component_id, value, deleted, created_at, created_by) VALUES
+(2, 1, 40.00, FALSE, NOW(), 1),
+(2, 2, 15.00, FALSE, NOW(), 1),
+(2, 3, 4000.00, FALSE, NOW(), 1),
+(2, 4, 2000.00, FALSE, NOW(), 1),
+(2, 5, 8.00, FALSE, NOW(), 1),
+(2, 6, 10.00, FALSE, NOW(), 1),
+(2, 7, 4.00, FALSE, NOW(), 1),
+(2, 8, 150.00, FALSE, NOW(), 1);
+
+-- Principal Salary Structure
+INSERT INTO salary_structure_component
+(salary_structure_id, component_id, value, deleted, created_at, created_by) VALUES
+(3, 1, 60.00, FALSE, NOW(), 1),
+(3, 2, 25.00, FALSE, NOW(), 1),
+(3, 3, 8000.00, FALSE, NOW(), 1),
+(3, 4, 5000.00, FALSE, NOW(), 1),
+(3, 5, 15.00, FALSE, NOW(), 1),
+(3, 6, 12.00, FALSE, NOW(), 1),
+(3, 7, 6.00, FALSE, NOW(), 1),
+(3, 8, 300.00, FALSE, NOW(), 1);
+
+-- Support Staff Salary Structure
+INSERT INTO salary_structure_component
+(salary_structure_id, component_id, value, deleted, created_at, created_by) VALUES
+(4, 1, 35.00, FALSE, NOW(), 1),
+(4, 2, 10.00, FALSE, NOW(), 1),
+(4, 3, 3000.00, FALSE, NOW(), 1),
+(4, 4, 1500.00, FALSE, NOW(), 1),
+(4, 5, 5.00, FALSE, NOW(), 1),
+(4, 6, 8.00, FALSE, NOW(), 1),
+(4, 7, 3.00, FALSE, NOW(), 1),
+(4, 8, 100.00, FALSE, NOW(), 1);
+
+
+INSERT INTO employee_salary (
+    employee_id,
+    salary_structure_id,
+    gross_salary,
+    total_deductions,
+    net_salary,
+    effective_date,
+    deleted,
+    created_at,
+    created_by
+) VALUES
+(1, 1, 100000.00, 15000.00, 85000.00, '2025-12-01', FALSE, NOW(), 101),
+(2, 2, 80000.00, 12000.00, 68000.00, '2025-12-01', FALSE, NOW(), 101),
+(3, 1, 95000.00, 14000.00, 81000.00, '2025-12-01', FALSE, NOW(), 101),
+(4, 3, 120000.00, 20000.00, 100000.00, '2025-12-01', FALSE, NOW(), 101),
+(5, 2, 70000.00, 10000.00, 60000.00, '2025-12-01', FALSE, NOW(), 101);
+
+
+
+INSERT INTO employee_deduction (
+    employee_id,
+    deduction_type,
+    amount,
+    month,
+    deleted,
+    created_at,
+    created_by
+) VALUES
+(1, 'PF', 5000.00, '2025-12-01', FALSE, NOW(), 101),
+(1, 'Tax', 7000.00, '2025-12-01', FALSE, NOW(), 101),
+(2, 'PF', 4000.00, '2025-12-01', FALSE, NOW(), 101),
+(2, 'Loan', 3000.00, '2025-12-01', FALSE, NOW(), 101),
+(3, 'PF', 4500.00, '2025-12-01', FALSE, NOW(), 101),
+(3, 'Tax', 6000.00, '2025-12-01', FALSE, NOW(), 101),
+(4, 'PF', 6000.00, '2025-12-01', FALSE, NOW(), 101),
+(4, 'Loan', 10000.00, '2025-12-01', FALSE, NOW(), 101),
+(5, 'PF', 3500.00, '2025-12-01', FALSE, NOW(), 101),
+(5, 'Tax', 5000.00, '2025-12-01', FALSE, NOW(), 101);
+
+
+INSERT INTO salary_payment
+(employee_salary_id, payment_date, payment_mode, transaction_reference, amount_paid, remarks, deleted, created_at)
+VALUES
+(1, '2025-12-31', 'BANK_TRANSFER', 'TXN12345', 50000.00, 'December salary', FALSE, NOW()),
+(2, '2025-12-31', 'CHEQUE', 'CHQ6789', 45000.00, 'December salary', FALSE, NOW()),
+(3, '2025-12-31', 'CASH', NULL, 30000.00, 'December salary - advance', FALSE, NOW());

@@ -173,6 +173,7 @@ public class LookUpController {
         result.put("religions", religionConfig.getList());
         result.put("nationalities", nationalityConfig.getMap());
         result.put("countries", countries);
+        result.put("employmentType",employeeDocumentConfig.getEmploymentTypes());
         return result;
     }
 
