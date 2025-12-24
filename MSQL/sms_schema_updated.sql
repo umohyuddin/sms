@@ -619,10 +619,10 @@ CREATE TABLE employee_address
     address_type VARCHAR(50)  NOT NULL,
     line1        VARCHAR(255) NOT NULL,
     line2        VARCHAR(255),
-    city         VARCHAR(100) NOT NULL,
-    state        VARCHAR(100),
+    city_id      BIGINT       NOT NULL,
+    province_id  BIGINT,
     postal_code  VARCHAR(20),
-    country      VARCHAR(100) NOT NULL,
+    country_id   BIGINT       NOT NULL,
 
     deleted      BOOLEAN DEFAULT FALSE,
     created_at   DATETIME,
@@ -632,9 +632,11 @@ CREATE TABLE employee_address
     deleted_at   DATETIME,
     deleted_by   BIGINT,
 
-    CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES employee_master (id)
+    CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES employee_master (id),
+    CONSTRAINT fk_city FOREIGN KEY (city_id) REFERENCES cities (id),
+    CONSTRAINT fk_province_address FOREIGN KEY (province_id) REFERENCES provinces (id),
+    CONSTRAINT fk_country FOREIGN KEY (country_id) REFERENCES country (id)
 );
-
 
 CREATE TABLE employee_emergency_contact
 (

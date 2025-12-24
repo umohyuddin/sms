@@ -1069,25 +1069,3 @@ VALUES ('EMP001', 'Uzair', 'Anwar', 'Uzair Anwar', 'MALE', '1990-05-12', 'SINGLE
 
 
 
-INSERT INTO employee_address
-(employee_id, address_type, line1, line2, city, state, postal_code, country,
- deleted, created_at, created_by)
-VALUES
--- Employee 1
-(1, 'PERMANENT', 'House 12, Street 5', 'G-10/2', 'Islamabad', 'ICT', '44000', 'Pakistan', FALSE, NOW(), 1),
-(1, 'CURRENT', 'Flat 8, Block B', 'F-11 Markaz', 'Islamabad', 'ICT', '44000', 'Pakistan', FALSE, NOW(), 1),
-
--- Employee 2
-(2, 'PERMANENT', 'House 45', 'Model Town', 'Lahore', 'Punjab', '54700', 'Pakistan', FALSE, NOW(), 1),
-(2, 'OFFICE', 'Office #301', 'Gulberg III', 'Lahore', 'Punjab', '54660', 'Pakistan', FALSE, NOW(), 1),
-
--- Employee 3
-(3, 'PERMANENT', 'House 88', 'PECHS Block 6', 'Karachi', 'Sindh', '75400', 'Pakistan', FALSE, NOW(), 1),
-(3, 'CURRENT', 'Apartment 12A', 'Clifton', 'Karachi', 'Sindh', '75600', 'Pakistan', FALSE, NOW(), 1),
-
--- Employee 4
-(4, 'PERMANENT', 'House 23', 'Satellite Town', 'Rawalpindi', 'Punjab', '46000', 'Pakistan', FALSE, NOW(), 1),
-
--- Employee 5
-(5, 'PERMANENT', 'House 10', 'University Road', 'Peshawar', 'KPK', '25000', 'Pakistan', FALSE, NOW(), 1),
-(5, 'CURRENT', 'Hostel Room 5', 'Hayatabad', 'Peshawar', 'KPK', '25100', 'Pakistan', FALSE, NOW(), 1);

@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.facade;
 
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeAddressRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeAddressResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
@@ -33,7 +34,15 @@ public class EmployeeAddressFacade {
 
     public EmployeeAddressResponseDto getAddressById(Long addressId) {
         return employeeAddressService.getById(addressId);
+    }
 
+    public EmployeeAddressResponseDto createAddress(EmployeeAddressRequestDto requestDto) {
+        return employeeAddressService.create(requestDto);
+    }
+
+
+    public EmployeeAddressResponseDto updateAddress(Long addressId, EmployeeAddressRequestDto requestDto) {
+        return employeeAddressService.update(addressId, requestDto);
     }
 }
 

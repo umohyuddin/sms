@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.lookups.service;
 
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.requestDto.ProvinceRequestDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
@@ -146,6 +147,18 @@ public class ProvinceService {
         } catch (Exception e) {
             log.error("Error searching provinces", e);
             throw new CustomServiceException("Failed to search Provinces", e);
+        }
+    }
+
+    public List<ProvinceResponseDTO> getByProvinceByCountry(Long countryId) {
+        try {
+            log.info(" Provinces by countryId: {}", countryId);
+            List<ProvinceEntity> result = provinceRepository.getByProvinceByCountry(countryId);
+            return MapperUtil.mapList(result, ProvinceResponseDTO.class);
+
+        } catch (Exception e) {
+            log.error("Error while getting provinces", e);
+            throw new CustomServiceException("Failed to get Provinces", e);
         }
     }
 }

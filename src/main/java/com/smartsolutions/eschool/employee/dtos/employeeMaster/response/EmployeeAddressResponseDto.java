@@ -20,8 +20,14 @@ public class EmployeeAddressResponseDto {
     private String line1;
     private String line2;
 
-    private String city;
-    private String state;
+    private Long cityId;
+    private String cityName;
+
+    private Long provinceId; // optional
+    private String provinceName;
+
     private String postalCode;
-    private String country;
+
+    private Long countryId;
+    private String countryName;
 }

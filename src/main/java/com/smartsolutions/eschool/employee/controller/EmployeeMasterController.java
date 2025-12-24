@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.controller;
 
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeAddressRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeAddressResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
@@ -38,7 +39,6 @@ import java.util.Map;
 @Slf4j
 public class EmployeeMasterController {
     private final EmployeeMasterFacade employeeFacade;
-
     private final EmployeeAddressFacade employeeAddressFacade;
 
     public EmployeeMasterController(EmployeeMasterFacade employeeFacade, EmployeeAddressFacade employeeAddressFacade) {
@@ -263,4 +263,42 @@ public class EmployeeMasterController {
             return ResponseEntity.status(500).build();
         }
     }
+
+
+    @PostMapping(value = "/{employeeId}/addresses", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeAddressResponseDto> createEmployeeAddress(@PathVariable Long employeeId, @RequestBody EmployeeAddressRequestDto requestDto) {
+
+        log.info("POST /api/institute/employees/{}/addresses called with data: {}", employeeId, requestDto);
+        try {
+            requestDto.setEmployeeId(employeeId); // ensure the employeeId from path is set
+            EmployeeAddressResponseDto createdAddress = employeeAddressFacade.createAddress(requestDto);
+            log.info("Employee address created successfully with id={}", createdAddress.getId());
+            return ResponseEntity.ok(createdAddress);
+        } catch (Exception e) {
+            log.error("Failed to create employee address for employeeId={}", employeeId, e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    // -------------------------
+// Update an existing employee address
+// -------------------------
+    @PutMapping(value = "/addresses/{addressId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeAddressResponseDto> updateEmployeeAddress(@PathVariable Long addressId, @RequestBody EmployeeAddressRequestDto requestDto) {
+
+        log.info("PUT /api/institute/employees/addresses/{} called with data: {}", addressId, requestDto);
+        try {
+            EmployeeAddressResponseDto updatedAddress = employeeAddressFacade.updateAddress(addressId, requestDto);
+            if (updatedAddress == null) {
+                log.warn("Address not found with id={}", addressId);
+                return ResponseEntity.notFound().build();
+            }
+            log.info("Employee address updated successfully with id={}", addressId);
+            return ResponseEntity.ok(updatedAddress);
+        } catch (Exception e) {
+            log.error("Failed to update employee address with id={}", addressId, e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
 }

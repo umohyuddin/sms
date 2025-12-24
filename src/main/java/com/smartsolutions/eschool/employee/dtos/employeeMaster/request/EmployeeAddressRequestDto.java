@@ -21,13 +21,13 @@ public class EmployeeAddressRequestDto {
 
     private String line2;
 
-    @NotBlank(message = "City is required")
-    private String city;
+    @NotNull(message = "City ID is required")
+    private Long cityId;
 
-    private String state;
+    private Long provinceId; // Optional, can be null
+
+    @NotNull(message = "Country ID is required")
+    private Long countryId;
 
     private String postalCode;
-
-    @NotBlank(message = "Country is required")
-    private String country;
 }

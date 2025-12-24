@@ -34,6 +34,7 @@ public interface ProvinceRepository extends JpaRepository<ProvinceEntity,Long>  
             """)
     List<ProvinceEntity> findAllActive();
 
+
     // Find all non-active provinces
     @Query("""
             SELECT p
@@ -74,4 +75,13 @@ public interface ProvinceRepository extends JpaRepository<ProvinceEntity,Long>  
                 p.deletedAt = CURRENT_TIMESTAMP
             """)
     int softDeleteAll();
+
+    @Query("""
+            SELECT p FROM ProvinceEntity p
+             WHERE p.country.id = :countryId
+              AND p.isActive = true
+              AND p.deleted = false
+            ORDER BY p.name ASC
+            """)
+    List<ProvinceEntity> getByProvinceByCountry( @Param("countryId") Long countryId);
 }

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "provinces")
+@Table(name = "provinces", uniqueConstraints = {@UniqueConstraint(columnNames = {"country_id", "name"})})
 @Getter
 @Setter
 public class ProvinceEntity extends AuditableEntity {
@@ -25,4 +25,11 @@ public class ProvinceEntity extends AuditableEntity {
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
+
+    /* -----------------------------
+     * COUNTRY (FK)
+     * ----------------------------- */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "country_id", nullable = false)
+    private CountryEntity country;
 }

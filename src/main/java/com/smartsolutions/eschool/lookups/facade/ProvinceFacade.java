@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.lookups.facade;
 
 import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.employee.service.EmployeeService;
+import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.requestDto.ProvinceRequestDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.service.ProvinceService;
@@ -51,5 +52,9 @@ public class ProvinceFacade {
 
     public List<ProvinceResponseDTO> searchByKeyword(String keyword) {
         return provinceService.searchByKeyword(keyword);
+    }
+
+    public List<ProvinceResponseDTO> getByProvinceByCountry(Long countryId) {
+        return provinceService.getByProvinceByCountry(countryId);
     }
 }

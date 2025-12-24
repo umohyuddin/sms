@@ -119,8 +119,17 @@ public class LookUpController {
     }
 
     // Get cities by province ID (for multi-level dropdown)
-    @GetMapping(value = "/provinces/{provinceId}/cities", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCitiesByProvince(@PathVariable Long provinceId) {
+    @GetMapping(value = "/countries/{countryId}/provinces", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getCitiesByProvince(@PathVariable Long countryId) {
+        log.info("GET /countries/{}/province called", countryId);
+        List<ProvinceResponseDTO> resources = provinceFacade.getByProvinceByCountry(countryId);
+        log.info("GET /countries/{}/province succeeded, returned {} cities", countryId, resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
+
+    @GetMapping(value = "/country/provinces/{provinceId}/cities", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getProvinceByCountry(@PathVariable Long provinceId) {
         log.info("GET /api/lookup/provinces/{}/cities called", provinceId);
         List<CityResponseDTO> resources = cityFacade.getByProvince(provinceId);
         log.info("GET /api/lookup/provinces/{}/cities succeeded, returned {} cities", provinceId, resources.size());

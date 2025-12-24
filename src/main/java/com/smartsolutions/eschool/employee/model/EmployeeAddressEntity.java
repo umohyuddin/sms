@@ -2,6 +2,9 @@ package com.smartsolutions.eschool.employee.model;
 
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.lookups.model.CityEntity;
+import com.smartsolutions.eschool.lookups.model.CountryEntity;
+import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,15 +33,19 @@ public class EmployeeAddressEntity extends AuditableEntity {
     @Column(name = "line2", length = 255)
     private String line2;
 
-    @Column(name = "city", length = 100, nullable = false)
-    private String city;
-
-    @Column(name = "state", length = 100)
-    private String state;
 
     @Column(name = "postal_code", length = 20)
     private String postalCode;
 
-    @Column(name = "country", length = 100, nullable = false)
-    private String country;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id", nullable = false, foreignKey = @ForeignKey(name = "fk_city"))
+    private CityEntity city;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "province_id", foreignKey = @ForeignKey(name = "fk_province"))
+    private ProvinceEntity province;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id", nullable = false, foreignKey = @ForeignKey(name = "fk_country"))
+    private CountryEntity country;
 }
