@@ -3,7 +3,10 @@ package com.smartsolutions.eschool.employee.facade;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
+import com.smartsolutions.eschool.employee.dtos.salaryPayment.request.SalaryPaymentRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.salaryPayment.response.SalaryPaymentResponseDTO;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
+import com.smartsolutions.eschool.employee.service.SalaryPaymentService;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -19,99 +22,33 @@ import java.util.Map;
 @Scope("prototype")
 public class SalaryPaymentFacade {
 
-    private final EmployeeMasterService employeeService;
+    private final SalaryPaymentService paymentService;
 
-    public SalaryPaymentFacade(EmployeeMasterService employeeService) {
-        this.employeeService = employeeService;
+    public SalaryPaymentFacade(SalaryPaymentService paymentService) {
+        this.paymentService = paymentService;
     }
 
-    // -------------------------
-    // Basic fetch operations
-    // -------------------------
-    public List<EmployeeMasterResponseDto> getAllEmployees() {
-        return employeeService.getAll();
+    public SalaryPaymentResponseDTO createPayment(SalaryPaymentRequestDTO requestDTO) {
+        return paymentService.createPayment(requestDTO);
     }
 
-    public EmployeeMasterResponseDto getEmployeeById(Long id) {
-        return employeeService.getById(id);
+    public SalaryPaymentResponseDTO updatePayment(Long id, SalaryPaymentRequestDTO requestDTO) {
+        return paymentService.updatePayment(id, requestDTO);
     }
 
-    public EmployeeMasterResponseDto getEmployeeByCode(String code) {
-        return employeeService.getByEmployeeCode(code);
+    public SalaryPaymentResponseDTO getPaymentById(Long id) {
+        return paymentService.getPaymentById(id);
     }
 
-    public List<EmployeeMasterResponseDto> searchEmployeesByName(String name) {
-        return employeeService.searchByName(name);
+    public List<SalaryPaymentResponseDTO> getAllPayments() {
+        return paymentService.getAllPayments();
     }
 
-    public List<EmployeeMasterResponseDto> getEmployeesByGender(String gender) {
-        return employeeService.getByGender(gender);
+    public List<SalaryPaymentResponseDTO> getPaymentsByEmployeeSalary(Long employeeSalaryId) {
+        return paymentService.getPaymentsByEmployeeSalary(employeeSalaryId);
     }
 
-    public List<EmployeeMasterResponseDto> getEmployeesByActiveStatus(Boolean status) {
-        return employeeService.getByActiveStatus(status);
+    public void softDeletePayment(Long id) {
+        paymentService.softDeletePayment(id);
     }
-
-    public List<EmployeeMasterResponseDto> getEmployeesWithProbationEndedBefore(Date date) {
-        return employeeService.getProbationEndedBefore(date);
-    }
-
-    // -------------------------
-    // Create / update operations
-    // -------------------------
-    public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto requestDto) {
-        return employeeService.createEmployee(requestDto);
-    }
-
-    // -------------------------
-    // Metrics / counts
-    // -------------------------
-    public long getTotalEmployees() {
-        return employeeService.countAllEmployees();
-    }
-
-    public long getTotalActiveEmployees() {
-        return employeeService.countActiveEmployees();
-    }
-
-    public long getTotalInactiveEmployees() {
-        return employeeService.countInactiveEmployees();
-    }
-
-    public String updateEmployeeProfile(Long employeeId, String file) {
-        return employeeService.saveProfilePhoto(employeeId, file);
-    }
-
-
-    public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
-        employeeService.saveEmployeeDocument(employeeId, docKey, file);
-    }
-
-
-    public List<EmployeeDocumentResponseDto> getEmployeeDocuments(Long employeeId) {
-        return employeeService.getDocumentsByEmployeeId(employeeId);
-    }
-
-    public Map<String, List<EmployeeDocumentResponseDto>> getDocumentsByEmployeeId(Long employeeId) {
-        return employeeService.getGroupedDocuments(employeeId);
-    }
-
-    public Resource getDocumentById(Long documentId, Long employeeId) {
-        return employeeService.downloadDocument(documentId, employeeId);
-    }
-
-    public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto requestDto) {
-        return employeeService.updateEmployee(id, requestDto);
-    }
-
-
-    public Long countAll() {
-        return employeeService.countAllEmployees();
-    }
-
-    public Map<String, Long> getEmployeeCountByGender() {
-        return employeeService.getEmployeeCountByGender();
-    }
-
 }
-

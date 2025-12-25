@@ -21,7 +21,7 @@ public class SalaryPaymentEntity extends AuditableEntity {
     // Link to employee salary (computed salary for month)
     @ManyToOne(optional = false)
     @JoinColumn(name = "employee_salary_id", nullable = false)
-    private EmployeeSalaryEntity employeeSalary;
+    private EmployeeMasterSalary employeeSalary;
 
     @Column(name = "payment_date", nullable = false)
     private LocalDate paymentDate;
@@ -38,6 +38,8 @@ public class SalaryPaymentEntity extends AuditableEntity {
 
     @Column(name = "remarks", length = 255)
     private String remarks;
+    @Column(name = "deleted")
+    private Boolean deleted;
 
     // Payment mode enum
     public enum PaymentMode {

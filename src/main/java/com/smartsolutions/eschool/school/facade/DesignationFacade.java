@@ -1,7 +1,10 @@
 package com.smartsolutions.eschool.school.facade;
 
+import com.smartsolutions.eschool.school.dtos.designations.request.DesignationRequestDTO;
+import com.smartsolutions.eschool.school.dtos.designations.response.DesignationResponseDTO;
 import com.smartsolutions.eschool.school.dtos.discountType.requestDto.DiscountTypeRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
+import com.smartsolutions.eschool.school.service.DesignationService;
 import com.smartsolutions.eschool.school.service.DiscountTypeService;
 import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
@@ -12,43 +15,59 @@ import java.util.List;
 @Component
 @Scope("prototype")
 public class DesignationFacade {
+    private final DesignationService designationService;
 
-private final DiscountTypeService discountTypeService;
-
-    public DesignationFacade(DiscountTypeService discountTypeService) {
-        this.discountTypeService = discountTypeService;
+    public DesignationFacade(DesignationService designationService) {
+        this.designationService = designationService;
     }
 
-    public DiscountTypeResponseDTO createDiscountType(@Valid DiscountTypeRequestDTO requestDTO) {
-        return discountTypeService.createDiscountType(requestDTO);
+    /* =========================
+       CREATE
+       ========================= */
+    public DesignationResponseDTO createDesignation(@Valid DesignationRequestDTO requestDTO) {
+        return designationService.createDesignation(requestDTO);
     }
 
-    public List<DiscountTypeResponseDTO> getAll() {
-        return discountTypeService.getAll();
+    /* =========================
+       GET BY ID
+       ========================= */
+    public DesignationResponseDTO getById(Long designationId) {
+        return designationService.getById(designationId);
     }
 
-    public DiscountTypeResponseDTO getById(Long discountTypeId) {
-        return discountTypeService.getById(discountTypeId);
+    /* =========================
+       GET ALL
+       ========================= */
+    public List<DesignationResponseDTO> getAll() {
+        return designationService.getAll();
     }
 
-    public List<DiscountTypeResponseDTO> getAllActive() {
-        return discountTypeService.getAllActive();
+    public List<DesignationResponseDTO> getAllActive() {
+        return designationService.getAllActive();
     }
 
-    public List<DiscountTypeResponseDTO> getAllInActive() {
-        return discountTypeService.getAllInActive();
-    }
+//    public List<DesignationResponseDTO> getAllInactive() {
+//        return designationService.getAllInactive();
+//    }
 
-    public int softDeleteById(Long discountTypeId) {
-        return discountTypeService.softDeleteById(discountTypeId);
-    }
+    /* =========================
+       UPDATE
+       ========================= */
+//    public DesignationResponseDTO updateDesignation(Long designationId, @Valid DesignationRequestDTO requestDTO) {
+//        return designationService.updateDesignation(designationId, requestDTO);
+//    }
 
+    /* =========================
+       SOFT DELETE
+       ========================= */
+//    public int softDeleteById(Long designationId) {
+//        return designationService.softDeleteById(designationId);
+//    }
 
-    public List<DiscountTypeResponseDTO> searchByKeyword(String keyword) {
-        return discountTypeService.searchByKeyword(keyword);
-    }
-
-    public DiscountTypeResponseDTO updateDiscountType(Long discountTypeId, @Valid DiscountTypeRequestDTO requestDTO) {
-        return discountTypeService.updateDiscountType(discountTypeId,requestDTO);
+    /* =========================
+       SEARCH
+       ========================= */
+    public List<DesignationResponseDTO> searchByKeyword(String keyword) {
+        return designationService.searchByKeyword(keyword);
     }
 }

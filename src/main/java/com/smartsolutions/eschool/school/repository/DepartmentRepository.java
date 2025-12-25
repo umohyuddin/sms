@@ -14,27 +14,23 @@ import java.util.Optional;
 
 @Repository
 public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Long> {
-    Optional<CampusEntity> findByIdAndDeletedFalse(Long id);
+    // 1. Find all active departments
+    @Query("SELECT d FROM DepartmentEntity d WHERE d.isActive = true AND d.deleted = false")
+    List<DepartmentEntity> findAllActiveDepartments();
 
-    List<CampusEntity> findByDeletedFalse();
+    // 2. Find by department code
+    @Query("SELECT d FROM DepartmentEntity d WHERE d.departmentCode = :code AND d.deleted = false")
+    Optional<DepartmentEntity> findByDepartmentCode(@Param("code") String code);
 
-    List<CampusEntity> findByInstituteIdAndDeletedFalse(Long instituteId);
+    // 3. Find departments by parent department
+    @Query("SELECT d FROM DepartmentEntity d WHERE d.parentDepartment.id = :parentId AND d.deleted = false")
+    List<DepartmentEntity> findByParentDepartmentId(@Param("parentId") Long parentId);
 
-    // Find all campuses by institute ID
-    List<CampusEntity> findByInstituteId(Long instituteId);
+    // 4. Find department by head employee
+    @Query("SELECT d FROM DepartmentEntity d WHERE d.headEmployee.id = :employeeId AND d.deleted = false")
+    Optional<DepartmentEntity> findByHeadEmployeeId(@Param("employeeId") Long employeeId);
 
-    // Find a campus by its name WHERE campus_name LIKE %?%
-    List<CampusEntity> findByCampusNameContainingAndDeletedFalse(String campusName);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE CampusEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " + "WHERE s.id = :id")
-    int softDeleteById(@Param("id") Long id);
-
-    Long id(Long id);
-
-
-    @Query("""
-            SELECT c FROM CampusEntity c WHERE (c.campusName LIKE %:keyword% OR c.campusCode LIKE %:keyword%) AND c.deleted = false""")
-    List<CampusEntity> searchByKeyword(@Param("keyword") String keyword);
+    // 5. Search departments by name (partial match)
+    @Query("SELECT d FROM DepartmentEntity d WHERE LOWER(d.departmentName) LIKE LOWER(CONCAT('%', :name, '%')) AND d.deleted = false")
+    List<DepartmentEntity> searchByDepartmentName(@Param("name") String name);
 }

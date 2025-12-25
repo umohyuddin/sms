@@ -3,89 +3,64 @@ package com.smartsolutions.eschool.employee.repository;
 import com.smartsolutions.eschool.employee.model.EmployeeBonusEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterSalary;
+import com.smartsolutions.eschool.employee.model.EmployeeSalaryEntity;
+import com.smartsolutions.eschool.global.enums.SalaryStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface EmployeeMasterSalaryRepository extends JpaRepository<EmployeeMasterSalary, Long> {
 
     // -------------------------
-    // Find by ID
+    // Find by Employee ID
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.id = :id")
-    Optional<EmployeeMasterSalary> findById(@Param("id") Long id);
+    @Query("SELECT e FROM EmployeeMasterSalary e WHERE e.employee.id = :employeeId AND e.deleted = false")
+    List<EmployeeMasterSalary> findAllByEmployeeId(@Param("employeeId") Long employeeId);
 
     // -------------------------
-    // Find by employee code
+    // Find by Employee ID and Status
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.employeeCode = :code")
-    Optional<EmployeeMasterEntity> findByEmployeeCode(@Param("code") String code);
-
-    // -------------------------
-    // Search by  name
-    // -------------------------
-
-    @Query("SELECT e FROM EmployeeMasterEntity e " +
-            "WHERE LOWER(e.firstName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<EmployeeMasterEntity> searchByName(@Param("name") String name);
+//    @Query("SELECT e FROM EmployeeMasterSalary e WHERE e.empId = :employeeId AND e.status = :status AND e.deleted = false")
+//    List<EmployeeMasterSalary> findByEmployeeIdAndStatus(@Param("employeeId") Long employeeId,
+//                                                         @Param("status") EmployeeSalaryEntity.SalaryStatus status);
 
     // -------------------------
-    // Filter by gender
+    // Find by Salary Status
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.gender = :gender")
-    List<EmployeeMasterEntity> findByGender(@Param("gender") String gender);
-
-    // -------------------------
-    // Filter by active status
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.active = :status")
-    List<EmployeeMasterEntity> findByActiveStatus(@Param("status") Boolean status);
+//    @Query("SELECT e FROM EmployeeMasterSalary e WHERE e.status = :status AND e.deleted = false")
+//    List<EmployeeMasterSalary> findByStatus(@Param("status") SalaryStatus status);
 
     // -------------------------
-    // Filter by joining date range
+    // Find by Effective Date (Payroll month)
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.joiningDate BETWEEN :start AND :end")
-    List<EmployeeMasterEntity> findByJoiningDateBetween(@Param("start") Date start, @Param("end") Date end);
-
-    // -------------------------
-    // Filter by probation end date
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.probationEndDate < :date")
-    List<EmployeeMasterEntity> findProbationEndedBefore(@Param("date") Date date);
-
+    @Query("SELECT e FROM EmployeeMasterSalary e WHERE e.effectiveDate = :effectiveDate AND e.deleted = false")
+    List<EmployeeMasterSalary> findByEffectiveDate(@Param("effectiveDate") LocalDate effectiveDate);
 
     // -------------------------
-    // Count queries
+    // Check if salary exists for employee in a month/year
     // -------------------------
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e")
-    long countAllEmployees();
-
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = TRUE")
-    long countActiveEmployees();
-
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = FALSE")
-    long countInactiveEmployees();
-
-    @Query("SELECT e.gender, COUNT(e) FROM EmployeeMasterEntity e GROUP BY e.gender")
-    List<Object[]> countEmployeesByGender();
+//    @Query("SELECT e FROM EmployeeMasterSalary e  WHERE e.employee.id = :employeeId AND e.year = :year AND e.month = :month AND e.deleted = false")
+//    Optional<EmployeeMasterSalary> findByEmployeeAndMonth(@Param("employeeId") Long employeeId,
+//                                                          @Param("year") Integer year,
+//                                                          @Param("month") Integer month);
 
     // -------------------------
-    // Ordering / Sorting
+    // Find all salaries for an employee within a date range
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.joiningDate DESC")
-    List<EmployeeMasterEntity> findAllOrderByJoiningDateDesc();
+    @Query("SELECT e FROM EmployeeMasterSalary e  WHERE e.employee.id = :employeeId AND e.effectiveDate BETWEEN :from AND :to AND e.deleted = false")
+    List<EmployeeMasterSalary> findSalariesByEmployeeAndDateRange(@Param("employeeId") Long employeeId,
+                                                                  @Param("from") LocalDate from,
+                                                                  @Param("to") LocalDate to);
 
-    @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.dateOfBirth ASC")
-    List<EmployeeMasterEntity> findAllOrderByDateOfBirthAsc();
-
-
-
+    // -------------------------
+    // Soft delete by ID
+    // -------------------------
+    @Query("UPDATE EmployeeMasterSalary e SET e.deleted = true WHERE e.id = :id")
+    void softDeleteById(@Param("id") Long id);
 }

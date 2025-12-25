@@ -2,9 +2,15 @@ package com.smartsolutions.eschool.employee.model;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@Entity
+@Table(name = "payroll_period")
 public class PayrollPeriodEntity  extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

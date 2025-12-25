@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.student.repository;
 
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -121,21 +122,62 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
 //            @Param("academicYearId") Long academicYearId
 //    );
 
+//    @Query("""
+//            SELECT s FROM StudentEntity s
+//            LEFT JOIN FETCH s.campus c
+//            LEFT JOIN FETCH s.standard st
+//            LEFT JOIN FETCH s.section sec
+//            LEFT JOIN FETCH s.academicYear ay
+//            WHERE s.deleted = false
+//              AND (:campusId IS NULL OR c.id = :campusId)
+//              AND (:standardId IS NULL OR st.id = :standardId)
+//              AND (:sectionId IS NULL OR sec.id = :sectionId)
+//              AND (:studentId IS NULL OR s.id = :studentId)
+//              AND (:academicYearId IS NULL OR ay.id = :academicYearId)
+//              AND (:keyword IS NULL OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+//                   OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+//                   OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+//            """)
+//@Query("""
+//    SELECT DISTINCT s FROM StudentEntity s
+//    LEFT JOIN FETCH s.campus c
+//    LEFT JOIN FETCH s.standard st
+//    LEFT JOIN FETCH s.section sec
+//    LEFT JOIN FETCH s.academicYear ay
+//    WHERE s.deleted = false
+//      AND (:campusId IS NULL OR c.id = :campusId)
+//      AND (:standardId IS NULL OR st.id = :standardId)
+//      AND (:sectionId IS NULL OR sec.id = :sectionId)
+//      AND (:studentId IS NULL OR s.id = :studentId)
+//      AND (:academicYearId IS NULL OR ay.id = :academicYearId)
+//      AND (
+//            :keyword IS NULL
+//            OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+//            OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+//            OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+//          )
+//""")
+
+    @EntityGraph(attributePaths = {
+            "campus",
+            "standard",
+            "section",
+            "academicYear"
+    })
     @Query("""
-            SELECT s FROM StudentEntity s
-            LEFT JOIN FETCH s.campus c
-            LEFT JOIN FETCH s.standard st
-            LEFT JOIN FETCH s.section sec
-            LEFT JOIN FETCH s.academicYear ay
-            WHERE s.deleted = false
-              AND (:campusId IS NULL OR c.id = :campusId)
-              AND (:standardId IS NULL OR st.id = :standardId)
-              AND (:sectionId IS NULL OR sec.id = :sectionId)
-              AND (:studentId IS NULL OR s.id = :studentId)
-              AND (:academicYearId IS NULL OR ay.id = :academicYearId)
-              AND (:keyword IS NULL OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                   OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                SELECT s FROM StudentEntity s
+                WHERE s.deleted = false
+                  AND (:campusId IS NULL OR s.campus.id = :campusId)
+                  AND (:standardId IS NULL OR s.standard.id = :standardId)
+                  AND (:sectionId IS NULL OR s.section.id = :sectionId)
+                  AND (:studentId IS NULL OR s.id = :studentId)
+                  AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
+                  AND (
+                        :keyword IS NULL
+                        OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                        OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                        OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                      )
             """)
     List<StudentEntity> searchStudents(
             @Param("campusId") Long campusId,

@@ -2,7 +2,9 @@ package com.smartsolutions.eschool.employee.repository;
 
 import com.smartsolutions.eschool.employee.model.EmployeeAdvanceEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
+import com.smartsolutions.eschool.employee.model.SalaryStructureComponentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,79 +14,62 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SalaryStructureComponentRepository extends JpaRepository<EmployeeAdvanceEntity, Long> {
+public interface SalaryStructureComponentRepository extends JpaRepository<SalaryStructureComponentEntity, Long> {
 
     // -------------------------
-    // Find by ID
+    // Find all active components
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.id = :id")
-    Optional<EmployeeAdvanceEntity> findById(@Param("id") Long id);
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.deleted = false")
+    List<SalaryStructureComponentEntity> findAllActive();
 
     // -------------------------
-    // Find by employee code
+    // Find by ID if not deleted
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.employeeCode = :code")
-    Optional<EmployeeMasterEntity> findByEmployeeCode(@Param("code") String code);
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.id = :id AND ssc.deleted = false")
+    Optional<SalaryStructureComponentEntity> findByIdActive(Long id);
 
     // -------------------------
-    // Search by  name
+    // Find all components by salary structure
     // -------------------------
-
-    @Query("SELECT e FROM EmployeeMasterEntity e " +
-            "WHERE LOWER(e.firstName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<EmployeeMasterEntity> searchByName(@Param("name") String name);
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.deleted = false")
+    List<SalaryStructureComponentEntity> findBySalaryStructureId(Long salaryStructureId);
 
     // -------------------------
-    // Filter by gender
+    // Find all components by component
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.gender = :gender")
-    List<EmployeeMasterEntity> findByGender(@Param("gender") String gender);
-
-    // -------------------------
-    // Filter by active status
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.active = :status")
-    List<EmployeeMasterEntity> findByActiveStatus(@Param("status") Boolean status);
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.component.id = :componentId AND ssc.deleted = false")
+    List<SalaryStructureComponentEntity> findByComponentId(Long componentId);
 
     // -------------------------
-    // Filter by joining date range
+    // Find specific component in salary structure
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.joiningDate BETWEEN :start AND :end")
-    List<EmployeeMasterEntity> findByJoiningDateBetween(@Param("start") Date start, @Param("end") Date end);
-
-    // -------------------------
-    // Filter by probation end date
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.probationEndDate < :date")
-    List<EmployeeMasterEntity> findProbationEndedBefore(@Param("date") Date date);
-
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.component.id = :componentId AND ssc.deleted = false")
+    Optional<SalaryStructureComponentEntity> findBySalaryStructureIdAndComponentId(Long salaryStructureId, Long componentId);
 
     // -------------------------
-    // Count queries
+    // Soft delete by ID
     // -------------------------
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e")
-    long countAllEmployees();
-
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = TRUE")
-    long countActiveEmployees();
-
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = FALSE")
-    long countInactiveEmployees();
-
-    @Query("SELECT e.gender, COUNT(e) FROM EmployeeMasterEntity e GROUP BY e.gender")
-    List<Object[]> countEmployeesByGender();
+    @Modifying
+    @Query("UPDATE SalaryStructureComponentEntity ssc SET ssc.deleted = true WHERE ssc.id = :id")
+    int softDeleteById(Long id);
 
     // -------------------------
-    // Ordering / Sorting
+    // Soft delete all components for a salary structure
     // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.joiningDate DESC")
-    List<EmployeeMasterEntity> findAllOrderByJoiningDateDesc();
+    @Modifying
+    @Query("UPDATE SalaryStructureComponentEntity ssc SET ssc.deleted = true WHERE ssc.salaryStructure.id = :salaryStructureId")
+    int softDeleteBySalaryStructureId(Long salaryStructureId);
 
-    @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.dateOfBirth ASC")
-    List<EmployeeMasterEntity> findAllOrderByDateOfBirthAsc();
+    // -------------------------
+    // Search by component name within salary structure
+    // -------------------------
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.component.name LIKE %:keyword% AND ssc.deleted = false")
+    List<SalaryStructureComponentEntity> searchByComponentName(Long salaryStructureId, String keyword);
 
-
+    // -------------------------
+    // Count active components for a salary structure
+    // -------------------------
+    @Query("SELECT COUNT(ssc) FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.deleted = false")
+    Long countActiveBySalaryStructureId(Long salaryStructureId);
 
 }

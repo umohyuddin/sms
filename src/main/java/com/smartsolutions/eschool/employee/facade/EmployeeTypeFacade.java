@@ -1,10 +1,14 @@
 
 package com.smartsolutions.eschool.employee.facade;
 
+import com.smartsolutions.eschool.employee.dtos.EmployeeType.request.EmployeeTypeRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.EmployeeType.response.EmployeeTypeResponseDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
+import com.smartsolutions.eschool.employee.service.EmployeeTypeService;
+import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -20,99 +24,71 @@ import java.util.Map;
 @Scope("prototype")
 public class EmployeeTypeFacade {
 
-    private final EmployeeMasterService employeeService;
+    private final EmployeeTypeService employeeTypeService;
 
-    public EmployeeTypeFacade(EmployeeMasterService employeeService) {
-        this.employeeService = employeeService;
+    public EmployeeTypeFacade(EmployeeTypeService employeeTypeService) {
+        this.employeeTypeService = employeeTypeService;
     }
 
     // -------------------------
-    // Basic fetch operations
+    // Create
     // -------------------------
-    public List<EmployeeMasterResponseDto> getAllEmployees() {
-        return employeeService.getAll();
-    }
-
-    public EmployeeMasterResponseDto getEmployeeById(Long id) {
-        return employeeService.getById(id);
-    }
-
-    public EmployeeMasterResponseDto getEmployeeByCode(String code) {
-        return employeeService.getByEmployeeCode(code);
-    }
-
-    public List<EmployeeMasterResponseDto> searchEmployeesByName(String name) {
-        return employeeService.searchByName(name);
-    }
-
-    public List<EmployeeMasterResponseDto> getEmployeesByGender(String gender) {
-        return employeeService.getByGender(gender);
-    }
-
-    public List<EmployeeMasterResponseDto> getEmployeesByActiveStatus(Boolean status) {
-        return employeeService.getByActiveStatus(status);
-    }
-
-    public List<EmployeeMasterResponseDto> getEmployeesWithProbationEndedBefore(Date date) {
-        return employeeService.getProbationEndedBefore(date);
+    public EmployeeTypeResponseDTO create(@Valid EmployeeTypeRequestDTO requestDTO) {
+        return employeeTypeService.create(requestDTO);
     }
 
     // -------------------------
-    // Create / update operations
+    // Read
     // -------------------------
-    public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto requestDto) {
-        return employeeService.createEmployee(requestDto);
+    public EmployeeTypeResponseDTO getById(Long id) {
+        return employeeTypeService.getById(id);
+    }
+
+    public List<EmployeeTypeResponseDTO> getAll() {
+        return employeeTypeService.getAll();
+    }
+
+    public List<EmployeeTypeResponseDTO> getAllActive() {
+        return employeeTypeService.getAllActive();
+    }
+
+    public List<EmployeeTypeResponseDTO> getAllInactive() {
+        return employeeTypeService.getAllInactive();
     }
 
     // -------------------------
-    // Metrics / counts
+    // Update
     // -------------------------
-    public long getTotalEmployees() {
-        return employeeService.countAllEmployees();
+    public EmployeeTypeResponseDTO update(Long id, @Valid EmployeeTypeRequestDTO requestDTO) {
+        return employeeTypeService.update(id, requestDTO);
     }
 
-    public long getTotalActiveEmployees() {
-        return employeeService.countActiveEmployees();
+    // -------------------------
+    // Delete (Soft Delete)
+    // -------------------------
+//    public int softDelete(Long id) {
+//        return employeeTypeService.softDeleteById(id);
+//    }
+
+    // -------------------------
+    // Search
+    // -------------------------
+//    public List<EmployeeTypeResponseDTO> searchByKeyword(String keyword) {
+//        return employeeTypeService.searchByKeyword(keyword);
+//    }
+
+    // -------------------------
+    // Metrics
+    // -------------------------
+    public long countAll() {
+        return employeeTypeService.countAll();
     }
 
-    public long getTotalInactiveEmployees() {
-        return employeeService.countInactiveEmployees();
+    public long countActive() {
+        return employeeTypeService.countActive();
     }
 
-    public String updateEmployeeProfile(Long employeeId, String file) {
-        return employeeService.saveProfilePhoto(employeeId, file);
+    public long countInactive() {
+        return employeeTypeService.countInactive();
     }
-
-
-    public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
-        employeeService.saveEmployeeDocument(employeeId, docKey, file);
-    }
-
-
-    public List<EmployeeDocumentResponseDto> getEmployeeDocuments(Long employeeId) {
-        return employeeService.getDocumentsByEmployeeId(employeeId);
-    }
-
-    public Map<String, List<EmployeeDocumentResponseDto>> getDocumentsByEmployeeId(Long employeeId) {
-        return employeeService.getGroupedDocuments(employeeId);
-    }
-
-    public Resource getDocumentById(Long documentId, Long employeeId) {
-        return employeeService.downloadDocument(documentId, employeeId);
-    }
-
-    public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto requestDto) {
-        return employeeService.updateEmployee(id, requestDto);
-    }
-
-
-    public Long countAll() {
-        return employeeService.countAllEmployees();
-    }
-
-    public Map<String, Long> getEmployeeCountByGender() {
-        return employeeService.getEmployeeCountByGender();
-    }
-
 }
-

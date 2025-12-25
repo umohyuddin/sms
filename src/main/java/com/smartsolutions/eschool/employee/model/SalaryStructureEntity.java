@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 @Table(name = "salary_structure")
 @Getter
 @Setter
-public class SalaryStructureEntity {
+public class SalaryStructureEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

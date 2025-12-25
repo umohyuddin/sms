@@ -685,19 +685,12 @@ CREATE TABLE employee_qualification
 
 CREATE TABLE departments (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-
     department_code VARCHAR(50)  NOT NULL UNIQUE,
     department_name VARCHAR(150) NOT NULL,
-
     description     VARCHAR(255),
-
-    -- Hierarchy (for large organizations)
     parent_id       BIGINT NULL,
-
     head_employee_id BIGINT NULL,
-
     is_active       BOOLEAN NOT NULL DEFAULT TRUE,
-
     deleted         BOOLEAN DEFAULT FALSE,
     created_at      DATETIME,
     created_by      BIGINT,
@@ -705,11 +698,8 @@ CREATE TABLE departments (
     updated_by      BIGINT,
     deleted_at      DATETIME,
     deleted_by      BIGINT,
-    CONSTRAINT fk_department_parent
-        FOREIGN KEY (parent_id) REFERENCES departments(id),
-
-    CONSTRAINT fk_department_head
-        FOREIGN KEY (head_employee_id) REFERENCES employee_master(id)
+    CONSTRAINT fk_department_parent FOREIGN KEY (parent_id) REFERENCES departments(id),
+    CONSTRAINT fk_department_head FOREIGN KEY (head_employee_id) REFERENCES employee_master(id)
 );
 
 
@@ -829,7 +819,7 @@ deleted         BOOLEAN DEFAULT FALSE,
     );
 
 
-    CREATE TABLE employee_deduction (
+        CREATE TABLE employee_deduction (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
         employee_id BIGINT NOT NULL,
         deduction_type VARCHAR(50) NOT NULL,   -- PF, Tax, Loan, etc.

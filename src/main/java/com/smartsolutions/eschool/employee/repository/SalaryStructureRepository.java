@@ -2,89 +2,51 @@ package com.smartsolutions.eschool.employee.repository;
 
 import com.smartsolutions.eschool.employee.model.EmployeeAdvanceEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
+import com.smartsolutions.eschool.employee.model.EmployeeTypeEntity;
+import com.smartsolutions.eschool.employee.model.SalaryStructureEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SalaryStructureRepository extends JpaRepository<EmployeeAdvanceEntity, Long> {
+public interface SalaryStructureRepository extends JpaRepository<SalaryStructureEntity, Long> {
 
-    // -------------------------
-    // Find by ID
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.id = :id")
-    Optional<EmployeeAdvanceEntity> findById(@Param("id") Long id);
+    // 1. Find all active salary structures
+    @Query("SELECT s FROM SalaryStructureEntity s WHERE s.deleted = false")
+    List<SalaryStructureEntity> findAllActive();
 
-    // -------------------------
-    // Find by employee code
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.employeeCode = :code")
-    Optional<EmployeeMasterEntity> findByEmployeeCode(@Param("code") String code);
+    // 2. Find salary structures by employee type
+    @Query("SELECT s FROM SalaryStructureEntity s WHERE s.employeeType = :employeeType AND s.deleted = false")
+    List<SalaryStructureEntity> findByEmployeeType(@Param("employeeType") EmployeeTypeEntity employeeType);
 
-    // -------------------------
-    // Search by  name
-    // -------------------------
+    // 3. Find salary structure by id (only if not deleted)
+    @Query("SELECT s FROM SalaryStructureEntity s WHERE s.id = :id AND s.deleted = false")
+    Optional<SalaryStructureEntity> findActiveById(@Param("id") Long id);
 
-    @Query("SELECT e FROM EmployeeMasterEntity e " +
-            "WHERE LOWER(e.firstName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<EmployeeMasterEntity> searchByName(@Param("name") String name);
+    // 4. Find salary structures effective on a given date
+    @Query("SELECT s FROM SalaryStructureEntity s " + "WHERE s.effectiveFrom <= :date " + "AND (s.effectiveTo IS NULL OR s.effectiveTo >= :date) " + "AND s.deleted = false")
+    List<SalaryStructureEntity> findEffectiveOn(@Param("date") LocalDate date);
 
-    // -------------------------
-    // Filter by gender
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.gender = :gender")
-    List<EmployeeMasterEntity> findByGender(@Param("gender") String gender);
+    // 5. Find latest salary structure for an employee type
+    @Query("SELECT s FROM SalaryStructureEntity s " + "WHERE s.employeeType = :employeeType " + "AND s.deleted = false " + "ORDER BY s.effectiveFrom DESC")
+    List<SalaryStructureEntity> findLatestByEmployeeType(@Param("employeeType") EmployeeTypeEntity employeeType);
 
-    // -------------------------
-    // Filter by active status
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.active = :status")
-    List<EmployeeMasterEntity> findByActiveStatus(@Param("status") Boolean status);
+    // 6. Soft delete a salary structure by id
+    @Query("UPDATE SalaryStructureEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " + "WHERE s.id = :id")
+    void softDeleteById(@Param("id") Long id);
 
-    // -------------------------
-    // Filter by joining date range
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.joiningDate BETWEEN :start AND :end")
-    List<EmployeeMasterEntity> findByJoiningDateBetween(@Param("start") Date start, @Param("end") Date end);
+    // 7. Find salary structures within a date range
+    @Query("SELECT s FROM SalaryStructureEntity s " + "WHERE s.effectiveFrom >= :startDate AND (s.effectiveTo <= :endDate OR s.effectiveTo IS NULL) " + "AND s.deleted = false")
+    List<SalaryStructureEntity> findWithinDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    // -------------------------
-    // Filter by probation end date
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.probationEndDate < :date")
-    List<EmployeeMasterEntity> findProbationEndedBefore(@Param("date") Date date);
-
-
-    // -------------------------
-    // Count queries
-    // -------------------------
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e")
-    long countAllEmployees();
-
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = TRUE")
-    long countActiveEmployees();
-
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = FALSE")
-    long countInactiveEmployees();
-
-    @Query("SELECT e.gender, COUNT(e) FROM EmployeeMasterEntity e GROUP BY e.gender")
-    List<Object[]> countEmployeesByGender();
-
-    // -------------------------
-    // Ordering / Sorting
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.joiningDate DESC")
-    List<EmployeeMasterEntity> findAllOrderByJoiningDateDesc();
-
-    @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.dateOfBirth ASC")
-    List<EmployeeMasterEntity> findAllOrderByDateOfBirthAsc();
-
-
+    // 8. Count salary structures for an employee type
+    @Query("SELECT COUNT(s) FROM SalaryStructureEntity s WHERE s.employeeType = :employeeType AND s.deleted = false")
+    Long countByEmployeeType(@Param("employeeType") EmployeeTypeEntity employeeType);
 
 }

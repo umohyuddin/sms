@@ -302,7 +302,7 @@ public class StudentService {
         return studentRepository.countStudentsRegisteredBetween(start, end);
     }
 
-    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long studentId, Long sectionId, Long academicYearId, String kw) {
+    public List<StudentDTO> searchStudents(Long campusId, Long standardId,  Long sectionId,Long studentId, Long academicYearId, String kw) {
         try {
             log.info("Searching students with filters → campusId={}, standardId={}, studentId={}, academicYearId={},kw={}", campusId, standardId, studentId, academicYearId,kw);
 

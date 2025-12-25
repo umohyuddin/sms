@@ -1,7 +1,10 @@
 package com.smartsolutions.eschool.school.facade;
 
+import com.smartsolutions.eschool.school.dtos.departments.request.DepartmentRequestDTO;
+import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentResponseDTO;
 import com.smartsolutions.eschool.school.dtos.discountType.requestDto.DiscountTypeRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
+import com.smartsolutions.eschool.school.service.DepartmentService;
 import com.smartsolutions.eschool.school.service.DiscountTypeService;
 import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
@@ -13,42 +16,36 @@ import java.util.List;
 @Scope("prototype")
 public class DepartmentFacade {
 
-private final DiscountTypeService discountTypeService;
+    private final DepartmentService departmentService;
 
-    public DepartmentFacade(DiscountTypeService discountTypeService) {
-        this.discountTypeService = discountTypeService;
+    public DepartmentFacade(DepartmentService departmentService) {
+        this.departmentService = departmentService;
     }
 
-    public DiscountTypeResponseDTO createDiscountType(@Valid DiscountTypeRequestDTO requestDTO) {
-        return discountTypeService.createDiscountType(requestDTO);
+    public DepartmentResponseDTO createDepartment(@Valid DepartmentRequestDTO requestDTO) {
+        return departmentService.createDepartment(requestDTO);
     }
 
-    public List<DiscountTypeResponseDTO> getAll() {
-        return discountTypeService.getAll();
+    public List<DepartmentResponseDTO> getAll() {
+        return departmentService.getAllDepartments();
     }
 
-    public DiscountTypeResponseDTO getById(Long discountTypeId) {
-        return discountTypeService.getById(discountTypeId);
+    public DepartmentResponseDTO getById(Long departmentId) {
+        return departmentService.getDepartmentById(departmentId);
     }
 
-    public List<DiscountTypeResponseDTO> getAllActive() {
-        return discountTypeService.getAllActive();
+    public List<DepartmentResponseDTO> getAllActive() {
+        return departmentService.getAllActiveDepartments();
     }
 
-    public List<DiscountTypeResponseDTO> getAllInActive() {
-        return discountTypeService.getAllInActive();
+    public DepartmentResponseDTO updateDepartment(
+            Long departmentId,
+            @Valid DepartmentRequestDTO requestDTO
+    ) {
+        return departmentService.updateDepartment(departmentId, requestDTO);
     }
 
-    public int softDeleteById(Long discountTypeId) {
-        return discountTypeService.softDeleteById(discountTypeId);
-    }
-
-
-    public List<DiscountTypeResponseDTO> searchByKeyword(String keyword) {
-        return discountTypeService.searchByKeyword(keyword);
-    }
-
-    public DiscountTypeResponseDTO updateDiscountType(Long discountTypeId, @Valid DiscountTypeRequestDTO requestDTO) {
-        return discountTypeService.updateDiscountType(discountTypeId,requestDTO);
+    public void deleteById(Long departmentId) {
+        departmentService.deleteDepartment(departmentId);
     }
 }

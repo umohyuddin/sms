@@ -4,7 +4,11 @@ package com.smartsolutions.eschool.employee.facade;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.request.EmployeeSalaryRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
+import com.smartsolutions.eschool.employee.service.EmployeeMasterSalaryService;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
+import com.smartsolutions.eschool.global.enums.SalaryStatus;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -14,105 +18,53 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Component
 @Scope("prototype")
 public class EmployeeMasterSalaryFacade {
 
-    private final EmployeeMasterService employeeService;
+    private final EmployeeMasterSalaryService salaryService;
 
-    public EmployeeMasterSalaryFacade(EmployeeMasterService employeeService) {
-        this.employeeService = employeeService;
+    public EmployeeMasterSalaryFacade(EmployeeMasterSalaryService salaryService) {
+        this.salaryService = salaryService;
     }
 
-    // -------------------------
-    // Basic fetch operations
-    // -------------------------
-    public List<EmployeeMasterResponseDto> getAllEmployees() {
-        return employeeService.getAll();
+    /* =========================
+       CREATE / UPDATE
+       ========================= */
+    public EmployeeSalaryResponseDTO createSalary(EmployeeSalaryRequestDTO requestDTO) {
+        return salaryService.createSalary(requestDTO);
     }
 
-    public EmployeeMasterResponseDto getEmployeeById(Long id) {
-        return employeeService.getById(id);
+    public EmployeeSalaryResponseDTO updateSalary(Long id, EmployeeSalaryRequestDTO requestDTO) {
+        return salaryService.updateSalary(id, requestDTO);
     }
 
-    public EmployeeMasterResponseDto getEmployeeByCode(String code) {
-        return employeeService.getByEmployeeCode(code);
+    /* =========================
+       GET / FETCH
+       ========================= */
+    public EmployeeSalaryResponseDTO getSalaryById(Long id) {
+        return salaryService.getSalaryById(id);
     }
 
-    public List<EmployeeMasterResponseDto> searchEmployeesByName(String name) {
-        return employeeService.searchByName(name);
+    public List<EmployeeSalaryResponseDTO> getAllSalariesForEmployee(Long employeeId) {
+        return salaryService.getAllSalariesForEmployee(employeeId);
     }
 
-    public List<EmployeeMasterResponseDto> getEmployeesByGender(String gender) {
-        return employeeService.getByGender(gender);
+//    public List<EmployeeSalaryResponseDTO> getSalariesByStatus(SalaryStatus status) {
+//        return salaryService.getSalariesByStatus(status);
+//    }
+
+//    public Optional<EmployeeSalaryResponseDTO> getSalaryByEmployeeAndMonth(Long employeeId, Integer year, Integer month) {
+//        return salaryService.getSalaryByEmployeeAndMonth(employeeId, year, month);
+//    }
+
+    /* =========================
+       SOFT DELETE
+       ========================= */
+    public void softDeleteSalary(Long id) {
+        salaryService.softDeleteSalary(id);
     }
-
-    public List<EmployeeMasterResponseDto> getEmployeesByActiveStatus(Boolean status) {
-        return employeeService.getByActiveStatus(status);
-    }
-
-    public List<EmployeeMasterResponseDto> getEmployeesWithProbationEndedBefore(Date date) {
-        return employeeService.getProbationEndedBefore(date);
-    }
-
-    // -------------------------
-    // Create / update operations
-    // -------------------------
-    public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto requestDto) {
-        return employeeService.createEmployee(requestDto);
-    }
-
-    // -------------------------
-    // Metrics / counts
-    // -------------------------
-    public long getTotalEmployees() {
-        return employeeService.countAllEmployees();
-    }
-
-    public long getTotalActiveEmployees() {
-        return employeeService.countActiveEmployees();
-    }
-
-    public long getTotalInactiveEmployees() {
-        return employeeService.countInactiveEmployees();
-    }
-
-    public String updateEmployeeProfile(Long employeeId, String file) {
-        return employeeService.saveProfilePhoto(employeeId, file);
-    }
-
-
-    public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
-        employeeService.saveEmployeeDocument(employeeId, docKey, file);
-    }
-
-
-    public List<EmployeeDocumentResponseDto> getEmployeeDocuments(Long employeeId) {
-        return employeeService.getDocumentsByEmployeeId(employeeId);
-    }
-
-    public Map<String, List<EmployeeDocumentResponseDto>> getDocumentsByEmployeeId(Long employeeId) {
-        return employeeService.getGroupedDocuments(employeeId);
-    }
-
-    public Resource getDocumentById(Long documentId, Long employeeId) {
-        return employeeService.downloadDocument(documentId, employeeId);
-    }
-
-    public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto requestDto) {
-        return employeeService.updateEmployee(id, requestDto);
-    }
-
-
-    public Long countAll() {
-        return employeeService.countAllEmployees();
-    }
-
-    public Map<String, Long> getEmployeeCountByGender() {
-        return employeeService.getEmployeeCountByGender();
-    }
-
 }
-

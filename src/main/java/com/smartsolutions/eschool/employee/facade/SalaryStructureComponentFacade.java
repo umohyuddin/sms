@@ -1,9 +1,12 @@
 package com.smartsolutions.eschool.employee.facade;
 
+import com.smartsolutions.eschool.employee.dtos.SalaryStructureComponent.request.SalaryStructureComponentRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.SalaryStructureComponent.response.SalaryStructureComponentResponseDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
+import com.smartsolutions.eschool.employee.service.SalaryStructureComponentService;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -19,99 +22,65 @@ import java.util.Map;
 @Scope("prototype")
 public class SalaryStructureComponentFacade {
 
-    private final EmployeeMasterService employeeService;
+    private final SalaryStructureComponentService componentService;
 
-    public SalaryStructureComponentFacade(EmployeeMasterService employeeService) {
-        this.employeeService = employeeService;
+    public SalaryStructureComponentFacade(SalaryStructureComponentService componentService) {
+        this.componentService = componentService;
     }
 
     // -------------------------
-    // Basic fetch operations
+    // Create
     // -------------------------
-    public List<EmployeeMasterResponseDto> getAllEmployees() {
-        return employeeService.getAll();
-    }
-
-    public EmployeeMasterResponseDto getEmployeeById(Long id) {
-        return employeeService.getById(id);
-    }
-
-    public EmployeeMasterResponseDto getEmployeeByCode(String code) {
-        return employeeService.getByEmployeeCode(code);
-    }
-
-    public List<EmployeeMasterResponseDto> searchEmployeesByName(String name) {
-        return employeeService.searchByName(name);
-    }
-
-    public List<EmployeeMasterResponseDto> getEmployeesByGender(String gender) {
-        return employeeService.getByGender(gender);
-    }
-
-    public List<EmployeeMasterResponseDto> getEmployeesByActiveStatus(Boolean status) {
-        return employeeService.getByActiveStatus(status);
-    }
-
-    public List<EmployeeMasterResponseDto> getEmployeesWithProbationEndedBefore(Date date) {
-        return employeeService.getProbationEndedBefore(date);
+    public SalaryStructureComponentResponseDTO createComponent(SalaryStructureComponentRequestDTO requestDTO) {
+        return componentService.createComponent(requestDTO);
     }
 
     // -------------------------
-    // Create / update operations
+    // Get by ID
     // -------------------------
-    public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto requestDto) {
-        return employeeService.createEmployee(requestDto);
+    public SalaryStructureComponentResponseDTO getComponentById(Long id) {
+        return componentService.getById(id);
     }
 
     // -------------------------
-    // Metrics / counts
+    // Get all active components
     // -------------------------
-    public long getTotalEmployees() {
-        return employeeService.countAllEmployees();
+    public List<SalaryStructureComponentResponseDTO> getAllActiveComponents() {
+        return componentService.getAllActive();
     }
 
-    public long getTotalActiveEmployees() {
-        return employeeService.countActiveEmployees();
+    // -------------------------
+    // Get components by salary structure
+    // -------------------------
+    public List<SalaryStructureComponentResponseDTO> getComponentsBySalaryStructure(Long salaryStructureId) {
+        return componentService.getBySalaryStructureId(salaryStructureId);
     }
 
-    public long getTotalInactiveEmployees() {
-        return employeeService.countInactiveEmployees();
+    // -------------------------
+    // Search components by name
+    // -------------------------
+    public List<SalaryStructureComponentResponseDTO> searchComponents(Long salaryStructureId, String keyword) {
+        return componentService.searchByName(salaryStructureId, keyword);
     }
 
-    public String updateEmployeeProfile(Long employeeId, String file) {
-        return employeeService.saveProfilePhoto(employeeId, file);
+    // -------------------------
+    // Update component
+    // -------------------------
+    public SalaryStructureComponentResponseDTO updateComponent(Long id, SalaryStructureComponentRequestDTO requestDTO) {
+        return componentService.updateComponent(id, requestDTO);
     }
 
-
-    public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
-        employeeService.saveEmployeeDocument(employeeId, docKey, file);
+    // -------------------------
+    // Soft delete
+    // -------------------------
+    public void softDeleteComponent(Long id) {
+        componentService.softDelete(id);
     }
 
-
-    public List<EmployeeDocumentResponseDto> getEmployeeDocuments(Long employeeId) {
-        return employeeService.getDocumentsByEmployeeId(employeeId);
+    // -------------------------
+    // Count active components by salary structure
+    // -------------------------
+    public Long countActiveComponents(Long salaryStructureId) {
+        return componentService.countActiveBySalaryStructureId(salaryStructureId);
     }
-
-    public Map<String, List<EmployeeDocumentResponseDto>> getDocumentsByEmployeeId(Long employeeId) {
-        return employeeService.getGroupedDocuments(employeeId);
-    }
-
-    public Resource getDocumentById(Long documentId, Long employeeId) {
-        return employeeService.downloadDocument(documentId, employeeId);
-    }
-
-    public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto requestDto) {
-        return employeeService.updateEmployee(id, requestDto);
-    }
-
-
-    public Long countAll() {
-        return employeeService.countAllEmployees();
-    }
-
-    public Map<String, Long> getEmployeeCountByGender() {
-        return employeeService.getEmployeeCountByGender();
-    }
-
 }
-

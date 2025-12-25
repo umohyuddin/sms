@@ -1,130 +1,109 @@
 package com.smartsolutions.eschool.employee.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.request.EmployeeSalaryRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
+import com.smartsolutions.eschool.employee.facade.EmployeeMasterSalaryFacade;
 import com.smartsolutions.eschool.employee.facade.EmployeeSalaryFaced;
 import com.smartsolutions.eschool.employee.model.EmployeeSalaryEntity;
+import com.smartsolutions.eschool.global.enums.SalaryStatus;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
+import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Transactional
 @RestController
-@RequestMapping("/api/employee/salary")
+@RequestMapping("/api/institute/employee-salaries")
+@Slf4j
 public class EmployeeSalaryController {
 
-    private EmployeeSalaryFaced employeeSalaryFaced;
-    private ObjectMapper objectMapper;
-    @Autowired
-    public EmployeeSalaryController(EmployeeSalaryFaced employeeSalaryFaced, ObjectMapper objectMapper) {
-        this.employeeSalaryFaced = employeeSalaryFaced;
-        this.objectMapper = objectMapper;
+    private final EmployeeMasterSalaryFacade salaryFacade;
+
+    public EmployeeSalaryController(EmployeeMasterSalaryFacade salaryFacade) {
+        this.salaryFacade = salaryFacade;
     }
 
-    @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getAll() throws Exception {
-        return new MultiResourceSuccessResponseObject(
-                employeeSalaryFaced.getAll()
-                        .stream()
-                        .map(entity -> {
-                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-                            return new ResourceObject(
-                                    String.valueOf(entity.getId()),
-                                    "Employee Salary",
-                                    resourceAttributes
-                            );
-                        })
-                        .collect(Collectors.toList()));
+    // -------------------------
+    // CREATE
+    // -------------------------
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeSalaryResponseDTO> createSalary(@Valid @RequestBody EmployeeSalaryRequestDTO requestDTO) {
+        log.info("POST /api/institute/employee-salaries called with {}", requestDTO);
+        EmployeeSalaryResponseDTO response = salaryFacade.createSalary(requestDTO);
+        log.info("Salary created successfully with id={}", response.getId());
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
-
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(employeeSalaryFaced.getById(id), Map.class);
-        List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(new ResourceObject(
-                                String.valueOf(id),
-                                "Employee Salary",
-                                resourceAttributes
-                        ));
-        return new MultiResourceSuccessResponseObject(resourceObject);
+    // -------------------------
+    // UPDATE
+    // -------------------------
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeSalaryResponseDTO> updateSalary(@PathVariable Long id, @Valid @RequestBody EmployeeSalaryRequestDTO requestDTO) {
+        log.info("PUT /api/institute/employee-salaries/{} called with {}", id, requestDTO);
+        EmployeeSalaryResponseDTO response = salaryFacade.updateSalary(id, requestDTO);
+        log.info("Salary updated successfully with id={}", response.getId());
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/get/emp/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject getByEmpId(@PathVariable Long id) throws Exception {
-
-        return new MultiResourceSuccessResponseObject(
-                employeeSalaryFaced.getByEmpId(id)
-                        .stream()
-                        .map(entity -> {
-                            Map<String, Object> resourceAttributes = objectMapper.convertValue(entity, Map.class);
-                            return new ResourceObject(
-                                    String.valueOf(entity.getId()),
-                                    "Employee Salary",
-                                    resourceAttributes
-                            );
-                        })
-                        .collect(Collectors.toList()));
+    // -------------------------
+    // GET BY ID
+    // -------------------------
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeSalaryResponseDTO> getSalaryById(@PathVariable Long id) {
+        log.info("GET /api/institute/employee-salaries/{} called", id);
+        EmployeeSalaryResponseDTO response = salaryFacade.getSalaryById(id);
+        return ResponseEntity.ok(response);
     }
 
-
-    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject create(
-            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-        if (!requestBody.containsKey("data")) {
-            throw new ValidationException("The request body did not contain a data attribute");
-        }
-        Map<String, Object> resourceMap = requestBody.get("data");
-        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        EmployeeSalaryEntity nEmployeeSalaryEntity = objectMapper.convertValue(attributes, EmployeeSalaryEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",employeeSalaryFaced.create(nEmployeeSalaryEntity));
-        List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(new ResourceObject(
-                                String.valueOf(nEmployeeSalaryEntity.getEmpId()),
-                                "Employee Salary",
-                                resourceAttributes
-                        ));
-        return new MultiResourceSuccessResponseObject(resourceObject);
+    // -------------------------
+    // GET ALL SALARIES FOR EMPLOYEE
+    // -------------------------
+    @GetMapping(value = "/employee/{employeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EmployeeSalaryResponseDTO>> getAllSalariesForEmployee(@PathVariable Long employeeId) {
+        log.info("GET /api/institute/employee-salaries/employee/{} called", employeeId);
+        List<EmployeeSalaryResponseDTO> response = salaryFacade.getAllSalariesForEmployee(employeeId);
+        return ResponseEntity.ok(response);
     }
 
-    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject update(
-            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-        if (!requestBody.containsKey("data")) {
-            throw new ValidationException("The request body did not contain a data attribute");
-        }
-        Map<String, Object> resourceMap = requestBody.get("data");
-        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        EmployeeSalaryEntity nEmployeeSalaryEntity = objectMapper.convertValue(attributes, EmployeeSalaryEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",employeeSalaryFaced.update(nEmployeeSalaryEntity));
-        List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(new ResourceObject(
-                                    String.valueOf(nEmployeeSalaryEntity.getId()),
-                                    "Employee Salary",
-                                    resourceAttributes
-                            ));
-        return new MultiResourceSuccessResponseObject(resourceObject);
-    }
+    // -------------------------
+    // GET SALARIES BY STATUS
+    // -------------------------
+//    @GetMapping(value = "/status/{status}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<EmployeeSalaryResponseDTO>> getSalariesByStatus(@PathVariable SalaryStatus status) {
+//        log.info("GET /api/institute/employee-salaries/status/{} called", status);
+//        List<EmployeeSalaryResponseDTO> response = salaryFacade.getSalariesByStatus(status);
+//        return ResponseEntity.ok(response);
+//    }
 
-    @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public MultiResourceSuccessResponseObject delete(
-            @PathVariable Long id
-    ) throws Exception {
-        Map<String, Object> resourceAttributes = Map.of("message",employeeSalaryFaced.delete(id));
-        List<ResourceObject> resourceObject = new ArrayList<>();
-        resourceObject.add(new ResourceObject(
-                                    String.valueOf(id),
-                                    "Employee salary",
-                                    resourceAttributes
-                            ));
-        return new MultiResourceSuccessResponseObject(resourceObject);
+    // -------------------------
+    // GET SALARY BY EMPLOYEE & MONTH/YEAR
+    // -------------------------
+//    @GetMapping(value = "/employee/{employeeId}/month", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<EmployeeSalaryResponseDTO> getSalaryByEmployeeAndMonth(@PathVariable Long employeeId, @RequestParam Integer year, @RequestParam Integer month) {
+//        log.info("GET /api/institute/employee-salaries/employee/{}/month called with year={}, month={}", employeeId, year, month);
+//        Optional<EmployeeSalaryResponseDTO> response = salaryFacade.getSalaryByEmployeeAndMonth(employeeId, year, month);
+//        return response.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+//    }
+
+    // -------------------------
+    // SOFT DELETE
+    // -------------------------
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> softDeleteSalary(@PathVariable Long id) {
+        log.info("DELETE /api/institute/employee-salaries/{} called", id);
+        salaryFacade.softDeleteSalary(id);
+        return ResponseEntity.noContent().build();
     }
 }

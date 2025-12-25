@@ -15,27 +15,172 @@ import java.util.Optional;
 
 @Repository
 public interface DesignationRepository extends JpaRepository<DesignationEntity, Long> {
-    Optional<CampusEntity> findByIdAndDeletedFalse(Long id);
 
-    List<CampusEntity> findByDeletedFalse();
-
-    List<CampusEntity> findByInstituteIdAndDeletedFalse(Long instituteId);
-
-    // Find all campuses by institute ID
-    List<CampusEntity> findByInstituteId(Long instituteId);
-
-    // Find a campus by its name WHERE campus_name LIKE %?%
-    List<CampusEntity> findByCampusNameContainingAndDeletedFalse(String campusName);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE CampusEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " + "WHERE s.id = :id")
-    int softDeleteById(@Param("id") Long id);
-
-    Long id(Long id);
-
+    /* =========================
+       BASIC FETCH
+       ========================= */
 
     @Query("""
-            SELECT c FROM CampusEntity c WHERE (c.campusName LIKE %:keyword% OR c.campusCode LIKE %:keyword%) AND c.deleted = false""")
-    List<CampusEntity> searchByKeyword(@Param("keyword") String keyword);
+                SELECT d FROM DesignationEntity d
+                WHERE d.id = :id
+                  AND d.isDeleted = false
+            """)
+    Optional<DesignationEntity> findByIdActive(@Param("id") Long id);
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.designationCode = :code
+                  AND d.isDeleted = false
+            """)
+    Optional<DesignationEntity> findByCode(@Param("code") String code);
+
+    /* =========================
+       LIST ALL
+       ========================= */
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.isDeleted = false
+                ORDER BY d.designationName
+            """)
+    List<DesignationEntity> findAllActive();
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.isActive = true
+                  AND d.isDeleted = false
+                ORDER BY d.designationName
+            """)
+    List<DesignationEntity> findAllEnabled();
+
+    /* =========================
+       EMPLOYEE TYPE
+       ========================= */
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.employeeType.id = :employeeTypeId
+                  AND d.isDeleted = false
+            """)
+    List<DesignationEntity> findByEmployeeType(@Param("employeeTypeId") Long employeeTypeId);
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.employeeType.id = :employeeTypeId
+                  AND d.isActive = true
+                  AND d.isDeleted = false
+            """)
+    List<DesignationEntity> findActiveByEmployeeType(@Param("employeeTypeId") Long employeeTypeId);
+
+    /* =========================
+       DEPARTMENT
+       ========================= */
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.department.id = :departmentId
+                  AND d.isDeleted = false
+            """)
+    List<DesignationEntity> findByDepartment(@Param("departmentId") Long departmentId);
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.department.id = :departmentId
+                  AND d.isActive = true
+                  AND d.isDeleted = false
+            """)
+    List<DesignationEntity> findActiveByDepartment(@Param("departmentId") Long departmentId);
+
+    /* =========================
+       EMPLOYEE TYPE + DEPARTMENT
+       ========================= */
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.employeeType.id = :employeeTypeId
+                  AND d.department.id = :departmentId
+                  AND d.isDeleted = false
+            """)
+    List<DesignationEntity> findByEmployeeTypeAndDepartment(@Param("employeeTypeId") Long employeeTypeId, @Param("departmentId") Long departmentId);
+
+    /* =========================
+       GLOBAL DESIGNATIONS
+       (No Department)
+       ========================= */
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.department IS NULL
+                  AND d.isDeleted = false
+            """)
+    List<DesignationEntity> findGlobalDesignations();
+
+    /* =========================
+       SEARCH
+       ========================= */
+
+    @Query("""
+                SELECT d FROM DesignationEntity d
+                WHERE d.isDeleted = false
+                  AND (
+                        LOWER(d.designationName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                     OR LOWER(d.designationCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                  )
+            """)
+    List<DesignationEntity> search(@Param("keyword") String keyword);
+
+    /* =========================
+       EXISTENCE / VALIDATION
+       ========================= */
+
+    @Query("""
+                SELECT CASE WHEN COUNT(d) > 0 THEN true ELSE false END
+                FROM DesignationEntity d
+                WHERE d.designationCode = :code
+                  AND d.isDeleted = false
+            """)
+    boolean existsByCode(@Param("code") String code);
+
+    @Query("""
+                SELECT CASE WHEN COUNT(d) > 0 THEN true ELSE false END
+                FROM DesignationEntity d
+                WHERE d.designationName = :name
+                  AND d.employeeType.id = :employeeTypeId
+                  AND d.isDeleted = false
+            """)
+    boolean existsByNameAndEmployeeType(@Param("name") String name, @Param("employeeTypeId") Long employeeTypeId);
+
+    /* =========================
+       COUNT / REPORTING
+       ========================= */
+
+    @Query("""
+                SELECT COUNT(d)
+                FROM DesignationEntity d
+                WHERE d.employeeType.id = :employeeTypeId
+                  AND d.isDeleted = false
+            """)
+    long countByEmployeeType(@Param("employeeTypeId") Long employeeTypeId);
+
+    @Query("""
+                SELECT COUNT(d)
+                FROM DesignationEntity d
+                WHERE d.department.id = :departmentId
+                  AND d.isDeleted = false
+            """)
+    long countByDepartment(@Param("departmentId") Long departmentId);
+
+    /* =========================
+       DROPDOWN
+       ========================= */
+
+    @Query("""
+                SELECT d
+                FROM DesignationEntity d
+                WHERE d.isActive = true
+                  AND d.isDeleted = false
+                ORDER BY d.designationName
+            """)
+    List<DesignationEntity> findForDropdown();
+
 }

@@ -1,40 +1,61 @@
 package com.smartsolutions.eschool.employee.repository;
 
 
-import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.smartsolutions.eschool.employee.model.SalaryComponentEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-@Entity
-@Table(name = "salary_component")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class SalaryComponentRepository extends AuditableEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+import java.util.List;
+import java.util.Optional;
 
-    @Column(nullable = false, length = 100)
-    private String name;
+@Repository
+public interface SalaryComponentRepository extends JpaRepository<SalaryComponentEntity, Long> {
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ComponentType type;
+    /* =========================
+       FIND BY ID (ACTIVE ONLY)
+       ========================= */
+    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.id = :id AND sc.deleted = false")
+    Optional<SalaryComponentEntity> findByIdActive(Long id);
 
-    @Column(name = "is_percentage", nullable = false)
-    private Boolean isPercentage = true;
+    /* =========================
+       FIND ALL ACTIVE
+       ========================= */
+    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.deleted = false ORDER BY sc.name ASC")
+    List<SalaryComponentEntity> findAllActive();
 
-    @Column(nullable = false)
-    private Boolean deleted = false;
+    /* =========================
+       FIND ALL INACTIVE
+       ========================= */
+    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.deleted = true ORDER BY sc.name ASC")
+    List<SalaryComponentEntity> findAllInactive();
 
+    /* =========================
+       SEARCH BY NAME
+       ========================= */
+    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.deleted = false AND LOWER(sc.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<SalaryComponentEntity> searchByName(String keyword);
 
-    public enum ComponentType {
-        EARNING,
-        DEDUCTION
-    }
+    /* =========================
+       FIND BY TYPE
+       ========================= */
+//    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.deleted = false AND sc.type = :type")
+//    List<SalaryComponentEntity> findByType(ComponentType type);
+
+    /* =========================
+       SOFT DELETE
+       ========================= */
+    @Modifying
+    @Query("UPDATE SalaryComponentEntity sc SET sc.deleted = true WHERE sc.id = :id")
+    int softDeleteById(Long id);
+
+    /* =========================
+       COUNT ACTIVE / INACTIVE
+       ========================= */
+    @Query("SELECT COUNT(sc) FROM SalaryComponentEntity sc WHERE sc.deleted = false")
+    Long countActive();
+
+    @Query("SELECT COUNT(sc) FROM SalaryComponentEntity sc WHERE sc.deleted = true")
+    Long countInactive();
 }

@@ -1,13 +1,12 @@
 package com.smartsolutions.eschool.school.service;
 
 
-import com.smartsolutions.eschool.global.configs.FeeConfig;
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.school.dtos.discountType.requestDto.DiscountTypeRequestDTO;
-import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
-import com.smartsolutions.eschool.school.model.DiscountTypeEntity;
-import com.smartsolutions.eschool.school.repository.DiscountTypeRepository;
+import com.smartsolutions.eschool.school.dtos.departments.request.DepartmentRequestDTO;
+import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentResponseDTO;
+import com.smartsolutions.eschool.school.model.DepartmentEntity;
+import com.smartsolutions.eschool.school.repository.DepartmentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -21,189 +20,129 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class DepartmentService {
-    private final DiscountTypeRepository discountTypeRepository;
 
-    private final FeeConfig feeConfig;
+    private final DepartmentRepository departmentRepository;
 
-    public DepartmentService(DiscountTypeRepository discountTypeRepository, FeeConfig feeConfig) {
-        this.discountTypeRepository = discountTypeRepository;
-        this.feeConfig = feeConfig;
+    public DepartmentService(DepartmentRepository departmentRepository) {
+        this.departmentRepository = departmentRepository;
     }
 
-    public DiscountTypeResponseDTO createDiscountType(@Valid DiscountTypeRequestDTO requestDTO) {
-        log.info("Creating new Discount Type: {}", requestDTO.getName());
+    public DepartmentResponseDTO createDepartment(@Valid DepartmentRequestDTO requestDTO) {
+        log.info("Creating new Department: {}", requestDTO.getDepartmentName());
         try {
-            DiscountTypeEntity entity = MapperUtil.mapObject(requestDTO, DiscountTypeEntity.class);
-            discountTypeRepository.save(entity);
-            log.info("Discount Type  saved with id: {}", entity.getId());
-            return MapperUtil.mapObject(entity, DiscountTypeResponseDTO.class);
+            DepartmentEntity entity = MapperUtil.mapObject(requestDTO, DepartmentEntity.class);
+
+            // Fetch and set parent department if provided
+            if (requestDTO.getParentDepartmentId() != null) {
+                DepartmentEntity parent = departmentRepository.findById(requestDTO.getParentDepartmentId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Parent Department not found with id: " + requestDTO.getParentDepartmentId()));
+                entity.setParentDepartment(parent);
+            }
+
+            departmentRepository.save(entity);
+            log.info("Department saved with id: {}", entity.getId());
+            return MapperUtil.mapObject(entity, DepartmentResponseDTO.class);
         } catch (DataAccessException dae) {
-            log.error("Database error while creating Discount Type", dae);
-            throw new CustomServiceException("Failed to create Discount Type due to database error");
+            log.error("Database error while creating Department", dae);
+            throw new CustomServiceException("Failed to create Department due to database error");
         } catch (Exception e) {
-            log.error("Unexpected error while creating Discount Type", e);
-            throw new CustomServiceException("Failed to create Discount Type");
+            log.error("Unexpected error while creating Department", e);
+            throw new CustomServiceException("Failed to create Department");
         }
     }
 
-    public List<DiscountTypeResponseDTO> getAll() {
+    public List<DepartmentResponseDTO> getAllDepartments() {
         try {
-            log.info("Fetching all Discount Types from database");
-            List<DiscountTypeEntity> result = discountTypeRepository.findAll();
-            return result.stream().map(this::toDto).collect(Collectors.toList());
+            log.info("Fetching all Departments from database");
+            List<DepartmentEntity> departments = departmentRepository.findAll();
+            return departments.stream().map(this::toDto).collect(Collectors.toList());
         } catch (DataAccessException dae) {
-            log.error("Database error while fetching Discount Types", dae);
-            throw new CustomServiceException("Unable to fetch Discount Types from database", dae);
+            log.error("Database error while fetching Departments", dae);
+            throw new CustomServiceException("Unable to fetch Departments from database", dae);
         } catch (MappingException me) {
-            log.error("Error mapping DiscountTpe Entity to Discount Types", me);
-            throw new CustomServiceException("Error converting student data", me);
+            log.error("Error mapping Department Entity to DTO", me);
+            throw new CustomServiceException("Error converting Department data", me);
         } catch (Exception e) {
-            log.error("Unexpected error while fetching Discount Types", e);
+            log.error("Unexpected error while fetching Departments", e);
             throw new CustomServiceException("Unexpected error occurred", e);
         }
     }
 
-    public DiscountTypeResponseDTO getById(Long discountTypeId) {
-        log.info("Request to fetch DiscountType with id={}", discountTypeId);
-        DiscountTypeEntity entity = discountTypeRepository.findByIdAndDeletedFalse(discountTypeId).orElseThrow(() -> {
-            log.warn("DiscountType not found for id={}", discountTypeId);
-            return new ResourceNotFoundException("Discount Type not found with id: " + discountTypeId);
-        });
-        DiscountTypeResponseDTO responseDTO = toDto(entity);
-        log.info("Successfully fetched DiscountType with id={}", responseDTO.getId());
-        return responseDTO;
+    public DepartmentResponseDTO getDepartmentById(Long id) {
+        log.info("Fetching Department with id={}", id);
+        DepartmentEntity entity = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+        return toDto(entity);
     }
 
-
-    public List<DiscountTypeResponseDTO> getAllActive() {
+    public DepartmentResponseDTO updateDepartment(Long id, @Valid DepartmentRequestDTO requestDTO) {
+        log.info("Updating Department with id={}", id);
         try {
-            log.info("Fetching all Active Discount Types from database");
-            List<DiscountTypeEntity> result = discountTypeRepository.findAllActive();
-            List<DiscountTypeResponseDTO> responseDTOS = MapperUtil.mapList(result, DiscountTypeResponseDTO.class);
-            log.info("Successfully fetched All Active Discount Types {} ", responseDTOS.size());
-            return responseDTOS;
+            DepartmentEntity existing = departmentRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+
+            existing.setDepartmentName(requestDTO.getDepartmentName());
+            existing.setDepartmentCode(requestDTO.getDepartmentCode());
+            existing.setDescription(requestDTO.getDescription());
+            existing.setIsActive(requestDTO.getIsActive());
+
+            if (requestDTO.getParentDepartmentId() != null) {
+                DepartmentEntity parent = departmentRepository.findById(requestDTO.getParentDepartmentId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Parent Department not found with id: " + requestDTO.getParentDepartmentId()));
+                existing.setParentDepartment(parent);
+            } else {
+                existing.setParentDepartment(null);
+            }
+
+            departmentRepository.save(existing);
+            log.info("Department updated successfully with id={}", existing.getId());
+            return toDto(existing);
         } catch (DataAccessException dae) {
-            log.error("Database error while fetching Active Discount Types", dae);
-            throw new CustomServiceException("Unable to fetch Active Discount Types from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping DiscountTpe Entity to Active Discount Types", me);
-            throw new CustomServiceException("Error converting student data", me);
+            log.error("Database error while updating Department with id={}", id, dae);
+            throw new CustomServiceException("Failed to update Department due to database error", dae);
         } catch (Exception e) {
-            log.error("Unexpected error while fetching Active Discount Types", e);
-            throw new CustomServiceException("Unexpected error occurred", e);
+            log.error("Unexpected error while updating Department with id={}", id, e);
+            throw new CustomServiceException("Unexpected error occurred while updating Department", e);
         }
     }
 
-    public List<DiscountTypeResponseDTO> getAllInActive() {
+    public void deleteDepartment(Long id) {
+        log.info("Soft deleting Department with id={}", id);
         try {
-            log.info("Fetching all Inactive Discount Types from database");
-            List<DiscountTypeEntity> result = discountTypeRepository.findAllNonActive();
-            List<DiscountTypeResponseDTO> responseDTOS = MapperUtil.mapList(result, DiscountTypeResponseDTO.class);
-            log.info("Successfully fetched Inactive Discount Types {} ", responseDTOS.size());
-            return responseDTOS;
+            DepartmentEntity existing = departmentRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+            existing.setDeleted(true);
+            departmentRepository.save(existing);
+            log.info("Department soft deleted with id={}", id);
         } catch (DataAccessException dae) {
-            log.error("Database error while fetching Inactive Discount Types", dae);
-            throw new CustomServiceException("Unable to fetch Inactive Discount Types from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping DiscountTpe Entity to Inactive Discount Types", me);
-            throw new CustomServiceException("Error converting Inactive Discount Types data", me);
+            log.error("Database error while deleting Department with id={}", id, dae);
+            throw new CustomServiceException("Failed to delete Department due to database error", dae);
         } catch (Exception e) {
-            log.error("Unexpected error while fetching Inactive Discount Types", e);
-            throw new CustomServiceException("Unexpected error occurred", e);
+            log.error("Unexpected error while deleting Department with id={}", id, e);
+            throw new CustomServiceException("Unexpected error occurred while deleting Department", e);
         }
     }
 
-    public int softDeleteById(Long id) {
-        log.info("delete request received for DiscountType ID: {}", id);
+    public List<DepartmentResponseDTO> getAllActiveDepartments() {
         try {
-            return discountTypeRepository.softDeleteById(id);
-        } catch (DataAccessException dae) {
-            log.error("Database error while deleting DiscountType with ID {}", id, dae);
-            throw new CustomServiceException("Failed to delete DiscountType due to database error", dae);
+            log.info("Fetching all active Departments");
+            List<DepartmentEntity> departments = departmentRepository.findAllActiveDepartments();
+            return departments.stream().map(this::toDto).collect(Collectors.toList());
         } catch (Exception e) {
-            log.error("Unexpected error while deleting DiscountType with ID {}", id, e);
-            throw new CustomServiceException("Unexpected error occurred during deletion", e);
+            log.error("Error fetching active Departments", e);
+            throw new CustomServiceException("Failed to fetch active Departments", e);
         }
     }
 
-    public List<DiscountTypeResponseDTO> searchByKeyword(String keyword) {
-        try {
-            log.info("Fetching all Discount Types based on search from database");
-            List<DiscountTypeEntity> result = discountTypeRepository.searchByKeyword(keyword);
-            List<DiscountTypeResponseDTO> responseDTOS = MapperUtil.mapList(result, DiscountTypeResponseDTO.class);
-            log.info("Successfully fetched Discount Types based on search {} ", responseDTOS.size());
-            return responseDTOS;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Discount Types based on search", dae);
-            throw new CustomServiceException("Unable to fetch Discount Types based on search from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping DiscountTpe Entity to Discount Types based on search", me);
-            throw new CustomServiceException("Error converting  Discount Types data based on search", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Discount Types based on search", e);
-            throw new CustomServiceException("Unexpected error occurred", e);
-        }
-    }
-
-
-    public DiscountTypeResponseDTO updateDiscountType(Long discountTypeId, @Valid DiscountTypeRequestDTO requestDTO) {
-        log.info("Update request received for DiscountType ID: {}", discountTypeId);
-
-        try {
-            // Fetch existing entity
-            DiscountTypeEntity existingEntity = discountTypeRepository.findByIdAndDeletedFalse(discountTypeId).orElseThrow(() -> {
-                log.warn("DiscountType not found with ID: {}", discountTypeId);
-                return new ResourceNotFoundException("Discount Type not found with id: " + discountTypeId);
-            });
-
-            existingEntity.setName(requestDTO.getName());
-            existingEntity.setDescription(requestDTO.getDescription());
-            existingEntity.setActive(requestDTO.getActive());
-            existingEntity.setChargeType(requestDTO.getChargeType());
-            existingEntity.setRecurrenceRule(requestDTO.getRecurrenceRule());
-
-            // Save the updated entity
-            discountTypeRepository.save(existingEntity);
-            log.info("DiscountType updated successfully with ID: {}", existingEntity.getId());
-
-            // Map to Response DTO
-            return MapperUtil.mapObject(existingEntity, DiscountTypeResponseDTO.class);
-
-        } catch (DataAccessException dae) {
-            log.error("Database error while updating DiscountType with ID: {}", discountTypeId, dae);
-            throw new CustomServiceException("Failed to update Discount Type due to database error", dae);
-        } catch (Exception e) {
-            log.error("Unexpected error while updating DiscountType with ID: {}", discountTypeId, e);
-            throw new CustomServiceException("Unexpected error occurred while updating Discount Type", e);
-        }
-    }
-
-
-    private DiscountTypeResponseDTO toDto(DiscountTypeEntity entity) {
-        DiscountTypeResponseDTO dto = new DiscountTypeResponseDTO();
-
+    private DepartmentResponseDTO toDto(DepartmentEntity entity) {
+        DepartmentResponseDTO dto = new DepartmentResponseDTO();
         dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setName(entity.getName());
+        dto.setDepartmentCode(entity.getDepartmentCode());
+        dto.setDepartmentName(entity.getDepartmentName());
         dto.setDescription(entity.getDescription());
-        dto.setActive(entity.getActive());
-
-        dto.setChargeType(entity.getChargeType());
-        dto.setChargeTypeLabel(getChargeTypeLabel(entity.getChargeType()));
-
-        dto.setRecurrenceRule(entity.getRecurrenceRule());
-        dto.setRecurrenceRuleLabel(getRecurrenceRuleLabel(entity.getRecurrenceRule()));
-
+        dto.setIsActive(entity.getIsActive());
+        dto.setParentDepartmentId(entity.getParentDepartment() != null ? entity.getParentDepartment().getId() : null);
+        dto.setHeadEmployeeId(entity.getHeadEmployee() != null ? entity.getHeadEmployee().getId() : null);
         return dto;
     }
-
-    private String getChargeTypeLabel(String chargeType) {
-        return feeConfig.getChargeTypes().getOrDefault(chargeType, chargeType);
-    }
-
-    private String getRecurrenceRuleLabel(String recurrenceRule) {
-        return feeConfig.getRecurrenceRules().getOrDefault(recurrenceRule, recurrenceRule);
-    }
-
 }
-
