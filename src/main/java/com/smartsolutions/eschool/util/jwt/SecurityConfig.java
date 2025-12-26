@@ -21,40 +21,33 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
+import java.util.Arrays;
+
+
 @EnableWebSecurity
+@Configuration
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
-
 
     public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("sms/auth/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain securityFilterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults()) // use CorsConfigurationSource bean
+                .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // allow preflight
+                        .requestMatchers("sms/auth/**").permitAll() // public auth endpoints
+                        .requestMatchers("/uploads/**").permitAll() // public uploads
+                        .anyRequest().authenticated() // all other endpoints need auth
+                ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-        //return NoOpPasswordEncoder.getInstance();
         return new BCryptPasswordEncoder();
     }
 
@@ -63,34 +56,28 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("http://192.168.100.50:4200");
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
+
+        // Allowed origins
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200", "http://192.168.100.50:4200"));
+
+        // Allow all HTTP methods
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Allow all headers
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        // Allow credentials (cookies / auth headers)
         configuration.setAllowCredentials(true);
-        configuration.addExposedHeader("Authorization");
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+
+        // Expose Authorization header to frontend
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
-//
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/**")
-//                        .allowedOrigins("http://192.168.100.50:4200")
-//                        .allowedMethods("*")
-//                        .allowedHeaders("*")
-//                        .allowCredentials(true)
-//                        .exposedHeaders("Authorization");
-//            }
-//        };
-//    }
-
 }
