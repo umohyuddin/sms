@@ -3,10 +3,10 @@ services:
     build: .
     container_name: sms-app
     ports:
-      - "8081:8080"
+      - "8081:8085"
     
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/students
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/sms
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: rootpassword123
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -21,7 +21,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword123
-      MYSQL_DATABASE: students
+      MYSQL_DATABASE: sms
       MYSQL_USER: Admin
       MYSQL_PASSWORD: Admin123
     ports:
