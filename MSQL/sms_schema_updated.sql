@@ -62,21 +62,47 @@ CREATE TABLE cities
 );
 -- TODO_
 -- institutes TABLE
-DROP TABLE IF EXISTS `institutes`;
-CREATE TABLE institutes
-(
-    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name             VARCHAR(100) NOT NULL,
-    address          VARCHAR(255),
-    contact_number   VARCHAR(20),
-    email            VARCHAR(100),
-    website          VARCHAR(100),
-    tagline          VARCHAR(255),
-    country          VARCHAR(100),
-    logo             LONGBLOB,
+DROP TABLE IF EXISTS institutes;
+
+CREATE TABLE institutes (
+    id BIGINT PRIMARY KEY,              -- always 1
+
+    name VARCHAR(150) NOT NULL,
+    tagline VARCHAR(255),
+
+    address VARCHAR(255),
+
+    country_id BIGINT NOT NULL,
+    province_id BIGINT NOT NULL,
+    city_id BIGINT NOT NULL,
+
+    contact_number VARCHAR(20),
+    email VARCHAR(100),
+    website VARCHAR(100),
+
+    logo_url VARCHAR(255),
     established_date DATE,
-    created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+     CONSTRAINT chk_single_institute CHECK (id = 1),
+
+        CONSTRAINT fk_institute_country
+            FOREIGN KEY (country_id) REFERENCES country(id),
+
+        CONSTRAINT fk_institute_province
+            FOREIGN KEY (province_id) REFERENCES provinces(id),
+
+        CONSTRAINT fk_institute_city
+            FOREIGN KEY (city_id) REFERENCES cities(id)
 );
 
 -- Table: campuses
@@ -690,7 +716,7 @@ CREATE TABLE departments (
     description     VARCHAR(255),
     parent_id       BIGINT NULL,
     head_employee_id BIGINT NULL,
-    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+    active       BOOLEAN NOT NULL DEFAULT TRUE,
     deleted         BOOLEAN DEFAULT FALSE,
     created_at      DATETIME,
     created_by      BIGINT,
@@ -752,7 +778,7 @@ CREATE TABLE designations (
 );
 
 
-CREATE TABLE salary_structure (
+    CREATE TABLE salary_structure (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     employee_type_id BIGINT NOT NULL,
     base_salary DECIMAL(12,2) NOT NULL,   -- Fixed base salary

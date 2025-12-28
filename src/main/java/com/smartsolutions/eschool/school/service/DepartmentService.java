@@ -1,10 +1,13 @@
 package com.smartsolutions.eschool.school.service;
 
 
+import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
+import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.dtos.departments.request.DepartmentRequestDTO;
 import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentResponseDTO;
+import com.smartsolutions.eschool.school.mapper.DepartmentMapper;
 import com.smartsolutions.eschool.school.model.DepartmentEntity;
 import com.smartsolutions.eschool.school.repository.DepartmentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
@@ -23,20 +26,34 @@ public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
 
-    public DepartmentService(DepartmentRepository departmentRepository) {
+    private final EmployeeMasterRepository employeeMasterRepository;
+    public DepartmentService(DepartmentRepository departmentRepository, EmployeeMasterRepository employeeMasterRepository) {
         this.departmentRepository = departmentRepository;
+        this.employeeMasterRepository = employeeMasterRepository;
     }
 
     public DepartmentResponseDTO createDepartment(@Valid DepartmentRequestDTO requestDTO) {
         log.info("Creating new Department: {}", requestDTO.getDepartmentName());
         try {
-            DepartmentEntity entity = MapperUtil.mapObject(requestDTO, DepartmentEntity.class);
-
+            DepartmentEntity entity = DepartmentMapper.INSTANCE.toEntity(requestDTO);
             // Fetch and set parent department if provided
             if (requestDTO.getParentDepartmentId() != null) {
                 DepartmentEntity parent = departmentRepository.findById(requestDTO.getParentDepartmentId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Parent Department not found with id: " + requestDTO.getParentDepartmentId()));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Parent Department not found with id: " + requestDTO.getParentDepartmentId()));
                 entity.setParentDepartment(parent);
+            } else {
+                entity.setParentDepartment(null);
+            }
+
+            // Fetch and set head employee if provided, else set null
+            if (requestDTO.getHeadEmployeeId() != null) {
+                EmployeeMasterEntity headEmployee = employeeMasterRepository.findById(requestDTO.getHeadEmployeeId())
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Employee not found with id: " + requestDTO.getHeadEmployeeId()));
+                entity.setHeadEmployee(headEmployee);
+            } else {
+                entity.setHeadEmployee(null);
             }
 
             departmentRepository.save(entity);
@@ -54,7 +71,7 @@ public class DepartmentService {
     public List<DepartmentResponseDTO> getAllDepartments() {
         try {
             log.info("Fetching all Departments from database");
-            List<DepartmentEntity> departments = departmentRepository.findAll();
+            List<DepartmentEntity> departments = departmentRepository.findAllActiveDepartments();
             return departments.stream().map(this::toDto).collect(Collectors.toList());
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Departments", dae);
@@ -84,7 +101,7 @@ public class DepartmentService {
             existing.setDepartmentName(requestDTO.getDepartmentName());
             existing.setDepartmentCode(requestDTO.getDepartmentCode());
             existing.setDescription(requestDTO.getDescription());
-            existing.setIsActive(requestDTO.getIsActive());
+            existing.setActive(requestDTO.getActive());
 
             if (requestDTO.getParentDepartmentId() != null) {
                 DepartmentEntity parent = departmentRepository.findById(requestDTO.getParentDepartmentId())
@@ -140,7 +157,8 @@ public class DepartmentService {
         dto.setDepartmentCode(entity.getDepartmentCode());
         dto.setDepartmentName(entity.getDepartmentName());
         dto.setDescription(entity.getDescription());
-        dto.setIsActive(entity.getIsActive());
+        dto.setActive(entity.getActive());
+        dto.setParentDepartmentName(entity.getParentDepartment() != null ? entity.getParentDepartment().getDepartmentName() : null);
         dto.setParentDepartmentId(entity.getParentDepartment() != null ? entity.getParentDepartment().getId() : null);
         dto.setHeadEmployeeId(entity.getHeadEmployee() != null ? entity.getHeadEmployee().getId() : null);
         return dto;

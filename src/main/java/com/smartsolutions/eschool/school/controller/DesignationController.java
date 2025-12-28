@@ -18,7 +18,7 @@ import java.util.List;
 
 @Transactional
 @RestController
-@RequestMapping("/api/school/designations")
+@RequestMapping("/api/institute/designations")
 @Slf4j
 public class DesignationController {
 

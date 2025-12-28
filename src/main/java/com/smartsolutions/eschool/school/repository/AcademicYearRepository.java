@@ -30,6 +30,8 @@ public interface AcademicYearRepository extends JpaRepository<AcademicYearEntity
             "WHERE LOWER(ar.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<AcademicYearEntity> searchByName(@Param("keyword") String keyword);
 
+    @Query("SELECT a FROM AcademicYearEntity a WHERE a.id = :id")
+    Optional<AcademicYearEntity> findAcademicYearById(@Param("id") Long id);
 }
 
 

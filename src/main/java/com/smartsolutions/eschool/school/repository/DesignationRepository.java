@@ -23,14 +23,14 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
     @Query("""
                 SELECT d FROM DesignationEntity d
                 WHERE d.id = :id
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     Optional<DesignationEntity> findByIdActive(@Param("id") Long id);
 
     @Query("""
                 SELECT d FROM DesignationEntity d
                 WHERE d.designationCode = :code
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     Optional<DesignationEntity> findByCode(@Param("code") String code);
 
@@ -40,15 +40,15 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
 
     @Query("""
                 SELECT d FROM DesignationEntity d
-                WHERE d.isDeleted = false
+                WHERE d.deleted = false
                 ORDER BY d.designationName
             """)
     List<DesignationEntity> findAllActive();
 
     @Query("""
                 SELECT d FROM DesignationEntity d
-                WHERE d.isActive = true
-                  AND d.isDeleted = false
+                WHERE d.active = true
+                  AND d.deleted = false
                 ORDER BY d.designationName
             """)
     List<DesignationEntity> findAllEnabled();
@@ -60,15 +60,15 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
     @Query("""
                 SELECT d FROM DesignationEntity d
                 WHERE d.employeeType.id = :employeeTypeId
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     List<DesignationEntity> findByEmployeeType(@Param("employeeTypeId") Long employeeTypeId);
 
     @Query("""
                 SELECT d FROM DesignationEntity d
                 WHERE d.employeeType.id = :employeeTypeId
-                  AND d.isActive = true
-                  AND d.isDeleted = false
+                  AND d.active = true
+                  AND d.deleted = false
             """)
     List<DesignationEntity> findActiveByEmployeeType(@Param("employeeTypeId") Long employeeTypeId);
 
@@ -79,15 +79,15 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
     @Query("""
                 SELECT d FROM DesignationEntity d
                 WHERE d.department.id = :departmentId
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     List<DesignationEntity> findByDepartment(@Param("departmentId") Long departmentId);
 
     @Query("""
                 SELECT d FROM DesignationEntity d
                 WHERE d.department.id = :departmentId
-                  AND d.isActive = true
-                  AND d.isDeleted = false
+                  AND d.active = true
+                  AND d.deleted = false
             """)
     List<DesignationEntity> findActiveByDepartment(@Param("departmentId") Long departmentId);
 
@@ -99,7 +99,7 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
                 SELECT d FROM DesignationEntity d
                 WHERE d.employeeType.id = :employeeTypeId
                   AND d.department.id = :departmentId
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     List<DesignationEntity> findByEmployeeTypeAndDepartment(@Param("employeeTypeId") Long employeeTypeId, @Param("departmentId") Long departmentId);
 
@@ -111,7 +111,7 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
     @Query("""
                 SELECT d FROM DesignationEntity d
                 WHERE d.department IS NULL
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     List<DesignationEntity> findGlobalDesignations();
 
@@ -121,7 +121,7 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
 
     @Query("""
                 SELECT d FROM DesignationEntity d
-                WHERE d.isDeleted = false
+                WHERE d.deleted = false
                   AND (
                         LOWER(d.designationName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                      OR LOWER(d.designationCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
@@ -137,7 +137,7 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
                 SELECT CASE WHEN COUNT(d) > 0 THEN true ELSE false END
                 FROM DesignationEntity d
                 WHERE d.designationCode = :code
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     boolean existsByCode(@Param("code") String code);
 
@@ -146,7 +146,7 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
                 FROM DesignationEntity d
                 WHERE d.designationName = :name
                   AND d.employeeType.id = :employeeTypeId
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     boolean existsByNameAndEmployeeType(@Param("name") String name, @Param("employeeTypeId") Long employeeTypeId);
 
@@ -158,7 +158,7 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
                 SELECT COUNT(d)
                 FROM DesignationEntity d
                 WHERE d.employeeType.id = :employeeTypeId
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     long countByEmployeeType(@Param("employeeTypeId") Long employeeTypeId);
 
@@ -166,7 +166,7 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
                 SELECT COUNT(d)
                 FROM DesignationEntity d
                 WHERE d.department.id = :departmentId
-                  AND d.isDeleted = false
+                  AND d.deleted = false
             """)
     long countByDepartment(@Param("departmentId") Long departmentId);
 
@@ -177,8 +177,8 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
     @Query("""
                 SELECT d
                 FROM DesignationEntity d
-                WHERE d.isActive = true
-                  AND d.isDeleted = false
+                WHERE d.active = true
+                  AND d.deleted = false
                 ORDER BY d.designationName
             """)
     List<DesignationEntity> findForDropdown();

@@ -226,6 +226,16 @@ public class CampusService {
             throw new CustomServiceException("Unexpected error occurred", e);
         }
     }
+
+    public Long getCampusCountByInstituteId(Long instituteId) {
+        if (instituteId == null) {
+            log.error("Institute ID is null");
+            throw new IllegalArgumentException("Institute ID must not be null");
+        }
+        Long count = campusRepository.countByInstituteId(instituteId);
+        log.info("Found {} campuses for institute ID {}", count, instituteId);
+        return count;
+    }
 }
 
 

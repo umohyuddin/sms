@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.school.controller;
 
+import com.smartsolutions.eschool.school.dtos.campuses.metaData.CampusMetaData;
 import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
 import com.smartsolutions.eschool.school.facade.CampusFacade;
@@ -96,5 +97,15 @@ public class CampusController {
         log.info("Returning updated Campus: id={}", updatedCampus.getId());
         return ResponseEntity.ok(updatedCampus);
     }
+
+
+    @GetMapping(value = "meta", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getCampusMetaData() throws Exception {
+        log.info("GET /api/institute/meta called");
+        CampusMetaData resources = nCampusFacade.getCampusMetaData();
+        log.info("GET /api/institute/meta succeeded");
+        return ResponseEntity.ok().body(resources);
+    }
+
 }
 

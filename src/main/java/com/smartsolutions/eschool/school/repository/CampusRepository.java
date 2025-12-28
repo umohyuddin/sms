@@ -38,4 +38,8 @@ public interface CampusRepository extends JpaRepository<CampusEntity, Long> {
     @Query("""
             SELECT c FROM CampusEntity c WHERE (c.campusName LIKE %:keyword% OR c.campusCode LIKE %:keyword%) AND c.deleted = false""")
     List<CampusEntity> searchByKeyword(@Param("keyword") String keyword);
+
+
+    @Query("SELECT COUNT(c) FROM CampusEntity c WHERE c.institute.id = :instituteId AND c.deleted = false")
+    Long countByInstituteId(@Param("instituteId") Long instituteId);
 }

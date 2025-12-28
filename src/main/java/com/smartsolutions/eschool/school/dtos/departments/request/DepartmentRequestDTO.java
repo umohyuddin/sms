@@ -24,5 +24,5 @@ public class DepartmentRequestDTO {
 
     private Long headEmployeeId;
 
-    private Boolean isActive = true;
+    private Boolean active = true;
 }

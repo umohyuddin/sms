@@ -68,6 +68,21 @@ public class AcademicYearService {
         }
     }
 
+    public AcademicYearResponseDTO getAcademicYearById(Long id) {
+        try {
+            log.info("Fetching Academic Year by id: {}", id);
+            AcademicYearEntity academicYear = academicYearRepository.findById(id).orElseThrow(() -> new RuntimeException("Academic Year not found with id: " + id));
+            return MapperUtil.mapObject(academicYear, AcademicYearResponseDTO.class);
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching academic year with id: {}", id, dae);
+            throw new RuntimeException("Failed to fetch academic year due to database issue");
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching academic year with id: {}", id, e);
+            throw new RuntimeException("Failed to fetch academic year");
+        }
+    }
+
+
     public AcademicYearRequestDTO createAcademicYear(@Valid AcademicYearRequestDTO requestDTO) {
         log.info("Creating new Academic Year: {}", requestDTO.getName());
 
@@ -107,6 +122,56 @@ public class AcademicYearService {
         } catch (Exception e) {
             log.error("Unexpected error while creating Academic Year", e);
             throw new RuntimeException("Failed to create Academic Year");
+        }
+    }
+
+
+    public AcademicYearResponseDTO updateAcademicYear(Long id, @Valid AcademicYearRequestDTO requestDTO) {
+        log.info("Updating Academic Year with id: {}", id);
+
+        try {
+            AcademicYearEntity existingEntity = academicYearRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Academic Year not found with id: " + id));
+
+            // Validate dates
+            if (requestDTO.getStartDate().isAfter(requestDTO.getEndDate())) {
+                throw new IllegalArgumentException("Start date cannot be after end date.");
+            }
+
+            // Validate name format
+            validateNameFormat(requestDTO.getName());
+
+            // If setting current = true, deactivate others
+            if (Boolean.TRUE.equals(requestDTO.getIsCurrent())) {
+                log.info("Deactivating other academic years...");
+                academicYearRepository.deactivateAllAcademicYears();
+            }
+
+            // Update fields
+            existingEntity.setName(requestDTO.getName());
+            existingEntity.setStartDate(requestDTO.getStartDate());
+            existingEntity.setEndDate(requestDTO.getEndDate());
+            existingEntity.setIsCurrent(requestDTO.getIsCurrent());
+
+            // Recalculate total months
+            long totalMonths = ChronoUnit.MONTHS.between(
+                    requestDTO.getStartDate().withDayOfMonth(1),
+                    requestDTO.getEndDate().withDayOfMonth(1)
+            ) + 1;
+
+            existingEntity.setTotalMonths(totalMonths);
+
+            AcademicYearEntity updatedEntity = academicYearRepository.save(existingEntity);
+            log.info("Academic Year updated successfully with id: {}", updatedEntity.getId());
+
+            return MapperUtil.mapObject(updatedEntity, AcademicYearResponseDTO.class);
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while updating Academic Year with id: {}", id, dae);
+            throw new RuntimeException("Failed to update Academic Year due to database error");
+        } catch (Exception e) {
+            log.error("Unexpected error while updating Academic Year with id: {}", id, e);
+            throw new RuntimeException("Failed to update Academic Year");
         }
     }
 

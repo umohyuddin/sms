@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Long> {
     // 1. Find all active departments
-    @Query("SELECT d FROM DepartmentEntity d WHERE d.isActive = true AND d.deleted = false")
+    @Query("SELECT d FROM DepartmentEntity d WHERE d.active = true AND d.deleted = false")
     List<DepartmentEntity> findAllActiveDepartments();
 
     // 2. Find by department code

@@ -57,6 +57,7 @@ public class SalaryStructureComponentService {
     // -------------------------
     // GET ALL ACTIVE
     // -------------------------
+    @Transactional
     public List<SalaryStructureComponentResponseDTO> getAllActive() {
         log.info("Fetching all active SalaryStructureComponents");
         List<SalaryStructureComponentEntity> entities = componentRepository.findAllActive();

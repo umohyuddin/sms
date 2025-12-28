@@ -35,4 +35,13 @@ public class AcademicYearFacade {
     public List<AcademicYearResponseDTO> searchAcademicYears(String keyword) {
         return academicYearService.searchByKeyword(keyword);
     }
+
+    public AcademicYearResponseDTO getAcademicYearById(Long id) {
+        return academicYearService.getAcademicYearById(id);
+    }
+
+    public AcademicYearResponseDTO updateAcademicYear(Long id, @Valid AcademicYearRequestDTO requestDTO) {
+        return academicYearService.updateAcademicYear(id, requestDTO);
+    }
+
 }

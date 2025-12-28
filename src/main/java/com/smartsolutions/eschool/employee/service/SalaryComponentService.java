@@ -184,7 +184,7 @@ public class SalaryComponentService {
         SalaryComponentResponseDTO dto = new SalaryComponentResponseDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
-        //dto.setType(entity.getType());
+        dto.setType(entity.getType());
         dto.setIsPercentage(entity.getIsPercentage());
         return dto;
     }

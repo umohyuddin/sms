@@ -1,6 +1,10 @@
 package com.smartsolutions.eschool.school.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.lookups.model.CityEntity;
+import com.smartsolutions.eschool.lookups.model.CountryEntity;
+import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.user.model.UserEntity;
 import jakarta.persistence.*;
@@ -19,10 +23,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InstituteEntity {
+public class InstituteEntity  extends AuditableEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -44,35 +47,28 @@ public class InstituteEntity {
     @Column(name = "tagline", length = 255)
     private String tagLine;
 
-    @Column(name = "country", nullable = true, length = 100)
-    private String country;
-
     @Lob
-    @Column(name = "logo", nullable = true, columnDefinition = "LONGBLOB")
+    @Column(name = "logo_url", nullable = true, columnDefinition = "LONGBLOB")
     private byte[] logo;
 
     @Column(name = "established_date")
     private LocalDate establishedDate;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "institute", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<CampusEntity> campuses;
 
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-    @PrePersist
-    public  void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id", nullable = false)
+    private CountryEntity country;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "province_id", nullable = false)
+    private ProvinceEntity province;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id", nullable = false)
+    private CityEntity city;
 
 }

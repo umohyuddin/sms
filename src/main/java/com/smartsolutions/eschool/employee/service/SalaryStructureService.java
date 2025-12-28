@@ -79,6 +79,7 @@ public class SalaryStructureService {
     /* =========================
        GET ALL ACTIVE
        ========================= */
+    @Transactional(readOnly = true)
     public List<SalaryStructureResponseDTO> getAllActive() {
         log.info("Fetching all active Salary Structures");
         try {

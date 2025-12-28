@@ -1,19 +1,12 @@
 package com.smartsolutions.eschool.employee.repository;
 
-import com.smartsolutions.eschool.employee.model.EmployeeBonusEntity;
-import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterSalary;
-import com.smartsolutions.eschool.employee.model.EmployeeSalaryEntity;
-import com.smartsolutions.eschool.global.enums.SalaryStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 public interface EmployeeMasterSalaryRepository extends JpaRepository<EmployeeMasterSalary, Long> {
 

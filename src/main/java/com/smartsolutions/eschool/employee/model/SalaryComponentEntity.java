@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.employee.model;
 
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.global.enums.ComponentType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,8 +36,4 @@ public class SalaryComponentEntity  extends AuditableEntity {
     private Boolean deleted = false;
 
 
-    public enum ComponentType {
-        EARNING,
-        DEDUCTION
-    }
 }

@@ -21,6 +21,6 @@ public class DesignationResponseDTO {
     private Long employeeTypeId;
     private String employeeTypeName;
 
-    private Boolean isActive;
-    private Boolean isDeleted;
+    private Boolean active;
+    private Boolean deleted;
 }

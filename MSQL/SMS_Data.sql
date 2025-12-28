@@ -1,50 +1,23 @@
--- ============================================================
--- Sample Data: Admission Types
--- This section populates the 'admission_type' table with a
--- predefined list of admission categories typically used in
--- school management systems. These records are intended to
--- standardize the process of student enrollment, fee
--- management, and reporting across different modules such as
--- student registration, class assignment, scholarship
--- management, and special programs.
--- ============================================================
-
-
-INSERT INTO admission_type (code, name, description, is_active)
-VALUES ('NEW_ADMISSION', 'New Admission / Fresh Admission', 'Student joining the school for the first time.', TRUE),
-       ('TRANSFER', 'Transfer Admission', 'Student transferring from another school.', TRUE),
-       ('READMISSION', 'Re-admission / Returning Student', 'Student returning after leaving the school.', TRUE),
-       ('LATERAL_ENTRY', 'Lateral Entry / Direct Admission', 'Student joining a higher grade directly.', TRUE),
-       ('SCHOLARSHIP', 'Scholarship / Concession Admission', 'Admission with full or partial fee waiver.', TRUE),
-       ('MANAGEMENT', 'Management / Special Admission', 'Admission under management quota.', TRUE),
-       ('EARLY', 'Early Admission', 'Admission before the academic session starts.', TRUE),
-       ('LATE', 'Late Admission', 'Admission after the academic session has started.', TRUE),
-       ('INTERNATIONAL', 'International / Expat Admission', 'Students from foreign countries.', TRUE),
-       ('SPECIAL_NEEDS', 'Special Needs Admission', 'Students requiring special assistance.', TRUE),
-       ('ONLINE', 'Online / Distance Learning Admission', 'Admission for online programs.', TRUE),
-       ('SIBLING', 'Sibling Admission', 'Admission given when a sibling is already enrolled.', TRUE),
-       ('STAFF_WARD', 'Staff / Employee Ward Admission', 'Children of school staff may get special consideration.',
-        TRUE),
-       ('MERIT', 'Merit-based Admission', 'Admission based purely on exam/test performance.', TRUE),
-       ('MID_YEAR', 'Late Entry Mid-Year', 'Students joining mid-session due to relocation or other reasons.', TRUE);
-
-
-
-INSERT INTO academic_years (name, start_date, end_date, total_months, is_current, created_at, updated_at)
-VALUES ('2022-2023', '2022-08-01', '2023-07-31', TIMESTAMPDIFF(MONTH, '2022-08-01', '2023-07-31') + 1, FALSE, NOW(),
-        NOW()),
-       ('2023-2024', '2023-08-01', '2024-07-31', TIMESTAMPDIFF(MONTH, '2023-08-01', '2024-07-31') + 1, FALSE, NOW(),
-        NOW()),
-       ('2024-2025', '2024-08-01', '2025-07-31', TIMESTAMPDIFF(MONTH, '2024-08-01', '2025-07-31') + 1, TRUE, NOW(),
-        NOW()),
-       ('2025-2026', '2025-08-01', '2026-07-31', TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1, FALSE, NOW(),
-        NOW()),
-       ('2026-2027', '2026-08-01', '2027-07-31', TIMESTAMPDIFF(MONTH, '2026-08-01', '2027-07-31') + 1, FALSE, NOW(),
-        NOW());
 
 
 
 
+INSERT INTO system_users (username, email, phone, password_hash, is_active, is_verified)
+VALUES ('admin.user', 'admin@example.com', '03001234567',
+        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, TRUE),
+
+       ('teacher.user', 'teacher@example.com', '03007654321',
+        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE),
+
+       ('student.user', 'student@example.com', '03111223344',
+        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE);
+
+
+-- ============================================
+-- Countries Table Insertions
+-- Purpose: Populate the 'country' table with country codes, ISO codes, phone codes.
+-- Used for student profiles, employee profiles, institute addresses, and general lookups.
+-- ============================================
 INSERT INTO country (country_code, country_name, iso_code, phone_code) VALUES
 ('AF','Afghanistan','AFG','+93'),
 ('AL','Albania','ALB','+355'),
@@ -172,12 +145,12 @@ INSERT INTO country (country_code, country_name, iso_code, phone_code) VALUES
 ('ZW','Zimbabwe','ZWE','+263');
 
 -- ============================================
--- Sample Data: Provinces of Pakistan
--- This dataset is used to populate the 'provinces' table
--- with all administrative regions required for addresses,
--- student profiles, employee profiles, and campus records.
+-- Provinces Table Insertions
+-- Purpose: Populate the 'provinces' table with administrative regions for each country.
+-- Used for address selection in institute, student, and employee forms.
 -- ============================================
 
+-- Pakistan Provinces
 INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by) VALUES
 (98, 'Punjab', 'PB', TRUE, 1, 1),
 (98, 'Sindh', 'SD', TRUE, 1, 1),
@@ -187,7 +160,7 @@ INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by
 (98, 'Gilgit-Baltistan', 'GB', TRUE, 1, 1),
 (98, 'Azad Jammu & Kashmir', 'AJK', TRUE, 1, 1);
 
-
+-- Saudi Arabia Provinces
 INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by) VALUES
 (105, 'Riyadh', 'RD', TRUE, 1, 1),
 (105, 'Makkah', 'MK', TRUE, 1, 1),
@@ -203,7 +176,7 @@ INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by
 (105, 'Al Jawf', 'JW', TRUE, 1, 1),
 (105, 'Asir', 'AS', TRUE, 1, 1);
 
-
+-- UAE Provinces
 INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by) VALUES
 (115, 'Abu Dhabi', 'AD', TRUE, 1, 1),
 (115, 'Dubai', 'DU', TRUE, 1, 1),
@@ -213,7 +186,7 @@ INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by
 (115, 'Ras Al Khaimah', 'RAK', TRUE, 1, 1),
 (115, 'Fujairah', 'FJ', TRUE, 1, 1);
 
-
+-- India Provinces
 INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by) VALUES
 (64, 'Andhra Pradesh', 'AP', TRUE, 1, 1),
 (64, 'Arunachal Pradesh', 'AR', TRUE, 1, 1),
@@ -252,49 +225,101 @@ INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by
 (64, 'Lakshadweep', 'LD', TRUE, 1, 1),
 (64, 'Andaman and Nicobar Islands', 'AN', TRUE, 1, 1);
 
--- Cities for Punjab (id=1)
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
-VALUES (1, 'Lahore', 'LHE', TRUE, 1, 1, NOW()),
-       (1, 'Faisalabad', 'FSD', TRUE, 1, 1, NOW()),
-       (1, 'Rawalpindi', 'RWP', TRUE, 1, 1, NOW()),
-       (1, 'Multan', 'MLN', TRUE, 1, 1,
+-- ============================================
+-- Cities Table Insertions
+-- Purpose: Populate the 'cities' table with cities for each province.
+-- Used for address selection in forms for students, employees, and campuses.
+-- ============================================
+
+-- Pakistan Cities
+-- Punjab
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+(1, 'Lahore', 'LHE', TRUE, 1, 1, NOW()),
+(1, 'Faisalabad', 'FSD', TRUE, 1, 1, NOW()),
+(1, 'Rawalpindi', 'RWP', TRUE, 1, 1, NOW()),
+(1, 'Multan', 'MLN', TRUE, 1, 1, NOW());
+
+-- Sindh
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+(2, 'Karachi', 'KHI', TRUE, 1, 1, NOW()),
+(2, 'Hyderabad', 'HYD', TRUE, 1, 1, NOW()),
+(2, 'Sukkur', 'SUK', TRUE, 1, 1, NOW()),
+(2, 'Larkana', 'LRK', TRUE, 1, 1, NOW());
+
+-- Khyber Pakhtunkhwa
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+(3, 'Peshawar', 'PEW', TRUE, 1, 1, NOW()),
+(3, 'Mardan', 'MRD', TRUE, 1, 1, NOW()),
+(3, 'Abbottabad', 'ABT', TRUE, 1, 1, NOW()),
+(3, 'Swat', 'SWT', TRUE, 1, 1, NOW());
+
+-- Balochistan
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+(4, 'Quetta', 'QTA', TRUE, 1, 1, NOW()),
+(4, 'Gwadar', 'GWD', TRUE, 1, 1, NOW()),
+(4, 'Sibi', 'SBI', TRUE, 1, 1, NOW()),
+(4, 'Zhob', 'ZHB', TRUE, 1, 1, NOW());
+
+-- Islamabad Capital Territory
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+(5, 'Islamabad', 'ISB', TRUE, 1, 1, NOW());
+
+-- Gilgit-Baltistan
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+(6, 'Gilgit', 'GIL', TRUE, 1, 1, NOW()),
+(6, 'Skardu', 'SKD', TRUE, 1, 1, NOW());
+
+-- Azad Jammu & Kashmir
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+(7, 'Muzaffarabad', 'MZD', TRUE, 1, 1, NOW()),
+(7, 'Mirpur', 'MIR', TRUE, 1, 1, NOW()),
+(7, 'Kotli', 'KOT', TRUE, 1, 1, NOW());
+
+
+-- ============================================================
+-- Sample Data: Admission Types
+-- This section populates the 'admission_type' table with a
+-- predefined list of admission categories typically used in
+-- school management systems. These records are intended to
+-- standardize the process of student enrollment, fee
+-- management, and reporting across different modules such as
+-- student registration, class assignment, scholarship
+-- management, and special programs.
+-- ============================================================
+
+
+INSERT INTO admission_type (code, name, description, is_active)
+VALUES ('NEW_ADMISSION', 'New Admission / Fresh Admission', 'Student joining the school for the first time.', TRUE),
+       ('TRANSFER', 'Transfer Admission', 'Student transferring from another school.', TRUE),
+       ('READMISSION', 'Re-admission / Returning Student', 'Student returning after leaving the school.', TRUE),
+       ('LATERAL_ENTRY', 'Lateral Entry / Direct Admission', 'Student joining a higher grade directly.', TRUE),
+       ('SCHOLARSHIP', 'Scholarship / Concession Admission', 'Admission with full or partial fee waiver.', TRUE),
+       ('MANAGEMENT', 'Management / Special Admission', 'Admission under management quota.', TRUE),
+       ('EARLY', 'Early Admission', 'Admission before the academic session starts.', TRUE),
+       ('LATE', 'Late Admission', 'Admission after the academic session has started.', TRUE),
+       ('INTERNATIONAL', 'International / Expat Admission', 'Students from foreign countries.', TRUE),
+       ('SPECIAL_NEEDS', 'Special Needs Admission', 'Students requiring special assistance.', TRUE),
+       ('ONLINE', 'Online / Distance Learning Admission', 'Admission for online programs.', TRUE),
+       ('SIBLING', 'Sibling Admission', 'Admission given when a sibling is already enrolled.', TRUE),
+       ('STAFF_WARD', 'Staff / Employee Ward Admission', 'Children of school staff may get special consideration.',
+        TRUE),
+       ('MERIT', 'Merit-based Admission', 'Admission based purely on exam/test performance.', TRUE),
+       ('MID_YEAR', 'Late Entry Mid-Year', 'Students joining mid-session due to relocation or other reasons.', TRUE);
+
+
+
+INSERT INTO academic_years (name, start_date, end_date, total_months, is_current, created_at, updated_at)
+VALUES ('2022-2023', '2022-08-01', '2023-07-31', TIMESTAMPDIFF(MONTH, '2022-08-01', '2023-07-31') + 1, FALSE, NOW(),
+        NOW()),
+       ('2023-2024', '2023-08-01', '2024-07-31', TIMESTAMPDIFF(MONTH, '2023-08-01', '2024-07-31') + 1, FALSE, NOW(),
+        NOW()),
+       ('2024-2025', '2024-08-01', '2025-07-31', TIMESTAMPDIFF(MONTH, '2024-08-01', '2025-07-31') + 1, TRUE, NOW(),
+        NOW()),
+       ('2025-2026', '2025-08-01', '2026-07-31', TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1, FALSE, NOW(),
+        NOW()),
+       ('2026-2027', '2026-08-01', '2027-07-31', TIMESTAMPDIFF(MONTH, '2026-08-01', '2027-07-31') + 1, FALSE, NOW(),
         NOW());
--- Cities for Sindh (id=2)
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
-VALUES (2, 'Karachi', 'KHI', TRUE, 1, 1, NOW()),
-       (2, 'Hyderabad', 'HYD', TRUE, 1, 1, NOW()),
-       (2, 'Sukkur', 'SUK', TRUE, 1, 1, NOW()),
-       (2, 'Larkana', 'LRK', TRUE, 1, 1,
-        NOW());
--- Cities for Khyber Pakhtunkhwa (id=3)
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
-VALUES (3, 'Peshawar', 'PEW', TRUE, 1, 1, NOW()),
-       (3, 'Mardan', 'MRD', TRUE, 1, 1, NOW()),
-       (3, 'Abbottabad', 'ABT', TRUE, 1, 1, NOW()),
-       (3, 'Swat', 'SWT', TRUE, 1, 1,
-        NOW());
--- Cities for Balochistan (id=4)
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
-VALUES (4, 'Quetta', 'QTA', TRUE, 1, 1, NOW()),
-       (4, 'Gwadar', 'GWD', TRUE, 1, 1, NOW()),
-       (4, 'Sibi', 'SBI', TRUE, 1, 1, NOW()),
-       (4, 'Zhob', 'ZHB', TRUE, 1, 1,
-        NOW());
--- Cities for Islamabad Capital Territory (id=5)
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
-VALUES (5, 'Islamabad', 'ISB', TRUE, 1, 1,
-        NOW());
--- Cities for Gilgit-Baltistan (id=6)
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
-VALUES (6, 'Gilgit', 'GIL', TRUE, 1, 1, NOW()),
-       (6, 'Skardu', 'SKD', TRUE, 1, 1,
-        NOW());
--- Cities for Azad Jammu & Kashmir (id=7)
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
-VALUES (7, 'Muzaffarabad', 'MZD', TRUE, 1, 1, NOW()),
-       (7, 'Mirpur', 'MIR', TRUE, 1, 1, NOW()),
-       (7, 'Kotli', 'KOT', TRUE, 1, 1,
-        NOW());
+
 
 
 
@@ -305,25 +330,20 @@ VALUES (7, 'Muzaffarabad', 'MZD', TRUE, 1, 1, NOW()),
 -- campuses, academic years, users, fee structures, and other
 -- modules within the system.
 -- ============================================================
-
 INSERT INTO institutes
-(name, address, contact_number, email, website, tagline, country, logo, established_date, created_at, updated_at)
-VALUES ('Smart Solutions School', '123 Main Street, Lahore', '+92-300-1234567', 'info@smartsolutions.edu',
-        'https://www.smartsolutions.edu', 'Excellence in Education', 'Pakistan', NULL, '2005-08-15', NOW(), NOW()),
-
-       ('Bright Future Academy', '456 Park Avenue, Karachi', '+92-301-7654321', 'contact@brightfuture.edu',
-        'https://www.brightfuture.edu', 'Empowering Young Minds', 'Pakistan', NULL, '2010-01-10', NOW(), NOW()),
-
-       ('Global Vision School', '789 River Road, Islamabad', '+92-302-1112223', 'admin@globalvision.edu',
-        'https://www.globalvision.edu', 'Learning Beyond Boundaries', 'Pakistan', NULL, '2012-05-20', NOW(), NOW()),
-
-       ('Riverside International School', '101 Riverside Street, Faisalabad', '+92-303-3334445',
-        'info@riversideschool.edu',
-        'https://www.riversideschool.edu', 'Nurturing Excellence', 'Pakistan', NULL, '2008-09-05', NOW(), NOW()),
-
-       ('Hilltop Learning Center', '202 Hilltop Road, Peshawar', '+92-304-5556667', 'contact@hilltop.edu',
-        'https://www.hilltop.edu', 'Climbing Higher Together', 'Pakistan', NULL, '2015-03-15', NOW(), NOW());
-
+(id, name, address, contact_number, email, website, tagline, logo_url,
+ established_date, country_id, province_id, city_id, created_at, updated_at)
+VALUES
+(1, 'Smart Solutions School',
+ '123 Main Street, Lahore',
+ '+92-300-1234567',
+ 'info@smartsolutions.edu',
+ 'https://www.smartsolutions.edu',
+ 'Excellence in Education',
+ NULL,
+ '2005-08-15',
+ 1, 1, 1,
+ NOW(), NOW());
 -- ============================================================
 -- Sample Data: Campuses
 -- This dataset seeds the 'campuses' table for Smart Solutions
@@ -965,17 +985,6 @@ VALUES
 COMMIT;
 
 
-INSERT INTO system_users (username, email, phone, password_hash, is_active, is_verified)
-VALUES ('admin.user', 'admin@example.com', '03001234567',
-        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, TRUE),
-
-       ('teacher.user', 'teacher@example.com', '03007654321',
-        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE),
-
-       ('student.user', 'student@example.com', '03111223344',
-        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE);
-
-
 
 INSERT INTO student_fee_assignments
     (student_id, fee_rate_id, total_amount, due_date, assigned_date)
@@ -1067,7 +1076,7 @@ VALUES ('EMP001', 'Uzair', 'Anwar', 'Uzair Anwar', 'MALE', '1990-05-12', 'SINGLE
         '03003456789', '03007654321', '0426789012', 'hamza.jpg', 'Finance Manager', 'hamza.shah@example.com', TRUE, 1,
         NOW(), 1, NOW());
 
-INSERT INTO departments (department_code, department_name, description, parent_id, head_employee_id, is_active)
+INSERT INTO departments (department_code, department_name, description, parent_id, head_employee_id, active)
 VALUES
 -- Top-level school departments
 ('SCH01', 'School of Science', 'All science-related departments', NULL, 1, TRUE),

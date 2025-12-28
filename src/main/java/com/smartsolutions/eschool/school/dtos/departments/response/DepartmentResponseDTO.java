@@ -20,8 +20,9 @@ public class DepartmentResponseDTO {
     private String description;
 
     private Long parentDepartmentId;
+    private String parentDepartmentName;
 
     private Long headEmployeeId;
 
-    private Boolean isActive;
+    private Boolean active;
 }

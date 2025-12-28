@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/school/academic")
 @Slf4j
 public class AcademicYearController {
-   private final AcademicYearFacade academicYearFacade;
+    private final AcademicYearFacade academicYearFacade;
 
     public AcademicYearController(AcademicYearFacade academicYearFacade) {
         this.academicYearFacade = academicYearFacade;
@@ -55,4 +55,23 @@ public class AcademicYearController {
         log.info("Search completed, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AcademicYearResponseDTO> getAcademicYearById(@PathVariable Long id) {
+        log.info("GET /api/school/academic/{} called", id);
+        AcademicYearResponseDTO response = academicYearFacade.getAcademicYearById(id);
+        log.info("GET by id succeeded for academic year id: {}", id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AcademicYearResponseDTO> updateAcademicYear(
+            @PathVariable Long id,
+            @RequestBody @Valid AcademicYearRequestDTO requestDTO) {
+        log.info("Received request to update academic year with id: {}", id);
+        AcademicYearResponseDTO response = academicYearFacade.updateAcademicYear(id, requestDTO);
+        log.info("Academic year updated successfully with id: {}", response.getId());
+        return ResponseEntity.ok(response);
+    }
+
 }

@@ -35,8 +35,8 @@ public class DepartmentEntity extends AuditableEntity {
     @JoinColumn(name = "head_employee_id")
     private EmployeeMasterEntity headEmployee;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 
     @Column(name = "deleted")
     private Boolean deleted = false;

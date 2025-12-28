@@ -1,14 +1,19 @@
 package com.smartsolutions.eschool.school.controller;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.school.dtos.InstituteDTO;
+import com.smartsolutions.eschool.school.dtos.institute.request.InstituteRequestDTO;
+import com.smartsolutions.eschool.school.dtos.institute.response.InstituteResponseDTO;
 import com.smartsolutions.eschool.school.facade.InstituteFacade;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
+import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,82 +30,33 @@ import java.util.stream.Collectors;
 @Slf4j
 public class InstituteController {
 
-    @Autowired
-    private InstituteFacade instituteFacade;
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final InstituteFacade instituteFacade;
 
-    //  get all employee
-    @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll() throws Exception {
-        log.info("GET /api/institute/getall called");
-        List<InstituteDTO> resources  =instituteFacade.getAll();
-        log.info("GET /api/institute/getall succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
+    public InstituteController(InstituteFacade instituteFacade) {
+        this.instituteFacade = instituteFacade;
     }
 
-//    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
-//
-//        Map<String, Object> resourceAttributes = objectMapper.convertValue(nInstituteFacade.getById(id), Map.class);
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                                    String.valueOf(id),
-//                                    "Institute",
-//                                    resourceAttributes
-//                            ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
-//
-//    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject create(
-//            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-//        if (!requestBody.containsKey("data")) {
-//            throw new ValidationException("The request body did not contain a data attribute");
-//        }
-//        Map<String, Object> resourceMap = requestBody.get("data");
-//        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-//        InstituteEntity nInstituteEntity = objectMapper.convertValue(attributes, InstituteEntity.class);
-//        Map<String, Object> resourceAttributes = Map.of("message",nInstituteFacade.create(nInstituteEntity));
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                                    nInstituteEntity.getName(),
-//                                    "Institute",
-//                                    resourceAttributes
-//                            ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
-//
-//    @PutMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject update(
-//            @RequestBody Map<String, Map<String, Object>> requestBody) throws Exception {
-//        if (!requestBody.containsKey("data")) {
-//            throw new ValidationException("The request body did not contain a data attribute");
-//        }
-//        Map<String, Object> resourceMap = requestBody.get("data");
-//        Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-//        InstituteEntity nInstituteEntity = objectMapper.convertValue(attributes, InstituteEntity.class);
-//        Map<String, Object> resourceAttributes = Map.of("message",nInstituteFacade.update(nInstituteEntity));
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                                    String.valueOf(nInstituteEntity.getName()),
-//                                    "Institute",
-//                                    resourceAttributes
-//                            ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
-//
-//    @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public MultiResourceSuccessResponseObject delete(
-//            @PathVariable Long id
-//    ) throws Exception {
-//        Map<String, Object> resourceAttributes = Map.of("message",nInstituteFacade.delete(id));
-//        List<ResourceObject> resourceObject = new ArrayList<>();
-//        resourceObject.add(new ResourceObject(
-//                                String.valueOf(id),
-//                                "Institute",
-//                                resourceAttributes
-//                        ));
-//        return new MultiResourceSuccessResponseObject(resourceObject);
-//    }
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<InstituteResponseDTO> getInstitute() {
+        log.info("GET /api/school/institute called");
+        InstituteResponseDTO responseDTO = instituteFacade.getInstitute();
+        if (responseDTO == null) {
+            log.info("No institute record found");
+            return ResponseEntity.noContent().build(); // HTTP 204
+        }
+        log.info("GET /api/school/institute succeeded");
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    // -------------------------------------------------------------------------
+    // UPDATE INSTITUTE
+    // -------------------------------------------------------------------------
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<InstituteResponseDTO> updateInstitute(@RequestBody @Valid InstituteRequestDTO requestDTO) {
+        log.info("PUT /api/school/institute called");
+        InstituteResponseDTO responseDTO = instituteFacade.updateInstitute(requestDTO);
+        log.info("PUT /api/school/institute succeeded");
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+    }
 }
+

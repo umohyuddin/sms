@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "designation")
+@Table(name = "designations")
 @Getter
 @Setter
 public class DesignationEntity extends AuditableEntity {
@@ -35,10 +35,10 @@ public class DesignationEntity extends AuditableEntity {
     @JoinColumn(name = "department_id")
     private DepartmentEntity department;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
 
 }

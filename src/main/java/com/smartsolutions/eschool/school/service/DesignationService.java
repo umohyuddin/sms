@@ -174,7 +174,7 @@ public class DesignationService {
         dto.setDesignationCode(entity.getDesignationCode());
         dto.setDesignationName(entity.getDesignationName());
         dto.setDescription(entity.getDescription());
-        dto.setIsActive(entity.getIsActive());
+        dto.setActive(entity.getActive());
         if (entity.getEmployeeType() != null) {
             dto.setEmployeeTypeId(entity.getEmployeeType().getId());
             dto.setEmployeeTypeName(entity.getEmployeeType().getName());
