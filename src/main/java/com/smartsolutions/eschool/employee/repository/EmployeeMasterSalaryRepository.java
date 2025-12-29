@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.repository;
 
+import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryFullResponseDTO;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterSalary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -56,4 +57,14 @@ public interface EmployeeMasterSalaryRepository extends JpaRepository<EmployeeMa
     // -------------------------
     @Query("UPDATE EmployeeMasterSalary e SET e.deleted = true WHERE e.id = :id")
     void softDeleteById(@Param("id") Long id);
+
+
+    @Query("""
+                SELECT s
+                FROM EmployeeMasterSalary s
+                JOIN FETCH s.employee e
+                WHERE s.deleted = false
+                ORDER BY s.effectiveDate DESC
+            """)
+    List<EmployeeMasterSalary> findEmployeeSalaryList();
 }

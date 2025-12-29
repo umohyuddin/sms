@@ -5,6 +5,7 @@ import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeM
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.request.EmployeeSalaryRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryFullResponseDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterSalaryService;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
@@ -53,6 +54,9 @@ public class EmployeeMasterSalaryFacade {
         return salaryService.getAllSalariesForEmployee(employeeId);
     }
 
+    public List<EmployeeSalaryFullResponseDTO> getEmployeeSalaryList() {
+        return salaryService.getEmployeeSalaryList();
+    }
 //    public List<EmployeeSalaryResponseDTO> getSalariesByStatus(SalaryStatus status) {
 //        return salaryService.getSalariesByStatus(status);
 //    }

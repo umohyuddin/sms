@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.employee.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.request.EmployeeSalaryRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryFullResponseDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterSalaryFacade;
 import com.smartsolutions.eschool.employee.facade.EmployeeSalaryFaced;
@@ -35,6 +36,12 @@ public class EmployeeSalaryController {
         this.salaryFacade = salaryFacade;
     }
 
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EmployeeSalaryFullResponseDTO>> getEmployeeSalaryList() {
+        log.info("GET /api/institute/employee-salaries called");
+        List<EmployeeSalaryFullResponseDTO> response = salaryFacade.getEmployeeSalaryList();
+        return ResponseEntity.ok(response);
+    }
     // -------------------------
     // CREATE
     // -------------------------

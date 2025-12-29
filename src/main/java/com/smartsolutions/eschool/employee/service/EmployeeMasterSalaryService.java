@@ -1,7 +1,9 @@
 package com.smartsolutions.eschool.employee.service;
 
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.request.EmployeeSalaryRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryFullResponseDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
+import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterSalary;
 import com.smartsolutions.eschool.employee.repository.EmployeeMasterSalaryRepository;
 import com.smartsolutions.eschool.global.enums.SalaryStatus;
@@ -53,8 +55,7 @@ public class EmployeeMasterSalaryService {
     public EmployeeSalaryResponseDTO getSalaryById(Long id) {
         log.info("Fetching salary by id={}", id);
         try {
-            EmployeeMasterSalary entity = salaryRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Salary not found with id=" + id));
+            EmployeeMasterSalary entity = salaryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Salary not found with id=" + id));
             return MapperUtil.mapObject(entity, EmployeeSalaryResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while fetching salary", dae);
@@ -69,9 +70,7 @@ public class EmployeeMasterSalaryService {
         log.info("Fetching all salaries for employeeId={}", employeeId);
         try {
             List<EmployeeMasterSalary> entities = salaryRepository.findAllByEmployeeId(employeeId);
-            return entities.stream()
-                    .map(e -> MapperUtil.mapObject(e, EmployeeSalaryResponseDTO.class))
-                    .collect(Collectors.toList());
+            return entities.stream().map(e -> MapperUtil.mapObject(e, EmployeeSalaryResponseDTO.class)).collect(Collectors.toList());
         } catch (DataAccessException dae) {
             log.error("Database error while fetching salaries", dae);
             throw new CustomServiceException("Unable to fetch salaries", dae);
@@ -84,8 +83,7 @@ public class EmployeeMasterSalaryService {
     public EmployeeSalaryResponseDTO updateSalary(Long id, @Valid EmployeeSalaryRequestDTO requestDTO) {
         log.info("Updating salary with id={}", id);
         try {
-            EmployeeMasterSalary existing = salaryRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Salary not found with id=" + id));
+            EmployeeMasterSalary existing = salaryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Salary not found with id=" + id));
 
             //existing.setEmpId(requestDTO.getEmployeeId());
             existing.setGrossSalary(requestDTO.getGrossSalary());
@@ -111,8 +109,7 @@ public class EmployeeMasterSalaryService {
     public void softDeleteSalary(Long id) {
         log.info("Soft delete requested for salary id={}", id);
         try {
-            EmployeeMasterSalary existing = salaryRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Salary not found with id=" + id));
+            EmployeeMasterSalary existing = salaryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Salary not found with id=" + id));
             existing.setDeleted(true);
             existing.setUpdatedAt(LocalDateTime.now());
             salaryRepository.save(existing);
@@ -120,6 +117,23 @@ public class EmployeeMasterSalaryService {
         } catch (DataAccessException dae) {
             log.error("Database error while deleting salary", dae);
             throw new CustomServiceException("Failed to delete salary due to database error", dae);
+        }
+    }
+
+    public List<EmployeeSalaryFullResponseDTO> getEmployeeSalaryList() {
+        log.info("Fetching employee salary list (entity approach)");
+        try {
+            // Fetch all salaries with employee loaded
+            List<EmployeeMasterSalary> salaries = salaryRepository.findEmployeeSalaryList();
+
+            // Map entity → DTO
+            return salaries.stream()
+                    .map(this::mapToFullResponse)
+                    .collect(Collectors.toList());
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching employee salary list", dae);
+            throw new CustomServiceException("Unable to fetch employee salary list", dae);
         }
     }
 
@@ -152,4 +166,19 @@ public class EmployeeMasterSalaryService {
 //            throw new CustomServiceException("Unable to fetch salary by month/year", dae);
 //        }
 //    }
+
+    private EmployeeSalaryFullResponseDTO mapToFullResponse(EmployeeMasterSalary s) {
+        EmployeeMasterEntity e = s.getEmployee();
+
+        return EmployeeSalaryFullResponseDTO.builder()
+                .salaryId(s.getId())
+                .employeeId(e.getId())
+                .employeeCode(e.getEmployeeCode())
+                .employeeName(e.getFullName())
+                .grossSalary(s.getGrossSalary())
+                .totalDeductions(s.getTotalDeductions())
+                .netSalary(s.getNetSalary())
+                .effectiveDate(s.getEffectiveDate())
+                .build();
+    }
 }
