@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.facade;
 
+import com.smartsolutions.eschool.student.dtos.feeCatalog.requestDto.FeeCatalogRequestDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
 import com.smartsolutions.eschool.student.service.FeeCatalogService;
 import org.springframework.context.annotation.Scope;
@@ -27,6 +28,14 @@ public class FeeCatelogFacade {
 
     public  List<FeeCatalogDTO> searchFeeCatalog(String keyword){
         return feeCatalogService.searchFeeCatalog(keyword);
+    }
+
+    public FeeCatalogDTO save(FeeCatalogRequestDTO feeCatalogDTO) {
+        return feeCatalogService.createFeeCatalog(feeCatalogDTO);
+    }
+
+    public FeeCatalogDTO update(Long id, FeeCatalogRequestDTO feeCatalogDTO) {
+        return feeCatalogService.update(id, feeCatalogDTO);
     }
 
 //    public List<FeeEntity> getByStudent(Long std_id) {

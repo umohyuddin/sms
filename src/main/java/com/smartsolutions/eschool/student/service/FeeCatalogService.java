@@ -1,11 +1,16 @@
 package com.smartsolutions.eschool.student.service;
 
 import com.smartsolutions.eschool.global.configs.FeeConfig;
+import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.student.dtos.feeCatalog.requestDto.FeeCatalogRequestDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
 import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
 import com.smartsolutions.eschool.student.repository.FeeCatalogRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
@@ -13,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -108,4 +114,75 @@ public class FeeCatalogService {
 
         return dto;
     }
+
+    @Transactional
+    public FeeCatalogDTO createFeeCatalog(FeeCatalogRequestDTO dto) {
+        log.info("Creating new FeeCatalog: {}", dto.getName());
+
+        // Check for duplicates
+        Optional<FeeCatalogEntity> existing = feeCatalogRepository.findByCodeOrNameIgnoreCase(dto.getCode(), dto.getName());
+        if (existing.isPresent()) {
+            throw new ValidationException("FeeCatalog with code '" + dto.getCode() + "' or name '" + dto.getName() + "' already exists");
+        }
+
+        try {
+            FeeCatalogEntity entity = MapperUtil.mapObject(dto, FeeCatalogEntity.class);
+            entity.setId(null); // ensure new record
+            FeeCatalogEntity saved = feeCatalogRepository.save(entity);
+            FeeCatalogDTO feeCatalogDTO = toDto(saved);
+            log.info("FeeCatalog created successfully with id: {}", feeCatalogDTO.getId());
+            return feeCatalogDTO;
+        } catch (DataAccessException dae) {
+            log.error("Database error while creating FeeCatalog", dae);
+            throw new CustomServiceException("Unable to create FeeCatalog", dae);
+        } catch (Exception e) {
+            log.error("Unexpected error while creating FeeCatalog", e);
+            throw new CustomServiceException("Unexpected error occurred while creating FeeCatalog", e);
+        }
+    }
+
+    public FeeCatalogDTO update(Long id, @Valid FeeCatalogRequestDTO dto) {
+        log.info("Updating FeeCatalog with id {} using DTO {}", id, dto);
+
+        // Fetch existing entity or throw exception
+        FeeCatalogEntity entity = feeCatalogRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new ResourceNotFoundException("FeeCatalog not found with id: " + id));
+
+        // Check for duplicates (code or name) excluding this entity itself
+        Optional<FeeCatalogEntity> existing = feeCatalogRepository.findByCodeOrNameIgnoreCase(dto.getCode(), dto.getName());
+        if (existing.isPresent() && !existing.get().getId().equals(id)) {
+            throw new ValidationException("FeeCatalog with code '" + dto.getCode() + "' or name '" + dto.getName() + "' already exists");
+        }
+        // Update fields if they are provided
+        if (dto.getCode() != null && !dto.getCode().isBlank()) {
+            entity.setCode(dto.getCode());
+        }
+
+        if (dto.getName() != null && !dto.getName().isBlank()) {
+            entity.setName(dto.getName());
+        }
+
+        if (dto.getDescription() != null) {
+            entity.setDescription(dto.getDescription());
+        }
+
+        if (dto.getChargeType() != null) {
+            entity.setChargeType(dto.getChargeType());
+        }
+
+        if (dto.getRecurrenceRule() != null) {
+            entity.setRecurrenceRule(dto.getRecurrenceRule());
+        }
+
+        entity.setActive(dto.getActive());
+
+        // Save updated entity
+        FeeCatalogEntity updated = feeCatalogRepository.save(entity);
+
+        // Map to DTO
+        FeeCatalogDTO response = toDto(updated);
+
+        log.info("FeeCatalog updated successfully: id={}", response.getId());
+        return response;
+    }
+
 }

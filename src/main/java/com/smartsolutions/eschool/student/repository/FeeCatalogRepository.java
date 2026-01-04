@@ -32,6 +32,13 @@ public interface FeeCatalogRepository extends JpaRepository<FeeCatalogEntity, Lo
     List<FeeCatalogEntity> searchFeeCatalog(@Param("keyword") String keyword);
 
 
+    @Query("SELECT fc FROM FeeCatalogEntity fc " +
+            "WHERE fc.deleted = false AND " +
+            "(LOWER(fc.code) = LOWER(:code) OR LOWER(fc.name) = LOWER(:name))")
+    Optional<FeeCatalogEntity> findByCodeOrNameIgnoreCase(
+            @Param("code") String code,
+            @Param("name") String name
+    );
 
 //    @Query("SELECT s FROM StudentEntity s " +
 //            "LEFT JOIN FETCH s.campus " +

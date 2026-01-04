@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.student.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
+import com.smartsolutions.eschool.student.dtos.feeCatalog.requestDto.FeeCatalogRequestDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
 import com.smartsolutions.eschool.student.facade.FeeCatelogFacade;
 import com.smartsolutions.eschool.student.facade.FeeFacade;
@@ -55,4 +56,26 @@ public class FeeCatalogController {
         log.info("GET /api/fee/catalog by keyword succeeded, returned {} resources", resources.size());
         return resources;
     }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createFeeCatalog(@RequestBody FeeCatalogRequestDTO feeCatalogDTO) {
+        log.info("POST /api/fee/catalogs called with payload: {}", feeCatalogDTO);
+        FeeCatalogDTO savedCatalog = feeCatalogFacade.save(feeCatalogDTO);
+        log.info("Fee Catalog created successfully with id={}", savedCatalog.getId());
+        return ResponseEntity.ok(savedCatalog);
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<FeeCatalogDTO> updateFeeCatalog(@PathVariable Long id, @RequestBody FeeCatalogRequestDTO feeCatalogDTO) {
+        log.info("PUT /api/fee/catalogs/{} called with {}", id, feeCatalogDTO);
+        try {
+            FeeCatalogDTO updatedCatalog = feeCatalogFacade.update(id, feeCatalogDTO);
+            log.info("Fee Catalog updated successfully with id={}", id);
+            return ResponseEntity.ok(updatedCatalog);
+        } catch (Exception e) {
+            log.error("Failed to update Fee Catalog with id={}", id, e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
 }
