@@ -3,7 +3,7 @@
 
 
 INSERT INTO system_users (username, email, phone, password_hash, is_active, is_verified)
-VALUES ('admin.user', 'admin@example.com', '03001234567',
+VALUES ('admin.user', 'admin@gmail.com', '03001234567',
         '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, TRUE),
 
        ('teacher.user', 'teacher@example.com', '03007654321',
@@ -342,7 +342,7 @@ VALUES
  'Excellence in Education',
  NULL,
  '2005-08-15',
- 1, 1, 1,
+ 98, 1, 1,
  NOW(), NOW());
 -- ============================================================
 -- Sample Data: Campuses

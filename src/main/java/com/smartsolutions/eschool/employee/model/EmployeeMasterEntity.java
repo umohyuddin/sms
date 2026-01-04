@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(
@@ -155,4 +156,15 @@ public class EmployeeMasterEntity extends AuditableEntity {
     // =========================
     @Column(name = "active", nullable = false)
     private Boolean active = true;
+
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<EmployeeDeductionEntity> deductions;
+
+    // Employee Advances (if you have an EmployeeAdvanceEntity)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<EmployeeAdvanceEntity> advances;
+    // Employee Salaries
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<EmployeeMasterSalary> salaries;
 }

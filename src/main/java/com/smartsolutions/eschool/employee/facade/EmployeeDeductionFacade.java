@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.employee.facade;
 
 import com.smartsolutions.eschool.employee.dtos.employeeDeduction.request.EmployeeDeductionRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeDeduction.response.EmployeeDeductionResponseDTO;
+import com.smartsolutions.eschool.employee.dtos.employeeDeduction.response.EmployeeWithDeductionsDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
@@ -50,5 +51,9 @@ public class EmployeeDeductionFacade {
 
     public void softDeleteDeduction(Long id) {
         deductionService.softDeleteDeduction(id);
+    }
+
+    public EmployeeWithDeductionsDTO getEmployeeWithDeductions(Long employeeId) {
+        return deductionService.getEmployeeWithDeductions(employeeId);
     }
 }

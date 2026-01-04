@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -101,8 +102,8 @@ public class SectionService {
         log.info("Fetching all sections by keyword: {}", keyword);
         List<SectionEntity> result = sectionRepository.searchSections(campusId, standardId, keyword);
         if (result.isEmpty()) {
-            log.warn("No sections found for keyword: {}", keyword);
-            throw new ResourceNotFoundException("No sections found matching: " + keyword);
+            log.info("No sections found for the given criteria.");
+            return Collections.emptyList(); // Return empty list instead of throwing exception
         }
         List<SectionDTO> sectionDTO = MapperUtil.mapList(result, SectionDTO.class);
         log.info("Successfully fetched {} sections", sectionDTO.size());

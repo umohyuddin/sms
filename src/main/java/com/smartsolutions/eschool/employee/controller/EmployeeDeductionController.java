@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.employee.controller;
 
 import com.smartsolutions.eschool.employee.dtos.employeeDeduction.request.EmployeeDeductionRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeDeduction.response.EmployeeDeductionResponseDTO;
+import com.smartsolutions.eschool.employee.dtos.employeeDeduction.response.EmployeeWithDeductionsDTO;
 import com.smartsolutions.eschool.employee.facade.EmployeeDeductionFacade;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
@@ -43,8 +44,7 @@ public class EmployeeDeductionController {
     // Update an existing deduction
     // -------------------------
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeDeductionResponseDTO> updateDeduction(@PathVariable Long id,
-                                                                        @Valid @RequestBody EmployeeDeductionRequestDTO requestDTO) {
+    public ResponseEntity<EmployeeDeductionResponseDTO> updateDeduction(@PathVariable Long id, @Valid @RequestBody EmployeeDeductionRequestDTO requestDTO) {
         log.info("PUT /api/institute/employees/deductions/{} called with {}", id, requestDTO);
         try {
             EmployeeDeductionResponseDTO response = deductionFacade.updateDeduction(id, requestDTO);
@@ -118,5 +118,12 @@ public class EmployeeDeductionController {
             log.error("Failed to delete deduction with id={}", id, e);
             return ResponseEntity.status(500).build();
         }
+    }
+
+    @GetMapping("/{employeeId}/deductions")
+    public ResponseEntity<EmployeeWithDeductionsDTO> getEmployeeWithDeductions(@PathVariable Long employeeId) {
+        log.info("GET /api/institute/employees/{}/deductions called", employeeId);
+        EmployeeWithDeductionsDTO response = deductionFacade.getEmployeeWithDeductions(employeeId);
+        return ResponseEntity.ok(response);
     }
 }

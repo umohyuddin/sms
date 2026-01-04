@@ -1,10 +1,10 @@
 package com.smartsolutions.eschool.lookups.controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
+import com.smartsolutions.eschool.Mocking.CampusServiceMocking;
+import com.smartsolutions.eschool.employee.dtos.EmployeeType.response.EmployeeTypeResponseDTO;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
+import com.smartsolutions.eschool.employee.facade.EmployeeTypeFacade;
 import com.smartsolutions.eschool.global.configs.*;
 import com.smartsolutions.eschool.lookups.dtos.DashboardCountsDTO;
 import com.smartsolutions.eschool.lookups.dtos.DashboardFinancialDTO;
@@ -15,15 +15,9 @@ import com.smartsolutions.eschool.lookups.facade.CityFacade;
 import com.smartsolutions.eschool.lookups.facade.CountryFacade;
 import com.smartsolutions.eschool.lookups.facade.LookUpFacade;
 import com.smartsolutions.eschool.lookups.facade.ProvinceFacade;
-import com.smartsolutions.eschool.lookups.service.CityService;
-import com.smartsolutions.eschool.lookups.service.CountryService;
+import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.facade.DashboardFacade;
-import com.smartsolutions.eschool.school.facade.DiscountTypeFacade;
-import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
-import com.smartsolutions.eschool.util.ResourceObject;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LookUpController {
 
+    private final CampusServiceMocking service;
     private final CountryFacade countryFacade;
     private final ReligionConfig religionConfig;
     private final FeeConfig feeConfig;
@@ -49,8 +44,10 @@ public class LookUpController {
     private final EmployeeDocumentConfig employeeDocumentConfig;
     private final EmployeeMasterFacade employeeFacade;
     private final LookUpFacade lookUpFacade;
+    private final EmployeeTypeFacade employeeTypeFacade;
 
-    public LookUpController(CountryFacade countryFacade, ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade, DashboardFacade dashboardFacade, LookUpFacade lookUpFacade) {
+    public LookUpController(CampusServiceMocking service, CountryFacade countryFacade, ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade, DashboardFacade dashboardFacade, LookUpFacade lookUpFacade, EmployeeTypeFacade employeeTypeFacade) {
+        this.service = service;
         this.countryFacade = countryFacade;
         this.religionConfig = religionConfig;
         this.feeConfig = feeConfig;
@@ -62,6 +59,7 @@ public class LookUpController {
         this.employeeDocumentConfig = employeeDocumentConfig;
         this.employeeFacade = employeeFacade;
         this.lookUpFacade = lookUpFacade;
+        this.employeeTypeFacade = employeeTypeFacade;
     }
 
 
@@ -154,11 +152,18 @@ public class LookUpController {
     @GetMapping("/docs/metadata")
     public Map<String, Object> getDocsMeta() {
         List<CountryResponseDTO> countriesList = countryFacade.getAll();
+        List<EmployeeTypeResponseDTO> employeeTypeResponseDTOS = employeeTypeFacade.getAll();
 
         Map<String, String> countries = countriesList.stream()
                 .collect(Collectors.toMap(
                         item -> String.valueOf(item.getId()),
                         CountryResponseDTO::getCountryName
+                ));
+
+        Map<String, String> systemEmployeeType = employeeTypeResponseDTOS.stream()
+                .collect(Collectors.toMap(
+                        item -> String.valueOf(item.getId()),
+                        EmployeeTypeResponseDTO::getName
                 ));
 
         Map<String, Object> result = new HashMap<>();
@@ -173,7 +178,9 @@ public class LookUpController {
         result.put("religions", religionConfig.getList());
         result.put("nationalities", nationalityConfig.getMap());
         result.put("countries", countries);
+        //need to change this conflicting with employee type
         result.put("employmentType",employeeDocumentConfig.getEmploymentTypes());
+        result.put("systemEmployeeType",systemEmployeeType);
         return result;
     }
 
@@ -194,5 +201,11 @@ public class LookUpController {
                 "gender", genderConfig.getList(),
                 "provinces", provinces, "docs", employeeDocumentConfig.getDocumentTypes());
     }
+
+    @GetMapping("mocking/{id}")
+    public CampusResponseDTO getCampus(@PathVariable String id) {
+        return service.getCampus(id);
+    }
+
 }
 

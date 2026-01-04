@@ -41,5 +41,15 @@ public interface EmployeeDeductionRepository extends JpaRepository<EmployeeDeduc
     @Modifying
     @Query("UPDATE EmployeeDeductionEntity e SET e.deleted = true WHERE e.id = :id")
     void softDeleteById(Long id);
+
+    @Query("""
+                SELECT e 
+                FROM EmployeeMasterEntity e
+                LEFT JOIN FETCH e.deductions d
+                WHERE e.id = :employeeId
+                  AND (d.deleted = false OR d IS NULL)
+            """)
+    Optional<EmployeeMasterEntity> findEmployeeWithActiveDeductions(@Param("employeeId") Long employeeId);
+
 }
 
