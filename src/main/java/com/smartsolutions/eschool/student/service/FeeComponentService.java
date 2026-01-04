@@ -119,7 +119,7 @@ public class FeeComponentService {
         }
 
         if (dto.getDiscountable() != null) {
-            entity.setActive(dto.getDiscountable());
+            entity.setDiscountable(dto.getDiscountable());
         }
 
         // Update Fee Catalog association if provided
