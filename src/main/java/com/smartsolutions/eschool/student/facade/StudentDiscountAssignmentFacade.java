@@ -82,6 +82,11 @@ public class StudentDiscountAssignmentFacade {
         return studentDiscountService.markAsInactive(assignmentId);
     }
 
+    public List<StudentDiscountAssignmentResponseDTO> getAssignedDiscountsForStudent(Long studentId, Long academicYearId) {
+        // Delegate to service method
+        return studentDiscountService.getAssignedDiscount(studentId, academicYearId);
+    }
+
 //    // -------------------------------------------------------------------------
 //    // SEARCH
 //    // -------------------------------------------------------------------------

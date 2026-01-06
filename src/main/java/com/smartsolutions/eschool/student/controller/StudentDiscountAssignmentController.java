@@ -48,6 +48,16 @@ public class StudentDiscountAssignmentController {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("/{studentId}/assigned")
+    public ResponseEntity<List<StudentDiscountAssignmentResponseDTO>> getAssignedDiscounts(@PathVariable Long studentId, @RequestParam Long academicYearId) {
+        log.info("GET /api/school/discounts/student/{}/assigned?academicYearId={} called", studentId, academicYearId);
+
+        List<StudentDiscountAssignmentResponseDTO> assignedDiscounts = studentDiscountFacade.getAssignedDiscountsForStudent(studentId, academicYearId);
+
+        log.info("Returned {} assigned discounts for student {}", assignedDiscounts.size(), studentId);
+        return ResponseEntity.ok(assignedDiscounts);
+    }
+
     // -------------------------------------------------------------------------
     // GET BY ID
     // -------------------------------------------------------------------------

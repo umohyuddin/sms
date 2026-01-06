@@ -44,6 +44,17 @@ public class StudentFeeAssignmentService {
         this.studentDiscountAssignmentService = studentDiscountAssignmentService;
     }
 
+
+    public boolean isFeeAssigned(Long studentId, Long academicYearId) {
+        try {
+            boolean exists = studentFeeAssignmentRepository.isFeeAssigned(studentId, academicYearId);
+            log.info("Fee assigned check for studentId={} and academicYearId={}: {}", studentId, academicYearId, exists);
+            return exists;
+        } catch (Exception e) {
+            log.error("Error checking fee assignment for studentId={} and academicYearId={}", studentId, academicYearId, e);
+            throw new RuntimeException("Failed to check fee assignment.", e);
+        }
+    }
     @Transactional
     public StudentFeeSummaryDTO assignStudentFee(Long studentId, @Valid StudentFeeAssignmentRequestDTO dto) {
         log.info("Assigning fees to studentId={} for academicYearId={} with components={}", studentId, dto.getAcademicYearId(), dto.getComponentIds());
@@ -53,6 +64,10 @@ public class StudentFeeAssignmentService {
                 log.error("Student with id {} not found", studentId);
                 return new ResourceNotFoundException("Student not found with id " + studentId);
             });
+            // Fetch academic year
+            AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId()).orElseThrow(() -> new ResourceNotFoundException("Academic year not found with id " + dto.getAcademicYearId()));
+
+            long totalMonths = academicYear.getTotalMonths();
 
             // Fetch fee rates
             List<FeeRateEntity> feeRates = feeRateRepository.findApplicableFeeRatesForStudent(dto.getComponentIds(), dto.getCampusId(), dto.getStandardId(), dto.getAcademicYearId());
@@ -67,12 +82,17 @@ public class StudentFeeAssignmentService {
                 StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
                 assignment.setStudent(student);
                 assignment.setFeeRate(feeRate);
-                assignment.setTotalAmount(feeRate.getAmount().doubleValue());
+
+                // Calculate total amount based on recurrence
+                String recurrenceRule = feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule();
+                double baseAmount = feeRate.getAmount().doubleValue();
+                double totalAmount = baseAmount * getRecurrenceMultiplier(recurrenceRule, (int) totalMonths);
+
+                assignment.setTotalAmount(totalAmount);
                 assignment.setAssignedDate(LocalDate.now());
                 assignment.setDueDate(dto.getDueDate());
                 return assignment;
             }).collect(Collectors.toList());
-
             List<StudentFeeAssignmentEntity> savedAssignments = studentFeeAssignmentRepository.saveAll(assignments);
             log.info("Saved {} fee assignments for studentId={}", savedAssignments.size(), studentId);
 
@@ -131,6 +151,7 @@ public class StudentFeeAssignmentService {
                 throw new ResourceNotFoundException("No fee assignments found for studentId={" + studentId + "} and academicYearId={" + academicYearId + "}");
             }
 
+
             StudentEntity student = assignments.get(0).getStudent();
 
             List<FeeAssignmentDTO> feeList = assignments.stream().map(sf -> {
@@ -161,14 +182,36 @@ public class StudentFeeAssignmentService {
     }
 
     public Double getTotalFeeAssigned(Long academicYearId) {
-        if(academicYearId == null) {
+        if (academicYearId == null) {
             // Fetch academic year
             AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> {
                 log.error("Current academic year not found");
                 return new ResourceNotFoundException("Current academic year not found");
             });
-            academicYearId =currentYear.getId();
+            academicYearId = currentYear.getId();
         }
         return studentFeeAssignmentRepository.getTotalFeeAssigned(academicYearId);
     }
+
+    public int getRecurrenceMultiplier(String rule, int totalMonths) {
+        if (rule == null) return 1;
+
+        switch (rule.toUpperCase()) {
+            case "ONE_TIME":
+                return 1;
+            case "MONTHLY":
+                return totalMonths; // usually 12 or as per AcademicYearEntity
+            case "BI_MONTHLY":
+                return totalMonths / 2; // every 2 months
+            case "QUARTERLY":
+                return totalMonths / 4; // every 3 months
+            case "HALF_YEARLY":
+                return totalMonths / 2; // 2 times a year
+            case "YEARLY":
+                return 1;
+            default:
+                return 1; // fallback to 1
+        }
+    }
+
 }

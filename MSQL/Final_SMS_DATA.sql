@@ -273,3 +273,33 @@ INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, 
 (7, 'Mirpur', 'MIR', TRUE, 1, 1, NOW()),
 (7, 'Kotli', 'KOT', TRUE, 1, 1, NOW());
 
+
+-- ============================================================
+-- Sample Data: Admission Types
+-- This section populates the 'admission_type' table with a
+-- predefined list of admission categories typically used in
+-- school management systems. These records are intended to
+-- standardize the process of student enrollment, fee
+-- management, and reporting across different modules such as
+-- student registration, class assignment, scholarship
+-- management, and special programs.
+-- ============================================================
+
+
+INSERT INTO admission_type (code, name, description, is_active)
+VALUES ('NEW_ADMISSION', 'New Admission / Fresh Admission', 'Student joining the school for the first time.', TRUE),
+       ('TRANSFER', 'Transfer Admission', 'Student transferring from another school.', TRUE),
+       ('READMISSION', 'Re-admission / Returning Student', 'Student returning after leaving the school.', TRUE),
+       ('LATERAL_ENTRY', 'Lateral Entry / Direct Admission', 'Student joining a higher grade directly.', TRUE),
+       ('SCHOLARSHIP', 'Scholarship / Concession Admission', 'Admission with full or partial fee waiver.', TRUE),
+       ('MANAGEMENT', 'Management / Special Admission', 'Admission under management quota.', TRUE),
+       ('EARLY', 'Early Admission', 'Admission before the academic session starts.', TRUE),
+       ('LATE', 'Late Admission', 'Admission after the academic session has started.', TRUE),
+       ('INTERNATIONAL', 'International / Expat Admission', 'Students from foreign countries.', TRUE),
+       ('SPECIAL_NEEDS', 'Special Needs Admission', 'Students requiring special assistance.', TRUE),
+       ('ONLINE', 'Online / Distance Learning Admission', 'Admission for online programs.', TRUE),
+       ('SIBLING', 'Sibling Admission', 'Admission given when a sibling is already enrolled.', TRUE),
+       ('STAFF_WARD', 'Staff / Employee Ward Admission', 'Children of school staff may get special consideration.',
+        TRUE),
+       ('MERIT', 'Merit-based Admission', 'Admission based purely on exam/test performance.', TRUE),
+       ('MID_YEAR', 'Late Entry Mid-Year', 'Students joining mid-session due to relocation or other reasons.', TRUE);

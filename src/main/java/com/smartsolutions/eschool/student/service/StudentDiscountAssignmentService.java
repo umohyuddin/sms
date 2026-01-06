@@ -21,6 +21,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -91,8 +93,8 @@ public class StudentDiscountAssignmentService {
 //            entity.setAcademicYear(academicYear);
 
             log.info("Successfully assigned discount, id: {}", entity.getId());
-
-            return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
+            return mapToResponseDto(entity);
+            //return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while assigning discount", dae);
             throw new CustomServiceException("Failed to assign discount due to database error");
@@ -184,4 +186,65 @@ public class StudentDiscountAssignmentService {
 //        List<StudentDiscountAssignmentEntity> result = assignmentRepository.searchByKeyword(keyword);
 //        return MapperUtil.mapList(result, StudentDiscountResponseDTO.class);
 //    }
+
+    @Transactional(readOnly = true)
+    public List<StudentDiscountAssignmentResponseDTO> getAssignedDiscount(Long studentId, Long academicYearId) {
+        try {
+            // Fetch all discount assignments for the student & academic year
+            List<StudentDiscountAssignmentEntity> assignments = assignmentRepository.findByStudentAndAcademicYear(studentId, academicYearId); // returns empty list if none
+            return assignments.stream().map(this::mapToResponseDto).toList();
+        } catch (Exception e) {
+            log.error("Error fetching assigned discount for studentId={} and academicYearId={}", studentId, academicYearId, e);
+            throw new CustomServiceException("Failed to fetch assigned discount");
+        }
+    }
+
+    private StudentDiscountAssignmentResponseDTO mapToResponseDto(StudentDiscountAssignmentEntity sda) {
+        StudentDiscountAssignmentResponseDTO dto = new StudentDiscountAssignmentResponseDTO();
+        dto.setId(sda.getId());
+        dto.setStudentId(sda.getStudent().getId());
+        dto.setStudentName(sda.getStudent().getFirstName() + " " + sda.getStudent().getLastName());
+
+        dto.setAppliedAmount(sda.getAppliedAmount());
+        dto.setAppliedPercentage(sda.getAppliedPercentage());
+        dto.setAssignmentActive(sda.getIsActive());
+        dto.setReason(sda.getReason());
+        dto.setCreatedAt(sda.getCreatedAt());
+
+        // ===== Campus =====
+        dto.setCampusId(sda.getCampus().getId());
+
+        // ===== Academic Year =====
+        dto.setAcademicYearId(sda.getAcademicYear().getId());
+        dto.setAcademicYearName(sda.getAcademicYear().getName());
+
+        // ===== Discount Rate =====
+        var discountRate = sda.getDiscountRate();
+        dto.setDiscountRateId(discountRate.getId());
+        dto.setDiscountValue(discountRate.getValue());
+        dto.setIsPercentage(discountRate.getIsPercentage());
+        dto.setEffectiveFrom(discountRate.getEffectiveFrom());
+        dto.setEffectiveTo(discountRate.getEffectiveTo());
+        dto.setDiscountRateActive(discountRate.getIsActive());
+
+        // ===== Discount Sub Type =====
+        var subType = discountRate.getDiscountSubType();
+        dto.setDiscountSubTypeId(subType.getId());
+        dto.setDiscountSubTypeCode(subType.getCode());
+        dto.setDiscountSubTypeName(subType.getName());
+        dto.setDiscountSubTypeDisplayOrder(subType.getDisplayOrder());
+
+        // ===== Discount Type =====
+        var type = subType.getDiscountType();
+        dto.setDiscountTypeId(type.getId());
+        dto.setDiscountTypeCode(type.getCode());
+        dto.setDiscountTypeName(type.getName());
+        dto.setChargeType(type.getChargeType());
+        dto.setDiscountTypePriority(type.getPriority());
+        dto.setDiscountTypeDisplayOrder(type.getDisplayOrder());
+
+        return dto;
+    }
+
+
 }

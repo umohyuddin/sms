@@ -33,5 +33,9 @@ private StudentFeeAssignmentService studentFeeAssignmentService;
         return studentFeeAssignmentService.getTotalFeeAssigned(academicYearId);
     }
 
+    public boolean hasAssignedFees(Long studentId, Long academicYearId) {
+        return studentFeeAssignmentService.isFeeAssigned(studentId, academicYearId);
+    }
+
 }
 

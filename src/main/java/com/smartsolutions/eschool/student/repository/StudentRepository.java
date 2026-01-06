@@ -24,13 +24,24 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
             "WHERE s.id = :id AND s.deleted = false")
     Optional<StudentEntity> findByIdAndDeletedFalse(Long id);
 
+//
+//    @Query("SELECT s FROM StudentEntity s " +
+//            "LEFT JOIN FETCH s.campus " +
+//            "LEFT JOIN FETCH s.standard " +
+//            "LEFT JOIN FETCH s.section " +
+//            "LEFT JOIN FETCH s.feeAssignments fa " +
+//            "WHERE s.deleted = false")
+//    List<StudentEntity> findByDeletedFalse();
 
-    @Query("SELECT s FROM StudentEntity s " +
-            "LEFT JOIN FETCH s.campus " +
-            "LEFT JOIN FETCH s.standard " +
-            "LEFT JOIN FETCH s.section " +
-            "WHERE s.deleted = false")
-    List<StudentEntity> findByDeletedFalse();
+        @Query("SELECT DISTINCT s FROM StudentEntity s " +
+                "LEFT JOIN FETCH s.campus " +
+                "LEFT JOIN FETCH s.standard " +
+                "LEFT JOIN FETCH s.section " +
+                "LEFT JOIN FETCH s.feeAssignments fa " +
+                "LEFT JOIN FETCH fa.feeRate fr " +
+                "LEFT JOIN FETCH fr.feeComponent fc " +
+                "WHERE s.deleted = false AND (fr.academicYear.id = :academicYearId OR fr.academicYear.id IS NULL)")
+        List<StudentEntity> findAllWithAssignments(@Param("academicYearId") Long academicYearId);
 
     @Query("SELECT s FROM StudentEntity s " +
             "LEFT JOIN FETCH s.campus " +

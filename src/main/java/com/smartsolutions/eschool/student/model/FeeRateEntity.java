@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "fee_rates")
+@Table(name = "fee_rates", uniqueConstraints = {@UniqueConstraint(columnNames = {"fee_component_id", "campus_id", "standard_id", "academic_year_id"})})
 @Getter
 @Setter
 @NoArgsConstructor

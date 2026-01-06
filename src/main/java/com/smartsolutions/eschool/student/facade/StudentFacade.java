@@ -5,6 +5,7 @@ import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
+import com.smartsolutions.eschool.student.service.StudentFeeAssignmentService;
 import com.smartsolutions.eschool.student.service.StudentService;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,9 +24,12 @@ public class StudentFacade {
     private final GenderConfig genderConfig;
     private Set<String> genderKeys;
 
-    public StudentFacade(StudentService studentService, GenderConfig genderConfig) {
+    private StudentFeeAssignmentService studentFeeAssignmentService;
+
+    public StudentFacade(StudentService studentService, GenderConfig genderConfig, StudentFeeAssignmentService studentFeeAssignmentService) {
         this.studentService = studentService;
         this.genderConfig = genderConfig;
+        this.studentFeeAssignmentService = studentFeeAssignmentService;
         genderKeys = this.genderConfig.getList().keySet();
     }
 

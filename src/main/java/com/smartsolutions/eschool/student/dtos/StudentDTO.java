@@ -33,6 +33,7 @@ public class StudentDTO {
     private LocalDate enrollmentDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean feeAssigned;
 
     // Relationships
     private CampusResponseDTO campus;
@@ -41,4 +42,5 @@ public class StudentDTO {
     private Long campusId;
     private Long standardId;
     private Long sectionId;
+    private Long academicYearId;
 }

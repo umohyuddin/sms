@@ -15,6 +15,7 @@ public class FeeConfig {
 
     private Map<String, String> chargeTypes;
     private Map<String, String> recurrenceRules;
+    private Map<String, String> discountTypes;
 
     public Map<String, String> getChargeTypes() {
         return chargeTypes;
@@ -30,5 +31,12 @@ public class FeeConfig {
 
     public void setRecurrenceRules(Map<String, String> recurrenceRules) {
         this.recurrenceRules = recurrenceRules;
+    }
+    public Map<String, String> getDiscountTypes() {
+        return discountTypes;
+    }
+
+    public void setDiscountTypes(Map<String, String> discountTypes) {
+        this.discountTypes = discountTypes;
     }
 }

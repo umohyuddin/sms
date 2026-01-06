@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "student_fee_summary")
+@Table(name = "student_fee_summary", uniqueConstraints = {@UniqueConstraint(columnNames = {"student_id", "academic_year_id"})})
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

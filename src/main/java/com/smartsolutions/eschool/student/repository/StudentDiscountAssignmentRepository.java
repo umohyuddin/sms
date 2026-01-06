@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface StudentDiscountAssignmentRepository extends JpaRepository<StudentDiscountAssignmentEntity, Long> {
@@ -58,6 +59,24 @@ public interface StudentDiscountAssignmentRepository extends JpaRepository<Stude
     @Query("UPDATE StudentDiscountAssignmentEntity sda SET sda.isActive = false WHERE sda.id = :id")
     int markAsInactive(@Param("id") Long id);
 
+
+    @Query("""
+        SELECT sda
+        FROM StudentDiscountAssignmentEntity sda
+        JOIN FETCH sda.student st
+        JOIN FETCH sda.campus c
+        JOIN FETCH sda.discountRate dr
+        JOIN FETCH dr.discountSubType dst
+        JOIN FETCH dst.discountType dt
+        JOIN FETCH sda.academicYear ay
+        WHERE st.id = :studentId
+          AND ay.id = :academicYearId
+          AND sda.deleted = false
+    """)
+    List<StudentDiscountAssignmentEntity> findByStudentAndAcademicYear(
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId
+    );
 //    // -------------------------------------------------------------------------
 //    // SEARCH BY KEYWORD (STUDENT NAME, CODE, OR OTHER FIELDS)
 //    // -------------------------------------------------------------------------

@@ -96,6 +96,9 @@ public interface FeeRateRepository extends JpaRepository<FeeRateEntity, Long> {
             @Param("feeComponentId") Long feeComponentId,
             @Param("keyword") String keyword
     );
+
+
+
 }
 
 

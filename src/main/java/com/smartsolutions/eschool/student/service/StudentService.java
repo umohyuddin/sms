@@ -58,10 +58,14 @@ public class StudentService {
     public List<StudentDTO> getAll() {
         try {
             log.info("Fetching all Students from database");
-            List<StudentEntity> result = studentRepository.findByDeletedFalse();
+
+            AcademicYearEntity academicYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
+
+            List<StudentEntity> result = studentRepository.findAllWithAssignments(academicYear.getId());
+            result.forEach(StudentEntity::calculateFeeAssigned);
+
             log.info("Successfully fetched {} Students", result.size());
             List<StudentDTO> studentDTOList = MapperUtil.mapList(result, StudentDTO.class);
-            //List<StudentDTO> studentDTOList = studentMapper.toDTOList(result);
             log.info("Successfully fetched {} Students", studentDTOList);
             return studentDTOList;
         } catch (DataAccessException dae) {

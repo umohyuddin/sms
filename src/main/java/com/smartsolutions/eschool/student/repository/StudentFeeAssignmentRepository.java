@@ -13,6 +13,12 @@ import java.util.List;
 @Repository
 public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFeeAssignmentEntity, Long> {
 
+    @Query("SELECT CASE WHEN COUNT(sfa) > 0 THEN true ELSE false END " +
+            "FROM StudentFeeAssignmentEntity sfa " +
+            "WHERE sfa.student.id = :studentId " +
+            "AND sfa.feeRate.academicYear.id = :academicYearId")
+        boolean isFeeAssigned(@Param("studentId") Long studentId,
+                          @Param("academicYearId") Long academicYearId);
 
     @Query("""
                 SELECT COALESCE(SUM(a.totalAmount), 0)

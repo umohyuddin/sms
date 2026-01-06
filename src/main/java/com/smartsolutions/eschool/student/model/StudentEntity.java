@@ -125,4 +125,11 @@ public class StudentEntity {
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<StudentFeeSummaryEntity> feeSummaries;
+
+    @Transient
+    private Boolean feeAssigned;
+
+    public void calculateFeeAssigned() {
+        this.feeAssigned = feeAssignments != null && !feeAssignments.isEmpty();
+    }
 }

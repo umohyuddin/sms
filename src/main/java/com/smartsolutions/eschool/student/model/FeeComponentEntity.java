@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "fee_component")
+@Table(name = "fee_component", uniqueConstraints = {@UniqueConstraint(columnNames = {"fee_catalog_id", "component_code"})})
 @Getter
 @Setter
 @NoArgsConstructor

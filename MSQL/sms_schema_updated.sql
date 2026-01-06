@@ -371,6 +371,7 @@ CREATE TABLE student_fee_assignments
     CONSTRAINT fk_sfa_student FOREIGN KEY (student_id) REFERENCES students (id),
     CONSTRAINT fk_sfa_fee_rate FOREIGN KEY (fee_rate_id) REFERENCES fee_rates (id)
 );
+ALTER TABLE student_fee_assignments ADD CONSTRAINT uq_student_fee_unique UNIQUE (student_id, fee_rate_id);
 
 
 DROP TABLE IF EXISTS student_fee_payments;
@@ -407,6 +408,7 @@ CREATE TABLE student_fee_summary
     CONSTRAINT fk_Student_fee_academic_year
         FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );
+ALTER TABLE student_fee_summary ADD CONSTRAINT uq_student_fee_summary UNIQUE (student_id, academic_year_id);
 
 DROP TABLE IF EXISTS discount_type;
 CREATE TABLE discount_type
@@ -544,7 +546,7 @@ CREATE TABLE student_discount_assignment
     CONSTRAINT fk_sda_rate FOREIGN KEY (discount_rate_id) REFERENCES discount_rate (id),
     CONSTRAINT fk_sda_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );
-
+ALTER TABLE student_discount_assignment ADD CONSTRAINT uq_student_discount_unique UNIQUE (student_id, discount_rate_id, academic_year_id);
 
 CREATE TABLE system_users
 (

@@ -145,7 +145,9 @@ public class LookUpController {
 
     @GetMapping("/fee-catalog/metadata")
     public Map<String, Map<String, String>> getFeeMeta() {
-        return Map.of("chargeTypes", feeConfig.getChargeTypes(), "recurrenceRules", feeConfig.getRecurrenceRules());
+        return Map.of("chargeTypes", feeConfig.getChargeTypes(),
+                "recurrenceRules", feeConfig.getRecurrenceRules(),
+                "discountChargeTypes", feeConfig.getDiscountTypes());
     }
 
 
@@ -179,17 +181,15 @@ public class LookUpController {
         result.put("nationalities", nationalityConfig.getMap());
         result.put("countries", countries);
         //need to change this conflicting with employee type
-        result.put("employmentType",employeeDocumentConfig.getEmploymentTypes());
-        result.put("systemEmployeeType",systemEmployeeType);
+        result.put("employmentType", employeeDocumentConfig.getEmploymentTypes());
+        result.put("systemEmployeeType", systemEmployeeType);
         return result;
     }
-
 
 
     @GetMapping("/admission/metadata")
     public Map<String, Map<String, String>> getAdmissionMeta() {
         List<ProvinceResponseDTO> provincesList = provinceFacade.getAll();
-
 
 
         Map<String, String> provinces = provincesList.stream().collect(Collectors.toMap(province -> String.valueOf(province.getId()), // convert Long to String
