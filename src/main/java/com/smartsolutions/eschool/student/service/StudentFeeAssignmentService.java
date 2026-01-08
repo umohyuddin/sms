@@ -7,6 +7,7 @@ import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeeAssignmentRe
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.byStudentId.FeeAssignmentDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.byStudentId.StudentFeeAssignmentsResponseDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentFeeAssignmentFlatDTO;
 import com.smartsolutions.eschool.student.dtos.studentDiscountAssignment.requestDto.StudentDiscountAssignmentRequestDTO;
 import com.smartsolutions.eschool.student.model.FeeRateEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
@@ -141,6 +142,99 @@ public class StudentFeeAssignmentService {
         }
     }
 
+    @Transactional
+    public StudentFeeSummaryDTO updateStudentFee(Long studentId, @Valid StudentFeeAssignmentRequestDTO dto) {
+        log.info("Updating fees for studentId={} for academicYearId={} with components={}",
+                studentId, dto.getAcademicYearId(), dto.getComponentIds());
+
+        try {
+            // Fetch student
+            StudentEntity student = studentRepository.findById(studentId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Student not found with id " + studentId));
+
+            // Fetch academic year
+            AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Academic year not found with id " + dto.getAcademicYearId()));
+
+            long totalMonths = academicYear.getTotalMonths();
+
+            // Fetch existing assignments for the student and academic year
+            List<StudentFeeAssignmentEntity> existingAssignments = studentFeeAssignmentRepository
+                    .findAssignedFeesForStudentAndYear(studentId, dto.getAcademicYearId());
+
+            // Delete or adjust existing assignments if needed
+            if (!existingAssignments.isEmpty()) {
+                log.info("Deleting {} existing assignments for studentId={}", existingAssignments.size(), studentId);
+                studentFeeAssignmentRepository.deleteAll(existingAssignments);
+            }
+
+            // Fetch fee rates for update
+            List<FeeRateEntity> feeRates = feeRateRepository.findApplicableFeeRatesForStudent(
+                    dto.getComponentIds(), dto.getCampusId(), dto.getStandardId(), dto.getAcademicYearId());
+
+            if (feeRates.isEmpty()) {
+                log.warn("No fee rates found for studentId={} and academicYearId={}", studentId, dto.getAcademicYearId());
+                throw new ResourceNotFoundException("No fee rates available for the given criteria");
+            }
+
+            // Map fee rates to new assignments
+            List<StudentFeeAssignmentEntity> updatedAssignments = feeRates.stream().map(feeRate -> {
+                StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
+                assignment.setStudent(student);
+                assignment.setFeeRate(feeRate);
+
+                String recurrenceRule = feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule();
+                double baseAmount = feeRate.getAmount().doubleValue();
+                double totalAmount = baseAmount * getRecurrenceMultiplier(recurrenceRule, (int) totalMonths);
+
+                assignment.setTotalAmount(totalAmount);
+                assignment.setAssignedDate(LocalDate.now());
+                assignment.setDueDate(dto.getDueDate());
+                return assignment;
+            }).collect(Collectors.toList());
+
+            List<StudentFeeAssignmentEntity> savedAssignments = studentFeeAssignmentRepository.saveAll(updatedAssignments);
+            log.info("Saved {} updated fee assignments for studentId={}", savedAssignments.size(), studentId);
+
+            // Update summary
+            Double totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId());
+
+            StudentFeeSummaryEntity summary = studentFeeSummaryRepository.findByStudentId(studentId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Fee summary not found for studentId " + studentId));
+
+            summary.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
+            summary.setBalance(summary.getTotalAssignedFee().subtract(summary.getTotalPaid()));
+
+            StudentFeeSummaryEntity savedSummary = studentFeeSummaryRepository.save(summary);
+            log.info("Updated StudentFeeSummaryEntity for studentId={} with totalAssignedFee={}", studentId, savedSummary.getTotalAssignedFee());
+
+            // ====== Handle discount assignment update ======
+            StudentDiscountAssignmentRequestDTO discountRequest = new StudentDiscountAssignmentRequestDTO();
+            discountRequest.setStudentId(studentId);
+            discountRequest.setCampusId(dto.getCampusId());
+            discountRequest.setDiscountRateId(dto.getDiscountComponentId());
+            discountRequest.setAcademicYearId(dto.getAcademicYearId());
+
+            if (dto.getDiscountComponentId() != null) {
+                log.info("Updating discount for studentId={} with discountComponentId={}", studentId, dto.getDiscountComponentId());
+                studentDiscountAssignmentService.updateDiscount(discountRequest); // can handle update internally
+            }else { log.info("No discount selected, deleting existing discount for studentId={} and academicYearId={}", studentId, dto.getAcademicYearId());
+
+            // delete existing discount if any
+            studentDiscountAssignmentService.deleteDiscount(studentId, dto.getAcademicYearId(), dto.getCampusId());
+        }
+
+            return MapperUtil.mapObject(savedSummary, StudentFeeSummaryDTO.class);
+
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to update fees for studentId={}", studentId, e);
+            throw new RuntimeException("Failed to update fees. Transaction rolled back.", e);
+        }
+    }
+
+
     public StudentFeeAssignmentsResponseDTO getFeeAssignmentByStudentId(Long studentId, Long academicYearId) {
         try {
             // Fetch assignments from repository
@@ -213,5 +307,84 @@ public class StudentFeeAssignmentService {
                 return 1; // fallback to 1
         }
     }
+
+
+    public List<StudentFeeAssignmentFlatDTO> getAssignedFeesForStudent(Long studentId, Long academicYearId) {
+        try {
+            // Fetch assignments using repository with JOIN FETCH for all related entities
+            List<StudentFeeAssignmentEntity> assignments =
+                    studentFeeAssignmentRepository.findAssignedFeesForStudentAndYear(studentId, academicYearId);
+
+            if (assignments.isEmpty()) {
+                log.warn("No fee assignments found for studentId={} and academicYearId={}", studentId, academicYearId);
+                return List.of();
+            }
+
+            // Map entities to flat DTOs
+            return assignments.stream()
+                    .map(this::toFlatDTO)
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.error("Failed to fetch assigned fees for studentId={} and academicYearId={}", studentId, academicYearId, e);
+            throw new RuntimeException("Error fetching assigned student fees", e);
+        }
+    }
+
+    public StudentFeeAssignmentFlatDTO toFlatDTO(StudentFeeAssignmentEntity assignment) {
+        if (assignment == null) return null;
+
+        var student = assignment.getStudent();
+        var feeRate = assignment.getFeeRate();
+        var feeComponent = feeRate.getFeeComponent();
+        var feeCatalog = feeComponent.getFeeCatalog();
+
+        return StudentFeeAssignmentFlatDTO.builder()
+                // Student
+                .studentId(student.getId())
+                .studentCode(student.getStudentCode())
+                .fullName(student.getFullName())
+                .firstName(student.getFirstName())
+                .lastName(student.getLastName())
+                .email(student.getEmail())
+                .phone(student.getPhone())
+                .campusId(student.getCampus() != null ? student.getCampus().getId() : null)
+                .campusName(student.getCampus() != null ? student.getCampus().getCampusName() : null)
+                .standardId(student.getStandard() != null ? student.getStandard().getId() : null)
+                .standardName(student.getStandard() != null ? student.getStandard().getStandardName() : null)
+                .sectionId(student.getSection() != null ? student.getSection().getId() : null)
+                .sectionName(student.getSection() != null ? student.getSection().getSectionName(): null)
+                .academicYearId(student.getAcademicYear() != null ? student.getAcademicYear().getId() : null)
+                .academicYearName(student.getAcademicYear() != null ? student.getAcademicYear().getName() : null)
+
+                // Assignment
+                .assignmentId(assignment.getId())
+                .totalAmount(assignment.getTotalAmount())
+                .assignedDate(assignment.getAssignedDate())
+                .dueDate(assignment.getDueDate())
+
+                // Fee Rate
+                .feeRateId(feeRate.getId())
+                .feeAmount(feeRate.getAmount())
+                .currency(feeRate.getCurrency())
+                .feeEffectiveFrom(feeRate.getEffectiveFrom())
+                .feeEffectiveTo(feeRate.getEffectiveTo())
+
+                // Fee Component
+                .feeComponentId(feeComponent.getId())
+                .feeComponentCode(feeComponent.getComponentCode())
+                .feeComponentName(feeComponent.getComponentName())
+                .discountable(feeComponent.isDiscountable())
+                .taxable(feeComponent.isTaxable())
+
+                // Fee Catalog
+                .feeCatalogId(feeCatalog.getId())
+                .feeCatalogCode(feeCatalog.getCode())
+                .feeCatalogName(feeCatalog.getName())
+                .feeCatalogChargeType(feeCatalog.getChargeType())
+                .feeCatalogRecurrenceRule(feeCatalog.getRecurrenceRule())
+                .build();
+    }
+
 
 }

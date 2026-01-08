@@ -77,6 +77,16 @@ public interface StudentDiscountAssignmentRepository extends JpaRepository<Stude
             @Param("studentId") Long studentId,
             @Param("academicYearId") Long academicYearId
     );
+
+    @Query("SELECT s FROM StudentDiscountAssignmentEntity s " +
+            "WHERE s.student.id = :studentId " +
+            "AND s.academicYear.id = :academicYearId " +
+            "AND s.campus.id = :campusId " +
+            "AND s.deleted = false")
+    Optional<StudentDiscountAssignmentEntity> findDiscountByAcademic_Campus_stundentId(
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId,
+            @Param("campusId") Long campusId);
 //    // -------------------------------------------------------------------------
 //    // SEARCH BY KEYWORD (STUDENT NAME, CODE, OR OTHER FIELDS)
 //    // -------------------------------------------------------------------------

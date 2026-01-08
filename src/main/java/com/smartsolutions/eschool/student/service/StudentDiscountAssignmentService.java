@@ -76,25 +76,8 @@ public class StudentDiscountAssignmentService {
             assignmentRepository.save(entity);
 
 
-//            ModelMapper modelMapper = new ModelMapper();
-//
-//// Skip mapping nested objects that you handle manually
-//            modelMapper.typeMap(StudentDiscountAssignmentRequestDTO.class, StudentDiscountAssignmentEntity.class).addMappings(mapper -> {
-//                mapper.skip(StudentDiscountAssignmentEntity::setStudent);
-//                mapper.skip(StudentDiscountAssignmentEntity::setCampus);
-//                mapper.skip(StudentDiscountAssignmentEntity::setAcademicYear);
-//                mapper.skip(StudentDiscountAssignmentEntity::setDiscountRate);
-//            });
-//            StudentDiscountAssignmentEntity entity = modelMapper.map(requestDTO, StudentDiscountAssignmentEntity.class);
-//
-//            entity.setStudent(student);
-//            entity.setDiscountRate(discountRate);
-//            entity.setCampus(campus);
-//            entity.setAcademicYear(academicYear);
-
             log.info("Successfully assigned discount, id: {}", entity.getId());
             return mapToResponseDto(entity);
-            //return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while assigning discount", dae);
             throw new CustomServiceException("Failed to assign discount due to database error");
@@ -104,6 +87,65 @@ public class StudentDiscountAssignmentService {
         } catch (Exception e) {
             log.error("Unexpected error while assigning discount", e);
             throw new CustomServiceException("Unexpected error occurred while assigning discount");
+        }
+    }
+
+
+    @Transactional
+    public StudentDiscountAssignmentResponseDTO updateDiscount(@Valid StudentDiscountAssignmentRequestDTO requestDTO) {
+        log.info("Updating discount for student: {} for academicYearId={}", requestDTO.getStudentId(), requestDTO.getAcademicYearId());
+
+        try {
+            StudentEntity student = studentRepository.findByIdAndDeletedFalse(requestDTO.getStudentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + requestDTO.getStudentId()));
+
+            DiscountRateEntity discountRate = discountRateRepository.findById(requestDTO.getDiscountRateId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Discount rate not found with id: " + requestDTO.getDiscountRateId()));
+
+            CampusEntity campus = null;
+            if (requestDTO.getCampusId() != null) {
+                campus = campusRepository.findById(requestDTO.getCampusId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + requestDTO.getCampusId()));
+            }
+
+            AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Academic year not found with id: " + requestDTO.getAcademicYearId()));
+
+            // Check for existing discount assignment
+            assignmentRepository
+                    .findDiscountByAcademic_Campus_stundentId(student.getId(), academicYear.getId(), campus != null ? campus.getId() : null)
+                    .ifPresent(existing -> {
+                        log.info("Deleting existing discount assignment with id: {}", existing.getId());
+                        assignmentRepository.delete(existing);
+                    });
+
+            // Create new assignment
+            StudentDiscountAssignmentEntity entity = new StudentDiscountAssignmentEntity();
+            entity.setStudent(student);
+            entity.setDiscountRate(discountRate);
+            entity.setCampus(campus);
+            entity.setAcademicYear(academicYear);
+            entity.setAppliedAmount(requestDTO.getAppliedAmount());
+            entity.setAppliedPercentage(requestDTO.getAppliedPercentage());
+            entity.setReason(requestDTO.getReason());
+            entity.setIsActive(true);
+            entity.setDeleted(false);
+            entity.setId(null);
+
+            assignmentRepository.save(entity);
+            log.info("Successfully created discount assignment, id: {}", entity.getId());
+
+            return mapToResponseDto(entity);
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while updating discount", dae);
+            throw new CustomServiceException("Failed to update discount due to database error");
+        } catch (MappingException me) {
+            log.error("Error mapping entity to DTO", me);
+            throw new CustomServiceException("Error converting discount assignment data", me);
+        } catch (Exception e) {
+            log.error("Unexpected error while updating discount", e);
+            throw new CustomServiceException("Unexpected error occurred while updating discount");
         }
     }
 
@@ -246,5 +288,24 @@ public class StudentDiscountAssignmentService {
         return dto;
     }
 
+
+    @Transactional
+    public void deleteDiscount(Long studentId, Long academicYearId, Long campusId) {
+        try {
+            assignmentRepository
+                    .findDiscountByAcademic_Campus_stundentId(studentId, academicYearId, campusId)
+                    .ifPresent(existing -> {
+                        log.info("Deleting existing discount assignment with id={} for studentId={}, academicYearId={}, campusId={}",
+                                existing.getId(), studentId, academicYearId, campusId);
+                        assignmentRepository.delete(existing);
+                    });
+        } catch (DataAccessException dae) {
+            log.error("Database error while deleting discount for studentId={}, academicYearId={}, campusId={}", studentId, academicYearId, campusId, dae);
+            throw new CustomServiceException("Failed to delete discount due to database error");
+        } catch (Exception e) {
+            log.error("Unexpected error while deleting discount for studentId={}, academicYearId={}, campusId={}", studentId, academicYearId, campusId, e);
+            throw new CustomServiceException("Unexpected error occurred while deleting discount");
+        }
+    }
 
 }

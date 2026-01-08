@@ -17,7 +17,7 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             "FROM StudentFeeAssignmentEntity sfa " +
             "WHERE sfa.student.id = :studentId " +
             "AND sfa.feeRate.academicYear.id = :academicYearId")
-        boolean isFeeAssigned(@Param("studentId") Long studentId,
+    boolean isFeeAssigned(@Param("studentId") Long studentId,
                           @Param("academicYearId") Long academicYearId);
 
     @Query("""
@@ -47,6 +47,25 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
     );
 
 
+    @Query("""
+                SELECT a
+                FROM StudentFeeAssignmentEntity a
+                JOIN FETCH a.student s
+                LEFT JOIN FETCH s.campus c
+                LEFT JOIN FETCH s.standard st
+                LEFT JOIN FETCH s.section sec
+                LEFT JOIN FETCH s.academicYear ay
+                JOIN FETCH a.feeRate fr
+                JOIN FETCH fr.feeComponent fc
+                JOIN FETCH fc.feeCatalog fca
+                WHERE s.id = :studentId
+                  AND s.academicYear.id = :academicYearId
+            """)
+    List<StudentFeeAssignmentEntity> findAssignedFeesForStudentAndYear(
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId
+    );
+
     /**
      * Calculates the total fee amount assigned to students for a specific academic year.
      * This query sums the totalAmount from all Student Fee Assignments
@@ -72,6 +91,7 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
      * 1. The due date has already passed (`dueDate < CURRENT_DATE`)
      * 2. The fee assignment belongs to the specified academic year via the Fee Rate
      * If no overdue fees exist, the method returns 0 instead of NULL.
+     *
      * @param academicYearId the ID of the academic year
      * @return the total overdue fee amount for the academic year
      */
