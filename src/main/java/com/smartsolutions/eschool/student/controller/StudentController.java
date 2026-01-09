@@ -1,18 +1,26 @@
 package com.smartsolutions.eschool.student.controller;
 
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
+import com.smartsolutions.eschool.global.utils.UploadUtil;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
+import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
 import com.smartsolutions.eschool.student.facade.StudentFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 @RestController
@@ -106,4 +114,69 @@ public class StudentController {
         log.info("Returning dashboard counts: {}", dashboard);
         return ResponseEntity.ok(dashboard);
     }
+
+
+
+//    @PostMapping(value = "/update-profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<?> uploadProfilePhoto(@RequestParam("employeeId") Long employeeId, @RequestPart("file") MultipartFile file) {
+//        if (file.isEmpty()) {
+//            return ResponseEntity.badRequest().body("Profile photo is required");
+//        }
+//        String filePath = UploadUtil.saveProfilePhoto(employeeId, file);
+//        filePath = employeeFacade.updateEmployeeProfile(employeeId, filePath);
+//        return ResponseEntity.ok(Map.of("message", "Profile photo uploaded successfully", "filePath", filePath));
+//    }
+//
+//
+//    @GetMapping("/profile-photos/{fileName:.+}")
+//    public ResponseEntity<Resource> getProfilePhoto(@PathVariable String fileName) throws IOException, MalformedURLException, FileNotFoundException {
+//        // Optional: check if user has permission
+//        Path file = Paths.get(UploadUtil.UPLOAD_DIR, fileName);
+//        Resource resource = new UrlResource(file.toUri());
+//        if (!resource.exists()) {
+//            throw new FileNotFoundException("File not found");
+//        }
+//        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(resource);
+//    }
+
+
+    @PostMapping(value = "/upload-document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> uploadStudentDocument(@RequestParam("studentId") Long studentId, @RequestParam("docKey") String docKey, @RequestPart("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "File is required"));
+        }
+        try {
+            // Save file to disk
+            String filePath = UploadUtil.saveStudentDocument(studentId, docKey, file);
+            // Save record in database via facade
+            studentFacade.saveStudentDocument(studentId, docKey, file);
+            return ResponseEntity.ok(Map.of("message", "Document uploaded successfully", "filePath", filePath, "docKey", docKey));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Failed to upload document", "error", e.getMessage()));
+        }
+    }
+
+    @GetMapping(value = "/{studentId}/documents", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getStudentDocuments(@PathVariable Long studentId) {
+        log.info("GET /api/institute /employees/{}/documents called", studentId);
+        try {
+            List<StudentDocumentResponseDto> documents = studentFacade.getSaveDocuments(studentId);
+            if (documents.isEmpty()) {
+                log.warn("No documents found for Employee with id: {}", studentId);
+            } else {
+                log.info("Returned {} documents for Employee with id: {}", documents.size(), studentId);
+            }
+            return ResponseEntity.ok(documents);
+        } catch (Exception e) {
+            log.error("Error fetching documents for Employee with id: {}", studentId, e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/download-document/{documentId}")
+    public ResponseEntity<Resource> downloadStudentDocument(@PathVariable Long documentId, @RequestParam("studentId") Long studentId) throws IOException {
+        Resource document = studentFacade.getDocumentById(documentId, studentId);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getFilename() + "\"").body(document);
+    }
+
 }

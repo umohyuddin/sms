@@ -47,5 +47,23 @@ public class UploadUtil {
         return filePath;
     }
 
+    public static String saveStudentDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
+        String uploadDir = EMPLOYEE_UPLOAD_DIR + "/students_" + employeeId + "/documents";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        // Remove spaces from original filename
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll("\\s+", "_");
+
+        String filename = docKey + "_" + System.currentTimeMillis() + "_" + originalFileName;
+        String filePath = Paths.get(uploadDir, filename).toString();
+
+        Files.write(Paths.get(filePath), file.getBytes());
+
+        return filePath;
+    }
+
 
 }

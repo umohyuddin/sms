@@ -5,11 +5,15 @@ import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
+import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
 import com.smartsolutions.eschool.student.service.StudentFeeAssignmentService;
 import com.smartsolutions.eschool.student.service.StudentService;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +120,24 @@ public class StudentFacade {
     public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long sectionId,Long studentId, Long academicYearId,String kw) {
         return  studentService.searchStudents(campusId,standardId,sectionId,studentId,academicYearId,kw);
     }
+
+    public void saveStudentDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
+        studentService.saveStudentDocument(employeeId, docKey, file);
+    }
+
+
+    public List<StudentDocumentResponseDto> getSaveDocuments(Long employeeId) {
+        return studentService.getDocumentsByStudentId(employeeId);
+    }
+
+    public Map<String, List<StudentDocumentResponseDto>> getDocumentsByEmployeeId(Long employeeId) {
+        return studentService.getGroupedDocuments(employeeId);
+    }
+
+    public Resource getDocumentById(Long documentId, Long employeeId) {
+        return studentService.downloadDocument(documentId, employeeId);
+    }
+
 }
 
 

@@ -276,6 +276,29 @@ CREATE TABLE students
     FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );
 
+CREATE TABLE student_document (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    student_id BIGINT NOT NULL,
+
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    file_type VARCHAR(50),
+    document_type VARCHAR(100) NOT NULL,
+
+           deleted BOOLEAN DEFAULT FALSE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_by BIGINT,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            updated_by BIGINT,
+            deleted_at DATETIME,
+            deleted_by BIGINT,
+    CONSTRAINT fk_student_document_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
+);
+
 
 DROP TABLE IF EXISTS `fee_catalog`;
 CREATE TABLE fee_catalog
