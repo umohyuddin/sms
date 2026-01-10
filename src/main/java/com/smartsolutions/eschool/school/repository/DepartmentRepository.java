@@ -15,7 +15,12 @@ import java.util.Optional;
 @Repository
 public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Long> {
     // 1. Find all active departments
-    @Query("SELECT d FROM DepartmentEntity d WHERE d.active = true AND d.deleted = false")
+    @Query("""
+                SELECT d
+                FROM DepartmentEntity d
+                LEFT JOIN FETCH d.headEmployee e
+                WHERE d.deleted = false
+            """)
     List<DepartmentEntity> findAllActiveDepartments();
 
     // 2. Find by department code
@@ -33,4 +38,22 @@ public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Lo
     // 5. Search departments by name (partial match)
     @Query("SELECT d FROM DepartmentEntity d WHERE LOWER(d.departmentName) LIKE LOWER(CONCAT('%', :name, '%')) AND d.deleted = false")
     List<DepartmentEntity> searchByDepartmentName(@Param("name") String name);
+
+    @Query("""
+        SELECT d
+        FROM DepartmentEntity d
+        LEFT JOIN d.parentDepartment p
+        LEFT JOIN d.headEmployee h
+        WHERE d.deleted = false
+          AND (
+              LOWER(d.departmentName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+              LOWER(d.departmentCode) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+              LOWER(d.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+              LOWER(p.departmentName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+              LOWER(h.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+              LOWER(h.employeeCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
+          )
+        ORDER BY d.departmentName ASC
+    """)
+    List<DepartmentEntity> searchDepartments(@Param("keyword") String keyword);
 }

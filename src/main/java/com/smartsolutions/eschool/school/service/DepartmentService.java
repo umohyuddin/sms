@@ -93,27 +93,35 @@ public class DepartmentService {
     }
 
     public DepartmentResponseDTO updateDepartment(Long id, @Valid DepartmentRequestDTO requestDTO) {
-        log.info("Updating Department with id={}", id);
+        log.info("Updating Department with id={} with data={}", id, requestDTO);
         try {
-            DepartmentEntity existing = departmentRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+            // Fetch existing department
+            DepartmentEntity existing = findDepartmentOrThrow(id);
 
-            existing.setDepartmentName(requestDTO.getDepartmentName());
-            existing.setDepartmentCode(requestDTO.getDepartmentCode());
-            existing.setDescription(requestDTO.getDescription());
-            existing.setActive(requestDTO.getActive());
+            // Update basic fields
+            updateEntityFromDto(existing, requestDTO);
 
+            if (requestDTO.getHeadEmployeeId() != null) {
+                EmployeeMasterEntity headEmployee = employeeMasterRepository.findById(requestDTO.getHeadEmployeeId())
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Head Employee not found with id: " + requestDTO.getHeadEmployeeId()));
+                existing.setHeadEmployee(headEmployee);
+            } else {
+                existing.setHeadEmployee(null);
+            }
+            // Handle parent department
             if (requestDTO.getParentDepartmentId() != null) {
-                DepartmentEntity parent = departmentRepository.findById(requestDTO.getParentDepartmentId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Parent Department not found with id: " + requestDTO.getParentDepartmentId()));
+                DepartmentEntity parent = findDepartmentOrThrow(requestDTO.getParentDepartmentId());
                 existing.setParentDepartment(parent);
             } else {
                 existing.setParentDepartment(null);
             }
 
-            departmentRepository.save(existing);
-            log.info("Department updated successfully with id={}", existing.getId());
-            return toDto(existing);
+            // Save changes
+            DepartmentEntity updated = departmentRepository.save(existing);
+            log.info("Department updated successfully with id={}", updated.getId());
+
+            return toDto(updated);
         } catch (DataAccessException dae) {
             log.error("Database error while updating Department with id={}", id, dae);
             throw new CustomServiceException("Failed to update Department due to database error", dae);
@@ -121,6 +129,20 @@ public class DepartmentService {
             log.error("Unexpected error while updating Department with id={}", id, e);
             throw new CustomServiceException("Unexpected error occurred while updating Department", e);
         }
+    }
+
+    // Helper: Fetch department or throw exception
+    private DepartmentEntity findDepartmentOrThrow(Long id) {
+        return departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+    }
+
+    // Helper: Map DTO to entity
+    private void updateEntityFromDto(DepartmentEntity entity, DepartmentRequestDTO dto) {
+        entity.setDepartmentName(dto.getDepartmentName());
+        entity.setDepartmentCode(dto.getDepartmentCode());
+        entity.setDescription(dto.getDescription());
+        entity.setActive(dto.getActive());
     }
 
     public void deleteDepartment(Long id) {
@@ -151,6 +173,30 @@ public class DepartmentService {
         }
     }
 
+
+    public List<DepartmentResponseDTO> searchDepartments(String keyword) {
+        try {
+            log.info("Searching Departments with keyword={}", keyword);
+
+            // If keyword is null or empty, return all active departments
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return getAllActiveDepartments();
+            }
+
+            // Call repository search
+            List<DepartmentEntity> results = departmentRepository.searchDepartments(keyword.trim());
+
+            log.info("Found {} departments matching keyword={}", results.size(), keyword);
+            return results.stream().map(this::toDto).collect(Collectors.toList());
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while searching Departments", dae);
+            throw new CustomServiceException("Failed to search Departments due to database error", dae);
+        } catch (Exception e) {
+            log.error("Unexpected error while searching Departments", e);
+            throw new CustomServiceException("Unexpected error occurred while searching Departments", e);
+        }
+    }
     private DepartmentResponseDTO toDto(DepartmentEntity entity) {
         DepartmentResponseDTO dto = new DepartmentResponseDTO();
         dto.setId(entity.getId());
@@ -161,6 +207,9 @@ public class DepartmentService {
         dto.setParentDepartmentName(entity.getParentDepartment() != null ? entity.getParentDepartment().getDepartmentName() : null);
         dto.setParentDepartmentId(entity.getParentDepartment() != null ? entity.getParentDepartment().getId() : null);
         dto.setHeadEmployeeId(entity.getHeadEmployee() != null ? entity.getHeadEmployee().getId() : null);
+        dto.setHeadEmployeeName(entity.getHeadEmployee() != null ? entity.getHeadEmployee().getFullName() : null);
+        dto.setHeadEmployeeCode(entity.getHeadEmployee() != null ? entity.getHeadEmployee().getEmployeeCode() : null);
+
         return dto;
     }
 }

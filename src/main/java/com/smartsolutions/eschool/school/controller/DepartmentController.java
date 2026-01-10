@@ -84,4 +84,17 @@ public class DepartmentController {
         log.info("Department soft deleted successfully with id: {}", departmentId);
         return ResponseEntity.ok("Department deleted successfully");
     }
+
+    @Operation(summary = "Search Departments", description = "Search departments by name, code, or head employee")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Departments found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DepartmentResponseDTO.class))), @ApiResponse(responseCode = "400", description = "Invalid search keyword")})
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DepartmentResponseDTO>> searchDepartments(@RequestParam(name = "keyword") String keyword) {
+        log.info("Searching Departments with keyword: {}", keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<DepartmentResponseDTO> results = departmentFacade.searchDepartments(keyword.trim());
+        log.info("Found {} departments matching keyword '{}'", results.size(), keyword);
+        return ResponseEntity.ok(results);
+    }
 }

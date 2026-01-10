@@ -45,6 +45,10 @@ public class DepartmentFacade {
         return departmentService.updateDepartment(departmentId, requestDTO);
     }
 
+
+    public List<DepartmentResponseDTO> searchDepartments(String keyword) {
+        return departmentService.searchDepartments(keyword);
+    }
     public void deleteById(Long departmentId) {
         departmentService.deleteDepartment(departmentId);
     }
