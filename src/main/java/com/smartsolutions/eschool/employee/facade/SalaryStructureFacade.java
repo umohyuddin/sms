@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -58,6 +59,7 @@ public class SalaryStructureFacade {
     public SalaryStructureResponseDTO closeSalaryStructure(Long id) {
         return salaryStructureService.closeSalaryStructure(id);
     }
+
     // -------------------------
     // Soft delete
     // -------------------------
@@ -79,4 +81,8 @@ public class SalaryStructureFacade {
 //    public List<SalaryStructureResponseDTO> getWithinDateRange(LocalDate startDate, LocalDate endDate) {
 //        return salaryStructureService.getWithinDateRange(startDate, endDate);
 //    }
+
+    public List<SalaryStructureResponseDTO> searchSalaryStructures(Long employeeTypeId, String employeeTypeName, BigDecimal minSalary, BigDecimal maxSalary, LocalDate fromDate, LocalDate toDate, Boolean isCurrent) {
+        return salaryStructureService.searchSalaryStructures(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
+    }
 }

@@ -5,10 +5,12 @@ import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryS
 import com.smartsolutions.eschool.employee.facade.SalaryStructureFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -49,8 +51,7 @@ public class SalaryStructureController {
     // Create
     // -------------------------
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SalaryStructureResponseDTO> createSalaryStructure(
-            @Valid @RequestBody SalaryStructureRequestDTO requestDTO) {
+    public ResponseEntity<SalaryStructureResponseDTO> createSalaryStructure(@Valid @RequestBody SalaryStructureRequestDTO requestDTO) {
         log.info("POST /api/institute/salary-structures called for EmployeeTypeId={}", requestDTO.getEmployeeTypeId());
         SalaryStructureResponseDTO created = salaryStructureFacade.createSalaryStructure(requestDTO);
         log.info("Salary Structure created successfully with id={}", created.getId());
@@ -61,9 +62,7 @@ public class SalaryStructureController {
     // Update
     // -------------------------
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SalaryStructureResponseDTO> updateSalaryStructure(
-            @PathVariable Long id,
-            @Valid @RequestBody SalaryStructureRequestDTO requestDTO) {
+    public ResponseEntity<SalaryStructureResponseDTO> updateSalaryStructure(@PathVariable Long id, @Valid @RequestBody SalaryStructureRequestDTO requestDTO) {
         log.info("PUT /api/institute/salary-structures/{} called", id);
         SalaryStructureResponseDTO updated = salaryStructureFacade.updateSalaryStructure(id, requestDTO);
         log.info("Salary Structure updated successfully with id={}", updated.getId());
@@ -113,5 +112,10 @@ public class SalaryStructureController {
     @PutMapping("/{id}/close")
     public ResponseEntity<SalaryStructureResponseDTO> closeSalaryStructure(@PathVariable Long id) {
         return ResponseEntity.ok(salaryStructureFacade.closeSalaryStructure(id));
+    }
+
+    @GetMapping("/search")
+    public List<SalaryStructureResponseDTO> searchSalaryStructures(@RequestParam(required = false) Long employeeTypeId, @RequestParam(required = false) String employeeTypeName, @RequestParam(required = false) BigDecimal minSalary, @RequestParam(required = false) BigDecimal maxSalary, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate, @RequestParam(required = false) Boolean isCurrent) {
+        return salaryStructureFacade.searchSalaryStructures(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
     }
 }

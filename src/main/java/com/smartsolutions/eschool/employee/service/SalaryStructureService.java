@@ -16,6 +16,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -171,4 +172,41 @@ public class SalaryStructureService {
         return MapperUtil.mapObject(existing, SalaryStructureResponseDTO.class);
     }
 
+    public List<SalaryStructureResponseDTO> searchSalaryStructures(
+            Long employeeTypeId,
+            String employeeTypeName,
+            BigDecimal minSalary,
+            BigDecimal maxSalary,
+            LocalDate fromDate,
+            LocalDate toDate,
+            Boolean isCurrent
+    ) {
+        // Fetch entities from repository
+        List<SalaryStructureEntity> entities = salaryStructureRepository.searchSalaryStructures(
+                employeeTypeId,
+                employeeTypeName,
+                minSalary,
+                maxSalary,
+                fromDate,
+                toDate,
+                isCurrent
+        );
+
+        // Convert to DTOs
+        return entities.stream()
+                .map(entity -> {
+                    SalaryStructureResponseDTO dto = new SalaryStructureResponseDTO();
+                    dto.setId(entity.getId());
+                    dto.setEmployeeTypeId(entity.getEmployeeType().getId());
+                    dto.setEmployeeTypeName(entity.getEmployeeType().getName());
+                    dto.setBaseSalary(entity.getBaseSalary());
+                    dto.setEffectiveFrom(entity.getEffectiveFrom());
+                    dto.setEffectiveTo(entity.getEffectiveTo());
+                    dto.setIsCurrent(entity.getIsCurrent());
+                    dto.setDeleted(entity.getDeleted());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 }
+
