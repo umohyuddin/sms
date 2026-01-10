@@ -809,6 +809,7 @@ CREATE TABLE designations (
     base_salary DECIMAL(12,2) NOT NULL,   -- Fixed base salary
     effective_from DATE NOT NULL,
     effective_to DATE,
+    is_current BOOLEAN NOT NULL DEFAULT TRUE,
           deleted         BOOLEAN DEFAULT FALSE,
           created_at      DATETIME,
           created_by      BIGINT,
@@ -816,7 +817,11 @@ CREATE TABLE designations (
           updated_by      BIGINT,
           deleted_at      DATETIME,
           deleted_by      BIGINT,
-    FOREIGN KEY (employee_type_id) REFERENCES employee_type(id)
+CONSTRAINT fk_salary_employee_type
+FOREIGN KEY (employee_type_id)
+REFERENCES employee_type(id),
+CHECK (effective_to IS NULL OR effective_to >= effective_from),
+UNIQUE (employee_type_id, is_current)
 );
 
 

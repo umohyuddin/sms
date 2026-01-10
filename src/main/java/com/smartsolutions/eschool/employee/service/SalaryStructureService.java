@@ -16,6 +16,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +27,7 @@ public class SalaryStructureService {
     private final SalaryStructureRepository salaryStructureRepository;
     private final EmployeeTypeRepository employeeTypeRepository;
 
-    public SalaryStructureService(SalaryStructureRepository salaryStructureRepository,
-                                  EmployeeTypeRepository employeeTypeRepository) {
+    public SalaryStructureService(SalaryStructureRepository salaryStructureRepository, EmployeeTypeRepository employeeTypeRepository) {
         this.salaryStructureRepository = salaryStructureRepository;
         this.employeeTypeRepository = employeeTypeRepository;
     }
@@ -35,28 +35,49 @@ public class SalaryStructureService {
     /* =========================
        CREATE
        ========================= */
-    public SalaryStructureResponseDTO createSalaryStructure(@Valid SalaryStructureRequestDTO requestDTO) {
-        log.info("Creating Salary Structure for Employee Type ID: {}", requestDTO.getEmployeeTypeId());
-        try {
-            EmployeeTypeEntity employeeType = employeeTypeRepository.findById(requestDTO.getEmployeeTypeId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Employee Type not found with id: " + requestDTO.getEmployeeTypeId()
-                    ));
+    public SalaryStructureResponseDTO createSalaryStructure(SalaryStructureRequestDTO request) {
 
-            SalaryStructureEntity entity = MapperUtil.mapObject(requestDTO, SalaryStructureEntity.class);
-            entity.setEmployeeType(employeeType);
-            salaryStructureRepository.save(entity);
+        EmployeeTypeEntity employeeType = employeeTypeRepository.findById(request.getEmployeeTypeId()).orElseThrow(() -> new IllegalArgumentException("Invalid employee type"));
 
-            log.info("Salary Structure saved with ID: {}", entity.getId());
-            return MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while creating Salary Structure", dae);
-            throw new CustomServiceException("Failed to create Salary Structure due to database error");
-        } catch (Exception e) {
-            log.error("Unexpected error while creating Salary Structure", e);
-            throw new CustomServiceException("Failed to create Salary Structure");
-        }
+        salaryStructureRepository.findByEmployeeTypeIdAndIsCurrentTrue(employeeType.getId()).ifPresent(existing -> {
+            existing.setIsCurrent(false);
+            existing.setEffectiveTo(request.getEffectiveFrom().minusDays(1));
+        });
+
+        SalaryStructureEntity entity = new SalaryStructureEntity();
+        entity.setEmployeeType(employeeType);
+        entity.setBaseSalary(request.getBaseSalary());
+        entity.setEffectiveFrom(request.getEffectiveFrom());
+        entity.setEffectiveTo(null);
+        entity.setIsCurrent(true);
+
+        entity = salaryStructureRepository.save(entity);
+        return MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class);
+
     }
+
+//    public SalaryStructureResponseDTO createSalaryStructure(@Valid SalaryStructureRequestDTO requestDTO) {
+//        log.info("Creating Salary Structure for Employee Type ID: {}", requestDTO.getEmployeeTypeId());
+//        try {
+//            EmployeeTypeEntity employeeType = employeeTypeRepository.findById(requestDTO.getEmployeeTypeId())
+//                    .orElseThrow(() -> new ResourceNotFoundException(
+//                            "Employee Type not found with id: " + requestDTO.getEmployeeTypeId()
+//                    ));
+//
+//            SalaryStructureEntity entity = MapperUtil.mapObject(requestDTO, SalaryStructureEntity.class);
+//            entity.setEmployeeType(employeeType);
+//            salaryStructureRepository.save(entity);
+//
+//            log.info("Salary Structure saved with ID: {}", entity.getId());
+//            return MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class);
+//        } catch (DataAccessException dae) {
+//            log.error("Database error while creating Salary Structure", dae);
+//            throw new CustomServiceException("Failed to create Salary Structure due to database error");
+//        } catch (Exception e) {
+//            log.error("Unexpected error while creating Salary Structure", e);
+//            throw new CustomServiceException("Failed to create Salary Structure");
+//        }
+//    }
 
     /* =========================
        GET BY ID
@@ -64,8 +85,7 @@ public class SalaryStructureService {
     public SalaryStructureResponseDTO getById(Long id) {
         log.info("Fetching Salary Structure by ID: {}", id);
         try {
-            SalaryStructureEntity entity = salaryStructureRepository.findActiveById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
+            SalaryStructureEntity entity = salaryStructureRepository.findActiveById(id).orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
             return MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Salary Structure", dae);
@@ -84,9 +104,7 @@ public class SalaryStructureService {
         log.info("Fetching all active Salary Structures");
         try {
             List<SalaryStructureEntity> entities = salaryStructureRepository.findAllActive();
-            return entities.stream()
-                    .map(entity -> MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class))
-                    .collect(Collectors.toList());
+            return entities.stream().map(entity -> MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class)).collect(Collectors.toList());
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Salary Structures", dae);
             throw new CustomServiceException("Unable to fetch Salary Structures", dae);
@@ -97,19 +115,12 @@ public class SalaryStructureService {
        UPDATE
        ========================= */
     @Transactional
-    public SalaryStructureResponseDTO updateSalaryStructure(Long id,
-                                                            @Valid SalaryStructureRequestDTO requestDTO) {
+    public SalaryStructureResponseDTO updateSalaryStructure(Long id, @Valid SalaryStructureRequestDTO requestDTO) {
         log.info("Updating Salary Structure with ID: {}", id);
         try {
-            SalaryStructureEntity existing = salaryStructureRepository.findActiveById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Salary Structure not found with id: " + id
-                    ));
+            SalaryStructureEntity existing = salaryStructureRepository.findActiveById(id).orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
 
-            EmployeeTypeEntity employeeType = employeeTypeRepository.findById(requestDTO.getEmployeeTypeId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Employee Type not found with id: " + requestDTO.getEmployeeTypeId()
-                    ));
+            EmployeeTypeEntity employeeType = employeeTypeRepository.findById(requestDTO.getEmployeeTypeId()).orElseThrow(() -> new ResourceNotFoundException("Employee Type not found with id: " + requestDTO.getEmployeeTypeId()));
 
             existing.setEmployeeType(employeeType);
             existing.setBaseSalary(requestDTO.getBaseSalary());
@@ -142,4 +153,22 @@ public class SalaryStructureService {
             throw new CustomServiceException("Failed to delete Salary Structure due to database error", dae);
         }
     }
+
+    @Transactional
+    public SalaryStructureResponseDTO closeSalaryStructure(Long id) {
+        SalaryStructureEntity existing = salaryStructureRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
+
+        if (!existing.getIsCurrent()) {
+            throw new CustomServiceException("Salary Structure is already closed");
+        }
+
+        existing.setIsCurrent(false); // mark as closed
+        existing.setEffectiveTo(LocalDate.now()); // optional: set today's date as end
+
+        salaryStructureRepository.save(existing);
+
+        return MapperUtil.mapObject(existing, SalaryStructureResponseDTO.class);
+    }
+
 }

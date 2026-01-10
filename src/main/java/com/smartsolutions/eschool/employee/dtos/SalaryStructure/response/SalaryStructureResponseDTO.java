@@ -14,24 +14,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalaryStructureResponseDTO {
-
     private Long id;
-
     private Long employeeTypeId;
     private String employeeTypeName; // for convenience
-
     private BigDecimal baseSalary;
-
+    private Boolean isCurrent;
     private LocalDate effectiveFrom;
     private LocalDate effectiveTo;
-
     private Boolean deleted;
-
-    // Optional audit fields
-    private LocalDateTime createdAt;
-    private Long createdBy;
-    private LocalDateTime updatedAt;
-    private Long updatedBy;
-    private LocalDateTime deletedAt;
-    private Long deletedBy;
 }

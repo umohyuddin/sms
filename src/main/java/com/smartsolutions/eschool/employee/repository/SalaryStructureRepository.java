@@ -26,7 +26,7 @@ public interface SalaryStructureRepository extends JpaRepository<SalaryStructure
     List<SalaryStructureEntity> findByEmployeeType(@Param("employeeType") EmployeeTypeEntity employeeType);
 
     // 3. Find salary structure by id (only if not deleted)
-    @Query("SELECT s FROM SalaryStructureEntity s WHERE s.id = :id AND s.deleted = false")
+    @Query("SELECT s FROM SalaryStructureEntity s JOIN FETCH s.employeeType WHERE s.id = :id")
     Optional<SalaryStructureEntity> findActiveById(@Param("id") Long id);
 
     // 4. Find salary structures effective on a given date
@@ -49,4 +49,14 @@ public interface SalaryStructureRepository extends JpaRepository<SalaryStructure
     @Query("SELECT COUNT(s) FROM SalaryStructureEntity s WHERE s.employeeType = :employeeType AND s.deleted = false")
     Long countByEmployeeType(@Param("employeeType") EmployeeTypeEntity employeeType);
 
+    Optional<SalaryStructureEntity> findByEmployeeTypeIdAndIsCurrentTrue(Long employeeTypeId);
+
+    @Query("""
+                SELECT s FROM SalaryStructureEntity s
+                WHERE s.employeeType.id = :employeeTypeId
+                AND s.isCurrent = true
+                AND s.deleted = false
+            """)
+    Optional<SalaryStructureEntity> findCurrentSalary(Long employeeTypeId);
 }
+

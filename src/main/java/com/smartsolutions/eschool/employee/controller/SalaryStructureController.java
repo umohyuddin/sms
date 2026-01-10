@@ -110,4 +110,8 @@ public class SalaryStructureController {
 //    }
 
 
+    @PutMapping("/{id}/close")
+    public ResponseEntity<SalaryStructureResponseDTO> closeSalaryStructure(@PathVariable Long id) {
+        return ResponseEntity.ok(salaryStructureFacade.closeSalaryStructure(id));
+    }
 }

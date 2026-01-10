@@ -23,4 +23,6 @@ public class SalaryStructureRequestDTO {
     private LocalDate effectiveFrom;
 
     private LocalDate effectiveTo; // optional
+
+    private Boolean isCurrent = true;
 }

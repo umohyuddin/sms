@@ -55,6 +55,9 @@ public class SalaryStructureFacade {
         return salaryStructureService.updateSalaryStructure(id, requestDTO);
     }
 
+    public SalaryStructureResponseDTO closeSalaryStructure(Long id) {
+        return salaryStructureService.closeSalaryStructure(id);
+    }
     // -------------------------
     // Soft delete
     // -------------------------
