@@ -135,7 +135,7 @@ public class SalaryComponentService {
                     .orElseThrow(() -> new ResourceNotFoundException("Salary Component not found with id: " + id));
 
             existing.setName(requestDTO.getName());
-            //existing.setType(requestDTO.getType());
+            existing.setType(requestDTO.getType());
             existing.setIsPercentage(requestDTO.getIsPercentage());
 
             salaryComponentRepository.save(existing);
@@ -187,5 +187,13 @@ public class SalaryComponentService {
         dto.setType(entity.getType());
         dto.setIsPercentage(entity.getIsPercentage());
         return dto;
+    }
+
+    public List<SalaryComponentEntity> searchComponents(String name, ComponentType type, Boolean isPercentage) {
+        // Normalize empty string to null
+        String normalizedName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;
+
+        // Repository method already handles nulls in the query
+        return salaryComponentRepository.search(normalizedName, type, isPercentage);
     }
 }

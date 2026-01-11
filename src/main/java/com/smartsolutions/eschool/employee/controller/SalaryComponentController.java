@@ -2,10 +2,12 @@ package com.smartsolutions.eschool.employee.controller;
 
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.request.SalaryStructureRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryStructureResponseDTO;
+import com.smartsolutions.eschool.employee.dtos.salaryComponent.SalaryComponentSearchDto;
 import com.smartsolutions.eschool.employee.dtos.salaryComponent.request.SalaryComponentRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.salaryComponent.response.SalaryComponentResponseDTO;
 import com.smartsolutions.eschool.employee.facade.SalaryComponentFacade;
 import com.smartsolutions.eschool.employee.facade.SalaryStructureFacade;
+import com.smartsolutions.eschool.employee.model.SalaryComponentEntity;
 import com.smartsolutions.eschool.global.enums.ComponentType;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +53,8 @@ public class SalaryComponentController {
     // -------------------------
     // Search by name
     // -------------------------
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SalaryComponentResponseDTO>> searchComponents(@RequestParam String keyword) {
+    @GetMapping(value = "/search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SalaryComponentResponseDTO>> searchComponents( @PathVariable("keyword") String keyword) {
         log.info("GET /api/institute/salary-components/search called with keyword={}", keyword);
         List<SalaryComponentResponseDTO> components = salaryComponentFacade.searchByName(keyword);
         log.info("Returned {} components matching keyword={}", components.size(), keyword);
@@ -117,4 +119,9 @@ public class SalaryComponentController {
         log.info("GET /api/institute/salary-components/count/inactive called");
         return ResponseEntity.ok(salaryComponentFacade.countInactive());
     }
+
+//    @GetMapping("/salary-components")
+//    public List<SalaryComponentResponseDTO> search(@RequestParam(required = false) String name, @RequestParam(required = false) ComponentType type, @RequestParam(required = false) Boolean isPercentage) {
+//        return salaryComponentFacade.searchComponents(new SalaryComponentSearchDto(name, type, isPercentage));
+//    }
 }

@@ -3,8 +3,10 @@ package com.smartsolutions.eschool.employee.facade;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
+import com.smartsolutions.eschool.employee.dtos.salaryComponent.SalaryComponentSearchDto;
 import com.smartsolutions.eschool.employee.dtos.salaryComponent.request.SalaryComponentRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.salaryComponent.response.SalaryComponentResponseDTO;
+import com.smartsolutions.eschool.employee.model.SalaryComponentEntity;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import com.smartsolutions.eschool.employee.service.SalaryComponentService;
 import com.smartsolutions.eschool.global.enums.ComponentType;
@@ -92,4 +94,8 @@ public class SalaryComponentFacade {
     public Long countInactive() {
         return salaryComponentService.countInactive();
     }
+
+//    public List<SalaryComponentResponseDTO> searchComponents(SalaryComponentSearchDto salaryComponentSearchDto) {
+//        return salaryComponentService.searchComponents(salaryComponentSearchDto.getName(),salaryComponentSearchDto.getType(),salaryComponentSearchDto.getIsPercentage());
+//    }
 }
