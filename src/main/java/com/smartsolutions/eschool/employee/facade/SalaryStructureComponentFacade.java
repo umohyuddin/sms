@@ -31,8 +31,8 @@ public class SalaryStructureComponentFacade {
     // -------------------------
     // Create
     // -------------------------
-    public SalaryStructureComponentResponseDTO createComponent(SalaryStructureComponentRequestDTO requestDTO) {
-        return componentService.createComponent(requestDTO);
+    public List<SalaryStructureComponentResponseDTO> createComponent(SalaryStructureComponentRequestDTO requestDTO) {
+        return componentService.createComponents(requestDTO);
     }
 
     // -------------------------
@@ -82,5 +82,9 @@ public class SalaryStructureComponentFacade {
     // -------------------------
     public Long countActiveComponents(Long salaryStructureId) {
         return componentService.countActiveBySalaryStructureId(salaryStructureId);
+    }
+
+    public List<SalaryStructureComponentResponseDTO> updateComponentsByEmployeeType(Long employeeTypeId, SalaryStructureComponentRequestDTO requestDTO) {
+        return componentService.updateComponentsByEmployeeType(employeeTypeId, requestDTO);
     }
 }

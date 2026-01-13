@@ -1,7 +1,10 @@
 package com.smartsolutions.eschool.employee.service;
 
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.request.SalaryStructureRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryStructureDetailDTO;
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryStructureResponseDTO;
+import com.smartsolutions.eschool.employee.dtos.SalaryStructureComponent.response.SalaryStructureComponentResponseDTO;
+import com.smartsolutions.eschool.employee.dtos.salaryComponent.response.SalaryComponentResponseDTO;
 import com.smartsolutions.eschool.employee.model.EmployeeTypeEntity;
 import com.smartsolutions.eschool.employee.model.SalaryStructureEntity;
 import com.smartsolutions.eschool.employee.repository.EmployeeTypeRepository;
@@ -157,8 +160,7 @@ public class SalaryStructureService {
 
     @Transactional
     public SalaryStructureResponseDTO closeSalaryStructure(Long id) {
-        SalaryStructureEntity existing = salaryStructureRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
+        SalaryStructureEntity existing = salaryStructureRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
 
         if (!existing.getIsCurrent()) {
             throw new CustomServiceException("Salary Structure is already closed");
@@ -172,41 +174,76 @@ public class SalaryStructureService {
         return MapperUtil.mapObject(existing, SalaryStructureResponseDTO.class);
     }
 
-    public List<SalaryStructureResponseDTO> searchSalaryStructures(
-            Long employeeTypeId,
-            String employeeTypeName,
-            BigDecimal minSalary,
-            BigDecimal maxSalary,
-            LocalDate fromDate,
-            LocalDate toDate,
-            Boolean isCurrent
-    ) {
+    public List<SalaryStructureResponseDTO> searchSalaryStructures(Long employeeTypeId, String employeeTypeName, BigDecimal minSalary, BigDecimal maxSalary, LocalDate fromDate, LocalDate toDate, Boolean isCurrent) {
         // Fetch entities from repository
-        List<SalaryStructureEntity> entities = salaryStructureRepository.searchSalaryStructures(
-                employeeTypeId,
-                employeeTypeName,
-                minSalary,
-                maxSalary,
-                fromDate,
-                toDate,
-                isCurrent
-        );
+        List<SalaryStructureEntity> entities = salaryStructureRepository.searchSalaryStructures(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
 
         // Convert to DTOs
-        return entities.stream()
-                .map(entity -> {
-                    SalaryStructureResponseDTO dto = new SalaryStructureResponseDTO();
-                    dto.setId(entity.getId());
-                    dto.setEmployeeTypeId(entity.getEmployeeType().getId());
-                    dto.setEmployeeTypeName(entity.getEmployeeType().getName());
-                    dto.setBaseSalary(entity.getBaseSalary());
-                    dto.setEffectiveFrom(entity.getEffectiveFrom());
-                    dto.setEffectiveTo(entity.getEffectiveTo());
-                    dto.setIsCurrent(entity.getIsCurrent());
-                    dto.setDeleted(entity.getDeleted());
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        return entities.stream().map(entity -> {
+            SalaryStructureResponseDTO dto = new SalaryStructureResponseDTO();
+            dto.setId(entity.getId());
+            dto.setEmployeeTypeId(entity.getEmployeeType().getId());
+            dto.setEmployeeTypeName(entity.getEmployeeType().getName());
+            dto.setBaseSalary(entity.getBaseSalary());
+            dto.setEffectiveFrom(entity.getEffectiveFrom());
+            dto.setEffectiveTo(entity.getEffectiveTo());
+            dto.setIsCurrent(entity.getIsCurrent());
+            dto.setDeleted(entity.getDeleted());
+            return dto;
+        }).collect(Collectors.toList());
     }
+
+
+    public List<SalaryStructureDetailDTO> getAllSalaryStructures() {
+        List<SalaryStructureEntity> structures = salaryStructureRepository.findSalaryDetail();
+
+        List<SalaryStructureDetailDTO> dtos = structures.
+                stream().
+                map(ss -> SalaryStructureDetailDTO.builder()
+                        .id(ss.getId()).
+                        employeeTypeName(ss.getEmployeeType().getName()).
+                        baseSalary(ss.getBaseSalary()).
+                        effectiveFrom(ss.getEffectiveFrom()).
+                        effectiveTo(ss.getEffectiveTo()).
+                        components(ss.getComponents().stream().map(c -> SalaryStructureComponentResponseDTO.builder().
+                                id(c.getComponent().getId()).
+                                salaryStructureId(ss.getId()).
+                                componentName(c.getComponent().getName()).
+                                componentType(c.getComponent().getType().toString())       // ComponentType enum
+                .isPercentage(c.getComponent().getIsPercentage()).value(c.getValue()).build()).toList()).build()).toList();
+
+        return dtos;
+    }
+
+    public SalaryStructureDetailDTO getSalaryStructureByEmployeeType(Long employeeTypeId) {
+
+        SalaryStructureEntity ss =
+                salaryStructureRepository.findCurrentSalaryByEmployeeType(employeeTypeId);
+
+        return SalaryStructureDetailDTO.builder()
+                .id(ss.getId())
+                .employeeTypeName(ss.getEmployeeType().getName())
+                .baseSalary(ss.getBaseSalary())
+                .effectiveFrom(ss.getEffectiveFrom())
+                .effectiveTo(ss.getEffectiveTo())
+                .components(
+                        ss.getComponents().stream()
+                                .map(c -> SalaryStructureComponentResponseDTO.builder()
+                                        .id(c.getComponent().getId())
+                                        .salaryStructureId(ss.getId())
+                                        .componentId(c.getComponent().getId())
+                                        .componentName(c.getComponent().getName())
+                                        .componentType(c.getComponent().getType().toString())
+                                        .isPercentage(c.getComponent().getIsPercentage())
+                                        .value(c.getValue())
+                                        .build()
+                                )
+                                .toList()
+                )
+                .build();
+    }
+
+
+
 }
 

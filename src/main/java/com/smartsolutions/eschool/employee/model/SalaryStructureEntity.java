@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(
@@ -44,4 +45,6 @@ public class SalaryStructureEntity extends AuditableEntity {
 
     @Column(nullable = false)
     private Boolean isCurrent = true;
+    @OneToMany(mappedBy = "salaryStructure", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SalaryStructureComponentEntity> components;
 }

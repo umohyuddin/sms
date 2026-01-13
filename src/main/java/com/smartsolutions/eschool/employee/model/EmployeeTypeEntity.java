@@ -28,4 +28,5 @@ public class EmployeeTypeEntity extends AuditableEntity {
     private Boolean deleted = false;
 
 
+
 }

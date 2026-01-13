@@ -10,7 +10,15 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "salary_structure_component")
+@Table(
+        name = "salary_structure_component",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "UK_salary_structure_component_unique",
+                        columnNames = {"salary_structure_id", "component_id"}
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor

@@ -852,7 +852,8 @@ CREATE TABLE salary_component (
                 deleted_at      DATETIME,
                 deleted_by      BIGINT,
         FOREIGN KEY (salary_structure_id) REFERENCES salary_structure(id),
-        FOREIGN KEY (component_id) REFERENCES salary_component(id)
+        FOREIGN KEY (component_id) REFERENCES salary_component(id),
+          CONSTRAINT UK_salary_structure_component UNIQUE (salary_structure_id, component_id)
     );
 
     CREATE TABLE employee_salary (

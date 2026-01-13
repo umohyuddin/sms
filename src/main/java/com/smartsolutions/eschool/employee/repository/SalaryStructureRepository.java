@@ -82,5 +82,37 @@ public interface SalaryStructureRepository extends JpaRepository<SalaryStructure
     );
 
 
-}
+    @Query("SELECT DISTINCT ss FROM SalaryStructureEntity ss " +
+            "JOIN FETCH ss.employeeType et " +
+            "LEFT JOIN FETCH ss.components ssc " +
+            "LEFT JOIN FETCH ssc.component " +
+            "WHERE ss.isCurrent = TRUE AND ss.deleted = FALSE")
+    List<SalaryStructureEntity> findSalaryDetail();
 
+
+    @Query("""
+                SELECT ss
+                FROM SalaryStructureEntity ss
+                JOIN FETCH ss.employeeType et
+                LEFT JOIN FETCH ss.components ssc
+                LEFT JOIN FETCH ssc.component c
+                WHERE et.id = :employeeTypeId
+                  AND ss.isCurrent = TRUE
+                  AND ss.deleted = FALSE
+            """)
+    SalaryStructureEntity findCurrentSalaryByEmployeeType(
+            @Param("employeeTypeId") Long employeeTypeId
+    );
+
+    @Query("""
+                SELECT ss
+                FROM SalaryStructureEntity ss
+                WHERE ss.employeeType.id = :employeeTypeId
+                  AND ss.isCurrent = true
+                  AND ss.deleted = false
+            """)
+    Optional<SalaryStructureEntity> findByEmployeeTypeId(
+            @Param("employeeTypeId") Long employeeTypeId
+    );
+
+}

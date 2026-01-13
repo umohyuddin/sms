@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.employee.facade;
 
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.request.SalaryStructureRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryStructureDetailDTO;
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryStructureResponseDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
@@ -84,5 +85,15 @@ public class SalaryStructureFacade {
 
     public List<SalaryStructureResponseDTO> searchSalaryStructures(Long employeeTypeId, String employeeTypeName, BigDecimal minSalary, BigDecimal maxSalary, LocalDate fromDate, LocalDate toDate, Boolean isCurrent) {
         return salaryStructureService.searchSalaryStructures(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
+    }
+
+    public List<SalaryStructureDetailDTO> findSalaryDetail() {
+        return salaryStructureService.getAllSalaryStructures();
+
+
+    }
+
+    public SalaryStructureDetailDTO getSalaryStructureByEmployeeType(Long employeeTypeId) {
+        return salaryStructureService.getSalaryStructureByEmployeeType(employeeTypeId);
     }
 }

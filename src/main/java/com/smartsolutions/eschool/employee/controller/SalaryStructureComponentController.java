@@ -27,10 +27,10 @@ public class SalaryStructureComponentController {
     // Create a new component
     // -------------------------
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SalaryStructureComponentResponseDTO> createComponent(@Valid @RequestBody SalaryStructureComponentRequestDTO requestDTO) {
+    public ResponseEntity<?> createComponent(@Valid @RequestBody SalaryStructureComponentRequestDTO requestDTO) {
         log.info("POST /components called with data: {}", requestDTO);
-        SalaryStructureComponentResponseDTO created = componentFacade.createComponent(requestDTO);
-        log.info("Component created with id={}", created.getId());
+        List<SalaryStructureComponentResponseDTO> created = componentFacade.createComponent(requestDTO);
+        log.info("Component created");
         return ResponseEntity.ok(created);
     }
 
@@ -107,5 +107,11 @@ public class SalaryStructureComponentController {
         log.info("GET /components/count/{} called", salaryStructureId);
         Long count = componentFacade.countActiveComponents(salaryStructureId);
         return ResponseEntity.ok(Map.of("count", count));
+    }
+
+    @PutMapping("/employee-type/{employeeTypeId}")
+    public ResponseEntity<List<SalaryStructureComponentResponseDTO>> updateComponentsByEmployeeType(@PathVariable Long employeeTypeId, @Valid @RequestBody SalaryStructureComponentRequestDTO requestDTO) {
+        List<SalaryStructureComponentResponseDTO> response = componentFacade.updateComponentsByEmployeeType(employeeTypeId, requestDTO);
+        return ResponseEntity.ok(response);
     }
 }

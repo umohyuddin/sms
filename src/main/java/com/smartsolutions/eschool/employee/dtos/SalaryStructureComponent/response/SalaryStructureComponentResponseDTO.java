@@ -1,12 +1,14 @@
 package com.smartsolutions.eschool.employee.dtos.SalaryStructureComponent.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor   // <--- add this
+@AllArgsConstructor
 public class SalaryStructureComponentResponseDTO {
     private Long id;
 

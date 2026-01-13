@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.employee.controller;
 
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.request.SalaryStructureRequestDTO;
+import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryStructureDetailDTO;
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryStructureResponseDTO;
 import com.smartsolutions.eschool.employee.facade.SalaryStructureFacade;
 import jakarta.validation.Valid;
@@ -34,6 +35,22 @@ public class SalaryStructureController {
         List<SalaryStructureResponseDTO> structures = salaryStructureFacade.getAllActive();
         log.info("Returned {} active salary structures", structures.size());
         return ResponseEntity.ok(structures);
+    }
+
+    @GetMapping(value = "/detail", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> findSalaryDetail
+            () {
+        log.info("GET /api/institute/salary-structures called");
+        List<SalaryStructureDetailDTO> structures = salaryStructureFacade.findSalaryDetail();
+        log.info("Returned {} active salary structures", structures.size());
+        return ResponseEntity.ok(structures);
+    }
+
+    // Get by Employee Type ID
+    @GetMapping("/by-employee-type/{employeeTypeId}")
+    public ResponseEntity<SalaryStructureDetailDTO> getByEmployeeType(@PathVariable Long employeeTypeId) {
+        SalaryStructureDetailDTO dto = salaryStructureFacade.getSalaryStructureByEmployeeType(employeeTypeId);
+        return ResponseEntity.ok(dto);
     }
 
     // -------------------------

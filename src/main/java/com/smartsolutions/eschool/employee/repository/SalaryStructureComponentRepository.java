@@ -1,7 +1,5 @@
 package com.smartsolutions.eschool.employee.repository;
 
-import com.smartsolutions.eschool.employee.model.EmployeeAdvanceEntity;
-import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.model.SalaryStructureComponentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,5 +68,16 @@ public interface SalaryStructureComponentRepository extends JpaRepository<Salary
     // -------------------------
     @Query("SELECT COUNT(ssc) FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.deleted = false")
     Long countActiveBySalaryStructureId(Long salaryStructureId);
+
+
+    @Query("""
+    SELECT ssc
+    FROM SalaryStructureComponentEntity ssc
+    WHERE ssc.salaryStructure.id = :salaryStructureId
+      AND ssc.deleted = false
+""")
+    List<SalaryStructureComponentEntity>
+    findActiveBySalaryStructureId(@Param("salaryStructureId") Long salaryStructureId);
+
 
 }
