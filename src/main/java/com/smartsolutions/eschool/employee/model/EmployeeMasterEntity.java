@@ -158,6 +158,11 @@ public class EmployeeMasterEntity extends AuditableEntity {
     private Boolean active = true;
 
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_type_id") // FK → employee_type.id
+    private EmployeeTypeEntity employeeType;
+
+
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<EmployeeDeductionEntity> deductions;
 

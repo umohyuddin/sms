@@ -590,6 +590,21 @@ CREATE TABLE system_users
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE employee_type (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255),
+  active          BOOLEAN NOT NULL DEFAULT TRUE,
+          deleted         BOOLEAN DEFAULT FALSE,
+          created_at      DATETIME,
+          created_by      BIGINT,
+          updated_at      DATETIME,
+          updated_by      BIGINT,
+          deleted_at      DATETIME,
+          deleted_by      BIGINT
+);
+
+
 
 CREATE TABLE employee_master
 (
@@ -620,6 +635,9 @@ CREATE TABLE employee_master
     joining_date       DATE,
     probation_end_date DATE,
 
+    -- Employee Type (current)
+    employee_type_id   BIGINT, -- FK → employee_type.id
+
     -- Profile
     profile_picture    VARCHAR(255),
     bio                TEXT,
@@ -627,7 +645,7 @@ CREATE TABLE employee_master
     -- Status
     active             BOOLEAN      NOT NULL DEFAULT TRUE,
 
-    deleted            BOOLEAN               DEFAULT FALSE,
+    deleted            BOOLEAN      DEFAULT FALSE,
     created_at         DATETIME,
     created_by         BIGINT,
     updated_at         DATETIME,
@@ -637,10 +655,13 @@ CREATE TABLE employee_master
 
     UNIQUE KEY uq_employee_code (employee_code),
     -- Indexes
-    INDEX              idx_employee_code (employee_code),
-    INDEX              idx_employee_active (active)
-);
+    INDEX idx_employee_code (employee_code),
+    INDEX idx_employee_active (active),
+    INDEX idx_employee_type (employee_type_id),
 
+    -- Foreign Key
+    CONSTRAINT fk_employee_type FOREIGN KEY (employee_type_id) REFERENCES employee_type(id)
+);
 
 
 CREATE TABLE employee_document
@@ -754,21 +775,27 @@ CREATE TABLE departments (
 );
 
 
+CREATE TABLE employee_department_history (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id     BIGINT       NOT NULL,
+    department_id   BIGINT       NOT NULL,
+    start_date      DATETIME     NOT NULL,
+    end_date        DATETIME,               -- NULL if current
+    is_current      BOOLEAN      NOT NULL DEFAULT TRUE,
 
+    deleted         BOOLEAN DEFAULT FALSE,
+    created_at      DATETIME,
+    created_by      BIGINT,
+    updated_at      DATETIME,
+    updated_by      BIGINT,
+    deleted_at      DATETIME,
+    deleted_by      BIGINT,
 
-CREATE TABLE employee_type (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL UNIQUE,
-    description VARCHAR(255),
-  active          BOOLEAN NOT NULL DEFAULT TRUE,
-          deleted         BOOLEAN DEFAULT FALSE,
-          created_at      DATETIME,
-          created_by      BIGINT,
-          updated_at      DATETIME,
-          updated_by      BIGINT,
-          deleted_at      DATETIME,
-          deleted_by      BIGINT
+    CONSTRAINT fk_employee_history FOREIGN KEY (employee_id) REFERENCES employee_master(id),
+    CONSTRAINT fk_department_history FOREIGN KEY (department_id) REFERENCES departments(id)
 );
+
+
 
 
 
@@ -802,6 +829,51 @@ CREATE TABLE designations (
         FOREIGN KEY (department_id) REFERENCES departments(id)
 );
 
+
+
+CREATE TABLE employee_designation_history (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id BIGINT NOT NULL,
+    designation_id BIGINT NOT NULL,
+    department_id BIGINT,       -- optional, can reference current department
+    start_date DATETIME NOT NULL,
+    end_date DATETIME,          -- NULL if current
+    is_current BOOLEAN NOT NULL DEFAULT TRUE,
+
+    deleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    CONSTRAINT fk_employee_designation FOREIGN KEY (employee_id) REFERENCES employee_master(id),
+    CONSTRAINT fk_designation FOREIGN KEY (designation_id) REFERENCES designations(id),
+    CONSTRAINT fk_department_designation FOREIGN KEY (department_id) REFERENCES departments(id)
+);
+
+
+
+CREATE TABLE employee_type_history (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_id BIGINT NOT NULL,
+    employee_type_id BIGINT NOT NULL,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME,          -- NULL if current
+    is_current BOOLEAN NOT NULL DEFAULT TRUE,
+
+    deleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    CONSTRAINT fk_employee_type_history_employee FOREIGN KEY (employee_id) REFERENCES employee_master(id),
+    CONSTRAINT fk_employee_type_history_type FOREIGN KEY (employee_type_id) REFERENCES employee_type(id)
+);
 
     CREATE TABLE salary_structure (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
