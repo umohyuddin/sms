@@ -48,12 +48,25 @@ public class EmployeeMasterService {
     // -------------------------
     // Get all employees
     // -------------------------
+// -------------------------
+// Get all employees with Employee Type
+// -------------------------
     public List<EmployeeMasterResponseDto> getAll() {
         try {
             log.info("Fetching all Employees from database");
-            List<EmployeeMasterEntity> result = employeeRepository.findAll();
-            log.info("Successfully fetched {} Employees", result.size());
-            return MapperUtil.mapList(result, EmployeeMasterResponseDto.class);
+
+            // 1️⃣ Fetch all employees along with employee type (use JOIN FETCH in repository)
+            List<EmployeeMasterEntity> employees = employeeRepository.findAllWithEmployeeType();
+
+            log.info("Successfully fetched {} Employees", employees.size());
+
+            // 2️⃣ Map each EmployeeMasterEntity to EmployeeMasterResponseDto using toDTO()
+            List<EmployeeMasterResponseDto> dtoList = employees.stream()
+                    .map(this::toDTO)
+                    .collect(Collectors.toList());
+
+            return dtoList;
+
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Employees", dae);
         } catch (MappingException me) {
@@ -61,6 +74,7 @@ public class EmployeeMasterService {
         } catch (Exception e) {
             log.error("Unexpected error while fetching Employees", e);
         }
+
         return Collections.emptyList();
     }
 
@@ -339,5 +353,53 @@ public class EmployeeMasterService {
         }
         return genderCountMap;
     }
+
+    EmployeeMasterResponseDto toDTO(EmployeeMasterEntity entity) {
+        if (entity == null) return null;
+
+        return EmployeeMasterResponseDto.builder()
+                .id(entity.getId())
+                .employeeCode(entity.getEmployeeCode())
+                // Personal Information
+                .firstName(entity.getFirstName())
+                .middleName(entity.getMiddleName())
+                .lastName(entity.getLastName())
+                .fullName(entity.getFullName())
+                .gender(entity.getGender())
+                .dateOfBirth(entity.getDateOfBirth())
+                .maritalStatus(entity.getMaritalStatus())
+                //.cnic(entity.getCnic())
+                //.passportNumber(entity.getPassportNumber())
+                .religion(entity.getReligion())
+                .nationality(entity.getNationality())
+                .bloodGroup(entity.getBloodGroup())
+                // Contact Information
+                .email(entity.getEmail())
+                .primaryPhone(entity.getPrimaryPhone())
+                .secondaryPhone(entity.getSecondaryPhone())
+                .workPhone(entity.getWorkPhone())
+                // Employment Details
+                .joiningDate(entity.getJoiningDate())
+                .probationEndDate(entity.getProbationEndDate())
+                // Employee Type
+                .employeeTypeId(entity.getEmployeeType() != null ? entity.getEmployeeType().getId() : null)
+                .employeeTypeName(entity.getEmployeeType() != null ? entity.getEmployeeType().getName() : null)
+                // Profile
+                .profilePicture(entity.getProfilePicture())
+                .bio(entity.getBio())
+                // Status
+                .active(entity.getActive())
+                //.deleted(entity.getDeleted())
+                // Auditable fields (optional)
+                //.createdAt(entity.getCreatedAt())
+                //.createdBy(entity.getCreatedBy())
+                //.updatedAt(entity.getUpdatedAt())
+                //.updatedBy(entity.getUpdatedBy())
+                //.deletedAt(entity.getDeletedAt())
+                //.deletedBy(entity.getDeletedBy())
+                .build();
+    }
+
+
 }
 

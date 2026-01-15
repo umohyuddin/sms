@@ -14,7 +14,12 @@ import java.util.Optional;
 @Repository
 public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEntity, Long> {
 
-    // -------------------------
+
+
+    @Query("SELECT e FROM EmployeeMasterEntity e " +
+            "LEFT JOIN FETCH e.employeeType " +
+            "WHERE e.active = true")
+    List<EmployeeMasterEntity> findAllWithEmployeeType();    // -------------------------
     // Find by ID
     // -------------------------
     @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.id = :id")

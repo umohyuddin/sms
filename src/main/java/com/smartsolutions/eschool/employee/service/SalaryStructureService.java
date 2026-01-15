@@ -257,7 +257,6 @@ public class SalaryStructureService {
 //    }
 
 
-
     public List<SalaryStructureDetailDTO> getAllSalaryStructures() {
         // Fetch all salary structures
         List<SalaryStructureEntity> structures = salaryStructureRepository.findSalaryDetail();
@@ -347,33 +346,63 @@ public class SalaryStructureService {
 
     public SalaryStructureDetailDTO getSalaryStructureByEmployeeType(Long employeeTypeId) {
 
-        SalaryStructureEntity ss =
-                salaryStructureRepository.findCurrentSalaryByEmployeeType(employeeTypeId);
+        SalaryStructureEntity ss = salaryStructureRepository.findCurrentSalaryByEmployeeType(employeeTypeId);
 
+        if (ss == null) {
+            throw new ResourceNotFoundException("No salary structure found for employee type ID: " + employeeTypeId);
+        }
+
+        // Map components (exclude deleted)
+        List<SalaryStructureComponentResponseDTO> componentDTOs = ss.getComponents().stream()
+                .filter(c -> !c.getDeleted())
+                .map(c -> SalaryStructureComponentResponseDTO.builder()
+                        .id(c.getComponent().getId())
+                        .salaryStructureId(ss.getId())
+                        .componentId(c.getComponent().getId())
+                        .componentName(c.getComponent().getName())
+                        .componentType(c.getComponent().getType().toString())
+                        .isPercentage(c.getComponent().getIsPercentage())
+                        .value(c.getValue())
+                        .build())
+                .toList();
+
+        // Initialize totals
+        BigDecimal totalEarnings = ss.getBaseSalary(); // Base salary counted as earning
+        BigDecimal totalDeductions = BigDecimal.ZERO;
+        BigDecimal totalWithoutDeduction = ss.getBaseSalary(); // total without deductions
+
+        // Calculate totals
+        for (SalaryStructureComponentResponseDTO comp : componentDTOs) {
+            BigDecimal compValue;
+
+            if (Boolean.TRUE.equals(comp.getIsPercentage())) {
+                compValue = ss.getBaseSalary().multiply(comp.getValue().divide(BigDecimal.valueOf(100)));
+            } else {
+                compValue = comp.getValue();
+            }
+
+            if ("EARNING".equalsIgnoreCase(comp.getComponentType())) {
+                totalEarnings = totalEarnings.add(compValue);
+                totalWithoutDeduction = totalWithoutDeduction.add(compValue);
+            } else if ("DEDUCTION".equalsIgnoreCase(comp.getComponentType())) {
+                totalDeductions = totalDeductions.add(compValue);
+            }
+        }
+
+        BigDecimal netSalary = totalEarnings.subtract(totalDeductions);
+
+        // Build DTO
         return SalaryStructureDetailDTO.builder()
                 .id(ss.getId())
                 .employeeTypeName(ss.getEmployeeType().getName())
                 .baseSalary(ss.getBaseSalary())
                 .effectiveFrom(ss.getEffectiveFrom())
                 .effectiveTo(ss.getEffectiveTo())
-                .components(
-                        ss.getComponents().stream()
-                                .map(c -> SalaryStructureComponentResponseDTO.builder()
-                                        .id(c.getComponent().getId())
-                                        .salaryStructureId(ss.getId())
-                                        .componentId(c.getComponent().getId())
-                                        .componentName(c.getComponent().getName())
-                                        .componentType(c.getComponent().getType().toString())
-                                        .isPercentage(c.getComponent().getIsPercentage())
-                                        .value(c.getValue())
-                                        .build()
-                                )
-                                .toList()
-                )
+                .components(componentDTOs)
+                .totalEarnings(totalEarnings)
+                .totalDeductions(totalDeductions)
+                .totalWithoutDeduction(totalWithoutDeduction)
+                .netSalary(netSalary)
                 .build();
     }
-
-
-
 }
-

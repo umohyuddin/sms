@@ -1,16 +1,12 @@
 package com.smartsolutions.eschool.employee.dtos.employeeMaster.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
 public class EmployeeMasterResponseDto {
 
     private Long id;
@@ -44,4 +40,7 @@ public class EmployeeMasterResponseDto {
 
     // Status
     private Boolean active;
+
+    private Long employeeTypeId;
+    private String employeeTypeName;
 }
