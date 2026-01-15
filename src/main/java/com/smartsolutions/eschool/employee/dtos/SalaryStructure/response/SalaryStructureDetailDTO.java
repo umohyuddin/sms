@@ -18,6 +18,10 @@ public class SalaryStructureDetailDTO {
     private BigDecimal baseSalary;
     private LocalDate effectiveFrom;
     private LocalDate effectiveTo;
+    private BigDecimal totalEarnings;
+    private BigDecimal totalDeductions;
+     private BigDecimal totalWithoutDeduction;
+    private BigDecimal netSalary;
     private List<SalaryStructureComponentResponseDTO> components;
 
 }

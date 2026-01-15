@@ -121,4 +121,16 @@ public class DesignationController {
 //        log.info("Designation updated successfully with id: {}", updated.getId());
 //        return ResponseEntity.ok(updated);
 //    }
+
+    /* =========================
+   GET BY DEPARTMENT
+   ========================= */
+    @GetMapping(value = "/by-department/{departmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getByDepartmentId(@PathVariable Long departmentId) {
+        log.info("GET /api/institute/designations/by-department/{} called", departmentId);
+        List<DesignationResponseDTO> resources = designationFacade.getByDepartmentId(departmentId);
+        log.info("GET /api/institute/designations/by-department/{} succeeded, returned {} resources", departmentId, resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
 }

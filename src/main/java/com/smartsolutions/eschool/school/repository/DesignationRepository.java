@@ -91,6 +91,16 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
             """)
     List<DesignationEntity> findActiveByDepartment(@Param("departmentId") Long departmentId);
 
+
+
+    @Query("""
+        SELECT d FROM DesignationEntity d
+        WHERE (d.department.id = :departmentId OR d.department IS NULL)
+          AND d.active = true
+          AND d.deleted = false
+      """)
+    List<DesignationEntity> findActiveByDepartmentOrGlobal(@Param("departmentId") Long departmentId);
+
     /* =========================
        EMPLOYEE TYPE + DEPARTMENT
        ========================= */

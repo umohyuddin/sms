@@ -194,26 +194,156 @@ public class SalaryStructureService {
     }
 
 
+//    public List<SalaryStructureDetailDTO> getAllSalaryStructures() {
+//        // Fetch all salary structures
+//        List<SalaryStructureEntity> structures = salaryStructureRepository.findSalaryDetail();
+//
+//        return structures.stream().map(ss -> {
+//
+//            // Map components (exclude deleted)
+//            List<SalaryStructureComponentResponseDTO> componentDTOs = ss.getComponents().stream()
+//                    .filter(c -> !c.getDeleted())
+//                    .map(c -> SalaryStructureComponentResponseDTO.builder()
+//                            .id(c.getComponent().getId())
+//                            .salaryStructureId(ss.getId())
+//                            .componentName(c.getComponent().getName())
+//                            .componentType(c.getComponent().getType().toString()) // EARNING or DEDUCTION
+//                            .isPercentage(c.getComponent().getIsPercentage())
+//                            .value(c.getValue())
+//                            .build())
+//                    .toList();
+//
+//            // Initialize totals
+//            BigDecimal totalEarnings = ss.getBaseSalary(); // Base salary counted as earning
+//            BigDecimal totalDeductions = BigDecimal.ZERO;
+//
+//            // Calculate totals
+//            for (SalaryStructureComponentResponseDTO comp : componentDTOs) {
+//                BigDecimal compValue;
+//
+//                // Calculate value based on percentage or fixed
+//                if (Boolean.TRUE.equals(comp.getIsPercentage())) {
+//                    compValue = ss.getBaseSalary()
+//                            .multiply(comp.getValue().divide(BigDecimal.valueOf(100)));
+//                } else {
+//                    compValue = comp.getValue();
+//                }
+//
+//                // Sum earnings vs deductions
+//                if ("EARNING".equalsIgnoreCase(comp.getComponentType())) {
+//                    totalEarnings = totalEarnings.add(compValue);
+//                } else if ("DEDUCTION".equalsIgnoreCase(comp.getComponentType())) {
+//                    totalDeductions = totalDeductions.add(compValue);
+//                }
+//            }
+//
+//            // Net salary = total earnings - total deductions
+//            BigDecimal netSalary = totalEarnings.subtract(totalDeductions);
+//
+//            // Build DTO
+//            return SalaryStructureDetailDTO.builder()
+//                    .id(ss.getId())
+//                    .employeeTypeName(ss.getEmployeeType().getName())
+//                    .baseSalary(ss.getBaseSalary())
+//                    .effectiveFrom(ss.getEffectiveFrom())
+//                    .effectiveTo(ss.getEffectiveTo())
+//                    .components(componentDTOs)
+//                    .totalEarnings(totalEarnings)
+//                    .totalDeductions(totalDeductions)
+//                    .netSalary(netSalary)
+//                    .build();
+//
+//        }).toList();
+//    }
+
+
+
     public List<SalaryStructureDetailDTO> getAllSalaryStructures() {
+        // Fetch all salary structures
         List<SalaryStructureEntity> structures = salaryStructureRepository.findSalaryDetail();
 
-        List<SalaryStructureDetailDTO> dtos = structures.
-                stream().
-                map(ss -> SalaryStructureDetailDTO.builder()
-                        .id(ss.getId()).
-                        employeeTypeName(ss.getEmployeeType().getName()).
-                        baseSalary(ss.getBaseSalary()).
-                        effectiveFrom(ss.getEffectiveFrom()).
-                        effectiveTo(ss.getEffectiveTo()).
-                        components(ss.getComponents().stream().map(c -> SalaryStructureComponentResponseDTO.builder().
-                                id(c.getComponent().getId()).
-                                salaryStructureId(ss.getId()).
-                                componentName(c.getComponent().getName()).
-                                componentType(c.getComponent().getType().toString())       // ComponentType enum
-                .isPercentage(c.getComponent().getIsPercentage()).value(c.getValue()).build()).toList()).build()).toList();
+        return structures.stream().map(ss -> {
 
-        return dtos;
+            // Map components (exclude deleted)
+            List<SalaryStructureComponentResponseDTO> componentDTOs = ss.getComponents().stream()
+                    .filter(c -> !c.getDeleted())
+                    .map(c -> SalaryStructureComponentResponseDTO.builder()
+                            .id(c.getComponent().getId())
+                            .salaryStructureId(ss.getId())
+                            .componentName(c.getComponent().getName())
+                            .componentType(c.getComponent().getType().toString()) // EARNING or DEDUCTION
+                            .isPercentage(c.getComponent().getIsPercentage())
+                            .value(c.getValue())
+                            .build())
+                    .toList();
+
+            // Initialize totals
+            BigDecimal totalEarnings = ss.getBaseSalary(); // Base salary counted as earning
+            BigDecimal totalDeductions = BigDecimal.ZERO;
+            BigDecimal totalWithoutDeduction = ss.getBaseSalary(); // Initialize total without deductions
+
+            // Calculate totals
+            for (SalaryStructureComponentResponseDTO comp : componentDTOs) {
+                BigDecimal compValue;
+
+                // Calculate value based on percentage or fixed
+                if (Boolean.TRUE.equals(comp.getIsPercentage())) {
+                    compValue = ss.getBaseSalary()
+                            .multiply(comp.getValue().divide(BigDecimal.valueOf(100)));
+                } else {
+                    compValue = comp.getValue();
+                }
+
+                // Sum earnings vs deductions
+                if ("EARNING".equalsIgnoreCase(comp.getComponentType())) {
+                    totalEarnings = totalEarnings.add(compValue);
+                    totalWithoutDeduction = totalWithoutDeduction.add(compValue); // Add earnings to totalWithoutDeduction
+                } else if ("DEDUCTION".equalsIgnoreCase(comp.getComponentType())) {
+                    totalDeductions = totalDeductions.add(compValue);
+                    // Do not subtract from totalWithoutDeduction
+                }
+            }
+
+            // Net salary = total earnings - total deductions
+            BigDecimal netSalary = totalEarnings.subtract(totalDeductions);
+
+            // Build DTO
+            return SalaryStructureDetailDTO.builder()
+                    .id(ss.getId())
+                    .employeeTypeName(ss.getEmployeeType().getName())
+                    .baseSalary(ss.getBaseSalary())
+                    .effectiveFrom(ss.getEffectiveFrom())
+                    .effectiveTo(ss.getEffectiveTo())
+                    .components(componentDTOs)
+                    .totalEarnings(totalEarnings)
+                    .totalDeductions(totalDeductions)
+                    .totalWithoutDeduction(totalWithoutDeduction) // NEW FIELD
+                    .netSalary(netSalary)
+                    .build();
+
+        }).toList();
     }
+
+//    public List<SalaryStructureDetailDTO> getAllSalaryStructures() {
+//        List<SalaryStructureEntity> structures = salaryStructureRepository.findSalaryDetail();
+//
+//        List<SalaryStructureDetailDTO> dtos = structures.
+//                stream().
+//                map(ss -> SalaryStructureDetailDTO.builder()
+//                        .id(ss.getId()).
+//                        employeeTypeName(ss.getEmployeeType().getName()).
+//                        baseSalary(ss.getBaseSalary()).
+//                        effectiveFrom(ss.getEffectiveFrom()).
+//                        effectiveTo(ss.getEffectiveTo()).
+//                        components(ss.getComponents().stream().map(c -> SalaryStructureComponentResponseDTO.builder().
+//                                id(c.getComponent().getId()).
+//                                salaryStructureId(ss.getId()).
+//                                componentName(c.getComponent().getName()).
+//                                componentType(c.getComponent().getType().toString())       // ComponentType enum
+//                .isPercentage(c.getComponent().getIsPercentage()).value(c.getValue()).build()).toList()).build()).toList();
+//
+//        return dtos;
+//    }
 
     public SalaryStructureDetailDTO getSalaryStructureByEmployeeType(Long employeeTypeId) {
 

@@ -166,6 +166,34 @@ public class DesignationService {
     }
 
     /* =========================
+   GET BY DEPARTMENT
+   ========================= */
+    public List<DesignationResponseDTO> getByDepartmentId(Long departmentId) {
+        log.info("Fetching Designations for Department ID: {}", departmentId);
+
+        try {
+            List<DesignationEntity> entities =
+                    designationRepository.findActiveByDepartmentOrGlobal(departmentId);
+
+            if (entities.isEmpty()) {
+                log.warn("No Designations found for Department ID: {}", departmentId);
+            }
+
+            return entities.stream()
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching Designations by Department ID: {}", departmentId, dae);
+            throw new CustomServiceException(
+                    "Unable to fetch Designations for department id: " + departmentId,
+                    dae
+            );
+        }
+    }
+
+
+    /* =========================
        HELPER MAPPER
        ========================= */
     private DesignationResponseDTO toDto(DesignationEntity entity) {

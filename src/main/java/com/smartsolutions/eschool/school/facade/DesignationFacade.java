@@ -70,4 +70,8 @@ public class DesignationFacade {
     public List<DesignationResponseDTO> searchByKeyword(String keyword) {
         return designationService.searchByKeyword(keyword);
     }
+
+    public List<DesignationResponseDTO> getByDepartmentId(Long departmentId) {
+        return designationService.getByDepartmentId(departmentId);
+    }
 }
