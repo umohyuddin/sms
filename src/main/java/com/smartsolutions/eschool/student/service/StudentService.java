@@ -25,6 +25,7 @@ import com.smartsolutions.eschool.student.repository.StudentDocumentRepository;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.MappingException;
@@ -64,7 +65,7 @@ public class StudentService {
     private final SectionRepository sectionRepository;
     private final AcademicYearRepository academicYearRepository;
     private final AdmissionTypeRepository admissionTypeRepository;
-    private final  StudentDocumentRepository studentDocumentRepository;
+    private final StudentDocumentRepository studentDocumentRepository;
 
     public StudentService(EmployeeDocumentConfig feeConfig, StudentRepository studentRepository, CampusRepository campusRepository, StandardRepository standardRepository, SectionRepository sectionRepository, AcademicYearRepository academicYearRepository, AdmissionTypeRepository admissionTypeRepository, StudentDocumentRepository studentDocumentRepository) {
         this.feeConfig = feeConfig;
@@ -190,13 +191,14 @@ public class StudentService {
         return Collections.emptyList();
     }
 
-    public StudentDTO getById(Long id) {
+    public StudentResponseDTO getById(Long id) {
         log.info("Fetching Student with id: {}", id);
         StudentEntity studentEntity = studentRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
             log.info("Fetching Student with id: {}", id);
             return new ResourceNotFoundException("Student not found with id: " + id);
         });
-        StudentDTO studentDTO = MapperUtil.mapObject(studentEntity, StudentDTO.class);
+//        StudentDTO studentDTO = MapperUtil.mapObject(studentEntity, StudentDTO.class);
+        StudentResponseDTO studentDTO = mapToResponse(studentEntity);
         log.info("Successfully fetched Standard: id={}", studentDTO.getId());
         return studentDTO;
     }
@@ -347,11 +349,11 @@ public class StudentService {
         studentDocumentRepository.save(document);
     }
 
-    public List<StudentDTO> searchStudents(Long campusId, Long standardId,  Long sectionId,Long studentId, Long academicYearId, String kw) {
+    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long sectionId, Long studentId, Long academicYearId, String kw) {
         try {
-            log.info("Searching students with filters → campusId={}, standardId={}, studentId={}, academicYearId={},kw={}", campusId, standardId, studentId, academicYearId,kw);
+            log.info("Searching students with filters → campusId={}, standardId={}, studentId={}, academicYearId={},kw={}", campusId, standardId, studentId, academicYearId, kw);
 
-            List<StudentEntity> result = studentRepository.searchStudents(campusId, standardId,sectionId, studentId, academicYearId,kw);
+            List<StudentEntity> result = studentRepository.searchStudents(campusId, standardId, sectionId, studentId, academicYearId, kw);
 
             log.info("Student search returned {} results", result.size());
 
@@ -391,19 +393,14 @@ public class StudentService {
         }
 
         // Group documents by their human-readable type from config
-        Map<String, List<StudentDocumentResponseDto>> groupedDocuments = documents.stream()
-                .collect(Collectors.groupingBy(doc ->
-                        feeConfig.getDocumentTypes().getOrDefault(doc.getDocumentType(), "Other")
-                ));
+        Map<String, List<StudentDocumentResponseDto>> groupedDocuments = documents.stream().collect(Collectors.groupingBy(doc -> feeConfig.getDocumentTypes().getOrDefault(doc.getDocumentType(), "Other")));
 
         return groupedDocuments;
     }
 
     public Resource downloadDocument(Long documentId, Long employeeId) {
         // 1️⃣ Fetch document from database
-        StudentDocumentEntity document = studentDocumentRepository.findDocumentByIdAndStudentId(documentId, employeeId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Document not found for employeeId=" + employeeId + " and documentId=" + documentId));
+        StudentDocumentEntity document = studentDocumentRepository.findDocumentByIdAndStudentId(documentId, employeeId).orElseThrow(() -> new RuntimeException("Document not found for employeeId=" + employeeId + " and documentId=" + documentId));
         Path path = Paths.get(document.getFilePath());
         try {
             Resource resource = new UrlResource(path.toUri());
@@ -416,4 +413,146 @@ public class StudentService {
         }
     }
 
+
+    public StudentResponseDTO updateStudent(Long studentId, @Valid StudentRequestDTO requestDTO) {
+        log.info("Updating Student with id {} using DTO {}", studentId, requestDTO);
+
+        // Fetch the existing student or throw if not found
+        StudentEntity entity = studentRepository.findByIdAndDeletedFalse(studentId).orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
+
+        // Update optional fields if provided
+        if (requestDTO.getFirstName() != null && !requestDTO.getFirstName().isBlank()) {
+            entity.setFirstName(requestDTO.getFirstName());
+        }
+
+//        if (requestDTO.getMiddleName() != null) {
+//            entity.setMiddleName(requestDTO.getMiddleName());
+//        }
+
+        if (requestDTO.getLastName() != null && !requestDTO.getLastName().isBlank()) {
+            entity.setLastName(requestDTO.getLastName());
+        }
+
+        // Update full name
+        entity.setFullName(entity.getFirstName() + " " + entity.getLastName());
+
+        if (requestDTO.getCnic() != null) {
+            entity.setCnic(requestDTO.getCnic());
+        }
+
+        if (requestDTO.getPassportNumber() != null) {
+            entity.setPassportNumber(requestDTO.getPassportNumber());
+        }
+
+        if (requestDTO.getPhone() != null) {
+            entity.setPhone(requestDTO.getPhone());
+        }
+
+        if (requestDTO.getEmail() != null) {
+            entity.setEmail(requestDTO.getEmail());
+        }
+
+        if (requestDTO.getDateOfBirth() != null) {
+            entity.setDateOfBirth(requestDTO.getDateOfBirth());
+        }
+
+        if (requestDTO.getGender() != null) {
+            entity.setGender(requestDTO.getGender());
+        }
+
+        if (requestDTO.getReligion() != null) {
+            entity.setReligion(requestDTO.getReligion());
+        }
+
+        if (requestDTO.getNationality() != null) {
+            entity.setNationality(requestDTO.getNationality());
+        }
+
+        if (requestDTO.getBloodGroup() != null) {
+            entity.setBloodGroup(requestDTO.getBloodGroup());
+        }
+
+        // Save updated entity
+        StudentEntity updated = studentRepository.save(entity);
+
+        // Map to Response DTO
+        StudentResponseDTO response = mapToResponse(updated);
+        log.info("Student updated successfully: {}", response.getId());
+        return response;
+    }
+
+    private StudentResponseDTO mapToResponse(StudentEntity student) {
+
+        if (student == null) {
+            return null;
+        }
+
+        // Calculate transient fields
+        student.calculateFeeAssigned();
+
+        StudentResponseDTO dto = new StudentResponseDTO();
+
+        // ===== BASIC INFO =====
+        dto.setId(student.getId());
+        dto.setFirstName(student.getFirstName());
+        dto.setLastName(student.getLastName());
+        dto.setFullName(student.getFullName());
+        dto.setStudentCode(student.getStudentCode());
+
+        dto.setDateOfBirth(student.getDateOfBirth());
+        dto.setGender(student.getGender());
+
+        dto.setEmail(student.getEmail());
+        dto.setPhone(student.getPhone());
+        dto.setAddress(student.getAddress());
+
+        dto.setCnic(student.getCnic());
+        dto.setPassportNumber(student.getPassportNumber());
+
+        dto.setReligion(student.getReligion());
+        dto.setNationality(student.getNationality());
+        dto.setBloodGroup(student.getBloodGroup());
+
+        // ===== STATUS =====
+        dto.setIsActive(student.getIsActive());
+        dto.setStatus(student.getStatus());
+
+
+        // ===== ENROLLMENT =====
+        dto.setEnrollmentDate(student.getEnrollmentDate());
+
+        // ===== CAMPUS =====
+        if (student.getCampus() != null) {
+            dto.setCampusId(student.getCampus().getId());
+            dto.setCampusName(student.getCampus().getCampusName());
+        }
+
+        // ===== STANDARD =====
+        if (student.getStandard() != null) {
+            dto.setStandardId(student.getStandard().getId());
+            dto.setStandardName(student.getStandard().getStandardName());
+        }
+
+        // ===== SECTION =====
+        if (student.getSection() != null) {
+            dto.setSectionId(student.getSection().getId());
+            dto.setSectionName(student.getSection().getSectionName());
+        }
+
+        // ===== ADMISSION TYPE =====
+        if (student.getAdmissionType() != null) {
+            dto.setAdmissionTypeId(student.getAdmissionType().getId());
+            dto.setAdmissionTypeName(student.getAdmissionType().getName());
+        }
+
+        // ===== ACADEMIC YEAR (NOT NULL) =====
+        dto.setAcademicYearId(student.getAcademicYear().getId());
+        dto.setAcademicYearName(student.getAcademicYear().getName());
+
+        // ===== AUDIT =====
+        dto.setCreatedAt(student.getCreatedAt());
+        dto.setUpdatedAt(student.getUpdatedAt());
+
+        return dto;
+    }
 }

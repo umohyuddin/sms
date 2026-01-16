@@ -66,7 +66,7 @@ public class StudentController {
         Long student = (studentId != null && !studentId.isBlank()) ? Long.valueOf(studentId) : null;
         Long academicYear = (academicYearId != null && !academicYearId.isBlank()) ? Long.valueOf(academicYearId) : null;
         String kw = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
-        List<StudentDTO> students = studentFacade.searchStudents(campus, standard, section, student,academicYear,kw);
+        List<StudentDTO> students = studentFacade.searchStudents(campus, standard, section, student, academicYear, kw);
         log.info("GET /api/students/search returned {} students", students.size());
         return students;
     }
@@ -91,7 +91,7 @@ public class StudentController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable Long id) throws Exception {
         log.info("Received request to fetch Student with id: {}", id);
-        StudentDTO studentDTO = studentFacade.getById(id);
+        StudentResponseDTO studentDTO = studentFacade.getById(id);
         log.info("Returning Student: id={}", studentDTO.getId());
         return ResponseEntity.ok(studentDTO);
     }
@@ -114,7 +114,6 @@ public class StudentController {
         log.info("Returning dashboard counts: {}", dashboard);
         return ResponseEntity.ok(dashboard);
     }
-
 
 
 //    @PostMapping(value = "/update-profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -178,5 +177,22 @@ public class StudentController {
         Resource document = studentFacade.getDocumentById(documentId, studentId);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getFilename() + "\"").body(document);
     }
+
+
+    @PutMapping(value = "/{studentId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateStudent(@PathVariable Long studentId, @RequestBody StudentRequestDTO studentRequestDTO) {
+
+        log.info("POST /api/institute/students/{} called to update student", studentId);
+
+        try {
+            StudentResponseDTO updatedStudent = studentFacade.updateStudent(studentId, studentRequestDTO);
+            log.info("Student updated successfully with id: {}", updatedStudent.getId());
+            return ResponseEntity.ok(updatedStudent);
+        } catch (Exception e) {
+            log.error("Failed to update student with id: {}", studentId, e);
+            return ResponseEntity.status(500).body(Map.of("message", "Failed to update student", "error", e.getMessage()));
+        }
+    }
+
 
 }

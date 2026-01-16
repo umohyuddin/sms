@@ -5,7 +5,10 @@ import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.Em
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterSalary;
+import com.smartsolutions.eschool.employee.model.SalaryStructureEntity;
+import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
 import com.smartsolutions.eschool.employee.repository.EmployeeMasterSalaryRepository;
+import com.smartsolutions.eschool.employee.repository.SalaryStructureRepository;
 import com.smartsolutions.eschool.global.enums.SalaryStatus;
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
@@ -16,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,27 +30,78 @@ import java.util.stream.Collectors;
 public class EmployeeMasterSalaryService {
 
     private final EmployeeMasterSalaryRepository salaryRepository;
+    private final EmployeeMasterRepository employeeMasterRepository;
+    private final SalaryStructureRepository salaryStructureRepository;
 
-    public EmployeeMasterSalaryService(EmployeeMasterSalaryRepository salaryRepository) {
+    public EmployeeMasterSalaryService(EmployeeMasterSalaryRepository salaryRepository, EmployeeMasterRepository employeeMasterRepository, SalaryStructureRepository salaryStructureRepository) {
         this.salaryRepository = salaryRepository;
+        this.employeeMasterRepository = employeeMasterRepository;
+        this.salaryStructureRepository = salaryStructureRepository;
     }
 
     /* =========================
        CREATE
        ========================= */
+    @Transactional
     public EmployeeSalaryResponseDTO createSalary(@Valid EmployeeSalaryRequestDTO requestDTO) {
-//        log.info("Creating salary for employeeId={} for month={} year={}",
-//                requestDTO.getEmployeeId(), requestDTO.getMonth(), requestDTO.getYear());
+
+        log.info("Applying salary for employeeId={} with structureId={} effectiveDate={}",
+                requestDTO.getEmployeeId(),
+                requestDTO.getSalaryStructureId(),
+                requestDTO.getEffectiveDate());
+
         try {
+            //  Validate Employee
+            EmployeeMasterEntity employee = employeeMasterRepository
+                    .findById(requestDTO.getEmployeeId())
+                    .orElseThrow(() ->
+                            new CustomServiceException("Employee not found with ID: " + requestDTO.getEmployeeId()));
+
+            // Validate Salary Structure
+            SalaryStructureEntity structure = salaryStructureRepository
+                    .findById(requestDTO.getSalaryStructureId())
+                    .orElseThrow(() ->
+                            new CustomServiceException("Salary Structure not found with ID: " + requestDTO.getSalaryStructureId()));
+
+            //  Check if salary already applied for this effective date
+//            boolean exists = salaryRepository
+//                    .existsByEmployeeIdAndEffectiveDateAndDeletedFalse(
+//                            requestDTO.getEmployeeId(),
+//                            requestDTO.getEffectiveDate());
+
+//            if (exists) {
+//                throw new CustomServiceException(
+//                        "Salary already applied for this employee on effective date: "
+//                                + requestDTO.getEffectiveDate());
+//            }
+
+            // Validate salary calculation
+            BigDecimal calculatedNet =
+                    requestDTO.getGrossSalary().subtract(requestDTO.getTotalDeductions());
+
+            if (calculatedNet.compareTo(requestDTO.getNetSalary()) != 0) {
+                throw new CustomServiceException("Net salary mismatch. Gross - Deductions is invalid.");
+            }
+
+            // Map DTO → Entity
             EmployeeMasterSalary entity = MapperUtil.mapObject(requestDTO, EmployeeMasterSalary.class);
+
+            entity.setEmployee(employee);
+            entity.setSalaryStructure(structure);
+            entity.setEffectiveDate(LocalDate.now());
             entity.setCreatedAt(LocalDateTime.now());
             entity.setDeleted(false);
+
+            // Save
             salaryRepository.save(entity);
-            log.info("Salary saved with id={}", entity.getId());
+
+            log.info("Salary successfully applied with id={}", entity.getId());
+
             return MapperUtil.mapObject(entity, EmployeeSalaryResponseDTO.class);
+
         } catch (DataAccessException dae) {
-            log.error("Database error while creating salary", dae);
-            throw new CustomServiceException("Failed to create salary due to database error");
+            log.error("Database error while applying salary", dae);
+            throw new CustomServiceException("Failed to apply salary due to database error");
         }
     }
 

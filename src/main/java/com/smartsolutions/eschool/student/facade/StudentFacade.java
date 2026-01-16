@@ -57,7 +57,7 @@ public class StudentFacade {
         return studentService.getStudentsBySection(id);
     }
 
-    public StudentDTO getById(Long id) {
+    public StudentResponseDTO getById(Long id) {
         return studentService.getById(id);
     }
 
@@ -136,6 +136,12 @@ public class StudentFacade {
 
     public Resource getDocumentById(Long documentId, Long employeeId) {
         return studentService.downloadDocument(documentId, employeeId);
+    }
+
+
+    public StudentResponseDTO updateStudent(Long studentId, StudentRequestDTO studentRequestDTO) {
+         return  studentService.updateStudent(studentId, studentRequestDTO);
+
     }
 
 }

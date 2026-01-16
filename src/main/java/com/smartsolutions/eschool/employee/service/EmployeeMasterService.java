@@ -81,10 +81,13 @@ public class EmployeeMasterService {
     // -------------------------
     // Get employee by ID
     // -------------------------
+
+    @Transactional
     public EmployeeMasterResponseDto getById(Long id) {
         log.info("Fetching Employee with id: {}", id);
-        EmployeeMasterEntity employee = employeeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
-        return MapperUtil.mapObject(employee, EmployeeMasterResponseDto.class);
+        EmployeeMasterEntity employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
+        return toDTO(employee);
     }
 
     // -------------------------
