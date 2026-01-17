@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response;
 
+import com.smartsolutions.eschool.employee.dtos.SalaryStructureComponent.response.SalaryStructureComponentResponseDTO;
 import com.smartsolutions.eschool.global.enums.SalaryStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +8,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,5 +32,7 @@ public class EmployeeSalaryResponseDTO {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+
 
 }

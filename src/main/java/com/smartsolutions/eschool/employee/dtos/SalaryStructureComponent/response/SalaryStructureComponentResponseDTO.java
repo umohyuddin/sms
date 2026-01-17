@@ -21,4 +21,5 @@ public class SalaryStructureComponentResponseDTO {
     private Boolean isPercentage;       // true if % of base salary
 
     private BigDecimal value;
+    private BigDecimal calculatedAmount;
 }

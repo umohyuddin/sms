@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -172,4 +173,13 @@ public class EmployeeMasterEntity extends AuditableEntity {
     // Employee Salaries
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<EmployeeMasterSalary> salaries;
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<EmployeeDepartmentHistoryEntity> departmentHistories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<EmployeeDesignationHistoryEntity> designationHistories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<EmployeeTypeHistoryEntity> typeHistories = new ArrayList<>();
 }

@@ -7,9 +7,13 @@ import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.Employee
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.request.EmployeeSalaryRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryFullResponseDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
+import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterSalaryService;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import com.smartsolutions.eschool.global.enums.SalaryStatus;
+import com.smartsolutions.eschool.school.service.DepartmentService;
+import com.smartsolutions.eschool.school.service.DesignationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -24,13 +28,17 @@ import java.util.Optional;
 
 @Component
 @Scope("prototype")
+@RequiredArgsConstructor
 public class EmployeeMasterSalaryFacade {
 
     private final EmployeeMasterSalaryService salaryService;
+    private final EmployeeMasterService employeeMasterService;
+    private final DesignationService designationService;
+    private final DepartmentService departmentService;
 
-    public EmployeeMasterSalaryFacade(EmployeeMasterSalaryService salaryService) {
-        this.salaryService = salaryService;
-    }
+//    public EmployeeMasterSalaryFacade(EmployeeMasterSalaryService salaryService) {
+//        this.salaryService = salaryService;
+//    }
 
     /* =========================
        CREATE / UPDATE
@@ -70,5 +78,9 @@ public class EmployeeMasterSalaryFacade {
        ========================= */
     public void softDeleteSalary(Long id) {
         salaryService.softDeleteSalary(id);
+    }
+
+    public EmployeeSalaryFullResponseDTO getSalaryDetail(Long employeeId) {
+        return salaryService.getEmployeeSalaryDetail(employeeId);
     }
 }

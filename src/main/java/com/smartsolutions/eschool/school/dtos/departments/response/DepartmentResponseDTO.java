@@ -1,14 +1,13 @@
 package com.smartsolutions.eschool.school.dtos.departments.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.smartsolutions.eschool.school.model.DepartmentEntity;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class DepartmentResponseDTO {
 
     private Long id;
@@ -27,4 +26,12 @@ public class DepartmentResponseDTO {
     private String headEmployeeName;
 
     private Boolean active;
+    public static DepartmentResponseDTO fromEntity(DepartmentEntity entity) {
+        if (entity == null) return null;
+        return DepartmentResponseDTO.builder()
+                .id(entity.getId())
+                .departmentName(entity.getDepartmentName())
+                .build();
+    }
+
 }

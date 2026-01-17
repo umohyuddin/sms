@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.dtos.employeeMaster.response;
 
+import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import lombok.*;
 
 import java.util.Date;
@@ -43,4 +44,15 @@ public class EmployeeMasterResponseDto {
 
     private Long employeeTypeId;
     private String employeeTypeName;
+
+    public static EmployeeMasterResponseDto fromEntity(EmployeeMasterEntity entity) {
+        if (entity == null) return null;
+
+        return EmployeeMasterResponseDto.builder()
+                .id(entity.getId())
+                .employeeCode(entity.getEmployeeCode())
+                .fullName(entity.getFullName())
+                .email(entity.getEmail())
+                .build();
+    }
 }

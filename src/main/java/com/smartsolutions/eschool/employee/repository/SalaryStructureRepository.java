@@ -114,5 +114,4 @@ public interface SalaryStructureRepository extends JpaRepository<SalaryStructure
     Optional<SalaryStructureEntity> findByEmployeeTypeId(
             @Param("employeeTypeId") Long employeeTypeId
     );
-
 }

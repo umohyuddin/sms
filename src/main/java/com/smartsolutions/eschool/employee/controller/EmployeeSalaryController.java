@@ -113,4 +113,11 @@ public class EmployeeSalaryController {
         salaryFacade.softDeleteSalary(id);
         return ResponseEntity.noContent().build();
     }
+
+    // GET salary detail by employee ID
+    @GetMapping("/by-employeeId/{employeeId}")
+    public ResponseEntity<EmployeeSalaryFullResponseDTO> getEmployeeSalary(@PathVariable Long employeeId) {
+        EmployeeSalaryFullResponseDTO salaryDetail = salaryFacade.getSalaryDetail(employeeId);
+        return ResponseEntity.ok(salaryDetail);
+    }
 }
