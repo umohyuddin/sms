@@ -107,20 +107,20 @@ public class DesignationController {
     /* =========================
        UPDATE
        ========================= */
-//    @PutMapping(value = "/{designationId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> updateDesignation(@PathVariable Long designationId,
-//                                               @RequestBody @Valid DesignationRequestDTO requestDTO) {
-//        log.info("Received request to update Designation with id: {}", designationId);
-//        DesignationResponseDTO updated = designationFacade.updateDesignation(designationId, requestDTO);
-//
-//        if (updated == null) {
-//            log.warn("Designation not found for id: {}", designationId);
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("Designation not found with id: " + designationId);
-//        }
-//        log.info("Designation updated successfully with id: {}", updated.getId());
-//        return ResponseEntity.ok(updated);
-//    }
+    @PutMapping(value = "/{designationId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateDesignation(@PathVariable Long designationId,
+                                               @RequestBody @Valid DesignationRequestDTO requestDTO) {
+        log.info("Received request to update Designation with id: {}", designationId);
+        DesignationResponseDTO updated = designationFacade.updateDesignation(designationId, requestDTO);
+
+        if (updated == null) {
+            log.warn("Designation not found for id: {}", designationId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Designation not found with id: " + designationId);
+        }
+        log.info("Designation updated successfully with id: {}", updated.getId());
+        return ResponseEntity.ok(updated);
+    }
 
     /* =========================
    GET BY DEPARTMENT

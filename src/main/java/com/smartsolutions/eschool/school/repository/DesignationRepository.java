@@ -193,4 +193,5 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
             """)
     List<DesignationEntity> findForDropdown();
 
+    Optional<DesignationEntity> findByIdAndDeletedFalse(Long id);
 }

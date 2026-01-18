@@ -74,4 +74,8 @@ public class DesignationFacade {
     public List<DesignationResponseDTO> getByDepartmentId(Long departmentId) {
         return designationService.getByDepartmentId(departmentId);
     }
+
+    public DesignationResponseDTO updateDesignation(Long designationId, @Valid DesignationRequestDTO requestDTO) {
+        return designationService.updateDesignation(designationId, requestDTO);
+    }
 }
