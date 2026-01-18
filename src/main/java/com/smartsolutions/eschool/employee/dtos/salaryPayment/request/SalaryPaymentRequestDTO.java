@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Setter
 public class SalaryPaymentRequestDTO {
     @NotNull(message = "Employee Salary ID is required")
-    private Long employeeSalaryId;
+    private Long employeeId;
 
     @NotNull(message = "Payment date is required")
     private LocalDate paymentDate;
@@ -22,7 +22,7 @@ public class SalaryPaymentRequestDTO {
     @NotNull(message = "Payment mode is required")
     private SalaryPaymentEntity.PaymentMode paymentMode;
 
-    @Size(max = 100, message = "Transaction reference must be max 100 characters")
+//    @Size(max = 100, message = "Transaction reference must be max 100 characters")
     private String transactionReference;
 
     @NotNull(message = "Amount paid is required")

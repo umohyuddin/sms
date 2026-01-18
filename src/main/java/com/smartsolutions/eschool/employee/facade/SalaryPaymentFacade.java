@@ -7,6 +7,7 @@ import com.smartsolutions.eschool.employee.dtos.salaryPayment.request.SalaryPaym
 import com.smartsolutions.eschool.employee.dtos.salaryPayment.response.SalaryPaymentResponseDTO;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import com.smartsolutions.eschool.employee.service.SalaryPaymentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class SalaryPaymentFacade {
 
     private final SalaryPaymentService paymentService;
@@ -51,4 +53,11 @@ public class SalaryPaymentFacade {
     public void softDeletePayment(Long id) {
         paymentService.softDeletePayment(id);
     }
+
+    public List<SalaryPaymentResponseDTO> getPaymentsByEmployeeId(Long employeeId) {
+        log.info("Facade: fetching salary payments for employeeId={}", employeeId);
+        return paymentService.getPaymentsByEmployeeId(employeeId);
+    }
+
+
 }

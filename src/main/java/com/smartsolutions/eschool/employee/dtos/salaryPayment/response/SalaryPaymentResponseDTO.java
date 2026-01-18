@@ -13,7 +13,9 @@ public class SalaryPaymentResponseDTO {
 
     private Long id;
 
+    private Long EmployeeId;
     private Long employeeSalaryId;
+    private String EmployeeName;
 
     private LocalDate paymentDate;
 

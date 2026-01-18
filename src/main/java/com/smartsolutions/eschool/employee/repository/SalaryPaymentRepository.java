@@ -32,7 +32,9 @@ public interface SalaryPaymentRepository extends JpaRepository<SalaryPaymentEnti
     /* =========================
        FIND ALL ACTIVE BY EMPLOYEE SALARY
        ========================= */
-    @Query("SELECT sp FROM SalaryPaymentEntity sp WHERE sp.employeeSalary.id = :employeeSalaryId AND sp.deleted = false")
+    @Query("SELECT sp FROM SalaryPaymentEntity sp WHERE sp.employeeSalary.id = :employeeSalaryId "
+    //        "AND sp.deleted = false"
+    )
     List<SalaryPaymentEntity> findAllByEmployeeSalaryIdActive(Long employeeSalaryId);
 
     /* =========================

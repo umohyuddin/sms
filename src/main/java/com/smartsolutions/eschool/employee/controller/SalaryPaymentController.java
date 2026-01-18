@@ -80,5 +80,12 @@ public class SalaryPaymentController {
         log.info("Salary payment soft deleted id={}", id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping(value = "/employee/{employeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SalaryPaymentResponseDTO>> getPaymentsByEmployeeId(@PathVariable Long employeeId) {
+        log.info("GET /api/institute/salary-payments/employee/{} called", employeeId);
+        List<SalaryPaymentResponseDTO> payments = paymentFacade.getPaymentsByEmployeeId(employeeId);
+        return ResponseEntity.ok(payments);
+    }
 }
 
