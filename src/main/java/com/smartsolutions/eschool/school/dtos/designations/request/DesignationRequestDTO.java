@@ -14,5 +14,5 @@ public class DesignationRequestDTO {
     private String description;           // Optional description
     private Long departmentId;            // Optional department ID
     private Long employeeTypeId;          // Required: links to employee type
-    private Boolean isActive = true;      // Optional; defaults to true
+    private Boolean active = true;      // Optional; defaults to true
 }

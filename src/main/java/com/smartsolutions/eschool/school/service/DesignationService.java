@@ -48,6 +48,14 @@ public class DesignationService {
         log.info("Creating new Designation: {}", requestDTO.getDesignationName());
         try {
             DesignationEntity entity = MapperUtil.mapObject(requestDTO, DesignationEntity.class);
+            if (requestDTO.getDepartmentId() != null && requestDTO.getDepartmentId() > 0) {
+                DepartmentEntity dept = departmentRepository.findById(requestDTO.getDepartmentId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+                entity.setDepartment(dept);
+            } else {
+                entity.setDepartment(null); // optional department
+            }
+
             designationRepository.save(entity);
             log.info("Designation saved with id: {}", entity.getId());
             return MapperUtil.mapObject(entity, DesignationResponseDTO.class);
@@ -66,7 +74,7 @@ public class DesignationService {
     public DesignationResponseDTO getById(Long id) {
         log.info("Fetching Designation by ID: {}", id);
         try {
-            DesignationEntity entity = designationRepository.findByIdActive(id)
+            DesignationEntity entity = designationRepository.findByIdWithDetails(id)
                     .orElseThrow(() -> {
                         log.warn("Designation not found for id={}", id);
                         return new ResourceNotFoundException("Designation not found with id: " + id);
@@ -128,16 +136,16 @@ public class DesignationService {
         log.info("Updating Designation with ID: {}", id);
 
         try {
-            // 1️⃣ Validate ID
+            // Validate ID
             if (id == null || id <= 0) {
                 throw new IllegalArgumentException("Invalid designation ID");
             }
 
-            // 2️⃣ Fetch existing designation
+            //  Fetch existing designation
             DesignationEntity existing = designationRepository.findByIdAndDeletedFalse(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Designation not found with ID: " + id));
 
-            // 3️⃣ Validate mandatory fields
+            //  Validate mandatory fields
             if (requestDTO.getDesignationName() == null || requestDTO.getDesignationName().trim().isEmpty()) {
                 throw new CustomServiceException("Designation name is required");
             }
@@ -146,26 +154,27 @@ public class DesignationService {
                 throw new CustomServiceException("Employee Type is required");
             }
 
-            // 4️⃣ Fetch associated EmployeeType entity
+            //  Fetch associated EmployeeType entity
             EmployeeTypeEntity employeeType = employeeTypeRepository.findById(requestDTO.getEmployeeTypeId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Employee Type not found with ID: " + requestDTO.getEmployeeTypeId()
                     ));
 
-            // 5️⃣ Fetch Department if provided
+            // Fetch Department if provided
             DepartmentEntity department = null;
-            if (requestDTO.getDepartmentId() != null) {
-                department = departmentRepository.findById(requestDTO.getDepartmentId())
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Department not found with ID: " + requestDTO.getDepartmentId()
-                        ));
+            if (requestDTO.getDepartmentId() != null && requestDTO.getDepartmentId() > 0) {
+                 department = departmentRepository.findById(requestDTO.getDepartmentId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+                existing.setDepartment(department);
+            } else {
+                existing.setDepartment(null); // optional department
             }
 
-            // 6️⃣ Update fields
+            // Update fields
             existing.setDesignationName(requestDTO.getDesignationName().trim());
             existing.setDesignationCode(requestDTO.getDesignationCode() != null ? requestDTO.getDesignationCode().trim() : null);
             existing.setDescription(requestDTO.getDescription() != null ? requestDTO.getDescription().trim() : null);
-            existing.setActive(requestDTO.getIsActive() != null ? requestDTO.getIsActive() : true);
+            existing.setActive(requestDTO.getActive() != null ? requestDTO.getActive() : true);
             existing.setEmployeeType(employeeType);
             existing.setDepartment(department);
 

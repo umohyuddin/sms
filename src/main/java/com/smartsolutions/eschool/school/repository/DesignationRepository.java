@@ -194,4 +194,31 @@ public interface DesignationRepository extends JpaRepository<DesignationEntity, 
     List<DesignationEntity> findForDropdown();
 
     Optional<DesignationEntity> findByIdAndDeletedFalse(Long id);
+
+    @Query("""
+        SELECT d FROM DesignationEntity d
+        LEFT JOIN FETCH d.employeeType
+        LEFT JOIN FETCH d.department
+        WHERE d.id = :id
+          AND d.deleted = false
+    """)
+    Optional<DesignationEntity> findByIdWithDetails(@Param("id") Long id);
+
+    @Query("""
+        SELECT d FROM DesignationEntity d
+        LEFT JOIN FETCH d.employeeType
+        LEFT JOIN FETCH d.department
+        WHERE (:departmentId IS NULL OR d.department.id = :departmentId)
+          AND d.deleted = false
+    """)
+    List<DesignationEntity> findByDepartmentWithDetails(@Param("departmentId") Long departmentId);
+
+
+    @Query("""
+        SELECT d FROM DesignationEntity d
+        LEFT JOIN FETCH d.employeeType
+        LEFT JOIN FETCH d.department
+        WHERE d.deleted = false
+    """)
+    List<DesignationEntity> findAllWithDetails();
 }
