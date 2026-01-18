@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -164,10 +166,18 @@ public class EmployeeMasterService {
         log.info("Creating new Employee: {}", employeeDTO);
 
 
+//        if (employee.getEmployeeCode() == null) {
+//            String lastCode = employeeRepository.findLastEmployeeCode(); // custom query
+//            int nextNumber = 1;
+//            if (lastCode != null) {
+//                nextNumber = Integer.parseInt(lastCode.replace("EMP", "")) + 1;
+//            }
+//            employee.setEmployeeCode(String.format("EMP%03d", nextNumber));
+//        }
         //TODO employee Code
         //TODO Probation Date
         EmployeeMasterEntity employeeEntity = MapperUtil.mapObject(employeeDTO, EmployeeMasterEntity.class);
-
+employeeEntity.setEmployeeCode(generateEmployeeCode());
         employeeEntity.setId(null);
         EmployeeMasterEntity savedEmployee = employeeRepository.save(employeeEntity);
 
@@ -403,6 +413,12 @@ public class EmployeeMasterService {
                 .build();
     }
 
+    private String generateEmployeeCode() {
+        LocalDate today = LocalDate.now();
+        String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMMdd")); // 20260118
+        int randomNum = new Random().nextInt(9000) + 1000; // 4-digit random number
+        return "EMP" + formattedDate + randomNum; // EMP202601181234
+    }
 
 }
 

@@ -68,8 +68,8 @@ public class SalaryPaymentService {
 
             paymentRepository.save(entity);
             log.info("Salary payment saved with id={}", entity.getId());
-
-            return MapperUtil.mapObject(entity, SalaryPaymentResponseDTO.class);
+           return mapToResponseDTO(entity);
+            //return MapperUtil.mapObject(entity, SalaryPaymentResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while creating salary payment", dae);
             throw new CustomServiceException("Failed to create salary payment due to database error");
@@ -78,6 +78,7 @@ public class SalaryPaymentService {
 
     /* =========================
        UPDATE PAYMENT
+
        ========================= */
     @Transactional
     public SalaryPaymentResponseDTO updatePayment(Long id, SalaryPaymentRequestDTO requestDTO) {
@@ -174,5 +175,33 @@ public class SalaryPaymentService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+
+    private SalaryPaymentResponseDTO mapToResponseDTO(SalaryPaymentEntity entity) {
+
+        SalaryPaymentResponseDTO dto = new SalaryPaymentResponseDTO();
+
+        dto.setId(entity.getId());
+
+        if (entity.getEmployeeSalary() != null) {
+            dto.setEmployeeSalaryId(entity.getEmployeeSalary().getId());
+
+            if (entity.getEmployeeSalary().getEmployee() != null) {
+                dto.setEmployeeId(
+                        entity.getEmployeeSalary().getEmployee().getId()
+                );
+            }
+        }
+
+        dto.setPaymentDate(entity.getPaymentDate());
+        dto.setPaymentMode(entity.getPaymentMode());
+        dto.setTransactionReference(entity.getTransactionReference());
+        dto.setAmountPaid(entity.getAmountPaid());
+        dto.setRemarks(entity.getRemarks());
+
+        //dto.setCreatedAt(entity.getCreatedAt()); // from AuditableEntity
+
+        return dto;
     }
 }
