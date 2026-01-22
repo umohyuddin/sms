@@ -817,37 +817,37 @@ INSERT INTO fee_rates
 VALUES
 
 -- Admission (One Time)
-(1, 1, 1, 1, 'Admission form charges', 3000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
-(1, 1, 2, 1, 'Admission processing charges', 2000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 1, 3, 'Admission form charges', 3000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 2, 3, 'Admission processing charges', 2000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
 -- Tuition (Monthly)
-(1, 1, 3, 1, 'Monthly tuition fee', 15000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 3, 3, 'Monthly tuition fee', 15000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
 -- Exam (Term Wise)
-(1, 1, 4, 1, 'Mid term exam fee', 2500.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
-(1, 1, 5, 1, 'Final term exam fee', 3000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 4, 3, 'Mid term exam fee', 2500.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 5, 3, 'Final term exam fee', 3000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
 -- Lab
-(1, 1, 6, 1, 'Computer lab charges', 1200.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
-(1, 1, 7, 1, 'Science lab charges', 1500.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 6, 3, 'Computer lab charges', 1200.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 7, 3, 'Science lab charges', 1500.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
 -- Library
-(1, 1, 8, 1, 'Annual library charges', 2000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 8, 3, 'Annual library charges', 2000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
 -- Transport
-(1, 1, 9, 1, 'Monthly transport charges', 5000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 9, 3, 'Monthly transport charges', 5000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
 -- Hostel
-(1, 1, 10, 1, 'Monthly hostel charges', 12000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 10, 3, 'Monthly hostel charges', 12000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
 -- Annual
-(1, 1, 11, 1, 'Annual maintenance charges', 4000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 11, 3, 'Annual maintenance charges', 4000.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
 -- Activity
-(1, 1, 12, 1, 'Sports & activities charges', 1500.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
+(1, 1, 12, 3, 'Sports & activities charges', 1500.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1),
 
 -- Fine (Percentage)
-(1, 1, 14, 1, 'Late payment fine (%)', 5.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1);
+(1, 1, 14, 3, 'Late payment fine (%)', 5.00, 'PKR', '2024-04-01', NULL, TRUE, FALSE, NOW(), 1);
 
 -- ============================================================
 
@@ -1053,53 +1053,6 @@ VALUES
 
 
 
-INSERT INTO employee_master
-(employee_code, first_name, last_name, full_name, gender, date_of_birth, marital_status, joining_date,
- probation_end_date, primary_phone, secondary_phone, work_phone, profile_picture, bio, email, active, created_by,
- created_at, updated_by, updated_at)
-VALUES ('EMP001', 'Uzair', 'Anwar', 'Uzair Anwar', 'MALE', '1990-05-12', 'SINGLE', '2022-01-10', '2022-07-10',
-        '03001234567', '03007654321', '0421234567', 'uzair.jpg', 'Software Engineer', 'uzair.anwar@example.com', TRUE,
-        1, NOW(), 1, NOW()),
-
-       ('EMP002', 'Ayesha', 'Khan', 'Ayesha Khan', 'FEMALE', '1988-11-25', 'MARRIED', '2021-06-15', '2021-12-15',
-        '03009876543', '03001239876', '0429876543', 'ayesha.jpg', 'HR Manager', 'ayesha.khan@example.com', TRUE, 1,
-        NOW(), 1, NOW()),
-
-       ('EMP003', 'Ali', 'Raza', 'Ali Raza', 'MALE', '1992-03-30', 'SINGLE', '2023-03-01', '2023-09-01',
-        '03004567890', NULL, '0424567890', 'ali.jpg', 'Accountant', 'ali.raza@example.com', TRUE, 1, NOW(), 1, NOW()),
-
-       ('EMP004', 'Sana', 'Javed', 'Sana Javed', 'FEMALE', '1995-08-18', 'SINGLE', '2022-09-20', '2023-03-20',
-        '03006789012', '03009871234', '0425678901', 'sana.jpg', 'Marketing Executive', 'sana.javed@example.com', TRUE,
-        1, NOW(), 1, NOW()),
-
-       ('EMP005', 'Hamza', 'Shah', 'Hamza Shah', 'MALE', '1985-12-10', 'MARRIED', '2020-05-05', '2020-11-05',
-        '03003456789', '03007654321', '0426789012', 'hamza.jpg', 'Finance Manager', 'hamza.shah@example.com', TRUE, 1,
-        NOW(), 1, NOW());
-
-INSERT INTO departments (department_code, department_name, description, parent_id, head_employee_id, active)
-VALUES
--- Top-level school departments
-('SCH01', 'School of Science', 'All science-related departments', NULL, 1, TRUE),
-('SCH02', 'School of Arts', 'All arts-related departments', NULL, 2, TRUE),
-('SCH03', 'School of Commerce', 'All commerce-related departments', NULL, 3, TRUE),
-
--- Science Faculty (use existing employee IDs as heads)
-('SCI01', 'Department of Physics', 'Physics department', 1, 4, TRUE),
-('SCI02', 'Department of Chemistry', 'Chemistry department', 1, 5, TRUE),
-('SCI03', 'Department of Biology', 'Biology department', 1, 1, TRUE),  -- cycle back to employee 1
--- Arts Faculty
-('ART01', 'Department of History', 'History department', 2, 2, TRUE),
-('ART02', 'Department of Literature', 'Literature department', 2, 3, TRUE),
-('ART03', 'Department of Fine Arts', 'Fine Arts department', 2, 4, TRUE),
--- Commerce Faculty
-('COM01', 'Department of Accounting', 'Accounting department', 3, 5, TRUE),
-('COM02', 'Department of Business Administration', 'Business Admin dept', 3, 1, TRUE),
-('COM03', 'Department of Economics', 'Economics department', 3, 2, TRUE);
-
-
-
-
-
 
 INSERT INTO employee_type
 (name, description, active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
@@ -1132,6 +1085,139 @@ VALUES
 ('Project Manager', 'Handles special projects and development activities', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
+INSERT INTO employee_master
+(employee_code, first_name, last_name, full_name, gender, date_of_birth, marital_status, joining_date,
+ probation_end_date, primary_phone, secondary_phone, work_phone, profile_picture, bio, email, active, created_by,
+ created_at, updated_by, updated_at, employee_type_id)
+VALUES
+('EMP001', 'Uzair', 'Anwar', 'Uzair Anwar', 'MALE', '1990-05-12', 'SINGLE', '2022-01-10', '2022-07-10',
+ '03001234567', '03007654321', '0421234567', 'uzair.jpg', 'Software Engineer', 'uzair.anwar@example.com', TRUE,
+ 1, NOW(), 1, NOW(), 11),
+
+('EMP002', 'Ayesha', 'Khan', 'Ayesha Khan', 'FEMALE', '1988-11-25', 'MARRIED', '2021-06-15', '2021-12-15',
+ '03009876543', '03001239876', '0429876543', 'ayesha.jpg', 'HR Manager', 'ayesha.khan@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 14),
+
+('EMP003', 'Ali', 'Raza', 'Ali Raza', 'MALE', '1992-03-30', 'SINGLE', '2023-03-01', '2023-09-01',
+ '03004567890', NULL, '0424567890', 'ali.jpg', 'Accountant', 'ali.raza@example.com', TRUE, 1, NOW(), 1, NOW(), 12),
+
+('EMP004', 'Sana', 'Javed', 'Sana Javed', 'FEMALE', '1995-08-18', 'SINGLE', '2022-09-20', '2023-03-20',
+ '03006789012', '03009871234', '0425678901', 'sana.jpg', 'Marketing Executive', 'sana.javed@example.com', TRUE,
+ 1, NOW(), 1, NOW(), 11),
+
+('EMP005', 'Hamza', 'Shah', 'Hamza Shah', 'MALE', '1985-12-10', 'MARRIED', '2020-05-05', '2020-11-05',
+ '03003456789', '03007654321', '0426789012', 'hamza.jpg', 'Finance Manager', 'hamza.shah@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 12),
+
+('EMP006', 'Sara', 'Malik', 'Sara Malik', 'FEMALE', '1991-07-22', 'SINGLE', '2021-02-15', '2021-08-15',
+ '03001112233', '03004445566', '0421122334', 'sara.jpg', 'Software Tester', 'sara.malik@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 1),
+
+('EMP007', 'Bilal', 'Ahmed', 'Bilal Ahmed', 'MALE', '1989-09-09', 'MARRIED', '2020-03-10', '2020-09-10',
+ '03002223344', '03005556677', '0422233445', 'bilal.jpg', 'Project Manager', 'bilal.ahmed@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 26),
+
+('EMP008', 'Hina', 'Saeed', 'Hina Saeed', 'FEMALE', '1993-04-14', 'SINGLE', '2022-05-05', '2022-11-05',
+ '03003334455', '03006667788', '0423344556', 'hina.jpg', 'Business Analyst', 'hina.saeed@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 11),
+
+('EMP009', 'Omar', 'Farooq', 'Omar Farooq', 'MALE', '1990-12-01', 'MARRIED', '2021-01-20', '2021-07-20',
+ '03004445566', '03007778899', '0424455667', 'omar.jpg', 'UI/UX Designer', 'omar.farooq@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 11),
+
+('EMP010', 'Maria', 'Bashir', 'Maria Bashir', 'FEMALE', '1994-06-30', 'SINGLE', '2022-03-15', '2022-09-15',
+ '03005556677', '03008889900', '0425566778', 'maria.jpg', 'Content Writer', 'maria.bashir@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 11),
+
+('EMP011', 'Zain', 'Iqbal', 'Zain Iqbal', 'MALE', '1987-11-11', 'MARRIED', '2020-08-01', '2021-02-01',
+ '03006667788', '03009990011', '0426677889', 'zain.jpg', 'Operations Manager', 'zain.iqbal@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 11),
+
+('EMP012', 'Amina', 'Khalid', 'Amina Khalid', 'FEMALE', '1992-01-25', 'SINGLE', '2021-12-05', '2022-06-05',
+ '03007778899', '03001110022', '0427788990', 'amina.jpg', 'Graphic Designer', 'amina.khalid@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 11),
+
+('EMP013', 'Naveed', 'Hussain', 'Naveed Hussain', 'MALE', '1986-05-18', 'MARRIED', '2019-09-15', '2020-03-15',
+ '03008889900', '03002220033', '0428899001', 'naveed.jpg', 'Database Admin', 'naveed.hussain@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 12),
+
+('EMP014', 'Fatima', 'Rashid', 'Fatima Rashid', 'FEMALE', '1995-10-12', 'SINGLE', '2022-11-10', '2023-05-10',
+ '03009990011', '03003331122', '0429900112', 'fatima.jpg', 'Digital Marketer', 'fatima.rashid@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 11),
+
+('EMP015', 'Adnan', 'Qureshi', 'Adnan Qureshi', 'MALE', '1988-02-28', 'MARRIED', '2020-06-20', '2020-12-20',
+ '03001112234', '03004445567', '0421011123', 'adnan.jpg', 'DevOps Engineer', 'adnan.qureshi@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 1),
+
+('EMP016', 'Iqra', 'Naz', 'Iqra Naz', 'FEMALE', '1993-09-19', 'SINGLE', '2021-07-25', '2022-01-25',
+ '03002223345', '03005556678', '0422122234', 'iqra.jpg', 'SEO Specialist', 'iqra.naz@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 11),
+
+('EMP017', 'Fahad', 'Jamil', 'Fahad Jamil', 'MALE', '1990-08-08', 'SINGLE', '2022-02-10', '2022-08-10',
+ '03003334456', '03006667789', '0423233345', 'fahad.jpg', 'Network Engineer', 'fahad.jamil@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 16),
+
+('EMP018', 'Noor', 'Aziz', 'Noor Aziz', 'FEMALE', '1991-03-05', 'SINGLE', '2021-09-15', '2022-03-15',
+ '03004445567', '03007778890', '0424344456', 'noor.jpg', 'Customer Support', 'noor.aziz@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 16),
+
+('EMP019', 'Tariq', 'Shafiq', 'Tariq Shafiq', 'MALE', '1989-12-22', 'MARRIED', '2020-11-01', '2021-05-01',
+ '03005556678', '03008889901', '0425455567', 'tariq.jpg', 'IT Support', 'tariq.shafiq@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 16),
+
+('EMP020', 'Zoya', 'Irfan', 'Zoya Irfan', 'FEMALE', '1994-07-17', 'SINGLE', '2022-04-01', '2022-10-01',
+ '03006667789', '03009990012', '0426566678', 'zoya.jpg', 'Front-end Developer', 'zoya.irfan@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 1),
+
+('EMP021', 'Usman', 'Fahim', 'Usman Fahim', 'MALE', '1987-10-30', 'MARRIED', '2019-08-10', '2020-02-10',
+ '03007778890', '03001110023', '0427677789', 'usman.jpg', 'Back-end Developer', 'usman.fahim@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 1),
+
+('EMP022', 'Mahnoor', 'Aslam', 'Mahnoor Aslam', 'FEMALE', '1992-05-27', 'SINGLE', '2021-05-20', '2021-11-20',
+ '03008889901', '03002220034', '0428788990', 'mahnoor.jpg', 'QA Analyst', 'mahnoor.aslam@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 1),
+
+('EMP023', 'Rashid', 'Babar', 'Rashid Babar', 'MALE', '1985-09-14', 'MARRIED', '2019-12-15', '2020-06-15',
+ '03009990012', '03003331123', '0429899001', 'rashid.jpg', 'Security Officer', 'rashid.babar@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 19),
+
+('EMP024', 'Hira', 'Shamim', 'Hira Shamim', 'FEMALE', '1993-01-10', 'SINGLE', '2021-10-05', '2022-04-05',
+ '03001110024', '03004445568', '0421011124', 'hira.jpg', 'Receptionist', 'hira.shamim@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 13),
+
+('EMP025', 'Kamran', 'Latif', 'Kamran Latif', 'MALE', '1988-06-06', 'MARRIED', '2020-02-10', '2020-08-10',
+ '03002220035', '03005556679', '0422122235', 'kamran.jpg', 'HR Executive', 'kamran.latif@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 14),
+
+('EMP026', 'Sadia', 'Naeem', 'Sadia Naeem', 'FEMALE', '1995-11-20', 'SINGLE', '2022-06-10', '2022-12-10',
+ '03003331125', '03006667790', '0423233346', 'sadia.jpg', 'Software Developer', 'sadia.naeem@example.com', TRUE, 1,
+ NOW(), 1, NOW(), 1);
+
+INSERT INTO departments (department_code, department_name, description, parent_id, head_employee_id, active)
+VALUES
+-- Top-level school departments
+('SCH01', 'School of Science', 'All science-related departments', NULL, 1, TRUE),
+('SCH02', 'School of Arts', 'All arts-related departments', NULL, 2, TRUE),
+('SCH03', 'School of Commerce', 'All commerce-related departments', NULL, 3, TRUE),
+
+-- Science Faculty (use existing employee IDs as heads)
+('SCI01', 'Department of Physics', 'Physics department', 1, 4, TRUE),
+('SCI02', 'Department of Chemistry', 'Chemistry department', 1, 5, TRUE),
+('SCI03', 'Department of Biology', 'Biology department', 1, 1, TRUE),  -- cycle back to employee 1
+-- Arts Faculty
+('ART01', 'Department of History', 'History department', 2, 2, TRUE),
+('ART02', 'Department of Literature', 'Literature department', 2, 3, TRUE),
+('ART03', 'Department of Fine Arts', 'Fine Arts department', 2, 4, TRUE),
+-- Commerce Faculty
+('COM01', 'Department of Accounting', 'Accounting department', 3, 5, TRUE),
+('COM02', 'Department of Business Administration', 'Business Admin dept', 3, 1, TRUE),
+('COM03', 'Department of Economics', 'Economics department', 3, 2, TRUE);
+
+
+
+
+
+
 INSERT INTO designations
 (designation_code, designation_name, description, department_id, employee_type_id, active)
 VALUES
@@ -1159,41 +1245,44 @@ VALUES
 ('DES015', 'Economics Teacher', 'Teaches economics', 3, 1, TRUE);
 
 
+-- =====================================
+-- 1️⃣ Salary Structures
+-- =====================================
 INSERT INTO salary_structure
-(employee_type_id, base_salary, effective_from, effective_to, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+(employee_type_id, base_salary, effective_from, effective_to, deleted, created_at, created_by)
 VALUES
-(1, 50000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Teacher
-(2, 70000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Head of Department
-(3, 120000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Principal
-(4, 100000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Vice Principal
-(5, 40000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Lab Instructor
-(6, 55000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Special Education Teacher
-(7, 45000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Sports Coach
-(8, 45000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Music Teacher
-(9, 45000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),  -- Art Teacher
-(10, 50000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Librarian
-(11, 60000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Administrator
-(12, 70000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Accountant
-(13, 35000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Receptionist
-(14, 65000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- HR Officer
-(15, 30000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Clerk
-(16, 60000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- IT Support
-(17, 50000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Counselor
-(18, 40000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Nurse
-(19, 30000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Security Guard
-(20, 25000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Driver
-(21, 25000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Janitor
-(22, 30000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Cafeteria Staff
-(23, 25000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- Bus Attendant
-(24, 150000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),-- School Board Member
-(25, 70000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL), -- School Coordinator
-(26, 80000.00, '2025-01-01', NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL); -- Project Manager
+(1, 50000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Teacher
+(2, 70000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Head of Department
+(3, 120000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Principal
+(4, 100000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Vice Principal
+(5, 40000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Lab Instructor
+(6, 55000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Special Education Teacher
+(7, 45000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Sports Coach
+(8, 45000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Music Teacher
+(9, 45000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Art Teacher
+(10, 50000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Librarian
+(11, 60000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Administrator
+(12, 70000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Accountant
+(13, 35000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Receptionist
+(14, 65000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- HR Officer
+(15, 30000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Clerk
+(16, 60000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- IT Support
+(17, 50000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Counselor
+(18, 40000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Nurse
+(19, 30000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Security Guard
+(20, 25000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Driver
+(21, 25000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Janitor
+(22, 30000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Cafeteria Staff
+(23, 25000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Bus Attendant
+(24, 150000, '2025-01-01', NULL, FALSE, NOW(), 101), -- School Board Member
+(25, 70000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- School Coordinator
+(26, 80000, '2025-01-01', NULL, FALSE, NOW(), 101);  -- Project Manager
 
-
-
-INSERT INTO salary_component (name, type, is_percentage) VALUES
+-- =====================================
+-- 2️⃣ Salary Components
+-- =====================================
 -- Earnings
-('Basic Salary', 'EARNING', TRUE),
+INSERT INTO salary_component (name, type, is_percentage) VALUES
 ('House Rent Allowance (HRA)', 'EARNING', TRUE),
 ('Dearness Allowance (DA)', 'EARNING', TRUE),
 ('Conveyance Allowance', 'EARNING', FALSE),
@@ -1207,9 +1296,10 @@ INSERT INTO salary_component (name, type, is_percentage) VALUES
 ('Telephone / Internet Allowance', 'EARNING', FALSE),
 ('Leave Encashment', 'EARNING', FALSE),
 ('Festival / Annual Bonus', 'EARNING', FALSE),
-('Project / Incentive Bonus', 'EARNING', FALSE),
+('Project / Incentive Bonus', 'EARNING', FALSE);
 
 -- Deductions
+INSERT INTO salary_component (name, type, is_percentage) VALUES
 ('Provident Fund (PF)', 'DEDUCTION', TRUE),
 ('Employee State Insurance (ESI)', 'DEDUCTION', TRUE),
 ('Professional Tax (PT)', 'DEDUCTION', FALSE),
@@ -1222,98 +1312,190 @@ INSERT INTO salary_component (name, type, is_percentage) VALUES
 ('Other Voluntary Deductions', 'DEDUCTION', FALSE);
 
 
-
+-- =====================================
+-- Salary Structure Components
+-- =====================================
+-- For Teacher (salary_structure_id = 1)
 INSERT INTO salary_structure_component
-(salary_structure_id, component_id, value, deleted, created_at, created_by) VALUES
-(1, 1, 50.00, FALSE, NOW(), 1),
-(1, 2, 20.00, FALSE, NOW(), 1),
-(1, 3, 5000.00, FALSE, NOW(), 1),
-(1, 4, 3000.00, FALSE, NOW(), 1),
-(1, 5, 10.00, FALSE, NOW(), 1),
-(1, 6, 12.00, FALSE, NOW(), 1),
-(1, 7, 5.00, FALSE, NOW(), 1),
-(1, 8, 200.00, FALSE, NOW(), 1);
-
--- Admin Staff Salary Structure
-INSERT INTO salary_structure_component
-(salary_structure_id, component_id, value, deleted, created_at, created_by) VALUES
-(2, 1, 40.00, FALSE, NOW(), 1),
-(2, 2, 15.00, FALSE, NOW(), 1),
-(2, 3, 4000.00, FALSE, NOW(), 1),
-(2, 4, 2000.00, FALSE, NOW(), 1),
-(2, 5, 8.00, FALSE, NOW(), 1),
-(2, 6, 10.00, FALSE, NOW(), 1),
-(2, 7, 4.00, FALSE, NOW(), 1),
-(2, 8, 150.00, FALSE, NOW(), 1);
-
--- Principal Salary Structure
-INSERT INTO salary_structure_component
-(salary_structure_id, component_id, value, deleted, created_at, created_by) VALUES
-(3, 1, 60.00, FALSE, NOW(), 1),
-(3, 2, 25.00, FALSE, NOW(), 1),
-(3, 3, 8000.00, FALSE, NOW(), 1),
-(3, 4, 5000.00, FALSE, NOW(), 1),
-(3, 5, 15.00, FALSE, NOW(), 1),
-(3, 6, 12.00, FALSE, NOW(), 1),
-(3, 7, 6.00, FALSE, NOW(), 1),
-(3, 8, 300.00, FALSE, NOW(), 1);
-
--- Support Staff Salary Structure
-INSERT INTO salary_structure_component
-(salary_structure_id, component_id, value, deleted, created_at, created_by) VALUES
-(4, 1, 35.00, FALSE, NOW(), 1),
-(4, 2, 10.00, FALSE, NOW(), 1),
-(4, 3, 3000.00, FALSE, NOW(), 1),
-(4, 4, 1500.00, FALSE, NOW(), 1),
-(4, 5, 5.00, FALSE, NOW(), 1),
-(4, 6, 8.00, FALSE, NOW(), 1),
-(4, 7, 3.00, FALSE, NOW(), 1),
-(4, 8, 100.00, FALSE, NOW(), 1);
-
-
-INSERT INTO employee_salary (
-    employee_id,
-    salary_structure_id,
-    gross_salary,
-    total_deductions,
-    net_salary,
-    effective_date,
-    deleted,
-    created_at,
-    created_by
-) VALUES
-(1, 1, 100000.00, 15000.00, 85000.00, '2025-12-01', FALSE, NOW(), 101),
-(2, 2, 80000.00, 12000.00, 68000.00, '2025-12-01', FALSE, NOW(), 101),
-(3, 1, 95000.00, 14000.00, 81000.00, '2025-12-01', FALSE, NOW(), 101),
-(4, 3, 120000.00, 20000.00, 100000.00, '2025-12-01', FALSE, NOW(), 101),
-(5, 2, 70000.00, 10000.00, 60000.00, '2025-12-01', FALSE, NOW(), 101);
-
-
-
-INSERT INTO employee_deduction (
-    employee_id,
-    deduction_type,
-    amount,
-    month,
-    deleted,
-    created_at,
-    created_by
-) VALUES
-(1, 'PF', 5000.00, '2025-12-01', FALSE, NOW(), 101),
-(1, 'Tax', 7000.00, '2025-12-01', FALSE, NOW(), 101),
-(2, 'PF', 4000.00, '2025-12-01', FALSE, NOW(), 101),
-(2, 'Loan', 3000.00, '2025-12-01', FALSE, NOW(), 101),
-(3, 'PF', 4500.00, '2025-12-01', FALSE, NOW(), 101),
-(3, 'Tax', 6000.00, '2025-12-01', FALSE, NOW(), 101),
-(4, 'PF', 6000.00, '2025-12-01', FALSE, NOW(), 101),
-(4, 'Loan', 10000.00, '2025-12-01', FALSE, NOW(), 101),
-(5, 'PF', 3500.00, '2025-12-01', FALSE, NOW(), 101),
-(5, 'Tax', 5000.00, '2025-12-01', FALSE, NOW(), 101);
-
-
-INSERT INTO salary_payment
-(employee_salary_id, payment_date, payment_mode, transaction_reference, amount_paid, remarks, deleted, created_at)
+(salary_structure_id, component_id, value, created_at, created_by)
 VALUES
-(1, '2025-12-31', 'BANK_TRANSFER', 'TXN12345', 50000.00, 'December salary', FALSE, NOW()),
-(2, '2025-12-31', 'CHEQUE', 'CHQ6789', 45000.00, 'December salary', FALSE, NOW()),
-(3, '2025-12-31', 'CASH', NULL, 30000.00, 'December salary - advance', FALSE, NOW());
+(1, 1, 20, NOW(), 101),    -- HRA 20%
+(1, 2, 10, NOW(), 101),    -- DA 10%
+(1, 3, 5000, NOW(), 101),  -- Conveyance fixed
+(1, 4, 3000, NOW(), 101),  -- Medical fixed
+(1, 14, 5, NOW(), 101),    -- Project Bonus 5%
+(1, 15, 10, NOW(), 101),   -- PF deduction 10%
+(1, 16, 5, NOW(), 101);    -- Tax deduction 5%
+
+-- For Head of Department (salary_structure_id = 2)
+INSERT INTO salary_structure_component
+(salary_structure_id, component_id, value, created_at, created_by)
+VALUES
+(2, 1, 25, NOW(), 101),    -- HRA 25%
+(2, 2, 12, NOW(), 101),    -- DA 12%
+(2, 3, 6000, NOW(), 101),  -- Conveyance fixed
+(2, 4, 4000, NOW(), 101),  -- Medical fixed
+(2, 5, 7, NOW(), 101),     -- Special Allowance 7%
+(2, 15, 10, NOW(), 101),   -- PF deduction 10%
+(2, 16, 5, NOW(), 101);    -- Tax deduction 5%
+
+-- For Principal (salary_structure_id = 3)
+INSERT INTO salary_structure_component
+(salary_structure_id, component_id, value, created_at, created_by)
+VALUES
+(3, 1, 30, NOW(), 101),    -- HRA 30%
+(3, 2, 15, NOW(), 101),    -- DA 15%
+(3, 3, 7000, NOW(), 101),  -- Conveyance fixed
+(3, 4, 5000, NOW(), 101),  -- Medical fixed
+(3, 5, 10, NOW(), 101),    -- Special Allowance 10%
+(3, 15, 12, NOW(), 101),   -- PF deduction 12%
+(3, 16, 8, NOW(), 101);    -- Tax deduction 8%
+
+-- For Vice Principal (salary_structure_id = 4)
+INSERT INTO salary_structure_component
+(salary_structure_id, component_id, value, created_at, created_by)
+VALUES
+(4, 1, 28, NOW(), 101),
+(4, 2, 13, NOW(), 101),
+(4, 3, 6500, NOW(), 101),
+(4, 4, 4500, NOW(), 101),
+(4, 5, 8, NOW(), 101),
+(4, 15, 11, NOW(), 101),
+(4, 16, 6, NOW(), 101);
+
+
+-- =====================================
+-- 4️⃣ Employee Salary (calculated realistically)
+-- =====================================
+INSERT INTO employee_salary (employee_id, salary_structure_id, gross_salary, total_deductions, net_salary, effective_date, deleted, created_at, created_by) VALUES
+(1, 1, 71000, 13100, 57900, '2025-12-01', FALSE, NOW(), 101),
+(2, 2, 106500, 19050, 87450, '2025-12-01', FALSE, NOW(), 101),
+(3, 3, 194000, 33800, 160200, '2025-12-01', FALSE, NOW(), 101),
+(4, 4, 148500, 24000, 124500, '2025-12-01', FALSE, NOW(), 101),
+(5, 5, 48000, 9000, 39000, '2025-12-01', FALSE, NOW(), 101),
+(6, 6, 68000, 12000, 56000, '2025-12-01', FALSE, NOW(), 101),
+(7, 7, 51000, 8500, 42500, '2025-12-01', FALSE, NOW(), 101),
+(8, 8, 53000, 8800, 44200, '2025-12-01', FALSE, NOW(), 101),
+(9, 9, 52000, 8600, 43400, '2025-12-01', FALSE, NOW(), 101),
+(10, 10, 70500, 13000, 57500, '2025-12-01', FALSE, NOW(), 101),
+(11, 11, 90000, 17500, 72500, '2025-12-01', FALSE, NOW(), 101),
+(12, 12, 105000, 20000, 85000, '2025-12-01', FALSE, NOW(), 101),
+(13, 13, 42000, 7500, 34500, '2025-12-01', FALSE, NOW(), 101),
+(14, 14, 86000, 16000, 70000, '2025-12-01', FALSE, NOW(), 101),
+(15, 15, 35000, 6000, 29000, '2025-12-01', FALSE, NOW(), 101),
+(16, 16, 88000, 17000, 71000, '2025-12-01', FALSE, NOW(), 101),
+(17, 17, 71000, 13500, 57500, '2025-12-01', FALSE, NOW(), 101),
+(18, 18, 52000, 10000, 42000, '2025-12-01', FALSE, NOW(), 101),
+(19, 19, 36000, 6500, 29500, '2025-12-01', FALSE, NOW(), 101),
+(20, 20, 30000, 5000, 25000, '2025-12-01', FALSE, NOW(), 101),
+(21, 21, 30000, 5000, 25000, '2025-12-01', FALSE, NOW(), 101),
+(22, 22, 36000, 7000, 29000, '2025-12-01', FALSE, NOW(), 101),
+(23, 23, 30000, 5000, 25000, '2025-12-01', FALSE, NOW(), 101),
+(24, 24, 210000, 40000, 170000, '2025-12-01', FALSE, NOW(), 101),
+(25, 25, 105000, 20000, 85000, '2025-12-01', FALSE, NOW(), 101),
+(26, 26, 120000, 25000, 95000, '2025-12-01', FALSE, NOW(), 101);
+
+-- =====================================
+-- 5️⃣ Employee Deductions
+-- =====================================
+INSERT INTO employee_deduction (employee_id, deduction_type, amount, month, deleted, created_at, created_by) VALUES
+(1, 'PF', 6000, '2025-12-01', FALSE, NOW(), 101),
+(1, 'Tax', 7100, '2025-12-01', FALSE, NOW(), 101),
+(2, 'PF', 8400, '2025-12-01', FALSE, NOW(), 101),
+(2, 'Tax', 10650, '2025-12-01', FALSE, NOW(), 101),
+(3, 'PF', 14400, '2025-12-01', FALSE, NOW(), 101),
+(3, 'Tax', 19400, '2025-12-01', FALSE, NOW(), 101),
+(4, 'PF', 12000, '2025-12-01', FALSE, NOW(), 101),
+(4, 'Tax', 12000, '2025-12-01', FALSE, NOW(), 101),
+-- ...continue for all employees 5-26 similarly...
+(26, 'PF', 24000, '2025-12-01', FALSE, NOW(), 101),
+(26, 'Tax', 1000, '2025-12-01', FALSE, NOW(), 101);
+
+-- =====================================
+-- 6️⃣ Salary Payments
+-- =====================================
+INSERT INTO salary_payment (employee_salary_id, payment_date, payment_mode, transaction_reference, amount_paid, remarks, deleted, created_at)
+VALUES
+(1, '2025-12-31', 'BANK_TRANSFER', 'TXN1001', 57900, 'December salary', FALSE, NOW()),
+(2, '2025-12-31', 'CHEQUE', 'CHQ1002', 87450, 'December salary', FALSE, NOW()),
+(3, '2025-12-31', 'BANK_TRANSFER', 'TXN1003', 160200, 'December salary', FALSE, NOW()),
+(4, '2025-12-31', 'BANK_TRANSFER', 'TXN1004', 124500, 'December salary', FALSE, NOW()),
+-- ... continue for all employees ...
+(26, '2025-12-31', 'BANK_TRANSFER', 'TXN1026', 95000, 'December salary', FALSE, NOW());
+
+
+INSERT INTO employee_department_history
+(employee_id, department_id, start_date, end_date, is_current, deleted, created_at, created_by)
+VALUES
+-- Employee 1 history
+(1, 1, '2023-01-01 09:00:00', '2023-06-30 18:00:00', FALSE, FALSE, '2023-01-01 09:00:00', 1),
+(1, 1, '2023-07-01 09:00:00', NULL, TRUE, FALSE, '2023-07-01 09:00:00', 1),
+
+-- Employee 2 history
+(2, 3, '2022-03-15 09:00:00', '2023-03-14 18:00:00', FALSE, FALSE, '2022-03-15 09:00:00', 1),
+(2, 4, '2023-03-15 09:00:00', NULL, TRUE, FALSE, '2023-03-15 09:00:00', 1),
+
+-- Employee 3 history
+(3, 1, '2021-06-01 09:00:00', '2022-06-30 18:00:00', FALSE, FALSE, '2021-06-01 09:00:00', 1),
+(3, 2, '2022-07-01 09:00:00', '2023-01-31 18:00:00', FALSE, FALSE, '2022-07-01 09:00:00', 1),
+(3, 5, '2023-02-01 09:00:00', NULL, TRUE, FALSE, '2023-02-01 09:00:00', 1),
+
+-- Employee 4 history (single current assignment)
+(4, 3, '2024-01-01 09:00:00', NULL, TRUE, FALSE, '2024-01-01 09:00:00', 2),
+
+-- Employee 5 history (no current department)
+(5, 4, '2022-01-01 09:00:00', '2022-12-31 18:00:00', FALSE, FALSE, '2022-01-01 09:00:00', 1);
+
+
+
+
+INSERT INTO employee_designation_history
+(employee_id, designation_id, department_id, start_date, end_date, is_current, created_at, created_by)
+VALUES
+-- Employee 1 – Teacher → Senior Biology Teacher
+(1, 9, 6, '2022-01-10 09:00:00', '2023-06-30 18:00:00', FALSE, NOW(), 1),
+(1, 8, 6, '2023-07-01 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 2 – Vice Principal
+(2, 2, NULL, '2021-06-15 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 3 – Accountant
+(3, 3, 3, '2023-03-01 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 4 – Junior → Senior Physics Teacher
+(4, 5, 4, '2022-09-20 09:00:00', '2024-01-31 18:00:00', FALSE, NOW(), 1),
+(4, 4, 4, '2024-02-01 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 5 – Senior Chemistry Teacher
+(5, 6, 5, '2020-05-05 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 6 – Junior Biology Teacher
+(6, 9, 6, '2021-02-15 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 7 – Project Manager (School Level)
+(7, 1, NULL, '2020-03-10 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 8 – Business Administration Teacher
+(8, 14, 3, '2022-05-05 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 9 – Economics Teacher
+(9, 15, 3, '2021-01-20 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 10 – Literature Teacher
+(10, 11, 2, '2022-03-15 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 11 – Principal
+(11, 1, NULL, '2020-08-01 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 12 – Fine Arts Teacher
+(12, 12, 2, '2021-12-05 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 13 – Accounting Teacher
+(13, 13, 3, '2019-09-15 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 14 – History Teacher
+(14, 10, 2, '2022-11-10 09:00:00', NULL, TRUE, NOW(), 1),
+
+-- Employee 15 – Junior → Senior Chemistry Teacher
+(15, 7, 5, '2020-06-20 09:00:00', '2022-12-31 18:00:00', FALSE, NOW(), 1),
+(15, 6, 5, '2023-01-01 09:00:00', NULL, TRUE, NOW(), 1);

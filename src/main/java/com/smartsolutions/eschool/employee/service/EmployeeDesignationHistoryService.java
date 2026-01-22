@@ -103,4 +103,31 @@ public class EmployeeDesignationHistoryService {
 
         return response;
     }
+
+    @Transactional
+    public EmployeeDesignationHistoryResponseDTO getCurrentDesignation(Long employeeId) {
+
+        EmployeeDesignationHistoryEntity current = repository
+                .findByEmployeeIdAndIsCurrentTrue(employeeId)
+                .orElseThrow(() ->
+                        new RuntimeException("No current designation found for employee ID: " + employeeId)
+                );
+
+        EmployeeDesignationHistoryResponseDTO response =
+                new EmployeeDesignationHistoryResponseDTO();
+
+        response.setId(current.getId());
+        response.setEmployeeId(current.getEmployee().getId());
+        response.setDesignationId(current.getDesignation().getId());
+        response.setDesignationName(current.getDesignation().getDesignationName());
+
+        if (current.getDepartment() != null) {
+            response.setDepartmentId(current.getDepartment().getId());
+        }
+
+        response.setIsCurrent(current.getIsCurrent());
+
+        return response;
+    }
+
 }

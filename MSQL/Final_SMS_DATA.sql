@@ -286,6 +286,134 @@ INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, 
 -- ============================================================
 
 
+INSERT INTO institutes (    id,name,tagline,address,country_id,province_id,city_id,contact_number,email,website,logo_url,    established_date,    is_deleted,    created_by,updated_by
+) VALUES (
+    1,
+    'Smart Solutions School System',
+    'Empowering Education for Tomorrow',
+    'Model Town, Lahore, Punjab, Pakistan',
+    98,   -- Pakistan
+    1,    -- Punjab
+    1,    -- Lahore
+    '042-35761999',
+    'info@smartsolutions.edu.pk',
+    'https://www.smartsolutions.edu.pk',
+    'https://www.smartsolutions.edu.pk/assets/logo.png',
+    '2010-03-15',
+    FALSE,
+    1,
+    1
+);
+
+
+INSERT INTO academic_years (
+    name,
+    start_date,
+    end_date,
+    total_months,
+    is_current,
+    created_at,
+    updated_at
+) VALUES (
+    '2025-2026',
+    '2025-08-01',
+    '2026-07-31',
+    TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1,
+    TRUE,
+    NOW(),
+    NOW()
+);
+
+
+INSERT INTO campuses (institute_id, province_id, city_id,
+                      campus_name, contact, email, website, address,
+                      logo, deleted,
+                      created_at, created_by, updated_at, updated_by,
+                      deleted_at, deleted_by)
+VALUES
+-- Punjab → Lahore (1)
+(1, 1, 1, 'Downtown Campus', '+92-300-1234567', 'downtown@smarteschool.com',
+ 'https://downtown.smarteschool.com', '123 Main Street', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Punjab → Lahore (1)
+(1, 1, 1, 'Uptown Campus', '+92-300-7654321', 'uptown@smarteschool.com',
+ 'https://uptown.smarteschool.com', '456 Park Avenue', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL);
+
+
+
+-- Sample standards for 2 campuses
+INSERT INTO standards (standard_name, campus_id, created_at, updated_at)
+VALUES
+-- Downtown Campus (campus_id = 1)
+('1st Grade', 1, NOW(), NOW()),
+('2nd Grade', 1, NOW(), NOW()),
+('3rd Grade', 1, NOW(), NOW()),
+('4th Grade', 1, NOW(), NOW()),
+('5th Grade', 1, NOW(), NOW()),
+
+-- Uptown Campus (campus_id = 2)
+('1st Grade', 2, NOW(), NOW()),
+('2nd Grade', 2, NOW(), NOW()),
+('3rd Grade', 2, NOW(), NOW()),
+('4th Grade', 2, NOW(), NOW()),
+('5th Grade', 2, NOW(), NOW());
+
+
+INSERT INTO sections (standard_id, section_name, created_at, updated_at, deleted, deleted_at)
+VALUES
+-- Standard 1
+(1, 'Section A', NOW(), NOW(), 0, NULL),
+(1, 'Section B', NOW(), NOW(), 0, NULL),
+(1, 'Section C', NOW(), NOW(), 0, NULL),
+
+-- Standard 2
+(2, 'Section A', NOW(), NOW(), 0, NULL),
+(2, 'Section B', NOW(), NOW(), 0, NULL),
+(2, 'Section C', NOW(), NOW(), 0, NULL),
+
+-- Standard 3
+(3, 'Section A', NOW(), NOW(), 0, NULL),
+(3, 'Section B', NOW(), NOW(), 0, NULL),
+(3, 'Section C', NOW(), NOW(), 0, NULL),
+
+-- Standard 4
+(4, 'Section A', NOW(), NOW(), 0, NULL),
+(4, 'Section B', NOW(), NOW(), 0, NULL),
+(4, 'Section C', NOW(), NOW(), 0, NULL),
+
+-- Standard 5
+(5, 'Section A', NOW(), NOW(), 0, NULL),
+(5, 'Section B', NOW(), NOW(), 0, NULL),
+(5, 'Section C', NOW(), NOW(), 0, NULL),
+
+-- Standard 6
+(6, 'Section A', NOW(), NOW(), 0, NULL),
+(6, 'Section B', NOW(), NOW(), 0, NULL),
+(6, 'Section C', NOW(), NOW(), 0, NULL),
+
+-- Standard 7
+(7, 'Section A', NOW(), NOW(), 0, NULL),
+(7, 'Section B', NOW(), NOW(), 0, NULL),
+(7, 'Section C', NOW(), NOW(), 0, NULL),
+
+-- Standard 8
+(8, 'Section A', NOW(), NOW(), 0, NULL),
+(8, 'Section B', NOW(), NOW(), 0, NULL),
+(8, 'Section C', NOW(), NOW(), 0, NULL),
+
+-- Standard 9
+(9, 'Section A', NOW(), NOW(), 0, NULL),
+(9, 'Section B', NOW(), NOW(), 0, NULL),
+(9, 'Section C', NOW(), NOW(), 0, NULL),
+
+-- Standard 10
+(10, 'Section A', NOW(), NOW(), 0, NULL),
+(10, 'Section B', NOW(), NOW(), 0, NULL),
+(10, 'Section C', NOW(), NOW(), 0, NULL);
+
+
 INSERT INTO admission_type (code, name, description, is_active)
 VALUES ('NEW_ADMISSION', 'New Admission / Fresh Admission', 'Student joining the school for the first time.', TRUE),
        ('TRANSFER', 'Transfer Admission', 'Student transferring from another school.', TRUE),
@@ -303,3 +431,5 @@ VALUES ('NEW_ADMISSION', 'New Admission / Fresh Admission', 'Student joining the
         TRUE),
        ('MERIT', 'Merit-based Admission', 'Admission based purely on exam/test performance.', TRUE),
        ('MID_YEAR', 'Late Entry Mid-Year', 'Students joining mid-session due to relocation or other reasons.', TRUE);
+
+

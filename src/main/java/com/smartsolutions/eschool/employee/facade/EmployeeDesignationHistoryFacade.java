@@ -15,4 +15,8 @@ public class EmployeeDesignationHistoryFacade {
     public EmployeeDesignationHistoryResponseDTO assignDesignation(EmployeeDesignationHistoryRequestDTO request) {
         return service.assignDesignation(request);
     }
+
+    public EmployeeDesignationHistoryResponseDTO getCurrentDepartment(Long employeeId) {
+        return service.getCurrentDesignation(employeeId);
+    }
 }
