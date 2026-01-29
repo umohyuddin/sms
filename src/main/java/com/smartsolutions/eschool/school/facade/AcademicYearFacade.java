@@ -44,4 +44,11 @@ public class AcademicYearFacade {
         return academicYearService.updateAcademicYear(id, requestDTO);
     }
 
+    public void makeAcademicYearCurrent(Long academicYearId) {
+        academicYearService.makeAcademicYearCurrent(academicYearId);
+    }
+
+    public void deleteAcademicYear(Long academicYearId) {
+        academicYearService.deleteAcademicYear(academicYearId);
+    }
 }

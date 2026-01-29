@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public abstract class AuditableEntity {
+    @Column(name = "organization_id", nullable = false, updatable = false)
+    private Long organizationId;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -32,6 +35,7 @@ public abstract class AuditableEntity {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.createdBy = getCurrentUser();
+        this.organizationId = 1L;
     }
 
     @PreUpdate

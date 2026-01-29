@@ -6,10 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EmployeeDesignationHistoryRepository extends JpaRepository<EmployeeDesignationHistoryEntity, Long> {
+public interface
+EmployeeDesignationHistoryRepository extends JpaRepository<EmployeeDesignationHistoryEntity, Long> {
 
     Optional<EmployeeDesignationHistoryEntity> findByEmployeeIdAndIsCurrentTrue(Long employeeId);
 
@@ -21,4 +23,7 @@ public interface EmployeeDesignationHistoryRepository extends JpaRepository<Empl
     Optional<EmployeeDesignationHistoryEntity> findCurrentByEmployeeId(
             @Param("employeeId") Long employeeId
     );
+
+
+    List<EmployeeDesignationHistoryEntity> findByEmployee_IdOrderByStartDateDesc(Long employeeId);
 }

@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/employees/designations")
@@ -38,5 +40,13 @@ public class EmployeeDesignationHistoryController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/history/{employeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getDepartmentHistory(
+            @PathVariable Long employeeId) {
+        log.info("Fetching department history for Employee ID {}", employeeId);
+        List<EmployeeDesignationHistoryResponseDTO> history = facade.getDesignationHistory(employeeId);
+        return ResponseEntity.ok(history);
     }
 }

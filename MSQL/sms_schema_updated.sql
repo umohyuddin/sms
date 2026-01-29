@@ -8,6 +8,8 @@ sms;
 
 
 
+
+
 CREATE TABLE country (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     country_code VARCHAR(5) NOT NULL UNIQUE,   -- PK, SA, US
@@ -105,6 +107,31 @@ CREATE TABLE institutes (
             FOREIGN KEY (city_id) REFERENCES cities(id)
 );
 
+
+
+CREATE TABLE subjects (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    code VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(150) NOT NULL,
+    description VARCHAR(255),
+
+    is_core BOOLEAN NOT NULL DEFAULT TRUE,
+
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME,
+    created_by BIGINT,
+
+    updated_at DATETIME,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
 -- Table: campuses
 -- Purpose:
 --   Stores all campus records for each institute within the school management system.
@@ -149,18 +176,50 @@ CREATE INDEX idx_campus_name ON campuses (campus_name);
 
 
 
-DROP TABLE IF EXISTS `academic_years`;
-CREATE TABLE academic_years
-(
-    id           BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name         VARCHAR(50) NOT NULL, -- e.g., "2024-2025"
-    start_date   DATE        NOT NULL,
-    end_date     DATE        NOT NULL,
-    total_months INT         NOT NULL, -- Total months in the academic year
-    is_current   BOOLEAN     NOT NULL DEFAULT FALSE,
-    created_at   DATETIME             DEFAULT CURRENT_TIMESTAMP,
-    updated_at   DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+DROP TABLE IF EXISTS academic_years;
+
+CREATE TABLE academic_years (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(50) NOT NULL,            -- e.g. "2024-2025"
+    code VARCHAR(20) NOT NULL,
+
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+
+    total_months BIGINT NOT NULL,
+
+    is_current BOOLEAN NOT NULL DEFAULT FALSE,
+
+    status VARCHAR(20) NOT NULL,          -- AcademicYearStatus (ENUM stored as STRING)
+
+    remarks VARCHAR(255),
+
+    is_locked BOOLEAN NOT NULL DEFAULT FALSE,
+    locked_at DATETIME,
+    locked_by BIGINT,
+
+    organization_id BIGINT NOT NULL,
+
+    -- Audit fields (from AuditableEntity)
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    -- Constraints
+    CONSTRAINT uk_academic_year_code UNIQUE (code),
+    CONSTRAINT uk_academic_year_date_range UNIQUE (start_date, end_date)
 );
+
+-- Indexes
+CREATE INDEX idx_academic_year_status ON academic_years (status);
+CREATE INDEX idx_academic_year_is_current ON academic_years (is_current);
+
 
 CREATE TABLE admission_type
 (

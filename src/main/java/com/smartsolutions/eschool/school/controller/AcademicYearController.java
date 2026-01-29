@@ -28,7 +28,7 @@ public class AcademicYearController {
     public ResponseEntity<?> createAcademicYear(@RequestBody @Valid AcademicYearRequestDTO requestDTO) {
         log.info("Received request to create academic year");
         AcademicYearRequestDTO academicYearRequestDTO = academicYearFacade.createAcademicYear(requestDTO);
-        log.info("Academic year created successfully with id: {}", academicYearRequestDTO.getId());
+        log.info("Academic year created successfully with id");
         return ResponseEntity.status(HttpStatus.CREATED).body(academicYearRequestDTO);
     }
 
@@ -74,4 +74,19 @@ public class AcademicYearController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping(value = "/{id}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> activateAcademicYear(@PathVariable Long id) {
+        log.info("Received request to activate academic year with id: {}", id);
+        academicYearFacade.makeAcademicYearCurrent(id);
+        log.info("Academic year activated successfully with id: {}", id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteAcademicYear(@PathVariable Long id) {
+        log.info("Received request to delete Academic Year with id: {}", id);
+        academicYearFacade.deleteAcademicYear(id);
+        log.info("Academic Year deleted successfully with id: {}", id);
+        return ResponseEntity.ok().build();
+    }
 }

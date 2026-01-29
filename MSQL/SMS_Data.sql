@@ -308,17 +308,13 @@ VALUES ('NEW_ADMISSION', 'New Admission / Fresh Admission', 'Student joining the
 
 
 
-INSERT INTO academic_years (name, start_date, end_date, total_months, is_current, created_at, updated_at)
-VALUES ('2022-2023', '2022-08-01', '2023-07-31', TIMESTAMPDIFF(MONTH, '2022-08-01', '2023-07-31') + 1, FALSE, NOW(),
-        NOW()),
-       ('2023-2024', '2023-08-01', '2024-07-31', TIMESTAMPDIFF(MONTH, '2023-08-01', '2024-07-31') + 1, FALSE, NOW(),
-        NOW()),
-       ('2024-2025', '2024-08-01', '2025-07-31', TIMESTAMPDIFF(MONTH, '2024-08-01', '2025-07-31') + 1, TRUE, NOW(),
-        NOW()),
-       ('2025-2026', '2025-08-01', '2026-07-31', TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1, FALSE, NOW(),
-        NOW()),
-       ('2026-2027', '2026-08-01', '2027-07-31', TIMESTAMPDIFF(MONTH, '2026-08-01', '2027-07-31') + 1, FALSE, NOW(),
-        NOW());
+INSERT INTO academic_years (name, code, start_date, end_date, total_months, is_current, status, remarks, is_locked, locked_at, locked_by, organization_id, created_at, created_by, updated_at, updated_by)
+VALUES
+('2022-2023', 'AY-2022-23', '2022-08-01', '2023-07-31', TIMESTAMPDIFF(MONTH, '2022-08-01', '2023-07-31') + 1, FALSE, 'ARCHIVED', 'Completed academic year', TRUE, NOW(), 1, 1, NOW(), 1, NOW(), 1),
+('2023-2024', 'AY-2023-24', '2023-08-01', '2024-07-31', TIMESTAMPDIFF(MONTH, '2023-08-01', '2024-07-31') + 1, FALSE, 'ARCHIVED', 'Completed academic year', TRUE, NOW(), 1, 1, NOW(), 1, NOW(), 1),
+('2024-2025', 'AY-2024-25', '2024-08-01', '2025-07-31', TIMESTAMPDIFF(MONTH, '2024-08-01', '2025-07-31') + 1, TRUE, 'ACTIVE', 'Current academic year', FALSE, NULL, NULL, 1, NOW(), 1, NOW(), 1),
+('2025-2026', 'AY-2025-26', '2025-08-01', '2026-07-31', TIMESTAMPDIFF(MONTH, '2025-08-01', '2026-07-31') + 1, FALSE, 'UPCOMING', 'Upcoming academic year', FALSE, NULL, NULL, 1, NOW(), 1, NOW(), 1),
+('2026-2027', 'AY-2026-27', '2026-08-01', '2027-07-31', TIMESTAMPDIFF(MONTH, '2026-08-01', '2027-07-31') + 1, FALSE, 'UPCOMING', 'Upcoming academic year', FALSE, NULL, NULL, 1, NOW(), 1, NOW(), 1);
 
 
 

@@ -1,29 +1,36 @@
 package com.smartsolutions.eschool.student.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsolutions.eschool.sclass.model.SubjectEntity;
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "attendance")
-@Data
+@Table(name = "attendance", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"student_id", "attendance_date"})
+})
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentAttendanceEntity {
+public class StudentAttendanceEntity extends AuditableEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "std_id")
+    @Column(name = "student_id", nullable = false)
     private Long studentId;
+
+    @Column(name = "standard_id")
+    private Long standardId;
+
+    @Column(name = "section_id")
+    private Long sectionId;
 
     @Column(name = "attendance_date", nullable = false)
     private LocalDate attendanceDate;
@@ -31,6 +38,12 @@ public class StudentAttendanceEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private AttendanceStatus status;
+
+    @Column(name = "marked_by")
+    private Long markedBy; // teacher/admin who marked attendance
+
+    @Column(name = "remarks")
+    private String remarks;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -41,12 +54,11 @@ public class StudentAttendanceEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "std_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "student_id", referencedColumnName = "id", insertable = false, updatable = false)
     @JsonIgnore
     private StudentEntity student;
 
-
     public enum AttendanceStatus {
-        P, A, L
+        PRESENT, ABSENT, LEAVE
     }
 }

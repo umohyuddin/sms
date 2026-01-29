@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -130,4 +131,33 @@ public class EmployeeDesignationHistoryService {
         return response;
     }
 
+    @Transactional()
+    public List<EmployeeDesignationHistoryResponseDTO> getDesignationHistory(Long employeeId) {
+
+        return repository
+                .findByEmployee_IdOrderByStartDateDesc(employeeId)
+                .stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+
+    EmployeeDesignationHistoryResponseDTO toDto(
+            EmployeeDesignationHistoryEntity entity
+    ) {
+        return EmployeeDesignationHistoryResponseDTO.builder()
+                .id(entity.getId())
+                .designationId(entity.getDesignation().getId())
+                .designationName(entity.getDesignation().getDesignationName())
+
+                .departmentId(
+                        entity.getDepartment() != null
+                                ? entity.getDepartment().getId()
+                                : null
+                )
+                .startDate(entity.getStartDate())
+                .endDate(entity.getEndDate())
+                .isCurrent(entity.getIsCurrent())
+                .build();
+    }
 }
