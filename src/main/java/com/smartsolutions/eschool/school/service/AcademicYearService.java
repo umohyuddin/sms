@@ -16,6 +16,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
@@ -251,6 +252,8 @@ public class AcademicYearService {
         // Soft delete
         year.setStatus(AcademicYearStatus.DELETED);
         year.setIsCurrent(false);
+        year.setDeletedAt(LocalDateTime.now());
+        year.setDeletedBy(1L);
 
         academicYearRepository.save(year);
 
@@ -338,6 +341,28 @@ public class AcademicYearService {
         return Collections.emptyList();
     }
 
+    public void deleteAcademicYear(Long academicYearId, Long currentUserId) {
+        AcademicYearEntity year = academicYearRepository.findById(academicYearId)
+                .orElseThrow(() -> new IllegalArgumentException("Academic Year not found"));
+
+        if (Boolean.TRUE.equals(year.getIsCurrent())) {
+            throw new IllegalStateException("Current Academic Year cannot be deleted");
+        }
+
+        if (Boolean.TRUE.equals(year.getIsLocked())) {
+            throw new IllegalStateException("Locked Academic Year cannot be deleted");
+        }
+
+        int updated = academicYearRepository.softDelete(
+                academicYearId,
+                LocalDateTime.now(),
+                currentUserId
+        );
+
+        if (updated == 0) {
+            throw new IllegalStateException("Unable to delete Academic Year. It may have been already deleted or is locked/current.");
+        }
+    }
     private void validateNameFormat(String name) {
         if (!name.matches("\\d{4}-\\d{4}")) {
             throw new IllegalArgumentException("Academic year name must be in 'YYYY-YYYY' format.");
