@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.employee.service;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeTypeCountDTO;
 import com.smartsolutions.eschool.employee.model.EmployeeDocumentEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.repository.EmployeeDocumentRepository;
@@ -418,6 +419,10 @@ employeeEntity.setEmployeeCode(generateEmployeeCode());
         String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMMdd")); // 20260118
         int randomNum = new Random().nextInt(9000) + 1000; // 4-digit random number
         return "EMP" + formattedDate + randomNum; // EMP202601181234
+    }
+
+    public List<EmployeeTypeCountDTO> getEmployeeCountByType() {
+        return employeeRepository.countEmployeesByType();
     }
 
 }

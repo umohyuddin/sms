@@ -5,6 +5,7 @@ import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeM
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeAddressResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeTypeCountDTO;
 import com.smartsolutions.eschool.employee.facade.EmployeeAddressFacade;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
 import com.smartsolutions.eschool.global.utils.UploadUtil;
@@ -299,6 +300,12 @@ public class EmployeeMasterController {
             log.error("Failed to update employee address with id={}", addressId, e);
             return ResponseEntity.status(500).build();
         }
+    }
+
+
+    @GetMapping("/count-by-type")
+    public ResponseEntity<List<EmployeeTypeCountDTO>> getEmployeeCountByType() {
+        return ResponseEntity.ok(employeeFacade.getEmployeeCountByType());
     }
 
 }

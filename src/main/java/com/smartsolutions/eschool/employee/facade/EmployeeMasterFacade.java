@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeM
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeAddressResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeTypeCountDTO;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
@@ -114,5 +115,8 @@ public class EmployeeMasterFacade {
         return employeeService.getEmployeeCountByGender();
     }
 
+    public List<EmployeeTypeCountDTO> getEmployeeCountByType() {
+        return employeeService.getEmployeeCountByType();
+    }
 }
 

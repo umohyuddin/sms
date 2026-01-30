@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.repository;
 
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeTypeCountDTO;
 import com.smartsolutions.eschool.employee.model.EmployeeAddressEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -91,5 +92,17 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEn
     List<EmployeeMasterEntity> findAllOrderByDateOfBirthAsc();
 
 
-
+    @Query("""
+        SELECT 
+            et.id AS employeeTypeId,
+            et.name AS employeeTypeName,
+            COUNT(e.id) AS totalEmployees
+        FROM EmployeeMasterEntity e
+        JOIN e.employeeType et
+        WHERE e.active = true
+        GROUP BY et.id, et.name
+    """)
+    List<EmployeeTypeCountDTO> countEmployeesByType();
 }
+
+
