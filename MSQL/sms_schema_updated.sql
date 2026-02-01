@@ -112,6 +112,8 @@ CREATE TABLE institutes (
 CREATE TABLE subjects (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
+    organization_id BIGINT NOT NULL,
+
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(150) NOT NULL,
     description VARCHAR(255),
@@ -143,6 +145,7 @@ DROP TABLE IF EXISTS `campuses`;
 CREATE TABLE campuses
 (
     id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
     institute_id BIGINT,
     province_id  BIGINT,
     city_id      BIGINT,
@@ -224,6 +227,7 @@ CREATE INDEX idx_academic_year_is_current ON academic_years (is_current);
 CREATE TABLE admission_type
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     code        VARCHAR(50)  NOT NULL UNIQUE,
     name        VARCHAR(150) NOT NULL,
     description VARCHAR(500),
@@ -245,6 +249,7 @@ DROP TABLE IF EXISTS standards;
 CREATE TABLE standards
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     campus_id     BIGINT      NOT NULL,
     standard_name VARCHAR(50) NOT NULL,
     standard_code VARCHAR(50),
@@ -271,6 +276,7 @@ DROP TABLE IF EXISTS `sections`;
 CREATE TABLE sections
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     standard_id  BIGINT      NOT NULL,
     section_name VARCHAR(10) NOT NULL,
     section_code VARCHAR(15),
@@ -298,6 +304,8 @@ DROP TABLE IF EXISTS `students`;
 CREATE TABLE students
 (
     id                BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id   BIGINT NOT NULL,
 
     first_name        VARCHAR(50)  NOT NULL,
     full_name         VARCHAR(100) NOT NULL,
@@ -338,6 +346,8 @@ CREATE TABLE students
 CREATE TABLE student_document (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
+    organization_id BIGINT NOT NULL,
+
     student_id BIGINT NOT NULL,
 
     file_name VARCHAR(255) NOT NULL,
@@ -363,6 +373,7 @@ DROP TABLE IF EXISTS `fee_catalog`;
 CREATE TABLE fee_catalog
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     code            VARCHAR(50)  NOT NULL UNIQUE,
     name            VARCHAR(100) NOT NULL,
     description     VARCHAR(255),
@@ -383,6 +394,8 @@ DROP TABLE IF EXISTS `fee_component`;
 CREATE TABLE fee_component
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
 
     fee_catalog_id BIGINT       NOT NULL,
     component_code VARCHAR(50)  NOT NULL,
@@ -408,6 +421,7 @@ DROP TABLE IF EXISTS fee_rates;
 CREATE TABLE fee_rates
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id  BIGINT NOT NULL,
     campus_id        BIGINT         NOT NULL,
     standard_id      BIGINT         NOT NULL,
     fee_component_id BIGINT,
@@ -440,6 +454,8 @@ CREATE TABLE student_fee_assignments
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
 
+    organization_id BIGINT NOT NULL,
+
     student_id    BIGINT NOT NULL,
     fee_rate_id   BIGINT NOT NULL,
 
@@ -460,6 +476,7 @@ DROP TABLE IF EXISTS student_fee_payments;
 CREATE TABLE student_fee_payments
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id  BIGINT NOT NULL,
     academic_year_id BIGINT      NOT NULL,
     student_id       BIGINT      NOT NULL,
     payment_date     DATE,
@@ -478,6 +495,7 @@ DROP TABLE IF EXISTS student_fee_summary;
 CREATE TABLE student_fee_summary
 (
     id                 BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id    BIGINT NOT NULL,
     student_id         BIGINT         NOT NULL,
     academic_year_id   BIGINT         NOT NULL,
     total_assigned_fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
@@ -496,6 +514,8 @@ DROP TABLE IF EXISTS discount_type;
 CREATE TABLE discount_type
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
 
     code            VARCHAR(50)  NOT NULL,
     name            VARCHAR(150) NOT NULL,
@@ -550,6 +570,7 @@ CREATE TABLE discount_type
 CREATE TABLE discount_sub_type
 (
     id               BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id  BIGINT NOT NULL,
     discount_type_id BIGINT             NOT NULL,
     code             VARCHAR(50) UNIQUE NOT NULL,
     name             VARCHAR(150)       NOT NULL,
@@ -573,6 +594,8 @@ CREATE TABLE discount_sub_type
 CREATE TABLE discount_rate
 (
     id                   BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    organization_id      BIGINT NOT NULL,
 
     value                DECIMAL(10, 2) NOT NULL,
     is_percentage        BOOLEAN        NOT NULL DEFAULT TRUE,
@@ -604,6 +627,8 @@ CREATE TABLE student_discount_assignment
 (
     id                 BIGINT PRIMARY KEY AUTO_INCREMENT,
 
+    organization_id    BIGINT NOT NULL,
+
     student_id         BIGINT NOT NULL,
     campus_id          BIGINT NOT NULL,
     discount_rate_id   BIGINT NOT NULL,
@@ -634,6 +659,8 @@ CREATE TABLE system_users
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
 
+    organization_id BIGINT NOT NULL,
+
     -- Authentication
     username      VARCHAR(50)  NOT NULL UNIQUE,
     email         VARCHAR(150) NOT NULL UNIQUE,
@@ -651,6 +678,7 @@ CREATE TABLE system_users
 
 CREATE TABLE employee_type (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
     name VARCHAR(50) NOT NULL UNIQUE,
     description VARCHAR(255),
   active          BOOLEAN NOT NULL DEFAULT TRUE,
@@ -668,6 +696,7 @@ CREATE TABLE employee_type (
 CREATE TABLE employee_master
 (
     id                 BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    organization_id    BIGINT NOT NULL,
     employee_code      VARCHAR(50)  NOT NULL UNIQUE,
 
     -- Personal Information
@@ -726,6 +755,7 @@ CREATE TABLE employee_master
 CREATE TABLE employee_document
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     employee_id   BIGINT       NOT NULL, -- foreign key to Teacher
     file_name     VARCHAR(255) NOT NULL,
     file_path     VARCHAR(500) NOT NULL,
@@ -746,6 +776,7 @@ CREATE TABLE employee_document
 CREATE TABLE employee_address
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     employee_id  BIGINT       NOT NULL,
     address_type VARCHAR(50)  NOT NULL,
     line1        VARCHAR(255) NOT NULL,
@@ -772,6 +803,7 @@ CREATE TABLE employee_address
 CREATE TABLE employee_emergency_contact
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     employee_id     BIGINT       NOT NULL,
     contact_name    VARCHAR(255) NOT NULL,
     relationship    VARCHAR(100) NOT NULL,
@@ -795,6 +827,7 @@ CREATE TABLE employee_emergency_contact
 CREATE TABLE employee_qualification
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     employee_id     BIGINT       NOT NULL,
     degree          VARCHAR(100) NOT NULL, -- e.g., B.Sc, M.Ed
     major_subject   VARCHAR(100),          -- e.g., Mathematics, English
@@ -816,6 +849,7 @@ CREATE TABLE employee_qualification
 
 CREATE TABLE departments (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     department_code VARCHAR(50)  NOT NULL UNIQUE,
     department_name VARCHAR(150) NOT NULL,
     description     VARCHAR(255),
@@ -836,6 +870,7 @@ CREATE TABLE departments (
 
 CREATE TABLE employee_department_history (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     employee_id     BIGINT       NOT NULL,
     department_id   BIGINT       NOT NULL,
     start_date      DATETIME     NOT NULL,
@@ -861,6 +896,8 @@ CREATE TABLE employee_department_history (
 
 CREATE TABLE designations (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
 
     designation_code VARCHAR(50) NOT NULL UNIQUE,
     designation_name VARCHAR(150) NOT NULL,
@@ -892,6 +929,7 @@ CREATE TABLE designations (
 
 CREATE TABLE employee_designation_history (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     employee_id BIGINT NOT NULL,
     designation_id BIGINT NOT NULL,
     department_id BIGINT,       -- optional, can reference current department
@@ -916,6 +954,7 @@ CREATE TABLE employee_designation_history (
 
 CREATE TABLE employee_type_history (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
     employee_id BIGINT NOT NULL,
     employee_type_id BIGINT NOT NULL,
     start_date DATETIME NOT NULL,
@@ -936,6 +975,7 @@ CREATE TABLE employee_type_history (
 
     CREATE TABLE salary_structure (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
     employee_type_id BIGINT NOT NULL,
     base_salary DECIMAL(12,2) NOT NULL,   -- Fixed base salary
     effective_from DATE NOT NULL,
@@ -958,6 +998,7 @@ UNIQUE (employee_type_id, is_current)
 
 CREATE TABLE salary_component (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
     name VARCHAR(100) NOT NULL,                   -- Full name of the component
     type ENUM('EARNING','DEDUCTION') NOT NULL,    -- Earning or Deduction
     is_percentage BOOLEAN NOT NULL DEFAULT TRUE, -- TRUE if % of base salary, FALSE if fixed amount
@@ -972,6 +1013,7 @@ CREATE TABLE salary_component (
 
     CREATE TABLE salary_structure_component (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        organization_id BIGINT NOT NULL,
         salary_structure_id BIGINT NOT NULL,
         component_id BIGINT NOT NULL,
         value DECIMAL(12,2) NOT NULL,              -- % if is_percentage, fixed amount if not
@@ -989,6 +1031,7 @@ CREATE TABLE salary_component (
 
     CREATE TABLE employee_salary (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        organization_id BIGINT NOT NULL,
         employee_id BIGINT NOT NULL,
         salary_structure_id BIGINT NOT NULL,
         gross_salary DECIMAL(12,2) NOT NULL,
@@ -1009,6 +1052,7 @@ deleted         BOOLEAN DEFAULT FALSE,
 
         CREATE TABLE employee_deduction (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        organization_id BIGINT NOT NULL,
         employee_id BIGINT NOT NULL,
         deduction_type VARCHAR(50) NOT NULL,   -- PF, Tax, Loan, etc.
         amount DECIMAL(12,2) NOT NULL,
@@ -1026,6 +1070,8 @@ deleted         BOOLEAN DEFAULT FALSE,
 
 CREATE TABLE salary_payment (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    organization_id BIGINT NOT NULL,
 
     employee_salary_id BIGINT NOT NULL,    -- Link to computed salary
     payment_date DATE NOT NULL,            -- Date salary was paid
@@ -1048,6 +1094,7 @@ CREATE TABLE salary_payment (
 
 CREATE TABLE payroll_period (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     status ENUM('PENDING','COMPLETED','CANCELLED') NOT NULL DEFAULT 'PENDING',
@@ -1064,6 +1111,7 @@ CREATE TABLE payroll_period (
 
 CREATE TABLE employee_bonus (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
     employee_id BIGINT NOT NULL,
     bonus_type VARCHAR(50) NOT NULL,  -- e.g., Festival Bonus, Performance
     amount DECIMAL(12,2) NOT NULL,
@@ -1083,6 +1131,7 @@ CREATE TABLE employee_bonus (
 
 CREATE TABLE employee_advance (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
     employee_id BIGINT NOT NULL,
     amount DECIMAL(12,2) NOT NULL,
     repayment_months INT,
@@ -1102,6 +1151,7 @@ CREATE TABLE employee_advance (
 
 CREATE TABLE salary_slip (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
     employee_salary_id BIGINT NOT NULL,
     payroll_period_id BIGINT NOT NULL,
     slip_url VARCHAR(255),  -- PDF or file location
