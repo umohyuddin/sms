@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 @RestController
@@ -27,7 +28,7 @@ public class AcademicYearController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAcademicYear(@RequestBody @Valid AcademicYearRequestDTO requestDTO) {
         log.info("Received request to create academic year");
-        AcademicYearRequestDTO academicYearRequestDTO = academicYearFacade.createAcademicYear(requestDTO);
+        AcademicYearResponseDTO academicYearRequestDTO = academicYearFacade.createAcademicYear(requestDTO);
         log.info("Academic year created successfully with id");
         return ResponseEntity.status(HttpStatus.CREATED).body(academicYearRequestDTO);
     }
@@ -88,5 +89,51 @@ public class AcademicYearController {
         academicYearFacade.deleteAcademicYear(id);
         log.info("Academic Year deleted successfully with id: {}", id);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/lock")
+    public ResponseEntity<?> lockAcademicYear(
+            @PathVariable Long id,
+            @RequestBody AcademicYearRequestDTO request) {
+
+        academicYearFacade.lockAcademicYear(id, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/archive")
+    public ResponseEntity<Void> archiveAcademicYear(
+            @PathVariable Long id,
+            @RequestBody AcademicYearRequestDTO request) {
+
+        academicYearFacade.archiveAcademicYear(id, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/close")
+    public ResponseEntity<?> closeAcademicYear(
+            @PathVariable Long id,
+            @RequestBody AcademicYearRequestDTO request) {
+
+        academicYearFacade.closeAcademicYear(id, request);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Academic Year closed successfully",
+                "academicYearId", id
+        ));
+    }
+
+    @PutMapping("/default")
+    public ResponseEntity<?> createDefaultAcademicYear() {
+        log.info("Request received to create default academic year if none exists");
+
+        AcademicYearResponseDTO response = academicYearFacade.createDefaultAcademicYear();
+
+        if (response == null) {
+            log.info("Academic year already exists, no default created");
+            return ResponseEntity.ok(Map.of("message", "Academic Year(s) already exist"));
+        }
+
+        log.info("Default academic year created successfully with id: {}", response.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

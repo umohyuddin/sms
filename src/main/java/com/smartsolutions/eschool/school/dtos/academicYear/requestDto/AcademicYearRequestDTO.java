@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.dtos.academicYear.requestDto;
 
 
+import com.smartsolutions.eschool.global.enums.AcademicYearStatus;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,6 +35,8 @@ public class AcademicYearRequestDTO {
     private Long totalMonths;
     private String remarks;
     private Boolean isCurrent;
+    private Boolean isLocked;
+    private AcademicYearStatus status;
 
     @AssertTrue(message = "Start date must be before end date")
     public boolean isDateRangeValid() {

@@ -20,7 +20,7 @@ public class AcademicYearFacade {
         this.academicYearService = academicYearService;
     }
 
-    public AcademicYearRequestDTO createAcademicYear(@Valid AcademicYearRequestDTO requestDTO) {
+    public AcademicYearResponseDTO createAcademicYear(@Valid AcademicYearRequestDTO requestDTO) {
         return academicYearService.createAcademicYear(requestDTO);
     }
 
@@ -50,5 +50,21 @@ public class AcademicYearFacade {
 
     public void deleteAcademicYear(Long academicYearId) {
         academicYearService.deleteAcademicYear(academicYearId);
+    }
+
+    public void lockAcademicYear(Long id, AcademicYearRequestDTO request) {
+        academicYearService.lockAcademicYear(id,request);
+    }
+
+    public void archiveAcademicYear(Long id, AcademicYearRequestDTO request) {
+        academicYearService.archiveAcademicYear(id,request);
+    }
+
+    public void closeAcademicYear(Long id, AcademicYearRequestDTO request) {
+        academicYearService.closeAcademicYear(id, request);
+    }
+
+    public AcademicYearResponseDTO createDefaultAcademicYear() {
+        return academicYearService.createDefaultAcademicYear();
     }
 }

@@ -8,6 +8,7 @@ import com.smartsolutions.eschool.school.dtos.academicYear.responseDto.AcademicY
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 @Service
@@ -74,7 +76,7 @@ public class AcademicYearService {
     public AcademicYearResponseDTO getAcademicYearById(Long id) {
         try {
             log.info("Fetching Academic Year by id: {}", id);
-            AcademicYearEntity academicYear = academicYearRepository.findById(id).orElseThrow(() -> new RuntimeException("Academic Year not found with id: " + id));
+            AcademicYearEntity academicYear = academicYearRepository.findActiveById(id).orElseThrow(() -> new RuntimeException("Academic Year not found with id: " + id));
             return MapperUtil.mapObject(academicYear, AcademicYearResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while fetching academic year with id: {}", id, dae);
@@ -86,7 +88,7 @@ public class AcademicYearService {
     }
 
 
-    public AcademicYearRequestDTO createAcademicYear(@Valid AcademicYearRequestDTO requestDTO) {
+    public AcademicYearResponseDTO createAcademicYear(@Valid AcademicYearRequestDTO requestDTO) {
         log.info("Creating new Academic Year: {}", requestDTO.getName());
 
         try {
@@ -131,7 +133,7 @@ public class AcademicYearService {
             log.info("Academic Year saved with id: {}", academicYearEntity.getId());
 
             // Map back to DTO
-            return MapperUtil.mapObject(academicYearEntity, AcademicYearRequestDTO.class);
+            return MapperUtil.mapObject(academicYearEntity, AcademicYearResponseDTO.class);
 
         } catch (DataAccessException dae) {
             log.error("Database error while creating Academic Year", dae);
@@ -179,7 +181,7 @@ public class AcademicYearService {
         }
 
         // Check overlapping with existing active year
-        AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> new RuntimeException("No active academic year found"));
+        AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElse(null);
 
 
         if (currentYear != null && !currentYear.getId().equals(year.getId())) {
@@ -190,6 +192,8 @@ public class AcademicYearService {
                         "Another Academic Year is already active and still running"
                 );
             }
+            currentYear.setIsCurrent(false);
+            academicYearRepository.save(currentYear);
         }
 
         // Required setup validations (optional but recommended)
@@ -261,14 +265,73 @@ public class AcademicYearService {
     }
 
 
-    public AcademicYearResponseDTO updateAcademicYear(Long id, @Valid AcademicYearRequestDTO requestDTO) {
+//    public AcademicYearResponseDTO updateAcademicYear(Long id, @Valid AcademicYearRequestDTO requestDTO) {
+//        log.info("Updating Academic Year with id: {}", id);
+//
+//        try {
+//            AcademicYearEntity existingEntity = academicYearRepository.findById(id)
+//                    .orElseThrow(() -> new RuntimeException("Academic Year not found with id: " + id));
+//
+//            // Validate dates
+//            if (requestDTO.getStartDate().isAfter(requestDTO.getEndDate())) {
+//                throw new IllegalArgumentException("Start date cannot be after end date.");
+//            }
+//
+//            // Validate name format
+//            validateNameFormat(requestDTO.getName());
+//
+//            // If setting current = true, deactivate others
+//            if (Boolean.TRUE.equals(requestDTO.getIsCurrent())) {
+//                log.info("Deactivating other academic years...");
+//                academicYearRepository.deactivateAllAcademicYears();
+//            }
+//
+//            // Update fields
+//            existingEntity.setName(requestDTO.getName());
+//            existingEntity.setStartDate(requestDTO.getStartDate());
+//            existingEntity.setEndDate(requestDTO.getEndDate());
+//            existingEntity.setIsCurrent(requestDTO.getIsCurrent());
+//
+//            // Recalculate total months
+//            long totalMonths = ChronoUnit.MONTHS.between(
+//                    requestDTO.getStartDate().withDayOfMonth(1),
+//                    requestDTO.getEndDate().withDayOfMonth(1)
+//            ) + 1;
+//
+//            existingEntity.setTotalMonths(totalMonths);
+//
+//            AcademicYearEntity updatedEntity = academicYearRepository.save(existingEntity);
+//            log.info("Academic Year updated successfully with id: {}", updatedEntity.getId());
+//
+//            return MapperUtil.mapObject(updatedEntity, AcademicYearResponseDTO.class);
+//
+//        } catch (DataAccessException dae) {
+//            log.error("Database error while updating Academic Year with id: {}", id, dae);
+//            throw new RuntimeException("Failed to update Academic Year due to database error");
+//        } catch (Exception e) {
+//            log.error("Unexpected error while updating Academic Year with id: {}", id, e);
+//            throw new RuntimeException("Failed to update Academic Year");
+//        }
+//    }
+
+    @Transactional
+    public AcademicYearResponseDTO updateAcademicYear(
+            Long id,
+            @Valid AcademicYearRequestDTO requestDTO) {
+
         log.info("Updating Academic Year with id: {}", id);
 
         try {
             AcademicYearEntity existingEntity = academicYearRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Academic Year not found with id: " + id));
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("Academic Year not found with id: " + id));
 
-            // Validate dates
+            // Prevent update if year is locked
+            if (Boolean.TRUE.equals(existingEntity.getIsLocked())) {
+                throw new IllegalStateException("Locked Academic Year cannot be updated.");
+            }
+
+            // Validate date logic
             if (requestDTO.getStartDate().isAfter(requestDTO.getEndDate())) {
                 throw new IllegalArgumentException("Start date cannot be after end date.");
             }
@@ -276,34 +339,45 @@ public class AcademicYearService {
             // Validate name format
             validateNameFormat(requestDTO.getName());
 
-            // If setting current = true, deactivate others
-            if (Boolean.TRUE.equals(requestDTO.getIsCurrent())) {
-                log.info("Deactivating other academic years...");
-                academicYearRepository.deactivateAllAcademicYears();
+            // Check overlapping academic years (exclude current record)
+            boolean overlaps = academicYearRepository.existsByDateRangeExcludingId(
+                    requestDTO.getStartDate(),
+                    requestDTO.getEndDate(),
+                    id
+            );
+            if (overlaps) {
+                throw new IllegalArgumentException(
+                        "Academic Year overlaps with an existing academic year."
+                );
             }
 
-            // Update fields
+
+
+            //Update fields
             existingEntity.setName(requestDTO.getName());
             existingEntity.setStartDate(requestDTO.getStartDate());
             existingEntity.setEndDate(requestDTO.getEndDate());
             existingEntity.setIsCurrent(requestDTO.getIsCurrent());
-
+            existingEntity.setRemarks(requestDTO.getRemarks());
             // Recalculate total months
             long totalMonths = ChronoUnit.MONTHS.between(
                     requestDTO.getStartDate().withDayOfMonth(1),
                     requestDTO.getEndDate().withDayOfMonth(1)
             ) + 1;
-
             existingEntity.setTotalMonths(totalMonths);
 
-            AcademicYearEntity updatedEntity = academicYearRepository.save(existingEntity);
+            // Save updated entity
+            AcademicYearEntity updatedEntity =
+                    academicYearRepository.save(existingEntity);
+
             log.info("Academic Year updated successfully with id: {}", updatedEntity.getId());
 
             return MapperUtil.mapObject(updatedEntity, AcademicYearResponseDTO.class);
 
         } catch (DataAccessException dae) {
             log.error("Database error while updating Academic Year with id: {}", id, dae);
-            throw new RuntimeException("Failed to update Academic Year due to database error");
+            throw new RuntimeException(
+                    "Failed to update Academic Year due to database error");
         } catch (Exception e) {
             log.error("Unexpected error while updating Academic Year with id: {}", id, e);
             throw new RuntimeException("Failed to update Academic Year");
@@ -341,28 +415,153 @@ public class AcademicYearService {
         return Collections.emptyList();
     }
 
-    public void deleteAcademicYear(Long academicYearId, Long currentUserId) {
-        AcademicYearEntity year = academicYearRepository.findById(academicYearId)
-                .orElseThrow(() -> new IllegalArgumentException("Academic Year not found"));
+    @Transactional
+    public void lockAcademicYear(Long id, AcademicYearRequestDTO request) {
 
-        if (Boolean.TRUE.equals(year.getIsCurrent())) {
-            throw new IllegalStateException("Current Academic Year cannot be deleted");
-        }
+        AcademicYearEntity year = academicYearRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Academic Year not found"));
 
         if (Boolean.TRUE.equals(year.getIsLocked())) {
-            throw new IllegalStateException("Locked Academic Year cannot be deleted");
+            throw new IllegalStateException("Academic Year is already locked");
         }
 
-        int updated = academicYearRepository.softDelete(
-                academicYearId,
-                LocalDateTime.now(),
-                currentUserId
-        );
-
-        if (updated == 0) {
-            throw new IllegalStateException("Unable to delete Academic Year. It may have been already deleted or is locked/current.");
+        if (Boolean.TRUE.equals(year.getIsCurrent())) {
+            throw new IllegalStateException("Current Academic Year cannot be locked");
         }
+
+        if (LocalDate.now().isBefore(year.getEndDate())) {
+            throw new IllegalStateException("Academic Year cannot be locked before end date");
+        }
+
+        if (!EnumSet.of(AcademicYearStatus.CLOSED, AcademicYearStatus.ARCHIVED)
+                .contains(year.getStatus())) {
+            throw new IllegalStateException("Academic Year status does not allow locking");
+        }
+
+        // Optional validations
+        // validateNoPendingFees(year.getId());
+        // validateNoPendingPayroll(year.getId());
+
+        year.setIsLocked(true);
+        year.setLockedAt(LocalDateTime.now());
+        year.setLockedBy(1L);
+        year.setStatus(AcademicYearStatus.LOCKED);
+        if (request.getRemarks() == null || request.getRemarks().isBlank()) {
+            throw new IllegalStateException("Remarks are required to lock Academic Year");
+        }
+        academicYearRepository.save(year);
     }
+
+
+    @Transactional
+    public void archiveAcademicYear(Long id, AcademicYearRequestDTO request) {
+
+        AcademicYearEntity year = academicYearRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Academic Year not found"));
+
+        // Rule 1: Already archived
+        if (AcademicYearStatus.ARCHIVED.equals(year.getStatus())) {
+            throw new IllegalStateException("Academic Year is already archived");
+        }
+
+        // Rule 2: Cannot archive current year
+        if (Boolean.TRUE.equals(year.getIsCurrent())) {
+            throw new IllegalStateException("Current Academic Year cannot be archived");
+        }
+
+        // Rule 3: End date must be passed
+        if (LocalDate.now().isBefore(year.getEndDate())) {
+            throw new IllegalStateException("Academic Year cannot be archived before end date");
+        }
+
+        // Rule 4: Only locked years can be archived (recommended)
+        if (!Boolean.TRUE.equals(year.getIsLocked())) {
+            throw new IllegalStateException("Only locked Academic Years can be archived");
+        }
+
+        // Optional: remarks validation
+        if (request.getRemarks() == null || request.getRemarks().isBlank()) {
+            throw new IllegalStateException("Remarks are required to archive Academic Year");
+        }
+
+        // State update
+        year.setStatus(AcademicYearStatus.ARCHIVED);
+        year.setIsCurrent(false);
+        year.setRemarks(request.getRemarks());
+
+        academicYearRepository.save(year);
+    }
+    @Transactional
+    public void closeAcademicYear(Long id, AcademicYearRequestDTO request) {
+
+        // Fetch academic year
+        AcademicYearEntity year = academicYearRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Academic Year not found with ID: " + id));
+
+        // Rule 1: Cannot close already closed
+        if (AcademicYearStatus.CLOSED.equals(year.getStatus())) {
+            throw new IllegalStateException("Academic Year is already closed");
+        }
+
+        // Rule 2: Cannot close current year
+        if (Boolean.TRUE.equals(year.getIsCurrent())) {
+            throw new IllegalStateException("Current Academic Year cannot be closed");
+        }
+
+        // Rule 3: End date must have passed
+        if (LocalDate.now().isBefore(year.getEndDate())) {
+            throw new IllegalStateException("Academic Year cannot be closed before its end date");
+        }
+
+        // Optional: All results finalized
+        // if (!resultsService.areResultsFinalized(year.getId())) {
+        //     throw new IllegalStateException("Cannot close Academic Year before results are finalized");
+        // }
+
+        // Optional: No pending financials
+        // validateNoPendingFees(year.getId());
+        // validateNoPendingPayroll(year.getId());
+
+        // Optional: Validate remarks
+        if (request.getRemarks() == null || request.getRemarks().isBlank()) {
+            year.setRemarks("Closed by system"); // default remark
+        } else {
+            year.setRemarks(request.getRemarks());
+        }
+
+        // Update status
+        year.setStatus(AcademicYearStatus.CLOSED);
+
+        academicYearRepository.save(year);
+    }
+
+
+    @Transactional
+    public AcademicYearResponseDTO createDefaultAcademicYear() {
+
+        // Check if any academic year exists
+        List<AcademicYearEntity> existingYears = academicYearRepository.findAll();
+        if (!existingYears.isEmpty()) {
+            // Do nothing if years already exist
+            return null;
+        }
+
+        // Create default year dynamically
+        int currentYear = LocalDate.now().getYear();
+        int nextYear = currentYear + 1;
+
+        AcademicYearRequestDTO defaultYear = new AcademicYearRequestDTO();
+        defaultYear.setName(currentYear + "-" + nextYear);
+        defaultYear.setCode("AY-" + currentYear + "-" + nextYear);
+        defaultYear.setStartDate(LocalDate.of(currentYear, 1, 1));
+        defaultYear.setEndDate(LocalDate.of(currentYear, 12, 31));
+        defaultYear.setStatus(AcademicYearStatus.DRAFT); // or ACTIVE
+        defaultYear.setRemarks("Default Academic Year created automatically");
+
+        // Save using existing create method
+        return createAcademicYear(defaultYear);
+    }
+
     private void validateNameFormat(String name) {
         if (!name.matches("\\d{4}-\\d{4}")) {
             throw new IllegalArgumentException("Academic year name must be in 'YYYY-YYYY' format.");
