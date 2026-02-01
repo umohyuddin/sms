@@ -1,7 +1,5 @@
 package com.smartsolutions.eschool.sclass.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Entity
 @Table(name = "timetable")

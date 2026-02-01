@@ -1,4 +1,4 @@
-package com.smartsolutions.eschool.student.dtos.requestDto;
+package com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

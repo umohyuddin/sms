@@ -1,27 +1,16 @@
 package com.smartsolutions.eschool.employee.controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.employee.dtos.EmployeeType.request.EmployeeTypeRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.EmployeeType.response.EmployeeTypeResponseDTO;
-import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
 import com.smartsolutions.eschool.employee.facade.EmployeeTypeFacade;
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
-import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
-import com.smartsolutions.eschool.util.ResourceObject;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/institute/employee-types")

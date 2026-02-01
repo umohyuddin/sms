@@ -3,7 +3,8 @@ package com.smartsolutions.eschool.student.service;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
-import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeePaymentRequestDTO;
+
+import com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto.StudentFeePaymentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeePayment.responseDto.StudentFeePaymentResponseDTO;
 import com.smartsolutions.eschool.student.model.*;
 import com.smartsolutions.eschool.student.repository.*;

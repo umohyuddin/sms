@@ -1,10 +1,14 @@
 package com.smartsolutions.eschool.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "system_users")
@@ -36,5 +40,11 @@ public class SystemUserEntity {
 
     @Column(name = "is_verified")
     private Boolean isVerified = false;
+
+    //Use a Data Transfer Object (DTO) to return only the fields you need without triggering lazy loading of relationships.
+    //Use @JsonIgnore to ignore the userRoles field during JSON serialization, which will prevent lazy loading.
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<UserRolesEntity> userRoles = new HashSet<>();
 
 }

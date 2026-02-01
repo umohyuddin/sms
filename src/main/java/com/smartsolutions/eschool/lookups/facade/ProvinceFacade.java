@@ -1,16 +1,9 @@
 package com.smartsolutions.eschool.lookups.facade;
 
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
-import com.smartsolutions.eschool.employee.service.EmployeeService;
-import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.requestDto.ProvinceRequestDTO;
 import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.service.ProvinceService;
 import jakarta.validation.Valid;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 

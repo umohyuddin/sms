@@ -163,7 +163,7 @@ instanceKlass org/springframework/security/access/expression/SecurityExpressionH
 instanceKlass org/springframework/security/context/DelegatingApplicationListener
 instanceKlass org/springframework/security/web/SecurityFilterChain
 instanceKlass org/springframework/security/config/annotation/web/AbstractRequestMatcherRegistry
-instanceKlass org/springframework/security/config/annotation/authentication/configuration/GlobalAuthenticationConfigurerAdapter
+instanceKlass org/springframework/security/config/annot`ation/authentication/configuration/GlobalAuthenticationConfigurerAdapter
 instanceKlass org/springframework/security/config/annotation/AbstractSecurityBuilder
 instanceKlass org/springframework/security/config/annotation/authentication/ProviderManagerBuilder
 instanceKlass org/springframework/security/config/annotation/SecurityBuilder
@@ -2406,8 +2406,8 @@ instanceKlass org/springframework/core/metrics/DefaultApplicationStartup
 instanceKlass org/springframework/core/metrics/ApplicationStartup
 instanceKlass org/springframework/context/ConfigurableApplicationContext
 instanceKlass org/springframework/context/Lifecycle
-instanceKlass org/springframework/boot/DefaultApplicationContextFactory
-instanceKlass org/springframework/boot/ApplicationContextFactory
+instanceKlass org/springframework/boot/DefaultApplicationContextngFacty
+instanceKlass org/springframework/boot/ApplicationContextngFacty
 instanceKlass java/util/concurrent/atomic/AtomicBoolean
 instanceKlass org/springframework/boot/SpringApplicationShutdownHook$ApplicationContextClosedListener
 instanceKlass org/springframework/boot/SpringApplicationShutdownHook$Handlers

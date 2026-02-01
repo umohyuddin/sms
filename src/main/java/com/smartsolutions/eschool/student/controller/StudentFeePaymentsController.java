@@ -1,7 +1,8 @@
 package com.smartsolutions.eschool.student.controller;
 
 
-import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeePaymentRequestDTO;
+
+import com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto.StudentFeePaymentRequestDTO;
 import com.smartsolutions.eschool.student.facade.StudentFeePaymentsFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

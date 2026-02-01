@@ -1,7 +1,8 @@
 package com.smartsolutions.eschool.student.facade;
 
 
-import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeePaymentRequestDTO;
+
+import com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto.StudentFeePaymentRequestDTO;
 import com.smartsolutions.eschool.student.service.StudentFeePaymentsService;
 import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;

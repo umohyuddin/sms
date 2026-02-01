@@ -26,15 +26,7 @@ public class RoleEntity extends AuditableEntity {
     private String roleName;
     private String description;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<UserRolesEntity> userRoles = new HashSet<>();
-
 }
-//    @OneToMany(mappedBy = "role")
-//    private Set<RolesMenu> rolesMenus = new HashSet<>();
-
-
-//    @JsonIgnore
-//    @ManyToMany(mappedBy = "roles")
-//    private List<User> users;
