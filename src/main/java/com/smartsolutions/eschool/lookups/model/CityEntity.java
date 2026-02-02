@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.lookups.model;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Table(name = "cities")
 @Getter
 @Setter
-public class CityEntity extends AuditableEntity {
+public class CityEntity extends ScopeAuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

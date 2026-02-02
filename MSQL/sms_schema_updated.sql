@@ -12,11 +12,19 @@ sms;
 
 CREATE TABLE country (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    country_code VARCHAR(5) NOT NULL UNIQUE,   -- PK, SA, US
-    country_name VARCHAR(100) NOT NULL,         -- Pakistan, Saudi Arabia
-    iso_code VARCHAR(3),                        -- ISO-3166 (PAK, SAU)
-    phone_code VARCHAR(10)
+    country_code VARCHAR(5) NOT NULL,
+    country_name VARCHAR(100) NOT NULL,
+    iso_code VARCHAR(3),
+    phone_code VARCHAR(10),
+
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
 );
+
 -- Table: provinces
 -- Purpose:
 --   Stores the list of provinces/states used across the school management system.

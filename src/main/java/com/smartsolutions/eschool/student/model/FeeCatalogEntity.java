@@ -1,17 +1,12 @@
 package com.smartsolutions.eschool.student.model;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
-import com.smartsolutions.eschool.school.model.AcademicYearEntity;
-import com.smartsolutions.eschool.school.model.CampusEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity

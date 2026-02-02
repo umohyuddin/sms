@@ -1,6 +1,5 @@
 package com.smartsolutions.eschool.school.model;
 
-import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeTypeEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;

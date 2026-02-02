@@ -3,7 +3,6 @@ package com.smartsolutions.eschool.school.model;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "discount_type")

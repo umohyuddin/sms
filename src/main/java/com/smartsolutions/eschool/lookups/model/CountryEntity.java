@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.lookups.model;
 
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Table(name = "country", uniqueConstraints = @UniqueConstraint(columnNames = {"country_code"}))
 @Getter
 @Setter
-public class CountryEntity {
+public class CountryEntity extends ScopeAuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

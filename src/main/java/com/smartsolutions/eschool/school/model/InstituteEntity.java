@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.school.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import com.smartsolutions.eschool.lookups.model.CityEntity;
 import com.smartsolutions.eschool.lookups.model.CountryEntity;
 import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
@@ -18,7 +19,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InstituteEntity  extends AuditableEntity {
+public class InstituteEntity  extends ScopeAuditableEntity {
 
     @Id
     @Column(name = "id")

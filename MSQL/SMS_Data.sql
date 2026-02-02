@@ -1,148 +1,302 @@
+INSERT INTO system_users
+(username, email, phone, password_hash, is_active, is_verified, organization_id)
+VALUES
+('admin.user', 'admin@gmail.com', '03001234567',
+ '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
+ TRUE, TRUE, 1),
 
+('teacher.user', 'teacher@example.com', '03007654321',
+ '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
+ TRUE, FALSE, 1),
 
-
-
-INSERT INTO system_users (username, email, phone, password_hash, is_active, is_verified)
-VALUES ('admin.user', 'admin@gmail.com', '03001234567',
-        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, TRUE),
-
-       ('teacher.user', 'teacher@example.com', '03007654321',
-        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE),
-
-       ('student.user', 'student@example.com', '03111223344',
-        '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y', TRUE, FALSE);
-
+('student.user', 'student@example.com', '03111223344',
+ '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
+ TRUE, FALSE, 1);
 
 -- ============================================
 -- Countries Table Insertions
 -- Purpose: Populate the 'country' table with country codes, ISO codes, phone codes.
 -- Used for student profiles, employee profiles, institute addresses, and general lookups.
 -- ============================================
-INSERT INTO country (country_code, country_name, iso_code, phone_code) VALUES
-('AF','Afghanistan','AFG','+93'),
-('AL','Albania','ALB','+355'),
-('DZ','Algeria','DZA','+213'),
-('AD','Andorra','AND','+376'),
-('AO','Angola','AGO','+244'),
-('AR','Argentina','ARG','+54'),
-('AM','Armenia','ARM','+374'),
-('AU','Australia','AUS','+61'),
-('AT','Austria','AUT','+43'),
-('AZ','Azerbaijan','AZE','+994'),
-('BH','Bahrain','BHR','+973'),
-('BD','Bangladesh','BGD','+880'),
-('BY','Belarus','BLR','+375'),
-('BE','Belgium','BEL','+32'),
-('BZ','Belize','BLZ','+501'),
-('BJ','Benin','BEN','+229'),
-('BT','Bhutan','BTN','+975'),
-('BO','Bolivia','BOL','+591'),
-('BA','Bosnia and Herzegovina','BIH','+387'),
-('BW','Botswana','BWA','+267'),
-('BR','Brazil','BRA','+55'),
-('BN','Brunei','BRN','+673'),
-('BG','Bulgaria','BGR','+359'),
-('BF','Burkina Faso','BFA','+226'),
-('BI','Burundi','BDI','+257'),
-('KH','Cambodia','KHM','+855'),
-('CM','Cameroon','CMR','+237'),
-('CA','Canada','CAN','+1'),
-('CV','Cape Verde','CPV','+238'),
-('CF','Central African Republic','CAF','+236'),
-('TD','Chad','TCD','+235'),
-('CL','Chile','CHL','+56'),
-('CN','China','CHN','+86'),
-('CO','Colombia','COL','+57'),
-('KM','Comoros','COM','+269'),
-('CG','Congo','COG','+242'),
-('CR','Costa Rica','CRI','+506'),
-('HR','Croatia','HRV','+385'),
-('CU','Cuba','CUB','+53'),
-('CY','Cyprus','CYP','+357'),
-('CZ','Czech Republic','CZE','+420'),
-('DK','Denmark','DNK','+45'),
-('DJ','Djibouti','DJI','+253'),
-('DO','Dominican Republic','DOM','+1'),
-('EC','Ecuador','ECU','+593'),
-('EG','Egypt','EGY','+20'),
-('SV','El Salvador','SLV','+503'),
-('EE','Estonia','EST','+372'),
-('ET','Ethiopia','ETH','+251'),
-('FI','Finland','FIN','+358'),
-('FR','France','FRA','+33'),
-('GA','Gabon','GAB','+241'),
-('GE','Georgia','GEO','+995'),
-('DE','Germany','DEU','+49'),
-('GH','Ghana','GHA','+233'),
-('GR','Greece','GRC','+30'),
-('GT','Guatemala','GTM','+502'),
-('GN','Guinea','GIN','+224'),
-('HT','Haiti','HTI','+509'),
-('HN','Honduras','HND','+504'),
-('HK','Hong Kong','HKG','+852'),
-('HU','Hungary','HUN','+36'),
-('IS','Iceland','ISL','+354'),
-('IN','India','IND','+91'),
-('ID','Indonesia','IDN','+62'),
-('IR','Iran','IRN','+98'),
-('IQ','Iraq','IRQ','+964'),
-('IE','Ireland','IRL','+353'),
-('IL','Israel','ISR','+972'),
-('IT','Italy','ITA','+39'),
-('JM','Jamaica','JAM','+1'),
-('JP','Japan','JPN','+81'),
-('JO','Jordan','JOR','+962'),
-('KZ','Kazakhstan','KAZ','+7'),
-('KE','Kenya','KEN','+254'),
-('KW','Kuwait','KWT','+965'),
-('KG','Kyrgyzstan','KGZ','+996'),
-('LA','Laos','LAO','+856'),
-('LV','Latvia','LVA','+371'),
-('LB','Lebanon','LBN','+961'),
-('LY','Libya','LBY','+218'),
-('LT','Lithuania','LTU','+370'),
-('LU','Luxembourg','LUX','+352'),
-('MY','Malaysia','MYS','+60'),
-('MV','Maldives','MDV','+960'),
-('ML','Mali','MLI','+223'),
-('MT','Malta','MLT','+356'),
-('MX','Mexico','MEX','+52'),
-('MN','Mongolia','MNG','+976'),
-('MA','Morocco','MAR','+212'),
-('MM','Myanmar','MMR','+95'),
-('NP','Nepal','NPL','+977'),
-('NL','Netherlands','NLD','+31'),
-('NZ','New Zealand','NZL','+64'),
-('NG','Nigeria','NGA','+234'),
-('NO','Norway','NOR','+47'),
-('OM','Oman','OMN','+968'),
-('PK','Pakistan','PAK','+92'),
-('PH','Philippines','PHL','+63'),
-('PL','Poland','POL','+48'),
-('PT','Portugal','PRT','+351'),
-('QA','Qatar','QAT','+974'),
-('RO','Romania','ROU','+40'),
-('RU','Russia','RUS','+7'),
-('SA','Saudi Arabia','SAU','+966'),
-('SG','Singapore','SGP','+65'),
-('ZA','South Africa','ZAF','+27'),
-('KR','South Korea','KOR','+82'),
-('ES','Spain','ESP','+34'),
-('LK','Sri Lanka','LKA','+94'),
-('SE','Sweden','SWE','+46'),
-('CH','Switzerland','CHE','+41'),
-('TH','Thailand','THA','+66'),
-('TR','Turkey','TUR','+90'),
-('AE','United Arab Emirates','ARE','+971'),
-('UA','Ukraine','UKR','+380'),
-('GB','United Kingdom','GBR','+44'),
-('US','United States','USA','+1'),
-('UY','Uruguay','URY','+598'),
-('UZ','Uzbekistan','UZB','+998'),
-('VN','Vietnam','VNM','+84'),
-('YE','Yemen','YEM','+967'),
-('ZM','Zambia','ZMB','+260'),
-('ZW','Zimbabwe','ZWE','+263');
+-- ====================================================
+-- INSERT COUNTRIES INTO `country` TABLE
+-- ====================================================
+
+-- Batch 1: Countries 1–50
+INSERT INTO country
+(id, country_code, country_name, iso_code, phone_code, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES
+(1,'AF','Afghanistan','AFG','+93', NOW(), 1, NULL, NULL, NULL, NULL),
+(2,'AL','Albania','ALB','+355', NOW(), 1, NULL, NULL, NULL, NULL),
+(3,'DZ','Algeria','DZA','+213', NOW(), 1, NULL, NULL, NULL, NULL),
+(4,'AD','Andorra','AND','+376', NOW(), 1, NULL, NULL, NULL, NULL),
+(5,'AO','Angola','AGO','+244', NOW(), 1, NULL, NULL, NULL, NULL),
+(6,'AR','Argentina','ARG','+54', NOW(), 1, NULL, NULL, NULL, NULL),
+(7,'AM_','Armenia','ARM','+374', NOW(), 1, NULL, NULL, NULL, NULL),
+(8,'AU','Australia','AUS','+61', NOW(), 1, NULL, NULL, NULL, NULL),
+(9,'AT','Austria','AUT','+43', NOW(), 1, NULL, NULL, NULL, NULL),
+(10,'AZ','Azerbaijan','AZE','+994', NOW(), 1, NULL, NULL, NULL, NULL),
+(11,'BH','Bahrain','BHR','+973', NOW(), 1, NULL, NULL, NULL, NULL),
+(12,'BD','Bangladesh','BGD','+880', NOW(), 1, NULL, NULL, NULL, NULL),
+(13,'BY','Belarus','BLR','+375', NOW(), 1, NULL, NULL, NULL, NULL),
+(14,'BE','Belgium','BEL','+32', NOW(), 1, NULL, NULL, NULL, NULL),
+(15,'BZ','Belize','BLZ','+501', NOW(), 1, NULL, NULL, NULL, NULL),
+(16,'BJ','Benin','BEN','+229', NOW(), 1, NULL, NULL, NULL, NULL),
+(17,'BT','Bhutan','BTN','+975', NOW(), 1, NULL, NULL, NULL, NULL),
+(18,'BO','Bolivia','BOL','+591', NOW(), 1, NULL, NULL, NULL, NULL),
+(19,'BA','Bosnia and Herzegovina','BIH','+387', NOW(), 1, NULL, NULL, NULL, NULL),
+(20,'BW','Botswana','BWA','+267', NOW(), 1, NULL, NULL, NULL, NULL),
+(21,'BR','Brazil','BRA','+55', NOW(), 1, NULL, NULL, NULL, NULL),
+(22,'BN','Brunei','BRN','+673', NOW(), 1, NULL, NULL, NULL, NULL),
+(23,'BG','Bulgaria','BGR','+359', NOW(), 1, NULL, NULL, NULL, NULL),
+(24,'BF','Burkina Faso','BFA','+226', NOW(), 1, NULL, NULL, NULL, NULL),
+(25,'BI','Burundi','BDI','+257', NOW(), 1, NULL, NULL, NULL, NULL),
+(26,'KH','Cambodia','KHM','+855', NOW(), 1, NULL, NULL, NULL, NULL),
+(27,'CM','Cameroon','CMR','+237', NOW(), 1, NULL, NULL, NULL, NULL),
+(28,'CA','Canada','CAN','+1', NOW(), 1, NULL, NULL, NULL, NULL),
+(29,'CV','Cape Verde','CPV','+238', NOW(), 1, NULL, NULL, NULL, NULL),
+(30,'CF','Central African Republic','CAF','+236', NOW(), 1, NULL, NULL, NULL, NULL),
+(31,'TD','Chad','TCD','+235', NOW(), 1, NULL, NULL, NULL, NULL),
+(32,'CL','Chile','CHL','+56', NOW(), 1, NULL, NULL, NULL, NULL),
+(33,'CN','China','CHN','+86', NOW(), 1, NULL, NULL, NULL, NULL),
+(34,'CO','Colombia','COL','+57', NOW(), 1, NULL, NULL, NULL, NULL),
+(35,'KM','Comoros','COM','+269', NOW(), 1, NULL, NULL, NULL, NULL),
+(36,'CG','Congo','COG','+242', NOW(), 1, NULL, NULL, NULL, NULL),
+(37,'CR','Costa Rica','CRI','+506', NOW(), 1, NULL, NULL, NULL, NULL),
+(38,'HR','Croatia','HRV','+385', NOW(), 1, NULL, NULL, NULL, NULL),
+(39,'CU','Cuba','CUB','+53', NOW(), 1, NULL, NULL, NULL, NULL),
+(40,'CY','Cyprus','CYP','+357', NOW(), 1, NULL, NULL, NULL, NULL),
+(41,'CZ','Czech Republic','CZE','+420', NOW(), 1, NULL, NULL, NULL, NULL),
+(42,'DK','Denmark','DNK','+45', NOW(), 1, NULL, NULL, NULL, NULL),
+(43,'DJ','Djibouti','DJI','+253', NOW(), 1, NULL, NULL, NULL, NULL),
+(44,'DO','Dominican Republic','DOM','+1', NOW(), 1, NULL, NULL, NULL, NULL),
+(45,'EC','Ecuador','ECU','+593', NOW(), 1, NULL, NULL, NULL, NULL),
+(46,'EG','Egypt','EGY','+20', NOW(), 1, NULL, NULL, NULL, NULL),
+(47,'SV','El Salvador','SLV','+503', NOW(), 1, NULL, NULL, NULL, NULL),
+(48,'EE','Estonia','EST','+372', NOW(), 1, NULL, NULL, NULL, NULL),
+(49,'ET','Ethiopia','ETH','+251', NOW(), 1, NULL, NULL, NULL, NULL),
+(50,'FI','Finland','FIN','+358', NOW(), 1, NULL, NULL, NULL, NULL);
+-- ====================================================
+-- Batch 2: Countries 51–100
+-- ====================================================
+INSERT INTO country
+(id, country_code, country_name, iso_code, phone_code, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES
+(51,'FR','France','FRA','+33', NOW(), 1, NULL, NULL, NULL, NULL),
+(52,'GA','Gabon','GAB','+241', NOW(), 1, NULL, NULL, NULL, NULL),
+(53,'GE','Georgia','GEO','+995', NOW(), 1, NULL, NULL, NULL, NULL),
+(54,'DE','Germany','DEU','+49', NOW(), 1, NULL, NULL, NULL, NULL),
+(55,'GH','Ghana','GHA','+233', NOW(), 1, NULL, NULL, NULL, NULL),
+(56,'GR','Greece','GRC','+30', NOW(), 1, NULL, NULL, NULL, NULL),
+(57,'GT','Guatemala','GTM','+502', NOW(), 1, NULL, NULL, NULL, NULL),
+(58,'GN','Guinea','GIN','+224', NOW(), 1, NULL, NULL, NULL, NULL),
+(59,'HT','Haiti','HTI','+509', NOW(), 1, NULL, NULL, NULL, NULL),
+(60,'HN','Honduras','HND','+504', NOW(), 1, NULL, NULL, NULL, NULL),
+(61,'HK','Hong Kong','HKG','+852', NOW(), 1, NULL, NULL, NULL, NULL),
+(62,'HU','Hungary','HUN','+36', NOW(), 1, NULL, NULL, NULL, NULL),
+(63,'IS','Iceland','ISL','+354', NOW(), 1, NULL, NULL, NULL, NULL),
+(64,'IN','India','IND','+91', NOW(), 1, NULL, NULL, NULL, NULL),
+(65,'ID','Indonesia','IDN','+62', NOW(), 1, NULL, NULL, NULL, NULL),
+(66,'IR','Iran','IRN','+98', NOW(), 1, NULL, NULL, NULL, NULL),
+(67,'IQ','Iraq','IRQ','+964', NOW(), 1, NULL, NULL, NULL, NULL),
+(68,'IE','Ireland','IRL','+353', NOW(), 1, NULL, NULL, NULL, NULL),
+(69,'IL','Israel','ISR','+972', NOW(), 1, NULL, NULL, NULL, NULL),
+(70,'IT','Italy','ITA','+39', NOW(), 1, NULL, NULL, NULL, NULL),
+(71,'JM','Jamaica','JAM','+1', NOW(), 1, NULL, NULL, NULL, NULL),
+(72,'JP','Japan','JPN','+81', NOW(), 1, NULL, NULL, NULL, NULL),
+(73,'JO','Jordan','JOR','+962', NOW(), 1, NULL, NULL, NULL, NULL),
+(74,'KZ','Kazakhstan','KAZ','+7', NOW(), 1, NULL, NULL, NULL, NULL),
+(75,'KE','Kenya','KEN','+254', NOW(), 1, NULL, NULL, NULL, NULL),
+(76,'KW','Kuwait','KWT','+965', NOW(), 1, NULL, NULL, NULL, NULL),
+(77,'KG','Kyrgyzstan','KGZ','+996', NOW(), 1, NULL, NULL, NULL, NULL),
+(78,'LA','Laos','LAO','+856', NOW(), 1, NULL, NULL, NULL, NULL),
+(79,'LV','Latvia','LVA','+371', NOW(), 1, NULL, NULL, NULL, NULL),
+(80,'LB','Lebanon','LBN','+961', NOW(), 1, NULL, NULL, NULL, NULL),
+(81,'LY','Libya','LBY','+218', NOW(), 1, NULL, NULL, NULL, NULL),
+(82,'LT','Lithuania','LTU','+370', NOW(), 1, NULL, NULL, NULL, NULL),
+(83,'LU','Luxembourg','LUX','+352', NOW(), 1, NULL, NULL, NULL, NULL),
+(84,'MY','Malaysia','MYS','+60', NOW(), 1, NULL, NULL, NULL, NULL),
+(85,'MV','Maldives','MDV','+960', NOW(), 1, NULL, NULL, NULL, NULL),
+(86,'ML','Mali','MLI','+223', NOW(), 1, NULL, NULL, NULL, NULL),
+(87,'MT','Malta','MLT','+356', NOW(), 1, NULL, NULL, NULL, NULL),
+(88,'MX','Mexico','MEX','+52', NOW(), 1, NULL, NULL, NULL, NULL),
+(89,'MN','Mongolia','MNG','+976', NOW(), 1, NULL, NULL, NULL, NULL),
+(90,'MA','Morocco','MAR','+212', NOW(), 1, NULL, NULL, NULL, NULL),
+(91,'MM','Myanmar','MMR','+95', NOW(), 1, NULL, NULL, NULL, NULL),
+(92,'NP','Nepal','NPL','+977', NOW(), 1, NULL, NULL, NULL, NULL),
+(93,'NL','Netherlands','NLD','+31', NOW(), 1, NULL, NULL, NULL, NULL),
+(94,'NZ','New Zealand','NZL','+64', NOW(), 1, NULL, NULL, NULL, NULL),
+(95,'NG','Nigeria','NGA','+234', NOW(), 1, NULL, NULL, NULL, NULL),
+(96,'NO','Norway','NOR','+47', NOW(), 1, NULL, NULL, NULL, NULL),
+(97,'OM','Oman','OMN','+968', NOW(), 1, NULL, NULL, NULL, NULL),
+(98,'PK','Pakistan','PAK','+92', NOW(), 1, NULL, NULL, NULL, NULL),
+(99,'PH','Philippines','PHL','+63', NOW(), 1, NULL, NULL, NULL, NULL),
+(100,'PL','Poland','POL','+48', NOW(), 1, NULL, NULL, NULL, NULL);
+-- ====================================================
+-- Batch 3: Countries 101–150
+-- ====================================================
+INSERT INTO country
+(id, country_code, country_name, iso_code, phone_code, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES
+(101,'PT','Portugal','PRT','+351', NOW(), 1, NULL, NULL, NULL, NULL),
+(102,'QA','Qatar','QAT','+974', NOW(), 1, NULL, NULL, NULL, NULL),
+(103,'RO','Romania','ROU','+40', NOW(), 1, NULL, NULL, NULL, NULL),
+(104,'RU','Russia','RUS','+7', NOW(), 1, NULL, NULL, NULL, NULL),
+(105,'SA','Saudi Arabia','SAU','+966', NOW(), 1, NULL, NULL, NULL, NULL),
+(106,'SG','Singapore','SGP','+65', NOW(), 1, NULL, NULL, NULL, NULL),
+(107,'ZA','South Africa','ZAF','+27', NOW(), 1, NULL, NULL, NULL, NULL),
+(108,'KR','South Korea','KOR','+82', NOW(), 1, NULL, NULL, NULL, NULL),
+(109,'ES','Spain','ESP','+34', NOW(), 1, NULL, NULL, NULL, NULL),
+(110,'LK','Sri Lanka','LKA','+94', NOW(), 1, NULL, NULL, NULL, NULL),
+(111,'SE','Sweden','SWE','+46', NOW(), 1, NULL, NULL, NULL, NULL),
+(112,'CH','Switzerland','CHE','+41', NOW(), 1, NULL, NULL, NULL, NULL),
+(113,'TH','Thailand','THA','+66', NOW(), 1, NULL, NULL, NULL, NULL),
+(114,'TR','Turkey','TUR','+90', NOW(), 1, NULL, NULL, NULL, NULL),
+(115,'AE','United Arab Emirates','ARE','+971', NOW(), 1, NULL, NULL, NULL, NULL),
+(116,'UA','Ukraine','UKR','+380', NOW(), 1, NULL, NULL, NULL, NULL),
+(117,'GB','United Kingdom','GBR','+44', NOW(), 1, NULL, NULL, NULL, NULL),
+(118,'US','United States','USA','+1', NOW(), 1, NULL, NULL, NULL, NULL),
+(119,'UY','Uruguay','URY','+598', NOW(), 1, NULL, NULL, NULL, NULL),
+(120,'UZ','Uzbekistan','UZB','+998', NOW(), 1, NULL, NULL, NULL, NULL),
+(121,'VN','Vietnam','VNM','+84', NOW(), 1, NULL, NULL, NULL, NULL),
+(122,'YE','Yemen','YEM','+967', NOW(), 1, NULL, NULL, NULL, NULL),
+(123,'ZM','Zambia','ZMB','+260', NOW(), 1, NULL, NULL, NULL, NULL),
+(124,'ZW','Zimbabwe','ZWE','+263', NOW(), 1, NULL, NULL, NULL, NULL),
+(125,'AM','Armenia','ARM','+374', NOW(), 1, NULL, NULL, NULL, NULL),
+(126,'AZ','Azerbaijan','AZE','+994', NOW(), 1, NULL, NULL, NULL, NULL),
+(127,'BY','Belarus','BLR','+375', NOW(), 1, NULL, NULL, NULL, NULL),
+(128,'BA','Bosnia and Herzegovina','BIH','+387', NOW(), 1, NULL, NULL, NULL, NULL),
+(129,'BG','Bulgaria','BGR','+359', NOW(), 1, NULL, NULL, NULL, NULL),
+(130,'HR','Croatia','HRV','+385', NOW(), 1, NULL, NULL, NULL, NULL),
+(131,'CY','Cyprus','CYP','+357', NOW(), 1, NULL, NULL, NULL, NULL),
+(132,'CZ','Czech Republic','CZE','+420', NOW(), 1, NULL, NULL, NULL, NULL),
+(133,'EE','Estonia','EST','+372', NOW(), 1, NULL, NULL, NULL, NULL),
+(134,'GE','Georgia','GEO','+995', NOW(), 1, NULL, NULL, NULL, NULL),
+(135,'HU','Hungary','HUN','+36', NOW(), 1, NULL, NULL, NULL, NULL),
+(136,'IS','Iceland','ISL','+354', NOW(), 1, NULL, NULL, NULL, NULL),
+(137,'KZ','Kazakhstan','KAZ','+7', NOW(), 1, NULL, NULL, NULL, NULL),
+(138,'KG','Kyrgyzstan','KGZ','+996', NOW(), 1, NULL, NULL, NULL, NULL),
+(139,'LV','Latvia','LVA','+371', NOW(), 1, NULL, NULL, NULL, NULL),
+(140,'LI','Liechtenstein','LIE','+423', NOW(), 1, NULL, NULL, NULL, NULL),
+(141,'LT','Lithuania','LTU','+370', NOW(), 1, NULL, NULL, NULL, NULL),
+(142,'LU','Luxembourg','LUX','+352', NOW(), 1, NULL, NULL, NULL, NULL),
+(143,'MK','North Macedonia','MKD','+389', NOW(), 1, NULL, NULL, NULL, NULL),
+(144,'MT','Malta','MLT','+356', NOW(), 1, NULL, NULL, NULL, NULL),
+(145,'MD','Moldova','MDA','+373', NOW(), 1, NULL, NULL, NULL, NULL),
+(146,'MC','Monaco','MCO','+377', NOW(), 1, NULL, NULL, NULL, NULL),
+(147,'ME','Montenegro','MNE','+382', NOW(), 1, NULL, NULL, NULL, NULL),
+(148,'NL','Netherlands','NLD','+31', NOW(), 1, NULL, NULL, NULL, NULL),
+(149,'NO','Norway','NOR','+47', NOW(), 1, NULL, NULL, NULL, NULL),
+(150,'PL','Poland','POL','+48', NOW(), 1, NULL, NULL, NULL, NULL);
+-- ====================================================
+-- Batch 4: Countries 151–200
+-- ====================================================
+INSERT INTO country
+(id, country_code, country_name, iso_code, phone_code, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES
+(151,'PT','Portugal','PRT','+351', NOW(), 1, NULL, NULL, NULL, NULL),
+(152,'RO','Romania','ROU','+40', NOW(), 1, NULL, NULL, NULL, NULL),
+(153,'RU','Russia','RUS','+7', NOW(), 1, NULL, NULL, NULL, NULL),
+(154,'SM','San Marino','SMR','+378', NOW(), 1, NULL, NULL, NULL, NULL),
+(155,'RS','Serbia','SRB','+381', NOW(), 1, NULL, NULL, NULL, NULL),
+(156,'SK','Slovakia','SVK','+421', NOW(), 1, NULL, NULL, NULL, NULL),
+(157,'SI','Slovenia','SVN','+386', NOW(), 1, NULL, NULL, NULL, NULL),
+(158,'ES','Spain','ESP','+34', NOW(), 1, NULL, NULL, NULL, NULL),
+(159,'SE','Sweden','SWE','+46', NOW(), 1, NULL, NULL, NULL, NULL),
+(160,'CH','Switzerland','CHE','+41', NOW(), 1, NULL, NULL, NULL, NULL),
+(161,'TR','Turkey','TUR','+90', NOW(), 1, NULL, NULL, NULL, NULL),
+(162,'UA','Ukraine','UKR','+380', NOW(), 1, NULL, NULL, NULL, NULL),
+(163,'GB','United Kingdom','GBR','+44', NOW(), 1, NULL, NULL, NULL, NULL),
+(164,'VA','Vatican City','VAT','+379', NOW(), 1, NULL, NULL, NULL, NULL),
+(165,'DZ','Algeria','DZA','+213', NOW(), 1, NULL, NULL, NULL, NULL),
+(166,'AO','Angola','AGO','+244', NOW(), 1, NULL, NULL, NULL, NULL),
+(167,'BJ','Benin','BEN','+229', NOW(), 1, NULL, NULL, NULL, NULL),
+(168,'BW','Botswana','BWA','+267', NOW(), 1, NULL, NULL, NULL, NULL),
+(169,'BF','Burkina Faso','BFA','+226', NOW(), 1, NULL, NULL, NULL, NULL),
+(170,'BI','Burundi','BDI','+257', NOW(), 1, NULL, NULL, NULL, NULL),
+(171,'CV','Cape Verde','CPV','+238', NOW(), 1, NULL, NULL, NULL, NULL),
+(172,'CM','Cameroon','CMR','+237', NOW(), 1, NULL, NULL, NULL, NULL),
+(173,'CF','Central African Republic','CAF','+236', NOW(), 1, NULL, NULL, NULL, NULL),
+(174,'TD','Chad','TCD','+235', NOW(), 1, NULL, NULL, NULL, NULL),
+(175,'KM','Comoros','COM','+269', NOW(), 1, NULL, NULL, NULL, NULL),
+(176,'CG','Congo','COG','+242', NOW(), 1, NULL, NULL, NULL, NULL),
+(177,'CD','Democratic Republic of the Congo','COD','+243', NOW(), 1, NULL, NULL, NULL, NULL),
+(178,'DJ','Djibouti','DJI','+253', NOW(), 1, NULL, NULL, NULL, NULL),
+(179,'EG','Egypt','EGY','+20', NOW(), 1, NULL, NULL, NULL, NULL),
+(180,'GQ','Equatorial Guinea','GNQ','+240', NOW(), 1, NULL, NULL, NULL, NULL),
+(181,'ER','Eritrea','ERI','+291', NOW(), 1, NULL, NULL, NULL, NULL),
+(182,'ET','Ethiopia','ETH','+251', NOW(), 1, NULL, NULL, NULL, NULL),
+(183,'GA','Gabon','GAB','+241', NOW(), 1, NULL, NULL, NULL, NULL),
+(184,'GM','Gambia','GMB','+220', NOW(), 1, NULL, NULL, NULL, NULL),
+(185,'GH','Ghana','GHA','+233', NOW(), 1, NULL, NULL, NULL, NULL),
+(186,'GN','Guinea','GIN','+224', NOW(), 1, NULL, NULL, NULL, NULL),
+(187,'GW','Guinea-Bissau','GNB','+245', NOW(), 1, NULL, NULL, NULL, NULL),
+(188,'CI','Ivory Coast','CIV','+225', NOW(), 1, NULL, NULL, NULL, NULL),
+(189,'KE','Kenya','KEN','+254', NOW(), 1, NULL, NULL, NULL, NULL),
+(190,'LS','Lesotho','LSO','+266', NOW(), 1, NULL, NULL, NULL, NULL),
+(191,'LR','Liberia','LBR','+231', NOW(), 1, NULL, NULL, NULL, NULL),
+(192,'LY','Libya','LBY','+218', NOW(), 1, NULL, NULL, NULL, NULL),
+(193,'MG','Madagascar','MDG','+261', NOW(), 1, NULL, NULL, NULL, NULL),
+(194,'MW','Malawi','MWI','+265', NOW(), 1, NULL, NULL, NULL, NULL),
+(195,'ML','Mali','MLI','+223', NOW(), 1, NULL, NULL, NULL, NULL),
+(196,'MR','Mauritania','MRT','+222', NOW(), 1, NULL, NULL, NULL, NULL),
+(197,'MU','Mauritius','MUS','+230', NOW(), 1, NULL, NULL, NULL, NULL),
+(198,'MA','Morocco','MAR','+212', NOW(), 1, NULL, NULL, NULL, NULL),
+(199,'MZ','Mozambique','MOZ','+258', NOW(), 1, NULL, NULL, NULL, NULL),
+(200,'NA','Namibia','NAM','+264', NOW(), 1, NULL, NULL, NULL, NULL);
+-- ====================================================
+-- Batch 5: Countries 201–246
+-- ====================================================
+INSERT INTO country
+(id, country_code, country_name, iso_code, phone_code, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES
+(201,'NP','Nepal','NPL','+977', NOW(), 1, NULL, NULL, NULL, NULL),
+(202,'NL','Netherlands','NLD','+31', NOW(), 1, NULL, NULL, NULL, NULL),
+(203,'NZ','New Zealand','NZL','+64', NOW(), 1, NULL, NULL, NULL, NULL),
+(204,'NI','Nicaragua','NIC','+505', NOW(), 1, NULL, NULL, NULL, NULL),
+(205,'NE','Niger','NER','+227', NOW(), 1, NULL, NULL, NULL, NULL),
+(206,'NG','Nigeria','NGA','+234', NOW(), 1, NULL, NULL, NULL, NULL),
+(207,'KP','North Korea','PRK','+850', NOW(), 1, NULL, NULL, NULL, NULL),
+(208,'MK','North Macedonia','MKD','+389', NOW(), 1, NULL, NULL, NULL, NULL),
+(209,'NO','Norway','NOR','+47', NOW(), 1, NULL, NULL, NULL, NULL),
+(210,'OM','Oman','OMN','+968', NOW(), 1, NULL, NULL, NULL, NULL),
+(211,'PK','Pakistan','PAK','+92', NOW(), 1, NULL, NULL, NULL, NULL),
+(212,'PW','Palau','PLW','+680', NOW(), 1, NULL, NULL, NULL, NULL),
+(213,'PA','Panama','PAN','+507', NOW(), 1, NULL, NULL, NULL, NULL),
+(214,'PG','Papua New Guinea','PNG','+675', NOW(), 1, NULL, NULL, NULL, NULL),
+(215,'PY','Paraguay','PRY','+595', NOW(), 1, NULL, NULL, NULL, NULL),
+(216,'PE','Peru','PER','+51', NOW(), 1, NULL, NULL, NULL, NULL),
+(217,'PH','Philippines','PHL','+63', NOW(), 1, NULL, NULL, NULL, NULL),
+(218,'PL','Poland','POL','+48', NOW(), 1, NULL, NULL, NULL, NULL),
+(219,'PT','Portugal','PRT','+351', NOW(), 1, NULL, NULL, NULL, NULL),
+(220,'QA','Qatar','QAT','+974', NOW(), 1, NULL, NULL, NULL, NULL),
+(221,'RO','Romania','ROU','+40', NOW(), 1, NULL, NULL, NULL, NULL),
+(222,'RU','Russia','RUS','+7', NOW(), 1, NULL, NULL, NULL, NULL),
+(223,'RW','Rwanda','RWA','+250', NOW(), 1, NULL, NULL, NULL, NULL),
+(224,'KN','Saint Kitts and Nevis','KNA','+1-869', NOW(), 1, NULL, NULL, NULL, NULL),
+(225,'LC','Saint Lucia','LCA','+1-758', NOW(), 1, NULL, NULL, NULL, NULL),
+(226,'VC','Saint Vincent and the Grenadines','VCT','+1-784', NOW(), 1, NULL, NULL, NULL, NULL),
+(227,'WS','Samoa','WSM','+685', NOW(), 1, NULL, NULL, NULL, NULL),
+(228,'SM','San Marino','SMR','+378', NOW(), 1, NULL, NULL, NULL, NULL),
+(229,'ST','Sao Tome and Principe','STP','+239', NOW(), 1, NULL, NULL, NULL, NULL),
+(230,'SA','Saudi Arabia','SAU','+966', NOW(), 1, NULL, NULL, NULL, NULL),
+(231,'SN','Senegal','SEN','+221', NOW(), 1, NULL, NULL, NULL, NULL),
+(232,'RS','Serbia','SRB','+381', NOW(), 1, NULL, NULL, NULL, NULL),
+(233,'SC','Seychelles','SYC','+248', NOW(), 1, NULL, NULL, NULL, NULL),
+(234,'SL','Sierra Leone','SLE','+232', NOW(), 1, NULL, NULL, NULL, NULL),
+(235,'SG','Singapore','SGP','+65', NOW(), 1, NULL, NULL, NULL, NULL),
+(236,'SK','Slovakia','SVK','+421', NOW(), 1, NULL, NULL, NULL, NULL),
+(237,'SI','Slovenia','SVN','+386', NOW(), 1, NULL, NULL, NULL, NULL),
+(238,'SB','Solomon Islands','SLB','+677', NOW(), 1, NULL, NULL, NULL, NULL),
+(239,'SO','Somalia','SOM','+252', NOW(), 1, NULL, NULL, NULL, NULL),
+(240,'ZA','South Africa','ZAF','+27', NOW(), 1, NULL, NULL, NULL, NULL),
+(241,'KR','South Korea','KOR','+82', NOW(), 1, NULL, NULL, NULL, NULL),
+(242,'SS','South Sudan','SSD','+211', NOW(), 1, NULL, NULL, NULL, NULL),
+(243,'ES','Spain','ESP','+34', NOW(), 1, NULL, NULL, NULL, NULL),
+(244,'LK','Sri Lanka','LKA','+94', NOW(), 1, NULL, NULL, NULL, NULL),
+(245,'SD','Sudan','SDN','+249', NOW(), 1, NULL, NULL, NULL, NULL),
+(246,'ZW','Zimbabwe','ZWE','+263', NOW(), 1, NULL, NULL, NULL, NULL);
+
 
 -- ============================================
 -- Provinces Table Insertions
@@ -151,131 +305,145 @@ INSERT INTO country (country_code, country_name, iso_code, phone_code) VALUES
 -- ============================================
 
 -- Pakistan Provinces
-INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by) VALUES
+-- ============================================
+-- Update Pakistan Provinces
+-- ============================================
+
+INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by)
+VALUES
 (98, 'Punjab', 'PB', TRUE, 1, 1),
 (98, 'Sindh', 'SD', TRUE, 1, 1),
 (98, 'Khyber Pakhtunkhwa', 'KP', TRUE, 1, 1),
 (98, 'Balochistan', 'BL', TRUE, 1, 1),
 (98, 'Islamabad Capital Territory', 'ICT', TRUE, 1, 1),
 (98, 'Gilgit-Baltistan', 'GB', TRUE, 1, 1),
-(98, 'Azad Jammu & Kashmir', 'AJK', TRUE, 1, 1);
-
--- Saudi Arabia Provinces
-INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by) VALUES
-(105, 'Riyadh', 'RD', TRUE, 1, 1),
-(105, 'Makkah', 'MK', TRUE, 1, 1),
-(105, 'Madinah', 'MD', TRUE, 1, 1),
-(105, 'Eastern Province', 'EP', TRUE, 1, 1),
-(105, 'Qassim', 'QA', TRUE, 1, 1),
-(105, 'Ha’il', 'HL', TRUE, 1, 1),
-(105, 'Tabuk', 'TB', TRUE, 1, 1),
-(105, 'Northern Borders', 'NB', TRUE, 1, 1),
-(105, 'Jazan', 'JZ', TRUE, 1, 1),
-(105, 'Najran', 'NJ', TRUE, 1, 1),
-(105, 'Al Bahah', 'BH', TRUE, 1, 1),
-(105, 'Al Jawf', 'JW', TRUE, 1, 1),
-(105, 'Asir', 'AS', TRUE, 1, 1);
-
--- UAE Provinces
-INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by) VALUES
-(115, 'Abu Dhabi', 'AD', TRUE, 1, 1),
-(115, 'Dubai', 'DU', TRUE, 1, 1),
-(115, 'Sharjah', 'SH', TRUE, 1, 1),
-(115, 'Ajman', 'AJ', TRUE, 1, 1),
-(115, 'Umm Al Quwain', 'UAQ', TRUE, 1, 1),
-(115, 'Ras Al Khaimah', 'RAK', TRUE, 1, 1),
-(115, 'Fujairah', 'FJ', TRUE, 1, 1);
-
--- India Provinces
-INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by) VALUES
-(64, 'Andhra Pradesh', 'AP', TRUE, 1, 1),
-(64, 'Arunachal Pradesh', 'AR', TRUE, 1, 1),
-(64, 'Assam', 'AS', TRUE, 1, 1),
-(64, 'Bihar', 'BR', TRUE, 1, 1),
-(64, 'Chhattisgarh', 'CG', TRUE, 1, 1),
-(64, 'Goa', 'GA', TRUE, 1, 1),
-(64, 'Gujarat', 'GJ', TRUE, 1, 1),
-(64, 'Haryana', 'HR', TRUE, 1, 1),
-(64, 'Himachal Pradesh', 'HP', TRUE, 1, 1),
-(64, 'Jharkhand', 'JH', TRUE, 1, 1),
-(64, 'Karnataka', 'KA', TRUE, 1, 1),
-(64, 'Kerala', 'KL', TRUE, 1, 1),
-(64, 'Madhya Pradesh', 'MP', TRUE, 1, 1),
-(64, 'Maharashtra', 'MH', TRUE, 1, 1),
-(64, 'Manipur', 'MN', TRUE, 1, 1),
-(64, 'Meghalaya', 'ML', TRUE, 1, 1),
-(64, 'Mizoram', 'MZ', TRUE, 1, 1),
-(64, 'Nagaland', 'NL', TRUE, 1, 1),
-(64, 'Odisha', 'OR', TRUE, 1, 1),
-(64, 'Rajasthan', 'RJ', TRUE, 1, 1),
-(64, 'Sikkim', 'SK', TRUE, 1, 1),
-(64, 'Tamil Nadu', 'TN', TRUE, 1, 1),
-(64, 'Telangana', 'TS', TRUE, 1, 1),
-(64, 'Tripura', 'TR', TRUE, 1, 1),
-(64, 'Uttar Pradesh', 'UP', TRUE, 1, 1),
-(64, 'Uttarakhand', 'UT', TRUE, 1, 1),
-(64, 'West Bengal', 'WB', TRUE, 1, 1),
-(64, 'Delhi', 'DL', TRUE, 1, 1),
-(64, 'Jammu and Kashmir', 'JK', TRUE, 1, 1),
-(64, 'Ladakh', 'LA', TRUE, 1, 1),
-(64, 'Puducherry', 'PY', TRUE, 1, 1),
-(64, 'Chandigarh', 'CH', TRUE, 1, 1),
-(64, 'Daman and Diu', 'DD', TRUE, 1, 1),
-(64, 'Dadra and Nagar Haveli', 'DN', TRUE, 1, 1),
-(64, 'Lakshadweep', 'LD', TRUE, 1, 1),
-(64, 'Andaman and Nicobar Islands', 'AN', TRUE, 1, 1);
+(98, 'Azad Jammu & Kashmir', 'AJK', TRUE, 1, 1)
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+code = VALUES(code),
+is_active = VALUES(is_active),
+updated_by = VALUES(updated_by);
 
 -- ============================================
--- Cities Table Insertions
--- Purpose: Populate the 'cities' table with cities for each province.
--- Used for address selection in forms for students, employees, and campuses.
+-- Update Pakistan Cities
 -- ============================================
 
--- Pakistan Cities
 -- Punjab
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES
 (1, 'Lahore', 'LHE', TRUE, 1, 1, NOW()),
 (1, 'Faisalabad', 'FSD', TRUE, 1, 1, NOW()),
 (1, 'Rawalpindi', 'RWP', TRUE, 1, 1, NOW()),
-(1, 'Multan', 'MLN', TRUE, 1, 1, NOW());
+(1, 'Multan', 'MLN', TRUE, 1, 1, NOW())
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+code = VALUES(code),
+is_active = VALUES(is_active),
+updated_by = VALUES(updated_by),
+created_at = VALUES(created_at);
 
 -- Sindh
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES
 (2, 'Karachi', 'KHI', TRUE, 1, 1, NOW()),
 (2, 'Hyderabad', 'HYD', TRUE, 1, 1, NOW()),
 (2, 'Sukkur', 'SUK', TRUE, 1, 1, NOW()),
-(2, 'Larkana', 'LRK', TRUE, 1, 1, NOW());
+(2, 'Larkana', 'LRK', TRUE, 1, 1, NOW())
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+code = VALUES(code),
+is_active = VALUES(is_active),
+updated_by = VALUES(updated_by),
+created_at = VALUES(created_at);
 
 -- Khyber Pakhtunkhwa
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES
 (3, 'Peshawar', 'PEW', TRUE, 1, 1, NOW()),
 (3, 'Mardan', 'MRD', TRUE, 1, 1, NOW()),
 (3, 'Abbottabad', 'ABT', TRUE, 1, 1, NOW()),
-(3, 'Swat', 'SWT', TRUE, 1, 1, NOW());
+(3, 'Swat', 'SWT', TRUE, 1, 1, NOW())
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+code = VALUES(code),
+is_active = VALUES(is_active),
+updated_by = VALUES(updated_by),
+created_at = VALUES(created_at);
 
 -- Balochistan
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES
 (4, 'Quetta', 'QTA', TRUE, 1, 1, NOW()),
 (4, 'Gwadar', 'GWD', TRUE, 1, 1, NOW()),
 (4, 'Sibi', 'SBI', TRUE, 1, 1, NOW()),
-(4, 'Zhob', 'ZHB', TRUE, 1, 1, NOW());
+(4, 'Zhob', 'ZHB', TRUE, 1, 1, NOW())
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+code = VALUES(code),
+is_active = VALUES(is_active),
+updated_by = VALUES(updated_by),
+created_at = VALUES(created_at);
 
 -- Islamabad Capital Territory
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
-(5, 'Islamabad', 'ISB', TRUE, 1, 1, NOW());
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES
+(5, 'Islamabad', 'ISB', TRUE, 1, 1, NOW())
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+code = VALUES(code),
+is_active = VALUES(is_active),
+updated_by = VALUES(updated_by),
+created_at = VALUES(created_at);
 
 -- Gilgit-Baltistan
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES
 (6, 'Gilgit', 'GIL', TRUE, 1, 1, NOW()),
-(6, 'Skardu', 'SKD', TRUE, 1, 1, NOW());
+(6, 'Skardu', 'SKD', TRUE, 1, 1, NOW())
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+code = VALUES(code),
+is_active = VALUES(is_active),
+updated_by = VALUES(updated_by),
+created_at = VALUES(created_at);
 
 -- Azad Jammu & Kashmir
-INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at) VALUES
+INSERT INTO cities (province_id, name, code, is_active, created_by, updated_by, created_at)
+VALUES
 (7, 'Muzaffarabad', 'MZD', TRUE, 1, 1, NOW()),
 (7, 'Mirpur', 'MIR', TRUE, 1, 1, NOW()),
-(7, 'Kotli', 'KOT', TRUE, 1, 1, NOW());
+(7, 'Kotli', 'KOT', TRUE, 1, 1, NOW())
+ON DUPLICATE KEY UPDATE
+name = VALUES(name),
+code = VALUES(code),
+is_active = VALUES(is_active),
+updated_by = VALUES(updated_by),
+created_at = VALUES(created_at);
 
 
+
+
+-- ============================================================
+-- Sample Data: Institutes
+-- This dataset seeds the 'institutes' table with example
+-- educational organizations. These entries are used to attach
+-- campuses, academic years, users, fee structures, and other
+-- modules within the system.
+-- ============================================================
+INSERT INTO institutes
+(id, name, address, contact_number, email, website, tagline, logo_url,
+ established_date, country_id, province_id, city_id, created_at, updated_at)
+VALUES
+(1, 'Smart Solutions School',
+ '123 Main Street, Lahore',
+ '+92-300-1234567',
+ 'info@smartsolutions.edu',
+ 'https://www.smartsolutions.edu',
+ 'Excellence in Education',
+ NULL,
+ '2005-08-15',
+ 98, 1, 1,
+ NOW(), NOW());
 -- ============================================================
 -- Sample Data: Admission Types
 -- This section populates the 'admission_type' table with a
@@ -319,27 +487,6 @@ VALUES
 
 
 
--- ============================================================
--- Sample Data: Institutes
--- This dataset seeds the 'institutes' table with example
--- educational organizations. These entries are used to attach
--- campuses, academic years, users, fee structures, and other
--- modules within the system.
--- ============================================================
-INSERT INTO institutes
-(id, name, address, contact_number, email, website, tagline, logo_url,
- established_date, country_id, province_id, city_id, created_at, updated_at)
-VALUES
-(1, 'Smart Solutions School',
- '123 Main Street, Lahore',
- '+92-300-1234567',
- 'info@smartsolutions.edu',
- 'https://www.smartsolutions.edu',
- 'Excellence in Education',
- NULL,
- '2005-08-15',
- 98, 1, 1,
- NOW(), NOW());
 -- ============================================================
 -- Sample Data: Campuses
 -- This dataset seeds the 'campuses' table for Smart Solutions
