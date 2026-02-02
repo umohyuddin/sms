@@ -115,6 +115,318 @@ CREATE TABLE institutes (
             FOREIGN KEY (city_id) REFERENCES cities(id)
 );
 
+DROP TABLE IF EXISTS school_types;
+CREATE TABLE school_types (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(30) UNIQUE NOT NULL,   -- PRIVATE, PUBLIC, CHARTER
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT chk_school_type_code_not_empty CHECK (LENGTH(code) > 0),
+    CONSTRAINT chk_school_type_name_not_empty CHECK (LENGTH(name) > 0)
+);
+CREATE INDEX idx_school_type_code ON school_types (code);
+CREATE INDEX idx_school_type_name ON school_types (name);
+
+DROP TABLE IF EXISTS education_boards;
+CREATE TABLE education_boards (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(50) UNIQUE,
+    name VARCHAR(150) NOT NULL,
+    country_code CHAR(2),   -- US, UK, AE, PK
+    description VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT chk_education_board_name_not_empty CHECK (LENGTH(name) > 0)
+);
+CREATE INDEX idx_education_board_code ON education_boards (code);
+CREATE INDEX idx_education_board_name ON education_boards (name);
+
+DROP TABLE IF EXISTS languages;
+CREATE TABLE languages (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    iso_code VARCHAR(10) UNIQUE,   -- en, ur, ar
+    name VARCHAR(50) NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT chk_language_name_not_empty CHECK (LENGTH(name) > 0)
+);
+CREATE INDEX idx_language_iso_code ON languages (iso_code);
+CREATE INDEX idx_language_name ON languages (name);
+
+DROP TABLE IF EXISTS institute_languages;
+CREATE TABLE institute_languages (
+    institute_id BIGINT,
+    language_id BIGINT,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (institute_id, language_id),
+    FOREIGN KEY (institute_id) REFERENCES institutes(id),
+    FOREIGN KEY (language_id) REFERENCES languages(id)
+);
+
+DROP TABLE IF EXISTS institute_contacts;
+CREATE TABLE institute_contacts (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+
+    contact_person_name VARCHAR(100),
+    role VARCHAR(50),          -- Admin, Accounts, Admissions
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    is_primary BOOLEAN DEFAULT FALSE,
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_contacts_institute ON institute_contacts (institute_id);
+
+DROP TABLE IF EXISTS institute_social_links;
+CREATE TABLE institute_social_links (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+
+    platform VARCHAR(50),     -- Facebook, LinkedIn, Instagram
+    url VARCHAR(255),
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_social_links_institute ON institute_social_links (institute_id);
+
+DROP TABLE IF EXISTS institute_academic_offerings;
+CREATE TABLE institute_academic_offerings (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+
+    education_level VARCHAR(50),    -- Primary, Secondary
+    curriculum VARCHAR(100),        -- Cambridge, IB
+    board VARCHAR(100),             -- FBISE, GCSE
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_academic_offerings_institute ON institute_academic_offerings (institute_id);
+
+DROP TABLE IF EXISTS institute_facilities;
+CREATE TABLE institute_facilities (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+
+    facility_type VARCHAR(50),   -- Lab, Library, Playground
+    description VARCHAR(255),
+    capacity INT,
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_facilities_institute ON institute_facilities (institute_id);
+
+DROP TABLE IF EXISTS institute_billing;
+CREATE TABLE institute_billing (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT UNIQUE NOT NULL,
+
+    billing_email VARCHAR(100),
+    tax_number VARCHAR(50),
+    currency VARCHAR(10),
+
+    subscription_plan VARCHAR(50),     -- Free, Basic, Premium
+    payment_cycle VARCHAR(20),          -- Monthly, Yearly
+    subscription_start DATE,
+    subscription_end DATE,
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_billing_institute ON institute_billing (institute_id);
+
+DROP TABLE IF EXISTS institute_documents;
+CREATE TABLE institute_documents (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+
+    document_type VARCHAR(50),     -- License, Registration
+    file_name VARCHAR(150),
+    file_url VARCHAR(255),
+    expiry_date DATE,
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_documents_institute ON institute_documents (institute_id);
+
+DROP TABLE IF EXISTS institute_accreditations;
+CREATE TABLE institute_accreditations (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+
+    authority_name VARCHAR(100),   -- KHDA, Ofsted, FBISE
+    license_number VARCHAR(50),
+    valid_from DATE,
+    valid_to DATE,
+
+    is_active BOOLEAN DEFAULT TRUE,
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_accreditations_institute ON institute_accreditations (institute_id);
+
+DROP TABLE IF EXISTS institute_profiles;
+CREATE TABLE institute_profiles (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT UNIQUE NOT NULL,
+
+    description TEXT,
+    mission TEXT,
+    vision TEXT,
+    `values` TEXT,
+
+    about_chairperson TEXT,        -- optional
+    organization_email VARCHAR(100),
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_profiles_institute ON institute_profiles (institute_id);
+
+DROP TABLE IF EXISTS institute_board_members;
+CREATE TABLE institute_board_members (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+
+    full_name VARCHAR(100) NOT NULL,
+    role VARCHAR(50),             -- Chairman, Director, Secretary
+    email VARCHAR(100),
+    contact_number VARCHAR(20),
+
+    term_start DATE,
+    term_end DATE,
+
+    is_active BOOLEAN DEFAULT TRUE,
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_board_members_institute ON institute_board_members (institute_id);
+
+DROP TABLE IF EXISTS institute_executives;
+CREATE TABLE institute_executives (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+
+    full_name VARCHAR(100),
+    title VARCHAR(50),        -- CEO, COO, Director Academics
+    email VARCHAR(100),
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+);
+CREATE INDEX idx_institute_executives_institute ON institute_executives (institute_id);
+
 
 
 CREATE TABLE subjects (
@@ -683,6 +995,25 @@ CREATE TABLE system_users
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+DROP TABLE IF EXISTS permission;
+CREATE TABLE permission
+(
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    permission_name  VARCHAR(255) NOT NULL,
+    code             VARCHAR(100) UNIQUE,
+    module           VARCHAR(255),
+    description      TEXT,
+
+    created_at       BIGINT,
+    updated_at       BIGINT,
+    is_deleted       BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT chk_permission_name_not_empty CHECK (LENGTH(permission_name) > 0),
+    CONSTRAINT chk_permission_code_not_empty CHECK (code IS NULL OR LENGTH(code) > 0)
+);
+CREATE INDEX idx_permission_name ON permission (permission_name);
+CREATE INDEX idx_permission_code ON permission (code);
 
 CREATE TABLE employee_type (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
