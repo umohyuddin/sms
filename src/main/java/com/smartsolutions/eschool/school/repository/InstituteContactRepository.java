@@ -20,6 +20,16 @@ public interface InstituteContactRepository extends JpaRepository<InstituteConta
             """)
     Optional<InstituteContactEntity> findByIdJpql(@Param("id") Long id);
 
+
+    @Query("""
+    SELECT c FROM InstituteContactEntity c
+    WHERE c.id = :id AND c.institute.id = :instituteId
+""")
+    Optional<InstituteContactEntity> findByIdAndOrganizationId(
+            @Param("id") Long id,
+            @Param("instituteId") Long instituteId
+    );
+
     @Query("""
             SELECT c FROM InstituteContactEntity c
             """)

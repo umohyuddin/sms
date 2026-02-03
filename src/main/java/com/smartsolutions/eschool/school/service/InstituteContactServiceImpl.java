@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -81,48 +82,50 @@ public class InstituteContactServiceImpl implements InstituteContactService {
     }
 
     @Override
-    public InstituteContactResponseDTO getById(Long id) {
-        InstituteContactEntity entity = instituteContactRepository.findByIdJpql(id)
-                .orElseThrow(() -> new ResourceNotFoundException("InstituteContact not found with id: " + id));
+    public InstituteContactResponseDTO getById(Long contactId, Long instituteId) {
+        InstituteContactEntity entity = instituteContactRepository.findByIdAndOrganizationId(contactId, instituteId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "InstituteContact not found with id: " + contactId + " for institute id: " + instituteId));
+
         InstituteContactResponseDTO dto = MapperUtil.mapObject(entity, InstituteContactResponseDTO.class);
         dto.setInstituteId(entity.getInstitute().getId());
         return dto;
     }
 
+
     @Override
-    public InstituteContactResponseDTO updateContact(Long id, InstituteContactUpdateRequestDTO requestDTO) {
-        InstituteContactEntity existing = instituteContactRepository.findByIdJpql(id)
-                .orElseThrow(() -> new ResourceNotFoundException("InstituteContact not found with id: " + id));
+    public InstituteContactResponseDTO updateContact(Long contactId, Long instituteId, InstituteContactUpdateRequestDTO requestDTO) {
+        InstituteContactEntity entity = instituteContactRepository
+                .findByIdAndOrganizationId(contactId, instituteId)
+                .orElseThrow(() -> new ResourceNotFoundException("Contact not found with id=" + contactId + " for institute=" + instituteId
+                ));
 
-        if (requestDTO.getContactPersonName() != null) {
-            existing.setContactPersonName(requestDTO.getContactPersonName());
-        }
-        if (requestDTO.getRole() != null) {
-            existing.setRole(requestDTO.getRole());
-        }
-        if (requestDTO.getPhone() != null) {
-            existing.setPhone(requestDTO.getPhone());
-        }
-        if (requestDTO.getEmail() != null) {
-            existing.setEmail(requestDTO.getEmail());
-        }
-        if (requestDTO.getIsPrimary() != null) {
-            existing.setIsPrimary(requestDTO.getIsPrimary());
-        }
+        // update fields
+        if (requestDTO.getContactPersonName() != null) entity.setContactPersonName(requestDTO.getContactPersonName());
+        if (requestDTO.getRole() != null) entity.setRole(requestDTO.getRole());
+        if (requestDTO.getPhone() != null) entity.setPhone(requestDTO.getPhone());
+        if (requestDTO.getEmail() != null) entity.setEmail(requestDTO.getEmail());
+        if (requestDTO.getIsPrimary() != null) entity.setIsPrimary(requestDTO.getIsPrimary());
 
-        InstituteContactEntity updated = instituteContactRepository.save(existing);
+        // save updated entity
+        InstituteContactEntity updated = instituteContactRepository.save(entity);
+
         InstituteContactResponseDTO dto = MapperUtil.mapObject(updated, InstituteContactResponseDTO.class);
         dto.setInstituteId(updated.getInstitute().getId());
         return dto;
     }
 
     @Override
-    public void deleteById(Long id) {
-        if (instituteContactRepository.findByIdJpql(id).isEmpty()) {
-            throw new ResourceNotFoundException("InstituteContact not found with id: " + id);
+    public void deleteById(Long id, Long organizationId) {
+        Optional<InstituteContactEntity> contactOpt = instituteContactRepository.findByIdAndOrganizationId(id, organizationId);
+        if (contactOpt.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "InstituteContact not found with id: " + id + " for instituteId: " + organizationId
+            );
         }
-        instituteContactRepository.deleteById(id);
+        instituteContactRepository.delete(contactOpt.get());
     }
+
 
     @Override
     public List<InstituteContactResponseDTO> searchByKeyword(String keyword) {

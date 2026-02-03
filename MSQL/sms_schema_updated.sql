@@ -83,7 +83,7 @@ CREATE TABLE roles (
       updated_by  BIGINT,
       deleted_at  DATETIME,
       deleted_by  BIGINT,
-      deleted     BOOLEAN      NOT NULL DEFAULT FALSE,
+      deleted     BOOLEAN      NOT NULL DEFAULT FALSE
 );
 -- TODO_
 -- institutes TABLE

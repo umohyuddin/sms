@@ -15,11 +15,11 @@ public interface InstituteContactService {
 
     Page<InstituteContactResponseDTO> getByInstituteId(Long instituteId, Pageable pageable);
 
-    InstituteContactResponseDTO getById(Long id);
+    InstituteContactResponseDTO getById(Long id,Long instituteId);
 
-    InstituteContactResponseDTO updateContact(Long id, InstituteContactUpdateRequestDTO requestDTO);
+    InstituteContactResponseDTO updateContact(Long id, Long instituteId,InstituteContactUpdateRequestDTO requestDTO);
 
-    void deleteById(Long id);
+    void deleteById(Long id, Long organizationId);
 
     List<InstituteContactResponseDTO> searchByKeyword(String keyword);
 }

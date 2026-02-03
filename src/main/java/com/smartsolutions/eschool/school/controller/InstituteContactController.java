@@ -43,20 +43,30 @@ public class InstituteContactController {
     }
 
     @GetMapping(value = "/{contactId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteContactResponseDTO> getById(@PathVariable Long contactId) {
-        return ResponseEntity.ok(instituteContactFacade.getById(contactId));
+    public ResponseEntity<InstituteContactResponseDTO> getById(
+            @PathVariable Long contactId,
+            @RequestParam Long instituteId) { // added instituteId
+        return ResponseEntity.ok(instituteContactFacade.getById(contactId, instituteId));
     }
 
     @PutMapping(value = "/{contactId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteContactResponseDTO> updateContact(@PathVariable Long contactId, @Valid @RequestBody InstituteContactUpdateRequestDTO requestDTO) {
-        return ResponseEntity.ok(instituteContactFacade.updateContact(contactId, requestDTO));
+    public ResponseEntity<InstituteContactResponseDTO> updateContact(
+            @PathVariable Long contactId,
+            @RequestParam Long instituteId,
+            @Valid @RequestBody InstituteContactUpdateRequestDTO requestDTO) {
+
+        InstituteContactResponseDTO updated = instituteContactFacade.updateContact(contactId, instituteId, requestDTO);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{contactId}")
-    public ResponseEntity<String> deleteContact(@PathVariable Long contactId) {
-        instituteContactFacade.deleteById(contactId);
+    public ResponseEntity<String> deleteContact(
+            @PathVariable Long contactId,
+            @RequestParam Long organizationId) {
+        instituteContactFacade.deleteById(contactId, organizationId);
         return ResponseEntity.ok("Institute contact deleted successfully");
     }
+
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<InstituteContactResponseDTO>> search(@RequestParam(name = "keyword") String keyword) {

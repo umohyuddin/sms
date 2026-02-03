@@ -14,7 +14,7 @@ public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
     @Query("""
             SELECT r FROM RoleEntity r
             WHERE (:keyword IS NULL OR :keyword = ''
-                OR LOWER(r.roleName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(r.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
             """)
     List<RoleEntity> searchByKeyword(@Param("keyword") String keyword);

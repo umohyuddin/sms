@@ -33,19 +33,23 @@ public class InstituteContactFacade {
         return instituteContactService.getByInstituteId(instituteId, pageable);
     }
 
-    public InstituteContactResponseDTO getById(Long id) {
-        return instituteContactService.getById(id);
+    public InstituteContactResponseDTO updateContact(Long contactId, Long instituteId, InstituteContactUpdateRequestDTO requestDTO) {
+        return instituteContactService.updateContact(contactId, instituteId, requestDTO);
     }
 
-    public InstituteContactResponseDTO updateContact(Long id, InstituteContactUpdateRequestDTO requestDTO) {
-        return instituteContactService.updateContact(id, requestDTO);
-    }
+//    public InstituteContactResponseDTO updateContact(Long id, InstituteContactUpdateRequestDTO requestDTO) {
+//        return instituteContactService.updateContact(id, requestDTO);
+//    }
 
-    public void deleteById(Long id) {
-        instituteContactService.deleteById(id);
+    public void deleteById(Long contactId, Long organizationId) {
+        instituteContactService.deleteById(contactId, organizationId);
     }
 
     public List<InstituteContactResponseDTO> searchByKeyword(String keyword) {
         return instituteContactService.searchByKeyword(keyword);
+    }
+
+    public InstituteContactResponseDTO getById(Long contactId, Long instituteId) {
+      return   instituteContactService.getById(contactId,instituteId);
     }
 }
