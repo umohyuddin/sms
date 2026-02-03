@@ -66,6 +66,25 @@ CREATE TABLE cities
     deleted     BOOLEAN      NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_province FOREIGN KEY (province_id) REFERENCES provinces (id)
 );
+
+CREATE TABLE roles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+
+    code VARCHAR(50) UNIQUE NOT NULL,   -- SUPER_ADMIN, TEACHER, HR
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+
+    is_system_role BOOLEAN DEFAULT FALSE,
+    active BOOLEAN DEFAULT TRUE,
+    created_at  DATETIME     NOT NULL,
+      created_by  BIGINT,
+      updated_at  DATETIME,
+      updated_by  BIGINT,
+      deleted_at  DATETIME,
+      deleted_by  BIGINT,
+      deleted     BOOLEAN      NOT NULL DEFAULT FALSE,
+);
 -- TODO_
 -- institutes TABLE
 DROP TABLE IF EXISTS institutes;

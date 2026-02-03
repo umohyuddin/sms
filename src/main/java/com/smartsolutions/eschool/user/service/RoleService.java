@@ -25,7 +25,7 @@ public class RoleService {
     }
 
     public RoleResponseDTO createRole(RoleRequestDTO requestDTO) {
-        log.info("Creating new Role: {}", requestDTO.getRoleName());
+        log.info("Creating new Role: {}", requestDTO.getName());
         try {
             RoleEntity entity = MapperUtil.mapObject(requestDTO, RoleEntity.class);
             entity.setId(null);
@@ -72,8 +72,8 @@ public class RoleService {
         RoleEntity existing = roleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
 
-        if (requestDTO.getRoleName() != null && !requestDTO.getRoleName().isBlank()) {
-            existing.setRoleName(requestDTO.getRoleName());
+        if (requestDTO.getName() != null && !requestDTO.getName().isBlank()) {
+            existing.setName(requestDTO.getName());
         }
         if (requestDTO.getDescription() != null) {
             existing.setDescription(requestDTO.getDescription());
@@ -98,4 +98,35 @@ public class RoleService {
         List<RoleEntity> result = roleRepository.searchByKeyword(keyword == null ? "" : keyword.trim());
         return MapperUtil.mapList(result, RoleResponseDTO.class);
     }
+    public List<RoleResponseDTO> getByOrganizationId(Long organizationId) {
+        log.info("Fetching Roles for organizationId: {}", organizationId);
+
+        try {
+            List<RoleEntity> roles = roleRepository.findByOrganizationId(organizationId);
+
+            if (roles == null || roles.isEmpty()) {
+                log.warn("No Roles found for organizationId: {}", organizationId);
+                return Collections.emptyList();
+            }
+
+            List<RoleResponseDTO> responseDTOS =
+                    MapperUtil.mapList(roles, RoleResponseDTO.class);
+
+            log.info("Successfully fetched {} Roles for organizationId: {}",
+                    responseDTOS.size(), organizationId);
+
+            return responseDTOS;
+
+        } catch (DataAccessException dae) {
+            log.error("Database error while fetching Roles for organizationId: {}", organizationId, dae);
+            throw dae;
+        } catch (MappingException me) {
+            log.error("Error mapping RoleEntity to RoleResponseDTO for organizationId: {}", organizationId, me);
+            throw me;
+        } catch (Exception ex) {
+            log.error("Unexpected error while fetching Roles for organizationId: {}", organizationId, ex);
+            throw ex;
+        }
+    }
+
 }

@@ -180,7 +180,7 @@ public class LookUpController {
         //need to change this conflicting with employee type
         result.put("employmentType", employeeDocumentConfig.getEmploymentTypes());
         result.put("systemEmployeeType", systemEmployeeType);
-        result.put("SchoolType",SchoolTypes);
+        result.put("SchoolTypes",SchoolTypes);
         return result;
     }
 

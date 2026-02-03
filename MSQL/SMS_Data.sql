@@ -23,6 +23,227 @@ INSERT INTO school_types (code, name, description, is_active, is_deleted) VALUES
 ('MONTESSORI', 'Montessori School', 'Focuses on child-led learning and early education.', TRUE, FALSE),
 ('VOCATIONAL', 'Vocational School', 'Specializes in skill-based education for trades and professions.', TRUE, FALSE);
 
+
+INSERT INTO roles
+(
+    organization_id,
+    code,
+    name,
+    description,
+    is_system_role,
+    active,
+    deleted,
+    created_by
+)
+VALUES
+-- ===============================
+-- SYSTEM / PLATFORM ROLES
+-- ===============================
+(1, 'SUPER_ADMIN', 'Super Administrator',
+ 'Full system access across all modules and organizations',
+ TRUE, TRUE, FALSE, 1),
+
+(1, 'ORG_ADMIN', 'Organization Administrator',
+ 'Manages institute-level configuration, campuses, and users',
+ TRUE, TRUE, FALSE, 1),
+
+-- ===============================
+-- ACADEMIC LEADERSHIP
+-- ===============================
+(1, 'PRINCIPAL', 'Principal',
+ 'Overall academic and administrative head of the school',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'VICE_PRINCIPAL', 'Vice Principal',
+ 'Assists principal in academic and disciplinary matters',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'HEAD_OF_DEPARTMENT', 'Head of Department',
+ 'Manages academic department and teaching staff',
+ FALSE, TRUE, FALSE, 1),
+
+-- ===============================
+-- TEACHING STAFF
+-- ===============================
+(1, 'TEACHER', 'Teacher',
+ 'Teaches assigned classes and manages student academics',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'CLASS_TEACHER', 'Class Teacher',
+ 'Responsible for a specific class and student coordination',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'SUBSTITUTE_TEACHER', 'Substitute Teacher',
+ 'Temporary teacher assigned to cover classes',
+ FALSE, TRUE, FALSE, 1),
+
+-- ===============================
+-- STUDENT & PARENT PORTALS
+-- ===============================
+(1, 'STUDENT', 'Student',
+ 'Student portal access for academics, attendance, and fees',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'PARENT', 'Parent / Guardian',
+ 'Parent portal access to monitor student progress and fees',
+ FALSE, TRUE, FALSE, 1),
+
+-- ===============================
+-- ADMISSIONS & EXAMINATION
+-- ===============================
+(1, 'ADMISSIONS_OFFICER', 'Admissions Officer',
+ 'Handles student admissions and enrollment process',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'EXAM_CONTROLLER', 'Examination Controller',
+ 'Manages exams, grading, and result publication',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'EXAMINER', 'Examiner',
+ 'Creates exams and evaluates student performance',
+ FALSE, TRUE, FALSE, 1),
+
+-- ===============================
+-- FINANCE & ACCOUNTS
+-- ===============================
+(1, 'ACCOUNTANT', 'Accountant',
+ 'Manages fee collection, payments, and accounting reports',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'FINANCE_MANAGER', 'Finance Manager',
+ 'Oversees financial operations and approvals',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'FEE_COLLECTION_OFFICER', 'Fee Collection Officer',
+ 'Handles daily fee collection and receipts',
+ FALSE, TRUE, FALSE, 1),
+
+-- ===============================
+-- HR & PAYROLL
+-- ===============================
+(1, 'HR_MANAGER', 'HR Manager',
+ 'Manages employees, payroll, and HR policies',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'HR_OFFICER', 'HR Officer',
+ 'Handles employee records, attendance, and documentation',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'PAYROLL_OFFICER', 'Payroll Officer',
+ 'Processes salaries and payroll cycles',
+ FALSE, TRUE, FALSE, 1),
+
+-- ===============================
+-- IT & SUPPORT
+-- ===============================
+(1, 'IT_ADMIN', 'IT Administrator',
+ 'Manages system configuration, users, and technical support',
+ FALSE, TRUE, FALSE, 1),
+
+(1, 'SUPPORT_STAFF', 'Support Staff',
+ 'Limited access for operational and support activities',
+ FALSE, TRUE, FALSE, 1);
+
+
+INSERT INTO education_boards
+(code, name, country_id, description, is_active, is_deleted)
+VALUES
+-- Federal
+('FBISE', 'Federal Board of Intermediate and Secondary Education', 98,
+ 'Federal education board responsible for SSC and HSSC examinations across Pakistan and overseas.', TRUE, FALSE),
+
+-- Punjab Boards
+('BISE_LAHORE', 'Board of Intermediate and Secondary Education Lahore', 98,
+ 'Provincial examination board for Lahore region.', TRUE, FALSE),
+
+('BISE_FAISALABAD', 'Board of Intermediate and Secondary Education Faisalabad', 98,
+ 'Provincial examination board for Faisalabad region.', TRUE, FALSE),
+
+('BISE_GUJRANWALA', 'Board of Intermediate and Secondary Education Gujranwala', 98,
+ 'Provincial examination board for Gujranwala region.', TRUE, FALSE),
+
+('BISE_MULTAN', 'Board of Intermediate and Secondary Education Multan', 98,
+ 'Provincial examination board for Multan region.', TRUE, FALSE),
+
+('BISE_RAWALPINDI', 'Board of Intermediate and Secondary Education Rawalpindi', 98,
+ 'Provincial examination board for Rawalpindi region.', TRUE, FALSE),
+
+('BISE_SARGODHA', 'Board of Intermediate and Secondary Education Sargodha', 98,
+ 'Provincial examination board for Sargodha region.', TRUE, FALSE),
+
+('BISE_BAHWALPUR', 'Board of Intermediate and Secondary Education Bahawalpur', 98,
+ 'Provincial examination board for Bahawalpur region.', TRUE, FALSE),
+
+('BISE_DG_KHAN', 'Board of Intermediate and Secondary Education Dera Ghazi Khan', 98,
+ 'Provincial examination board for Dera Ghazi Khan region.', TRUE, FALSE),
+
+('BISE_SAHIWAL', 'Board of Intermediate and Secondary Education Sahiwal', 98,
+ 'Provincial examination board for Sahiwal region.', TRUE, FALSE),
+
+-- Sindh Boards
+('BSEK', 'Board of Secondary Education Karachi', 98,
+ 'Secondary education examination board for Karachi.', TRUE, FALSE),
+
+('BIEK', 'Board of Intermediate Education Karachi', 98,
+ 'Intermediate education examination board for Karachi.', TRUE, FALSE),
+
+('BISE_HYDERABAD', 'Board of Intermediate and Secondary Education Hyderabad', 98,
+ 'Provincial examination board for Hyderabad region.', TRUE, FALSE),
+
+('BISE_SUKKUR', 'Board of Intermediate and Secondary Education Sukkur', 98,
+ 'Provincial examination board for Sukkur region.', TRUE, FALSE),
+
+('BISE_LARKANA', 'Board of Intermediate and Secondary Education Larkana', 98,
+ 'Provincial examination board for Larkana region.', TRUE, FALSE),
+
+('BISE_MIRPURKHAS', 'Board of Intermediate and Secondary Education Mirpurkhas', 98,
+ 'Provincial examination board for Mirpurkhas region.', TRUE, FALSE),
+
+('AKU_EB', 'Aga Khan University Examination Board', 98,
+ 'Private national examination board recognized across Pakistan.', TRUE, FALSE),
+
+-- Khyber Pakhtunkhwa Boards
+('BISE_PESHAWAR', 'Board of Intermediate and Secondary Education Peshawar', 98,
+ 'Provincial examination board for Peshawar region.', TRUE, FALSE),
+
+('BISE_ABBOTABAD', 'Board of Intermediate and Secondary Education Abbottabad', 98,
+ 'Provincial examination board for Abbottabad region.', TRUE, FALSE),
+
+('BISE_MARDAN', 'Board of Intermediate and Secondary Education Mardan', 98,
+ 'Provincial examination board for Mardan region.', TRUE, FALSE),
+
+('BISE_BANNU', 'Board of Intermediate and Secondary Education Bannu', 98,
+ 'Provincial examination board for Bannu region.', TRUE, FALSE),
+
+('BISE_SWAT', 'Board of Intermediate and Secondary Education Swat', 98,
+ 'Provincial examination board for Swat region.', TRUE, FALSE),
+
+('BISE_MALAKAND', 'Board of Intermediate and Secondary Education Malakand', 98,
+ 'Provincial examination board for Malakand region.', TRUE, FALSE),
+
+('BISE_KOHAT', 'Board of Intermediate and Secondary Education Kohat', 98,
+ 'Provincial examination board for Kohat region.', TRUE, FALSE),
+
+('BISE_DI_KHAN', 'Board of Intermediate and Secondary Education Dera Ismail Khan', 98,
+ 'Provincial examination board for Dera Ismail Khan region.', TRUE, FALSE),
+
+-- Balochistan Boards
+('BISE_QUETTA', 'Board of Intermediate and Secondary Education Quetta', 98,
+ 'Provincial examination board for Quetta region.', TRUE, FALSE),
+
+('BISE_TURBAT', 'Board of Intermediate and Secondary Education Turbat', 98,
+ 'Regional examination board for Turbat region.', TRUE, FALSE),
+
+('BISE_ZHOB', 'Board of Intermediate and Secondary Education Zhob', 98,
+ 'Regional examination board for Zhob region.', TRUE, FALSE),
+
+-- AJK & GB
+('BISE_AJK', 'Board of Intermediate and Secondary Education Azad Jammu and Kashmir', 98,
+ 'Examination board for Azad Jammu and Kashmir.', TRUE, FALSE),
+
+('BISE_GB', 'Board of Intermediate and Secondary Education Gilgit Baltistan', 98,
+ 'Examination board for Gilgit-Baltistan region.', TRUE, FALSE);
+
 -- ============================================
 -- Countries Table Insertions
 -- Purpose: Populate the 'country' table with country codes, ISO codes, phone codes.

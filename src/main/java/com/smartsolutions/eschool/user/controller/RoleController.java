@@ -72,4 +72,13 @@ public class RoleController {
         log.info("Found {} roles matching keyword '{}'", results.size(), keyword);
         return ResponseEntity.ok(results);
     }
+
+    @GetMapping(value = "/organization/{organizationId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<RoleResponseDTO>> getRolesByOrganizationId(@PathVariable Long organizationId) {
+        log.info("GET roles for organizationId={}", organizationId);
+        List<RoleResponseDTO> roles = roleFacade.getByOrganizationId(organizationId);
+        log.info("Returned {} roles for organizationId={}", roles.size(), organizationId);
+        return ResponseEntity.ok(roles);
+    }
+
 }

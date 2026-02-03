@@ -41,4 +41,8 @@ public class RoleFacade {
     public List<RoleResponseDTO> searchByKeyword(String keyword) {
         return roleService.searchByKeyword(keyword);
     }
+
+    public List<RoleResponseDTO> getByOrganizationId(Long organizationId) {
+        return roleService.getByOrganizationId(organizationId);
+    }
 }
