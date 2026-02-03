@@ -13,6 +13,16 @@ VALUES
  '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
  TRUE, FALSE, 1);
 
+INSERT INTO school_types (code, name, description, is_active, is_deleted) VALUES
+('PUBLIC', 'Public School', 'Funded and operated by the government, free for students.', TRUE, FALSE),
+('PRIVATE', 'Private School', 'Privately funded school, requires tuition fees.', TRUE, FALSE),
+('CHARTER', 'Charter School', 'Publicly funded independent school with special curriculum.', TRUE, FALSE),
+('TRUST', 'Trust School', 'Managed by charitable trusts or foundations.', TRUE, FALSE),
+('INTERNATIONAL', 'International School', 'Follows international curriculum like IB or Cambridge.', TRUE, FALSE),
+('GOVERNMENT', 'Government School', 'Directly run by local or federal government authorities.', TRUE, FALSE),
+('MONTESSORI', 'Montessori School', 'Focuses on child-led learning and early education.', TRUE, FALSE),
+('VOCATIONAL', 'Vocational School', 'Specializes in skill-based education for trades and professions.', TRUE, FALSE);
+
 -- ============================================
 -- Countries Table Insertions
 -- Purpose: Populate the 'country' table with country codes, ISO codes, phone codes.

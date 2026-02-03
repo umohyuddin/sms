@@ -11,7 +11,7 @@ import java.util.List;
 public interface SchoolTypeService {
     SchoolTypeResponseDTO createSchoolType(SchoolTypeCreateRequestDTO requestDTO);
 
-    Page<SchoolTypeResponseDTO> getAll(Pageable pageable);
+    List<SchoolTypeResponseDTO> getAll();
 
     List<SchoolTypeResponseDTO> getAllActive();
 

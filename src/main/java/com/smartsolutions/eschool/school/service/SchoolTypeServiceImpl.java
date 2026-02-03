@@ -50,11 +50,11 @@ public class SchoolTypeServiceImpl implements SchoolTypeService {
     }
 
     @Override
-    public Page<SchoolTypeResponseDTO> getAll(Pageable pageable) {
+    public List<SchoolTypeResponseDTO> getAll() {
         try {
             log.info("Fetching all SchoolTypes from database");
-            Page<SchoolTypeEntity> result = schoolTypeRepository.findAllJpql(pageable);
-            return result.map(entity -> MapperUtil.mapObject(entity, SchoolTypeResponseDTO.class));
+            List<SchoolTypeEntity> result = schoolTypeRepository.findAllJpql();
+            return MapperUtil.mapList(result, SchoolTypeResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while fetching SchoolTypes", dae);
         } catch (MappingException me) {
@@ -62,7 +62,7 @@ public class SchoolTypeServiceImpl implements SchoolTypeService {
         } catch (Exception e) {
             log.error("Unexpected error while fetching SchoolTypes", e);
         }
-        return Page.empty();
+        return Collections.emptyList();
     }
 
     @Override

@@ -25,8 +25,8 @@ public class SchoolTypeFacade {
         return schoolTypeService.createSchoolType(requestDTO);
     }
 
-    public Page<SchoolTypeResponseDTO> getAll(Pageable pageable) {
-        return schoolTypeService.getAll(pageable);
+    public List<SchoolTypeResponseDTO> getAll() {
+        return schoolTypeService.getAll();
     }
 
     public List<SchoolTypeResponseDTO> getAllActive() {

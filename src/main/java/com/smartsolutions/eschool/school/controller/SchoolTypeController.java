@@ -35,10 +35,10 @@ public class SchoolTypeController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<SchoolTypeResponseDTO>> getAllSchoolTypes(Pageable pageable) {
+    public ResponseEntity<List<SchoolTypeResponseDTO>> getAllSchoolTypes(Pageable pageable) {
         log.info("GET /api/institute/school-types called");
-        Page<SchoolTypeResponseDTO> schoolTypes = schoolTypeFacade.getAll(pageable);
-        log.info("Returned {} school types", schoolTypes.getTotalElements());
+        List<SchoolTypeResponseDTO> schoolTypes = schoolTypeFacade.getAll();
+        log.info("Returned {} school types", schoolTypes.size());
         return ResponseEntity.ok(schoolTypes);
     }
 

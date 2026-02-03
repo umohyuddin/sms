@@ -16,7 +16,9 @@ import com.smartsolutions.eschool.lookups.facade.CountryFacade;
 import com.smartsolutions.eschool.lookups.facade.LookUpFacade;
 import com.smartsolutions.eschool.lookups.facade.ProvinceFacade;
 import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
+import com.smartsolutions.eschool.school.dtos.schoolTypes.responseDto.SchoolTypeResponseDTO;
 import com.smartsolutions.eschool.school.facade.DashboardFacade;
+import com.smartsolutions.eschool.school.facade.SchoolTypeFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LookUpController {
 
+    private final SchoolTypeFacade schoolTypeFacade;
     private final CampusServiceMocking service;
     private final CountryFacade countryFacade;
     private final ReligionConfig religionConfig;
@@ -46,7 +49,8 @@ public class LookUpController {
     private final LookUpFacade lookUpFacade;
     private final EmployeeTypeFacade employeeTypeFacade;
 
-    public LookUpController(CampusServiceMocking service, CountryFacade countryFacade, ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade, DashboardFacade dashboardFacade, LookUpFacade lookUpFacade, EmployeeTypeFacade employeeTypeFacade) {
+    public LookUpController(SchoolTypeFacade schoolTypeFacade, CampusServiceMocking service, CountryFacade countryFacade, ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade, DashboardFacade dashboardFacade, LookUpFacade lookUpFacade, EmployeeTypeFacade employeeTypeFacade) {
+        this.schoolTypeFacade = schoolTypeFacade;
         this.service = service;
         this.countryFacade = countryFacade;
         this.religionConfig = religionConfig;
@@ -145,9 +149,7 @@ public class LookUpController {
 
     @GetMapping("/fee-catalog/metadata")
     public Map<String, Map<String, String>> getFeeMeta() {
-        return Map.of("chargeTypes", feeConfig.getChargeTypes(),
-                "recurrenceRules", feeConfig.getRecurrenceRules(),
-                "discountChargeTypes", feeConfig.getDiscountTypes());
+        return Map.of("chargeTypes", feeConfig.getChargeTypes(), "recurrenceRules", feeConfig.getRecurrenceRules(), "discountChargeTypes", feeConfig.getDiscountTypes());
     }
 
 
@@ -155,18 +157,13 @@ public class LookUpController {
     public Map<String, Object> getDocsMeta() {
         List<CountryResponseDTO> countriesList = countryFacade.getAll();
         List<EmployeeTypeResponseDTO> employeeTypeResponseDTOS = employeeTypeFacade.getAll();
+        List<SchoolTypeResponseDTO> schoolTypeResponseDTOS = schoolTypeFacade.getAll();
 
-        Map<String, String> countries = countriesList.stream()
-                .collect(Collectors.toMap(
-                        item -> String.valueOf(item.getId()),
-                        CountryResponseDTO::getCountryName
-                ));
+        Map<String, String> countries = countriesList.stream().collect(Collectors.toMap(item -> String.valueOf(item.getId()), CountryResponseDTO::getCountryName));
+        Map<String, String> SchoolTypes = schoolTypeResponseDTOS.stream().collect(Collectors.toMap(item -> String.valueOf(item.getId()), SchoolTypeResponseDTO::getName));
 
-        Map<String, String> systemEmployeeType = employeeTypeResponseDTOS.stream()
-                .collect(Collectors.toMap(
-                        item -> String.valueOf(item.getId()),
-                        EmployeeTypeResponseDTO::getName
-                ));
+
+        Map<String, String> systemEmployeeType = employeeTypeResponseDTOS.stream().collect(Collectors.toMap(item -> String.valueOf(item.getId()), EmployeeTypeResponseDTO::getName));
 
         Map<String, Object> result = new HashMap<>();
         result.put("docs", employeeDocumentConfig.getDocumentTypes());
@@ -183,6 +180,7 @@ public class LookUpController {
         //need to change this conflicting with employee type
         result.put("employmentType", employeeDocumentConfig.getEmploymentTypes());
         result.put("systemEmployeeType", systemEmployeeType);
+        result.put("SchoolType",SchoolTypes);
         return result;
     }
 
@@ -195,11 +193,7 @@ public class LookUpController {
         Map<String, String> provinces = provincesList.stream().collect(Collectors.toMap(province -> String.valueOf(province.getId()), // convert Long to String
                 ProvinceResponseDTO::getName));
 
-        return Map.of("bloodGroup", bloodGroupConfig.getGroup(),
-                "religions", religionConfig.getList(),
-                "nationalities", nationalityConfig.getMap(),
-                "gender", genderConfig.getList(),
-                "provinces", provinces, "docs", employeeDocumentConfig.getDocumentTypes());
+        return Map.of("bloodGroup", bloodGroupConfig.getGroup(), "religions", religionConfig.getList(), "nationalities", nationalityConfig.getMap(), "gender", genderConfig.getList(), "provinces", provinces, "docs", employeeDocumentConfig.getDocumentTypes());
     }
 
     @GetMapping("mocking/{id}")

@@ -23,7 +23,7 @@ public interface SchoolTypeRepository extends JpaRepository<SchoolTypeEntity, Lo
     @Query("""
             SELECT s FROM SchoolTypeEntity s
             """)
-    Page<SchoolTypeEntity> findAllJpql(Pageable pageable);
+    List<SchoolTypeEntity> findAllJpql();
 
     @Query("""
             SELECT s FROM SchoolTypeEntity s

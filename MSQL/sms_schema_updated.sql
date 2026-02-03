@@ -6,10 +6,6 @@ USE
 sms;
 
 
-
-
-
-
 CREATE TABLE country (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     country_code VARCHAR(5) NOT NULL,
@@ -78,39 +74,31 @@ CREATE TABLE institutes (
     id BIGINT PRIMARY KEY,              -- always 1
 
     name VARCHAR(150) NOT NULL,
+    email VARCHAR(100),
+    website VARCHAR(100),
     tagline VARCHAR(255),
-
+    contact_number VARCHAR(20),
     address VARCHAR(255),
-
     country_id BIGINT NOT NULL,
     province_id BIGINT NOT NULL,
     city_id BIGINT NOT NULL,
-
-    contact_number VARCHAR(20),
-    email VARCHAR(100),
-    website VARCHAR(100),
-
-    logo_url VARCHAR(255),
     established_date DATE,
+    
+    logo_url VARCHAR(255),
+
 
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by BIGINT,
-
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     updated_by BIGINT,
-
     deleted_at DATETIME,
     deleted_by BIGINT,
      CONSTRAINT chk_single_institute CHECK (id = 1),
-
         CONSTRAINT fk_institute_country
             FOREIGN KEY (country_id) REFERENCES country(id),
-
         CONSTRAINT fk_institute_province
             FOREIGN KEY (province_id) REFERENCES provinces(id),
-
         CONSTRAINT fk_institute_city
             FOREIGN KEY (city_id) REFERENCES cities(id)
 );
@@ -123,7 +111,12 @@ CREATE TABLE school_types (
     description VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
     CONSTRAINT chk_school_type_code_not_empty CHECK (LENGTH(code) > 0),
     CONSTRAINT chk_school_type_name_not_empty CHECK (LENGTH(name) > 0)
 );
@@ -135,15 +128,24 @@ CREATE TABLE education_boards (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     code VARCHAR(50) UNIQUE,
     name VARCHAR(150) NOT NULL,
-    country_code CHAR(2),   -- US, UK, AE, PK
+    country_id BIGINT,                 -- FK to countries table
     description VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-
-    CONSTRAINT chk_education_board_name_not_empty CHECK (LENGTH(name) > 0)
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    CONSTRAINT chk_education_board_name_not_empty CHECK (LENGTH(name) > 0),
+    CONSTRAINT fk_education_board_country FOREIGN KEY (country_id) REFERENCES country(id)
 );
+
 CREATE INDEX idx_education_board_code ON education_boards (code);
 CREATE INDEX idx_education_board_name ON education_boards (name);
+CREATE INDEX idx_education_board_country ON education_boards (country_id);
+
 
 DROP TABLE IF EXISTS languages;
 CREATE TABLE languages (
