@@ -5,8 +5,6 @@ import com.smartsolutions.eschool.school.dtos.languages.requestDto.LanguageUpdat
 import com.smartsolutions.eschool.school.dtos.languages.responseDto.LanguageResponseDTO;
 import com.smartsolutions.eschool.school.service.LanguageService;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,8 +23,8 @@ public class LanguageFacade {
         return languageService.createLanguage(requestDTO);
     }
 
-    public Page<LanguageResponseDTO> getAll(Pageable pageable) {
-        return languageService.getAll(pageable);
+    public List<LanguageResponseDTO> getAll() {
+        return languageService.getAll();
     }
 
     public LanguageResponseDTO getById(Long id) {

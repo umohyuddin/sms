@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +33,7 @@ public class SchoolTypeController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SchoolTypeResponseDTO>> getAllSchoolTypes(Pageable pageable) {
+    public ResponseEntity<List<SchoolTypeResponseDTO>> getAllSchoolTypes() {
         log.info("GET /api/institute/school-types called");
         List<SchoolTypeResponseDTO> schoolTypes = schoolTypeFacade.getAll();
         log.info("Returned {} school types", schoolTypes.size());

@@ -4,8 +4,6 @@ import com.smartsolutions.eschool.school.dtos.schoolTypes.requestDto.SchoolTypeC
 import com.smartsolutions.eschool.school.dtos.schoolTypes.requestDto.SchoolTypeUpdateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.schoolTypes.responseDto.SchoolTypeResponseDTO;
 import com.smartsolutions.eschool.school.service.SchoolTypeService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 

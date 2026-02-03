@@ -10,8 +10,6 @@ import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,10 +41,10 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
-    public Page<LanguageResponseDTO> getAll(Pageable pageable) {
+    public List<LanguageResponseDTO> getAll() {
         try {
-            Page<LanguageEntity> result = languageRepository.findAllJpql(pageable);
-            return result.map(entity -> MapperUtil.mapObject(entity, LanguageResponseDTO.class));
+            List<LanguageEntity> result = languageRepository.findAllJpql();
+            return MapperUtil.mapList(result, LanguageResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Languages", dae);
         } catch (MappingException me) {
@@ -54,7 +52,7 @@ public class LanguageServiceImpl implements LanguageService {
         } catch (Exception e) {
             log.error("Unexpected error while fetching Languages", e);
         }
-        return Page.empty();
+        return List.of();
     }
 
     @Override

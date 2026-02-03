@@ -3,17 +3,14 @@ package com.smartsolutions.eschool.school.service;
 import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.requestDto.InstituteBoardMemberCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.requestDto.InstituteBoardMemberUpdateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.responseDto.InstituteBoardMemberResponseDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.util.List;
 
 public interface InstituteBoardMemberService {
     InstituteBoardMemberResponseDTO createBoardMember(InstituteBoardMemberCreateRequestDTO requestDTO);
 
-    Page<InstituteBoardMemberResponseDTO> getAll(Pageable pageable);
+    List<InstituteBoardMemberResponseDTO> getAll();
 
-    Page<InstituteBoardMemberResponseDTO> getByInstituteId(Long instituteId, Pageable pageable);
+    List<InstituteBoardMemberResponseDTO> getByInstituteId(Long instituteId);
 
     List<InstituteBoardMemberResponseDTO> getAllActive();
 

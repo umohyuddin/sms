@@ -1,8 +1,6 @@
 package com.smartsolutions.eschool.school.repository;
 
 import com.smartsolutions.eschool.school.model.LanguageEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,7 +21,7 @@ public interface LanguageRepository extends JpaRepository<LanguageEntity, Long> 
     @Query("""
             SELECT l FROM LanguageEntity l
             """)
-    Page<LanguageEntity> findAllJpql(Pageable pageable);
+    List<LanguageEntity> findAllJpql();
 
     @Query("""
             SELECT l FROM LanguageEntity l

@@ -6,8 +6,6 @@ import com.smartsolutions.eschool.school.dtos.instituteContacts.responseDto.Inst
 import com.smartsolutions.eschool.school.facade.InstituteContactFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +31,13 @@ public class InstituteContactController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<InstituteContactResponseDTO>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(instituteContactFacade.getAll(pageable));
+    public ResponseEntity<List<InstituteContactResponseDTO>> getAll() {
+        return ResponseEntity.ok(instituteContactFacade.getAll());
     }
 
     @GetMapping(value = "/institute/{instituteId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<InstituteContactResponseDTO>> getByInstituteId(@PathVariable Long instituteId, Pageable pageable) {
-        return ResponseEntity.ok(instituteContactFacade.getByInstituteId(instituteId, pageable));
+    public ResponseEntity<List<InstituteContactResponseDTO>> getByInstituteId(@PathVariable Long instituteId) {
+        return ResponseEntity.ok(instituteContactFacade.getByInstituteId(instituteId));
     }
 
     @GetMapping(value = "/{contactId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,7 +62,7 @@ public class InstituteContactController {
             @PathVariable Long contactId,
             @RequestParam Long organizationId) {
         instituteContactFacade.deleteById(contactId, organizationId);
-        return ResponseEntity.ok("Institute contact deleted successfully");
+        return ResponseEntity.ok().build();
     }
 
 

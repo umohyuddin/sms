@@ -12,8 +12,6 @@ import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,14 +50,14 @@ public class InstituteDocumentServiceImpl implements InstituteDocumentService {
     }
 
     @Override
-    public Page<InstituteDocumentResponseDTO> getAll(Pageable pageable) {
+    public List<InstituteDocumentResponseDTO> getAll() {
         try {
-            Page<InstituteDocumentEntity> result = instituteDocumentRepository.findAllJpql(pageable);
-            return result.map(entity -> {
+            List<InstituteDocumentEntity> result = instituteDocumentRepository.findAllJpql();
+            return result.stream().map(entity -> {
                 InstituteDocumentResponseDTO dto = MapperUtil.mapObject(entity, InstituteDocumentResponseDTO.class);
                 dto.setInstituteId(entity.getInstitute().getId());
                 return dto;
-            });
+            }).toList();
         } catch (DataAccessException dae) {
             log.error("Database error while fetching InstituteDocuments", dae);
         } catch (MappingException me) {
@@ -67,17 +65,17 @@ public class InstituteDocumentServiceImpl implements InstituteDocumentService {
         } catch (Exception e) {
             log.error("Unexpected error while fetching InstituteDocuments", e);
         }
-        return Page.empty();
+        return List.of();
     }
 
     @Override
-    public Page<InstituteDocumentResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        Page<InstituteDocumentEntity> result = instituteDocumentRepository.findByInstituteId(instituteId, pageable);
-        return result.map(entity -> {
+    public List<InstituteDocumentResponseDTO> getByInstituteId(Long instituteId) {
+        List<InstituteDocumentEntity> result = instituteDocumentRepository.findByInstituteId(instituteId);
+        return result.stream().map(entity -> {
             InstituteDocumentResponseDTO dto = MapperUtil.mapObject(entity, InstituteDocumentResponseDTO.class);
             dto.setInstituteId(entity.getInstitute().getId());
             return dto;
-        });
+        }).toList();
     }
 
     @Override

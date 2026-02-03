@@ -6,8 +6,6 @@ import com.smartsolutions.eschool.school.dtos.languages.responseDto.LanguageResp
 import com.smartsolutions.eschool.school.facade.LanguageFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +31,8 @@ public class LanguageController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<LanguageResponseDTO>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(languageFacade.getAll(pageable));
+    public ResponseEntity<List<LanguageResponseDTO>> getAll() {
+        return ResponseEntity.ok(languageFacade.getAll());
     }
 
     @GetMapping(value = "/{languageId}", produces = MediaType.APPLICATION_JSON_VALUE)

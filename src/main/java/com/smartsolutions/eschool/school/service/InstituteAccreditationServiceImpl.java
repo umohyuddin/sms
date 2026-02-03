@@ -12,8 +12,6 @@ import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,14 +53,14 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
     }
 
     @Override
-    public Page<InstituteAccreditationResponseDTO> getAll(Pageable pageable) {
+    public List<InstituteAccreditationResponseDTO> getAll() {
         try {
-            Page<InstituteAccreditationEntity> result = instituteAccreditationRepository.findAllJpql(pageable);
-            return result.map(entity -> {
+            List<InstituteAccreditationEntity> result = instituteAccreditationRepository.findAllJpql();
+            return result.stream().map(entity -> {
                 InstituteAccreditationResponseDTO dto = MapperUtil.mapObject(entity, InstituteAccreditationResponseDTO.class);
                 dto.setInstituteId(entity.getInstitute().getId());
                 return dto;
-            });
+            }).toList();
         } catch (DataAccessException dae) {
             log.error("Database error while fetching InstituteAccreditations", dae);
         } catch (MappingException me) {
@@ -70,17 +68,17 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
         } catch (Exception e) {
             log.error("Unexpected error while fetching InstituteAccreditations", e);
         }
-        return Page.empty();
+        return List.of();
     }
 
     @Override
-    public Page<InstituteAccreditationResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        Page<InstituteAccreditationEntity> result = instituteAccreditationRepository.findByInstituteId(instituteId, pageable);
-        return result.map(entity -> {
+    public List<InstituteAccreditationResponseDTO> getByInstituteId(Long instituteId) {
+        List<InstituteAccreditationEntity> result = instituteAccreditationRepository.findByInstituteId(instituteId);
+        return result.stream().map(entity -> {
             InstituteAccreditationResponseDTO dto = MapperUtil.mapObject(entity, InstituteAccreditationResponseDTO.class);
             dto.setInstituteId(entity.getInstitute().getId());
             return dto;
-        });
+        }).toList();
     }
 
     @Override

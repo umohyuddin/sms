@@ -6,8 +6,6 @@ import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.responseDto.
 import com.smartsolutions.eschool.school.facade.InstituteBoardMemberFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +31,13 @@ public class InstituteBoardMemberController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<InstituteBoardMemberResponseDTO>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(instituteBoardMemberFacade.getAll(pageable));
+    public ResponseEntity<List<InstituteBoardMemberResponseDTO>> getAll() {
+        return ResponseEntity.ok(instituteBoardMemberFacade.getAll());
     }
 
     @GetMapping(value = "/institute/{instituteId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<InstituteBoardMemberResponseDTO>> getByInstituteId(@PathVariable Long instituteId, Pageable pageable) {
-        return ResponseEntity.ok(instituteBoardMemberFacade.getByInstituteId(instituteId, pageable));
+    public ResponseEntity<List<InstituteBoardMemberResponseDTO>> getByInstituteId(@PathVariable Long instituteId) {
+        return ResponseEntity.ok(instituteBoardMemberFacade.getByInstituteId(instituteId));
     }
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -12,8 +12,6 @@ import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,14 +50,14 @@ public class InstituteAcademicOfferingServiceImpl implements InstituteAcademicOf
     }
 
     @Override
-    public Page<InstituteAcademicOfferingResponseDTO> getAll(Pageable pageable) {
+    public List<InstituteAcademicOfferingResponseDTO> getAll() {
         try {
-            Page<InstituteAcademicOfferingEntity> result = instituteAcademicOfferingRepository.findAllJpql(pageable);
-            return result.map(entity -> {
+            List<InstituteAcademicOfferingEntity> result = instituteAcademicOfferingRepository.findAllJpql();
+            return result.stream().map(entity -> {
                 InstituteAcademicOfferingResponseDTO dto = MapperUtil.mapObject(entity, InstituteAcademicOfferingResponseDTO.class);
                 dto.setInstituteId(entity.getInstitute().getId());
                 return dto;
-            });
+            }).toList();
         } catch (DataAccessException dae) {
             log.error("Database error while fetching InstituteAcademicOfferings", dae);
         } catch (MappingException me) {
@@ -67,17 +65,17 @@ public class InstituteAcademicOfferingServiceImpl implements InstituteAcademicOf
         } catch (Exception e) {
             log.error("Unexpected error while fetching InstituteAcademicOfferings", e);
         }
-        return Page.empty();
+        return List.of();
     }
 
     @Override
-    public Page<InstituteAcademicOfferingResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        Page<InstituteAcademicOfferingEntity> result = instituteAcademicOfferingRepository.findByInstituteId(instituteId, pageable);
-        return result.map(entity -> {
+    public List<InstituteAcademicOfferingResponseDTO> getByInstituteId(Long instituteId) {
+        List<InstituteAcademicOfferingEntity> result = instituteAcademicOfferingRepository.findByInstituteId(instituteId);
+        return result.stream().map(entity -> {
             InstituteAcademicOfferingResponseDTO dto = MapperUtil.mapObject(entity, InstituteAcademicOfferingResponseDTO.class);
             dto.setInstituteId(entity.getInstitute().getId());
             return dto;
-        });
+        }).toList();
     }
 
     @Override

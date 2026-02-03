@@ -1,8 +1,6 @@
 package com.smartsolutions.eschool.school.repository;
 
 import com.smartsolutions.eschool.school.model.InstituteAccreditationEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,13 +21,13 @@ public interface InstituteAccreditationRepository extends JpaRepository<Institut
     @Query("""
             SELECT a FROM InstituteAccreditationEntity a
             """)
-    Page<InstituteAccreditationEntity> findAllJpql(Pageable pageable);
+    List<InstituteAccreditationEntity> findAllJpql();
 
     @Query("""
             SELECT a FROM InstituteAccreditationEntity a
             WHERE a.institute.id = :instituteId
             """)
-    Page<InstituteAccreditationEntity> findByInstituteId(@Param("instituteId") Long instituteId, Pageable pageable);
+    List<InstituteAccreditationEntity> findByInstituteId(@Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT a FROM InstituteAccreditationEntity a

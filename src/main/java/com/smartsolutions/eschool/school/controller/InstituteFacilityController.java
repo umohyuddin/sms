@@ -6,8 +6,6 @@ import com.smartsolutions.eschool.school.dtos.instituteFacilities.responseDto.In
 import com.smartsolutions.eschool.school.facade.InstituteFacilityFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +31,13 @@ public class InstituteFacilityController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<InstituteFacilityResponseDTO>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(instituteFacilityFacade.getAll(pageable));
+    public ResponseEntity<List<InstituteFacilityResponseDTO>> getAll() {
+        return ResponseEntity.ok(instituteFacilityFacade.getAll());
     }
 
     @GetMapping(value = "/institute/{instituteId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<InstituteFacilityResponseDTO>> getByInstituteId(@PathVariable Long instituteId, Pageable pageable) {
-        return ResponseEntity.ok(instituteFacilityFacade.getByInstituteId(instituteId, pageable));
+    public ResponseEntity<List<InstituteFacilityResponseDTO>> getByInstituteId(@PathVariable Long instituteId) {
+        return ResponseEntity.ok(instituteFacilityFacade.getByInstituteId(instituteId));
     }
 
     @GetMapping(value = "/{facilityId}", produces = MediaType.APPLICATION_JSON_VALUE)

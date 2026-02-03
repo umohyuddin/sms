@@ -5,9 +5,8 @@ import com.smartsolutions.eschool.school.dtos.instituteLanguages.responseDto.Ins
 import com.smartsolutions.eschool.school.facade.InstituteLanguageFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +29,8 @@ public class InstituteLanguageController {
     }
 
     @GetMapping(value = "/institute/{instituteId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<InstituteLanguageResponseDTO>> getByInstituteId(@PathVariable Long instituteId, Pageable pageable) {
-        return ResponseEntity.ok(instituteLanguageFacade.getByInstituteId(instituteId, pageable));
+    public ResponseEntity<List<InstituteLanguageResponseDTO>> getByInstituteId(@PathVariable Long instituteId) {
+        return ResponseEntity.ok(instituteLanguageFacade.getByInstituteId(instituteId));
     }
 
     @GetMapping(value = "/{instituteId}/{languageId}", produces = MediaType.APPLICATION_JSON_VALUE)

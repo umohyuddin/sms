@@ -12,8 +12,6 @@ import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,14 +50,14 @@ public class InstituteBoardMemberServiceImpl implements InstituteBoardMemberServ
     }
 
     @Override
-    public Page<InstituteBoardMemberResponseDTO> getAll(Pageable pageable) {
+    public List<InstituteBoardMemberResponseDTO> getAll() {
         try {
-            Page<InstituteBoardMemberEntity> result = instituteBoardMemberRepository.findAllJpql(pageable);
-            return result.map(entity -> {
+            List<InstituteBoardMemberEntity> result = instituteBoardMemberRepository.findAllJpql();
+            return result.stream().map(entity -> {
                 InstituteBoardMemberResponseDTO dto = MapperUtil.mapObject(entity, InstituteBoardMemberResponseDTO.class);
                 dto.setInstituteId(entity.getInstitute().getId());
                 return dto;
-            });
+            }).toList();
         } catch (DataAccessException dae) {
             log.error("Database error while fetching InstituteBoardMembers", dae);
         } catch (MappingException me) {
@@ -67,17 +65,17 @@ public class InstituteBoardMemberServiceImpl implements InstituteBoardMemberServ
         } catch (Exception e) {
             log.error("Unexpected error while fetching InstituteBoardMembers", e);
         }
-        return Page.empty();
+        return List.of();
     }
 
     @Override
-    public Page<InstituteBoardMemberResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        Page<InstituteBoardMemberEntity> result = instituteBoardMemberRepository.findByInstituteId(instituteId, pageable);
-        return result.map(entity -> {
+    public List<InstituteBoardMemberResponseDTO> getByInstituteId(Long instituteId) {
+        List<InstituteBoardMemberEntity> result = instituteBoardMemberRepository.findByInstituteId(instituteId);
+        return result.stream().map(entity -> {
             InstituteBoardMemberResponseDTO dto = MapperUtil.mapObject(entity, InstituteBoardMemberResponseDTO.class);
             dto.setInstituteId(entity.getInstitute().getId());
             return dto;
-        });
+        }).toList();
     }
 
     @Override
@@ -106,9 +104,9 @@ public class InstituteBoardMemberServiceImpl implements InstituteBoardMemberServ
         if (requestDTO.getFullName() != null) {
             existing.setFullName(requestDTO.getFullName());
         }
-        if (requestDTO.getRole() != null) {
-            existing.setRole(requestDTO.getRole());
-        }
+//        if (requestDTO.getRole() != null) {
+//            existing.setRole(requestDTO.getRole());
+//        }
         if (requestDTO.getEmail() != null) {
             existing.setEmail(requestDTO.getEmail());
         }

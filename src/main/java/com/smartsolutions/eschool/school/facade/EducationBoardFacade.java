@@ -5,8 +5,6 @@ import com.smartsolutions.eschool.school.dtos.educationBoards.requestDto.Educati
 import com.smartsolutions.eschool.school.dtos.educationBoards.responseDto.EducationBoardResponseDTO;
 import com.smartsolutions.eschool.school.service.EducationBoardService;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,8 +23,8 @@ public class EducationBoardFacade {
         return educationBoardService.createEducationBoard(requestDTO);
     }
 
-    public Page<EducationBoardResponseDTO> getAll(Pageable pageable) {
-        return educationBoardService.getAll(pageable);
+    public List<EducationBoardResponseDTO> getAll() {
+        return educationBoardService.getAll();
     }
 
     public List<EducationBoardResponseDTO> getAllActive() {

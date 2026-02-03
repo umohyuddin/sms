@@ -13,12 +13,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InstituteBoardMemberCreateRequestDTO {
-
-    @NotNull
     private Long instituteId;
-
+    private Long roleId;
     private String fullName;
-    private String role;
     private String email;
     private String contactNumber;
     private LocalDate termStart;

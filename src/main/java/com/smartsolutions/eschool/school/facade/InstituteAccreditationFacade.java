@@ -5,8 +5,6 @@ import com.smartsolutions.eschool.school.dtos.instituteAccreditations.requestDto
 import com.smartsolutions.eschool.school.dtos.instituteAccreditations.responseDto.InstituteAccreditationResponseDTO;
 import com.smartsolutions.eschool.school.service.InstituteAccreditationService;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,12 +23,12 @@ public class InstituteAccreditationFacade {
         return instituteAccreditationService.createAccreditation(requestDTO);
     }
 
-    public Page<InstituteAccreditationResponseDTO> getAll(Pageable pageable) {
-        return instituteAccreditationService.getAll(pageable);
+    public List<InstituteAccreditationResponseDTO> getAll() {
+        return instituteAccreditationService.getAll();
     }
 
-    public Page<InstituteAccreditationResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        return instituteAccreditationService.getByInstituteId(instituteId, pageable);
+    public List<InstituteAccreditationResponseDTO> getByInstituteId(Long instituteId) {
+        return instituteAccreditationService.getByInstituteId(instituteId);
     }
 
     public List<InstituteAccreditationResponseDTO> getAllActive() {

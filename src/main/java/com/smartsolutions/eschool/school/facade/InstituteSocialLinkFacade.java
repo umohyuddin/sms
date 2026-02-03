@@ -5,8 +5,6 @@ import com.smartsolutions.eschool.school.dtos.instituteSocialLinks.requestDto.In
 import com.smartsolutions.eschool.school.dtos.instituteSocialLinks.responseDto.InstituteSocialLinkResponseDTO;
 import com.smartsolutions.eschool.school.service.InstituteSocialLinkService;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,12 +23,12 @@ public class InstituteSocialLinkFacade {
         return instituteSocialLinkService.createSocialLink(requestDTO);
     }
 
-    public Page<InstituteSocialLinkResponseDTO> getAll(Pageable pageable) {
-        return instituteSocialLinkService.getAll(pageable);
+    public List<InstituteSocialLinkResponseDTO> getAll() {
+        return instituteSocialLinkService.getAll();
     }
 
-    public Page<InstituteSocialLinkResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        return instituteSocialLinkService.getByInstituteId(instituteId, pageable);
+    public List<InstituteSocialLinkResponseDTO> getByInstituteId(Long instituteId) {
+        return instituteSocialLinkService.getByInstituteId(instituteId);
     }
 
     public InstituteSocialLinkResponseDTO getById(Long id) {

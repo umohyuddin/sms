@@ -6,8 +6,6 @@ import com.smartsolutions.eschool.school.dtos.instituteAccreditations.responseDt
 import com.smartsolutions.eschool.school.facade.InstituteAccreditationFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +31,13 @@ public class InstituteAccreditationController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<InstituteAccreditationResponseDTO>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(instituteAccreditationFacade.getAll(pageable));
+    public ResponseEntity<List<InstituteAccreditationResponseDTO>> getAll() {
+        return ResponseEntity.ok(instituteAccreditationFacade.getAll());
     }
 
     @GetMapping(value = "/institute/{instituteId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<InstituteAccreditationResponseDTO>> getByInstituteId(@PathVariable Long instituteId, Pageable pageable) {
-        return ResponseEntity.ok(instituteAccreditationFacade.getByInstituteId(instituteId, pageable));
+    public ResponseEntity<List<InstituteAccreditationResponseDTO>> getByInstituteId(@PathVariable Long instituteId) {
+        return ResponseEntity.ok(instituteAccreditationFacade.getByInstituteId(instituteId));
     }
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)

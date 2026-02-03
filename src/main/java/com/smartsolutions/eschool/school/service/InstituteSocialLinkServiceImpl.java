@@ -12,8 +12,6 @@ import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,14 +50,14 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
     }
 
     @Override
-    public Page<InstituteSocialLinkResponseDTO> getAll(Pageable pageable) {
+    public List<InstituteSocialLinkResponseDTO> getAll() {
         try {
-            Page<InstituteSocialLinkEntity> result = instituteSocialLinkRepository.findAllJpql(pageable);
-            return result.map(entity -> {
+            List<InstituteSocialLinkEntity> result = instituteSocialLinkRepository.findAllJpql();
+            return result.stream().map(entity -> {
                 InstituteSocialLinkResponseDTO dto = MapperUtil.mapObject(entity, InstituteSocialLinkResponseDTO.class);
                 dto.setInstituteId(entity.getInstitute().getId());
                 return dto;
-            });
+            }).toList();
         } catch (DataAccessException dae) {
             log.error("Database error while fetching InstituteSocialLinks", dae);
         } catch (MappingException me) {
@@ -67,17 +65,17 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
         } catch (Exception e) {
             log.error("Unexpected error while fetching InstituteSocialLinks", e);
         }
-        return Page.empty();
+        return List.of();
     }
 
     @Override
-    public Page<InstituteSocialLinkResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        Page<InstituteSocialLinkEntity> result = instituteSocialLinkRepository.findByInstituteId(instituteId, pageable);
-        return result.map(entity -> {
+    public List<InstituteSocialLinkResponseDTO> getByInstituteId(Long instituteId) {
+        List<InstituteSocialLinkEntity> result = instituteSocialLinkRepository.findByInstituteId(instituteId);
+        return result.stream().map(entity -> {
             InstituteSocialLinkResponseDTO dto = MapperUtil.mapObject(entity, InstituteSocialLinkResponseDTO.class);
             dto.setInstituteId(entity.getInstitute().getId());
             return dto;
-        });
+        }).toList();
     }
 
     @Override

@@ -5,8 +5,6 @@ import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.requestDto.I
 import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.responseDto.InstituteBoardMemberResponseDTO;
 import com.smartsolutions.eschool.school.service.InstituteBoardMemberService;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,12 +23,12 @@ public class InstituteBoardMemberFacade {
         return instituteBoardMemberService.createBoardMember(requestDTO);
     }
 
-    public Page<InstituteBoardMemberResponseDTO> getAll(Pageable pageable) {
-        return instituteBoardMemberService.getAll(pageable);
+    public List<InstituteBoardMemberResponseDTO> getAll() {
+        return instituteBoardMemberService.getAll();
     }
 
-    public Page<InstituteBoardMemberResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        return instituteBoardMemberService.getByInstituteId(instituteId, pageable);
+    public List<InstituteBoardMemberResponseDTO> getByInstituteId(Long instituteId) {
+        return instituteBoardMemberService.getByInstituteId(instituteId);
     }
 
     public List<InstituteBoardMemberResponseDTO> getAllActive() {

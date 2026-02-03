@@ -5,8 +5,6 @@ import com.smartsolutions.eschool.school.dtos.instituteAcademicOfferings.request
 import com.smartsolutions.eschool.school.dtos.instituteAcademicOfferings.responseDto.InstituteAcademicOfferingResponseDTO;
 import com.smartsolutions.eschool.school.service.InstituteAcademicOfferingService;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,12 +23,12 @@ public class InstituteAcademicOfferingFacade {
         return instituteAcademicOfferingService.createOffering(requestDTO);
     }
 
-    public Page<InstituteAcademicOfferingResponseDTO> getAll(Pageable pageable) {
-        return instituteAcademicOfferingService.getAll(pageable);
+    public List<InstituteAcademicOfferingResponseDTO> getAll() {
+        return instituteAcademicOfferingService.getAll();
     }
 
-    public Page<InstituteAcademicOfferingResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        return instituteAcademicOfferingService.getByInstituteId(instituteId, pageable);
+    public List<InstituteAcademicOfferingResponseDTO> getByInstituteId(Long instituteId) {
+        return instituteAcademicOfferingService.getByInstituteId(instituteId);
     }
 
     public InstituteAcademicOfferingResponseDTO getById(Long id) {

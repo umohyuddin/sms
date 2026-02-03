@@ -3,17 +3,14 @@ package com.smartsolutions.eschool.school.service;
 import com.smartsolutions.eschool.school.dtos.instituteSocialLinks.requestDto.InstituteSocialLinkCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteSocialLinks.requestDto.InstituteSocialLinkUpdateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteSocialLinks.responseDto.InstituteSocialLinkResponseDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.util.List;
 
 public interface InstituteSocialLinkService {
     InstituteSocialLinkResponseDTO createSocialLink(InstituteSocialLinkCreateRequestDTO requestDTO);
 
-    Page<InstituteSocialLinkResponseDTO> getAll(Pageable pageable);
+    List<InstituteSocialLinkResponseDTO> getAll();
 
-    Page<InstituteSocialLinkResponseDTO> getByInstituteId(Long instituteId, Pageable pageable);
+    List<InstituteSocialLinkResponseDTO> getByInstituteId(Long instituteId);
 
     InstituteSocialLinkResponseDTO getById(Long id);
 

@@ -10,8 +10,6 @@ import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,10 +45,10 @@ public class EducationBoardServiceImpl implements EducationBoardService {
     }
 
     @Override
-    public Page<EducationBoardResponseDTO> getAll(Pageable pageable) {
+    public List<EducationBoardResponseDTO> getAll() {
         try {
-            Page<EducationBoardEntity> result = educationBoardRepository.findAllJpql(pageable);
-            return result.map(entity -> MapperUtil.mapObject(entity, EducationBoardResponseDTO.class));
+            List<EducationBoardEntity> result = educationBoardRepository.findAllJpql();
+            return MapperUtil.mapList(result, EducationBoardResponseDTO.class);
         } catch (DataAccessException dae) {
             log.error("Database error while fetching EducationBoards", dae);
         } catch (MappingException me) {
@@ -58,7 +56,7 @@ public class EducationBoardServiceImpl implements EducationBoardService {
         } catch (Exception e) {
             log.error("Unexpected error while fetching EducationBoards", e);
         }
-        return Page.empty();
+        return List.of();
     }
 
     @Override

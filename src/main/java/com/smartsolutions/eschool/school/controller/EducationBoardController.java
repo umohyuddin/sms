@@ -6,8 +6,6 @@ import com.smartsolutions.eschool.school.dtos.educationBoards.responseDto.Educat
 import com.smartsolutions.eschool.school.facade.EducationBoardFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +31,8 @@ public class EducationBoardController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<EducationBoardResponseDTO>> getAll(Pageable pageable) {
-        return ResponseEntity.ok(educationBoardFacade.getAll(pageable));
+    public ResponseEntity<List<EducationBoardResponseDTO>> getAll() {
+        return ResponseEntity.ok(educationBoardFacade.getAll());
     }
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)

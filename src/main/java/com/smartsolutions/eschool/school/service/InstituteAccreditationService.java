@@ -3,17 +3,14 @@ package com.smartsolutions.eschool.school.service;
 import com.smartsolutions.eschool.school.dtos.instituteAccreditations.requestDto.InstituteAccreditationCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteAccreditations.requestDto.InstituteAccreditationUpdateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteAccreditations.responseDto.InstituteAccreditationResponseDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.util.List;
 
 public interface InstituteAccreditationService {
     InstituteAccreditationResponseDTO createAccreditation(InstituteAccreditationCreateRequestDTO requestDTO);
 
-    Page<InstituteAccreditationResponseDTO> getAll(Pageable pageable);
+    List<InstituteAccreditationResponseDTO> getAll();
 
-    Page<InstituteAccreditationResponseDTO> getByInstituteId(Long instituteId, Pageable pageable);
+    List<InstituteAccreditationResponseDTO> getByInstituteId(Long instituteId);
 
     List<InstituteAccreditationResponseDTO> getAllActive();
 

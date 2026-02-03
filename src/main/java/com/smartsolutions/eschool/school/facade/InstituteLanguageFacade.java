@@ -4,9 +4,9 @@ import com.smartsolutions.eschool.school.dtos.instituteLanguages.requestDto.Inst
 import com.smartsolutions.eschool.school.dtos.instituteLanguages.responseDto.InstituteLanguageResponseDTO;
 import com.smartsolutions.eschool.school.service.InstituteLanguageService;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Scope("prototype")
@@ -26,8 +26,8 @@ public class InstituteLanguageFacade {
         return instituteLanguageService.getById(instituteId, languageId);
     }
 
-    public Page<InstituteLanguageResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        return instituteLanguageService.getByInstituteId(instituteId, pageable);
+    public List<InstituteLanguageResponseDTO> getByInstituteId(Long instituteId) {
+        return instituteLanguageService.getByInstituteId(instituteId);
     }
 
     public void delete(Long instituteId, Long languageId) {

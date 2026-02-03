@@ -1,8 +1,6 @@
 package com.smartsolutions.eschool.school.repository;
 
 import com.smartsolutions.eschool.school.model.InstituteBoardMemberEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,13 +21,13 @@ public interface InstituteBoardMemberRepository extends JpaRepository<InstituteB
     @Query("""
             SELECT b FROM InstituteBoardMemberEntity b
             """)
-    Page<InstituteBoardMemberEntity> findAllJpql(Pageable pageable);
+    List<InstituteBoardMemberEntity> findAllJpql();
 
     @Query("""
             SELECT b FROM InstituteBoardMemberEntity b
             WHERE b.institute.id = :instituteId
             """)
-    Page<InstituteBoardMemberEntity> findByInstituteId(@Param("instituteId") Long instituteId, Pageable pageable);
+    List<InstituteBoardMemberEntity> findByInstituteId(@Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT b FROM InstituteBoardMemberEntity b

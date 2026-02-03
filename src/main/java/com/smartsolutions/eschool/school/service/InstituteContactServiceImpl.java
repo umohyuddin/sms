@@ -9,15 +9,14 @@ import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.InstituteContactRepository;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -53,14 +52,14 @@ public class InstituteContactServiceImpl implements InstituteContactService {
     }
 
     @Override
-    public Page<InstituteContactResponseDTO> getAll(Pageable pageable) {
+    public List<InstituteContactResponseDTO> getAll() {
         try {
-            Page<InstituteContactEntity> result = instituteContactRepository.findAllJpql(pageable);
-            return result.map(entity -> {
+            List<InstituteContactEntity> result = instituteContactRepository.findAllJpql();
+            return result.stream().map(entity -> {
                 InstituteContactResponseDTO dto = MapperUtil.mapObject(entity, InstituteContactResponseDTO.class);
                 dto.setInstituteId(entity.getInstitute().getId());
                 return dto;
-            });
+            }).toList();
         } catch (DataAccessException dae) {
             log.error("Database error while fetching InstituteContacts", dae);
         } catch (MappingException me) {
@@ -68,17 +67,17 @@ public class InstituteContactServiceImpl implements InstituteContactService {
         } catch (Exception e) {
             log.error("Unexpected error while fetching InstituteContacts", e);
         }
-        return Page.empty();
+        return List.of();
     }
 
     @Override
-    public Page<InstituteContactResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        Page<InstituteContactEntity> result = instituteContactRepository.findByInstituteId(instituteId, pageable);
-        return result.map(entity -> {
+    public List<InstituteContactResponseDTO> getByInstituteId(Long instituteId) {
+        List<InstituteContactEntity> result = instituteContactRepository.findByInstituteId(instituteId);
+        return result.stream().map(entity -> {
             InstituteContactResponseDTO dto = MapperUtil.mapObject(entity, InstituteContactResponseDTO.class);
             dto.setInstituteId(entity.getInstitute().getId());
             return dto;
-        });
+        }).toList();
     }
 
     @Override
@@ -116,14 +115,19 @@ public class InstituteContactServiceImpl implements InstituteContactService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id, Long organizationId) {
-        Optional<InstituteContactEntity> contactOpt = instituteContactRepository.findByIdAndOrganizationId(id, organizationId);
-        if (contactOpt.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "InstituteContact not found with id: " + id + " for instituteId: " + organizationId
-            );
-        }
-        instituteContactRepository.delete(contactOpt.get());
+
+        InstituteContactEntity entity = instituteContactRepository
+                .findByIdAndOrganizationId(id, organizationId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "InstituteContact not found with id: " + id));
+
+        entity.setIsDeleted(true);
+        entity.setDeletedAt(LocalDateTime.now());
+        entity.setDeletedBy(1L);
+
+        instituteContactRepository.save(entity);
     }
 
 

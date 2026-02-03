@@ -11,9 +11,9 @@ import com.smartsolutions.eschool.school.repository.InstituteLanguageRepository;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
 import com.smartsolutions.eschool.school.repository.LanguageRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -61,9 +61,11 @@ public class InstituteLanguageServiceImpl implements InstituteLanguageService {
     }
 
     @Override
-    public Page<InstituteLanguageResponseDTO> getByInstituteId(Long instituteId, Pageable pageable) {
-        return instituteLanguageRepository.findByInstituteId(instituteId, pageable)
-                .map(entity -> new InstituteLanguageResponseDTO(entity.getInstitute().getId(), entity.getLanguage().getId(), entity.getLanguage().getName()));
+    public List<InstituteLanguageResponseDTO> getByInstituteId(Long instituteId) {
+        return instituteLanguageRepository.findByInstituteId(instituteId)
+                .stream()
+                .map(entity -> new InstituteLanguageResponseDTO(entity.getInstitute().getId(), entity.getLanguage().getId(), entity.getLanguage().getName()))
+                .toList();
     }
 
     @Override
