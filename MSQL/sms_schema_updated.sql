@@ -189,12 +189,13 @@ CREATE TABLE institute_languages (
 );
 
 DROP TABLE IF EXISTS institute_contacts;
+
 CREATE TABLE institute_contacts (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    institute_id BIGINT NOT NULL,
+    institute_id BIGINT NOT NULL,          -- FK to institutes
+    role_id BIGINT NOT NULL,               -- FK to roles
 
-    contact_person_name VARCHAR(100),
-    role VARCHAR(50),          -- Admin, Accounts, Admissions
+    contact_person_name VARCHAR(150) NOT NULL,
     phone VARCHAR(20),
     email VARCHAR(100),
     is_primary BOOLEAN DEFAULT FALSE,
@@ -210,9 +211,14 @@ CREATE TABLE institute_contacts (
     deleted_at DATETIME,
     deleted_by BIGINT,
 
-    FOREIGN KEY (institute_id) REFERENCES institutes(id)
+    FOREIGN KEY (institute_id) REFERENCES institutes(id),
+    FOREIGN KEY (role_id) REFERENCES roles(id)
 );
+
+-- Indexes for faster lookup
 CREATE INDEX idx_institute_contacts_institute ON institute_contacts (institute_id);
+CREATE INDEX idx_institute_contacts_role ON institute_contacts (role_id);
+CREATE INDEX idx_institute_contacts_deleted ON institute_contacts (is_deleted);
 
 DROP TABLE IF EXISTS institute_social_links;
 CREATE TABLE institute_social_links (

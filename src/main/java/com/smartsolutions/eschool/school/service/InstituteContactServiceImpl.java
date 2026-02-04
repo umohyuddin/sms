@@ -38,21 +38,28 @@ public class InstituteContactServiceImpl implements InstituteContactService {
 
     public InstituteContactResponseDTO createContact(InstituteContactCreateRequestDTO requestDTO) {
 
-        InstituteEntity institute = instituteRepository.findById(requestDTO.getInstituteId()).orElseThrow(() -> new ResourceNotFoundException("Institute not found with id: " + requestDTO.getInstituteId()));
+        // Fetch institute
+        InstituteEntity institute = instituteRepository.findById(requestDTO.getInstituteId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Institute not found with id: " + requestDTO.getInstituteId()));
 
-        RoleEntity role = roleRepository.findById(requestDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + requestDTO.getRoleId()));
+        // Fetch role
+        RoleEntity role = roleRepository.findById(requestDTO.getRoleId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Role not found with id: " + requestDTO.getRoleId()));
 
-        InstituteContactEntity entity = MapperUtil.mapObject(requestDTO, InstituteContactEntity.class);
-        entity.setId(null);
+        // Map request DTO → Entity
+        InstituteContactEntity entity = InstituteContactMapper.toEntity(requestDTO);
+
+        // Set relationships
         entity.setInstitute(institute);
         entity.setRole(role);
 
+        // Save entity
         InstituteContactEntity saved = instituteContactRepository.save(entity);
-        InstituteContactResponseDTO response = MapperUtil.mapObject(saved, InstituteContactResponseDTO.class);
-        response.setInstituteId(saved.getInstitute().getId());
-        RoleResponseDTO roleDTO = MapperUtil.mapObject(saved.getRole(), RoleResponseDTO.class);
-        response.setRole(roleDTO);
-        return response;
+
+        // Map Entity → Response DTO
+        return InstituteContactMapper.toResponseDTO(saved);
     }
 
     @Override
@@ -88,41 +95,42 @@ public class InstituteContactServiceImpl implements InstituteContactService {
     }
 
 
+    @Transactional
     @Override
-    public InstituteContactResponseDTO updateContact(Long contactId, Long instituteId, InstituteContactUpdateRequestDTO requestDTO) {
+    public InstituteContactResponseDTO updateContact(
+            Long contactId,
+            Long instituteId,
+            InstituteContactUpdateRequestDTO requestDTO
+    ) {
+        // Fetch the existing contact with role eagerly
+        InstituteContactEntity entity = instituteContactRepository
+                .findByIdAndInstituteIdWithRole(contactId, instituteId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Contact not found with id=" + contactId + " for institute=" + instituteId
+                ));
 
-        // Fetch the entity
-        InstituteContactEntity entity = instituteContactRepository.findByIdAndInstituteId(contactId, instituteId).orElseThrow(() -> new ResourceNotFoundException("Contact not found with id=" + contactId + " for institute=" + instituteId));
+        // Update simple fields using utility method
+        InstituteContactMapper.updateEntity(entity, requestDTO);
 
-        // Update fields if provided
-        if (requestDTO.getContactPersonName() != null) {
-            entity.setContactPersonName(requestDTO.getContactPersonName());
-        }
+        // Update role if roleId is provided
+        if (requestDTO.getRoleId() != null &&
+                (entity.getRole() == null || !entity.getRole().getId().equals(requestDTO.getRoleId()))) {
 
-        if (requestDTO.getRoleId() != null) {
-            // Fetch RoleEntity
-            RoleEntity role = roleRepository.findById(requestDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role not found with id=" + requestDTO.getRoleId()));
+            RoleEntity role = roleRepository
+                    .findById(requestDTO.getRoleId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Role not found with id=" + requestDTO.getRoleId()
+                    ));
             entity.setRole(role);
         }
 
-        if (requestDTO.getPhone() != null) {
-            entity.setPhone(requestDTO.getPhone());
-        }
-
-        if (requestDTO.getEmail() != null) {
-            entity.setEmail(requestDTO.getEmail());
-        }
-
-        if (requestDTO.getIsPrimary() != null) {
-            entity.setIsPrimary(requestDTO.getIsPrimary());
-        }
-
-        // Save updated entity
+        // Save the updated entity
         InstituteContactEntity updated = instituteContactRepository.save(entity);
 
-        // Map to DTO using reusable mapper
+        // Map to DTO using reusable mapper (role is already loaded, no LazyInitializationException)
         return InstituteContactMapper.toResponseDTO(updated);
     }
+
 
     @Override
     @Transactional
@@ -142,6 +150,7 @@ public class InstituteContactServiceImpl implements InstituteContactService {
 
         // Save updated entity
         instituteContactRepository.save(entity);
+
     }
 
     @Override

@@ -134,6 +134,8 @@ public interface InstituteContactRepository extends JpaRepository<InstituteConta
     //Always include JOIN FETCH c.role and c.institute.id = :instituteId for multi-tenant safety.
 
 
-
+    @Query("SELECT c FROM InstituteContactEntity c JOIN FETCH c.role WHERE c.id = :contactId AND c.institute.id = :instituteId")
+    Optional<InstituteContactEntity> findByIdAndInstituteIdWithRole(@Param("contactId") Long contactId,
+                                                                    @Param("instituteId") Long instituteId);
 
 }
