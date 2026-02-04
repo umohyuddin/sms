@@ -13,7 +13,6 @@ import lombok.Setter;
 public class InstituteSocialLinkCreateRequestDTO {
     @NotNull
     private Long instituteId;
-
     private String platform;
     private String url;
 }

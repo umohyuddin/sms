@@ -50,9 +50,9 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
     }
 
     @Override
-    public List<InstituteSocialLinkResponseDTO> getAll() {
+    public List<InstituteSocialLinkResponseDTO> getAll(Long instituteId) {
         try {
-            List<InstituteSocialLinkEntity> result = instituteSocialLinkRepository.findAllJpql();
+            List<InstituteSocialLinkEntity> result = instituteSocialLinkRepository.findByInstituteId(instituteId);
             return result.stream().map(entity -> {
                 InstituteSocialLinkResponseDTO dto = MapperUtil.mapObject(entity, InstituteSocialLinkResponseDTO.class);
                 dto.setInstituteId(entity.getInstitute().getId());
@@ -79,18 +79,18 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
     }
 
     @Override
-    public InstituteSocialLinkResponseDTO getById(Long id) {
-        InstituteSocialLinkEntity entity = instituteSocialLinkRepository.findByIdJpql(id)
-                .orElseThrow(() -> new ResourceNotFoundException("InstituteSocialLink not found with id: " + id));
+    public InstituteSocialLinkResponseDTO getById(Long id, Long instituteId) {
+        InstituteSocialLinkEntity entity = instituteSocialLinkRepository.findByIdAndInstituteId(id, instituteId)
+                .orElseThrow(() -> new ResourceNotFoundException("InstituteSocialLink not found with id: " + id + " for institute id: " + instituteId));
         InstituteSocialLinkResponseDTO dto = MapperUtil.mapObject(entity, InstituteSocialLinkResponseDTO.class);
         dto.setInstituteId(entity.getInstitute().getId());
         return dto;
     }
 
     @Override
-    public InstituteSocialLinkResponseDTO updateSocialLink(Long id, InstituteSocialLinkUpdateRequestDTO requestDTO) {
-        InstituteSocialLinkEntity existing = instituteSocialLinkRepository.findByIdJpql(id)
-                .orElseThrow(() -> new ResourceNotFoundException("InstituteSocialLink not found with id: " + id));
+    public InstituteSocialLinkResponseDTO updateSocialLink(Long id, Long instituteId, InstituteSocialLinkUpdateRequestDTO requestDTO) {
+        InstituteSocialLinkEntity existing = instituteSocialLinkRepository.findByIdAndInstituteId(id, instituteId)
+                .orElseThrow(() -> new ResourceNotFoundException("InstituteSocialLink not found with id: " + id + " for institute id: " + instituteId));
 
         if (requestDTO.getPlatform() != null) {
             existing.setPlatform(requestDTO.getPlatform());
@@ -106,16 +106,16 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
     }
 
     @Override
-    public void deleteById(Long id) {
-        if (instituteSocialLinkRepository.findByIdJpql(id).isEmpty()) {
-            throw new ResourceNotFoundException("InstituteSocialLink not found with id: " + id);
+    public void deleteById(Long id, Long instituteId) {
+        if (instituteSocialLinkRepository.findByIdAndInstituteId(id, instituteId).isEmpty()) {
+            throw new ResourceNotFoundException("InstituteSocialLink not found with id: " + id + " for institute id: " + instituteId);
         }
         instituteSocialLinkRepository.deleteById(id);
     }
 
     @Override
-    public List<InstituteSocialLinkResponseDTO> searchByKeyword(String keyword) {
-        List<InstituteSocialLinkEntity> result = instituteSocialLinkRepository.searchByKeyword(keyword == null ? "" : keyword.trim());
+    public List<InstituteSocialLinkResponseDTO> searchByKeyword(String keyword, Long instituteId) {
+        List<InstituteSocialLinkEntity> result = instituteSocialLinkRepository.searchByKeywordAndInstituteId(keyword == null ? "" : keyword.trim(), instituteId);
         return result.stream().map(entity -> {
             InstituteSocialLinkResponseDTO dto = MapperUtil.mapObject(entity, InstituteSocialLinkResponseDTO.class);
             dto.setInstituteId(entity.getInstitute().getId());

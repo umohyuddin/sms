@@ -31,8 +31,8 @@ public class InstituteSocialLinkController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> getAll() {
-        return ResponseEntity.ok(instituteSocialLinkFacade.getAll());
+    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> getAll(@RequestParam Long instituteId) {
+        return ResponseEntity.ok(instituteSocialLinkFacade.getAll(instituteId));
     }
 
     @GetMapping(value = "/institute/{instituteId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -41,26 +41,31 @@ public class InstituteSocialLinkController {
     }
 
     @GetMapping(value = "/{socialLinkId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteSocialLinkResponseDTO> getById(@PathVariable Long socialLinkId) {
-        return ResponseEntity.ok(instituteSocialLinkFacade.getById(socialLinkId));
+    public ResponseEntity<InstituteSocialLinkResponseDTO> getById(@PathVariable Long socialLinkId,
+                                                                  @RequestParam Long instituteId) {
+        return ResponseEntity.ok(instituteSocialLinkFacade.getById(socialLinkId, instituteId));
     }
 
     @PutMapping(value = "/{socialLinkId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteSocialLinkResponseDTO> updateSocialLink(@PathVariable Long socialLinkId, @Valid @RequestBody InstituteSocialLinkUpdateRequestDTO requestDTO) {
-        return ResponseEntity.ok(instituteSocialLinkFacade.updateSocialLink(socialLinkId, requestDTO));
+    public ResponseEntity<InstituteSocialLinkResponseDTO> updateSocialLink(@PathVariable Long socialLinkId,
+                                                                           @RequestParam Long instituteId,
+                                                                           @Valid @RequestBody InstituteSocialLinkUpdateRequestDTO requestDTO) {
+        return ResponseEntity.ok(instituteSocialLinkFacade.updateSocialLink(socialLinkId, instituteId, requestDTO));
     }
 
     @DeleteMapping("/{socialLinkId}")
-    public ResponseEntity<String> deleteSocialLink(@PathVariable Long socialLinkId) {
-        instituteSocialLinkFacade.deleteById(socialLinkId);
+    public ResponseEntity<String> deleteSocialLink(@PathVariable Long socialLinkId,
+                                                   @RequestParam Long instituteId) {
+        instituteSocialLinkFacade.deleteById(socialLinkId, instituteId);
         return ResponseEntity.ok("Institute social link deleted successfully");
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> search(@RequestParam(name = "keyword") String keyword) {
+    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> search(@RequestParam(name = "keyword") String keyword,
+                                                                       @RequestParam Long instituteId) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(instituteSocialLinkFacade.searchByKeyword(keyword.trim()));
+        return ResponseEntity.ok(instituteSocialLinkFacade.searchByKeyword(keyword.trim(), instituteId));
     }
 }

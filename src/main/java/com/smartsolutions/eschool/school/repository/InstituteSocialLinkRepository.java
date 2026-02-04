@@ -15,13 +15,10 @@ public interface InstituteSocialLinkRepository extends JpaRepository<InstituteSo
     @Query("""
             SELECT s FROM InstituteSocialLinkEntity s
             WHERE s.id = :id
+              AND s.institute.id = :instituteId
             """)
-    Optional<InstituteSocialLinkEntity> findByIdJpql(@Param("id") Long id);
-
-    @Query("""
-            SELECT s FROM InstituteSocialLinkEntity s
-            """)
-    List<InstituteSocialLinkEntity> findAllJpql();
+    Optional<InstituteSocialLinkEntity> findByIdAndInstituteId(@Param("id") Long id,
+                                                              @Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT s FROM InstituteSocialLinkEntity s
@@ -29,11 +26,13 @@ public interface InstituteSocialLinkRepository extends JpaRepository<InstituteSo
             """)
     List<InstituteSocialLinkEntity> findByInstituteId(@Param("instituteId") Long instituteId);
 
-    @Query("""
-            SELECT s FROM InstituteSocialLinkEntity s
-            WHERE (:keyword IS NULL OR :keyword = ''
-                OR LOWER(s.platform) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(s.url) LIKE LOWER(CONCAT('%', :keyword, '%')))
-            """)
-    List<InstituteSocialLinkEntity> searchByKeyword(@Param("keyword") String keyword);
+                @Query("""
+                                                SELECT s FROM InstituteSocialLinkEntity s
+                                                WHERE s.institute.id = :instituteId
+                                                        AND (:keyword IS NULL OR :keyword = ''
+                                                                OR LOWER(s.platform) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                                                                OR LOWER(s.url) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                                                """)
+                List<InstituteSocialLinkEntity> searchByKeywordAndInstituteId(@Param("keyword") String keyword,
+                                                                                                                                                                                                                                                                        @Param("instituteId") Long instituteId);
 }

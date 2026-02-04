@@ -23,27 +23,27 @@ public class InstituteSocialLinkFacade {
         return instituteSocialLinkService.createSocialLink(requestDTO);
     }
 
-    public List<InstituteSocialLinkResponseDTO> getAll() {
-        return instituteSocialLinkService.getAll();
+    public List<InstituteSocialLinkResponseDTO> getAll(Long instituteId) {
+        return instituteSocialLinkService.getAll(instituteId);
     }
 
     public List<InstituteSocialLinkResponseDTO> getByInstituteId(Long instituteId) {
         return instituteSocialLinkService.getByInstituteId(instituteId);
     }
 
-    public InstituteSocialLinkResponseDTO getById(Long id) {
-        return instituteSocialLinkService.getById(id);
+    public InstituteSocialLinkResponseDTO getById(Long id, Long instituteId) {
+        return instituteSocialLinkService.getById(id, instituteId);
     }
 
-    public InstituteSocialLinkResponseDTO updateSocialLink(Long id, InstituteSocialLinkUpdateRequestDTO requestDTO) {
-        return instituteSocialLinkService.updateSocialLink(id, requestDTO);
+    public InstituteSocialLinkResponseDTO updateSocialLink(Long id, Long instituteId, InstituteSocialLinkUpdateRequestDTO requestDTO) {
+        return instituteSocialLinkService.updateSocialLink(id, instituteId, requestDTO);
     }
 
-    public void deleteById(Long id) {
-        instituteSocialLinkService.deleteById(id);
+    public void deleteById(Long id, Long instituteId) {
+        instituteSocialLinkService.deleteById(id, instituteId);
     }
 
-    public List<InstituteSocialLinkResponseDTO> searchByKeyword(String keyword) {
-        return instituteSocialLinkService.searchByKeyword(keyword);
+    public List<InstituteSocialLinkResponseDTO> searchByKeyword(String keyword, Long instituteId) {
+        return instituteSocialLinkService.searchByKeyword(keyword, instituteId);
     }
 }
