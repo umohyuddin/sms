@@ -55,7 +55,7 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
     @Override
     public List<InstituteAccreditationResponseDTO> getAll() {
         try {
-            List<InstituteAccreditationEntity> result = instituteAccreditationRepository.findAllJpql();
+            List<InstituteAccreditationEntity> result = instituteAccreditationRepository.findAllActiveJpql();
             return result.stream().map(entity -> {
                 InstituteAccreditationResponseDTO dto = MapperUtil.mapObject(entity, InstituteAccreditationResponseDTO.class);
                 dto.setInstituteId(entity.getInstitute().getId());
@@ -73,7 +73,7 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
 
     @Override
     public List<InstituteAccreditationResponseDTO> getByInstituteId(Long instituteId) {
-        List<InstituteAccreditationEntity> result = instituteAccreditationRepository.findByInstituteId(instituteId);
+        List<InstituteAccreditationEntity> result = instituteAccreditationRepository.findByInstituteIdAndDeletedFalse(instituteId);
         return result.stream().map(entity -> {
             InstituteAccreditationResponseDTO dto = MapperUtil.mapObject(entity, InstituteAccreditationResponseDTO.class);
             dto.setInstituteId(entity.getInstitute().getId());
@@ -83,7 +83,7 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
 
     @Override
     public List<InstituteAccreditationResponseDTO> getAllActive() {
-        List<InstituteAccreditationEntity> result = instituteAccreditationRepository.findAllActive();
+        List<InstituteAccreditationEntity> result = instituteAccreditationRepository.findAllActiveAndNotDeleted();
         return result.stream().map(entity -> {
             InstituteAccreditationResponseDTO dto = MapperUtil.mapObject(entity, InstituteAccreditationResponseDTO.class);
             dto.setInstituteId(entity.getInstitute().getId());
@@ -93,7 +93,7 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
 
     @Override
     public InstituteAccreditationResponseDTO getById(Long id) {
-        InstituteAccreditationEntity entity = instituteAccreditationRepository.findByIdJpql(id)
+        InstituteAccreditationEntity entity = instituteAccreditationRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("InstituteAccreditation not found with id: " + id));
         InstituteAccreditationResponseDTO dto = MapperUtil.mapObject(entity, InstituteAccreditationResponseDTO.class);
         dto.setInstituteId(entity.getInstitute().getId());
@@ -102,7 +102,7 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
 
     @Override
     public InstituteAccreditationResponseDTO updateAccreditation(Long id, InstituteAccreditationUpdateRequestDTO requestDTO) {
-        InstituteAccreditationEntity existing = instituteAccreditationRepository.findByIdJpql(id)
+        InstituteAccreditationEntity existing = instituteAccreditationRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("InstituteAccreditation not found with id: " + id));
 
         if (requestDTO.getAuthorityName() != null) {
@@ -129,10 +129,11 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
 
     @Override
     public void deleteById(Long id) {
-        if (instituteAccreditationRepository.findByIdJpql(id).isEmpty()) {
+        log.info("Soft delete request for Institute Accreditation id={}", id);
+        int result = instituteAccreditationRepository.softDeleteById(id);
+        if (result == 0) {
             throw new ResourceNotFoundException("InstituteAccreditation not found with id: " + id);
         }
-        instituteAccreditationRepository.deleteById(id);
     }
 
     @Override
@@ -147,7 +148,7 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
 
     @Override
     public InstituteAccreditationResponseDTO activate(Long id) {
-        InstituteAccreditationEntity entity = instituteAccreditationRepository.findByIdJpql(id)
+        InstituteAccreditationEntity entity = instituteAccreditationRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("InstituteAccreditation not found with id: " + id));
         entity.setIsActive(true);
         InstituteAccreditationEntity saved = instituteAccreditationRepository.save(entity);
@@ -158,7 +159,7 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
 
     @Override
     public InstituteAccreditationResponseDTO deactivate(Long id) {
-        InstituteAccreditationEntity entity = instituteAccreditationRepository.findByIdJpql(id)
+        InstituteAccreditationEntity entity = instituteAccreditationRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("InstituteAccreditation not found with id: " + id));
         entity.setIsActive(false);
         InstituteAccreditationEntity saved = instituteAccreditationRepository.save(entity);

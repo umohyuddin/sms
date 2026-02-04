@@ -57,7 +57,7 @@ public class InstituteSocialLinkController {
     public ResponseEntity<String> deleteSocialLink(@PathVariable Long socialLinkId,
                                                    @RequestParam Long instituteId) {
         instituteSocialLinkFacade.deleteById(socialLinkId, instituteId);
-        return ResponseEntity.ok("Institute social link deleted successfully");
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)

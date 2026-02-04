@@ -1,7 +1,9 @@
 package com.smartsolutions.eschool.school.repository;
 
 import com.smartsolutions.eschool.school.model.InstituteAccreditationEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,31 +17,46 @@ public interface InstituteAccreditationRepository extends JpaRepository<Institut
     @Query("""
             SELECT a FROM InstituteAccreditationEntity a
             WHERE a.id = :id
+              AND a.deleted = false
             """)
-    Optional<InstituteAccreditationEntity> findByIdJpql(@Param("id") Long id);
+    Optional<InstituteAccreditationEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
     @Query("""
             SELECT a FROM InstituteAccreditationEntity a
+            WHERE a.deleted = false
             """)
-    List<InstituteAccreditationEntity> findAllJpql();
+    List<InstituteAccreditationEntity> findAllActiveJpql();
 
     @Query("""
             SELECT a FROM InstituteAccreditationEntity a
             WHERE a.institute.id = :instituteId
+              AND a.deleted = false
             """)
-    List<InstituteAccreditationEntity> findByInstituteId(@Param("instituteId") Long instituteId);
+    List<InstituteAccreditationEntity> findByInstituteIdAndDeletedFalse(@Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT a FROM InstituteAccreditationEntity a
             WHERE a.isActive = true
+              AND a.deleted = false
             """)
-    List<InstituteAccreditationEntity> findAllActive();
+    List<InstituteAccreditationEntity> findAllActiveAndNotDeleted();
 
     @Query("""
             SELECT a FROM InstituteAccreditationEntity a
-            WHERE (:keyword IS NULL OR :keyword = ''
+            WHERE (a.deleted = false)
+              AND (:keyword IS NULL OR :keyword = ''
                 OR LOWER(a.authorityName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(a.licenseNumber) LIKE LOWER(CONCAT('%', :keyword, '%')))
             """)
     List<InstituteAccreditationEntity> searchByKeyword(@Param("keyword") String keyword);
+
+    @Modifying
+    @Transactional
+    @Query("""
+            UPDATE InstituteAccreditationEntity a
+            SET a.deleted = true,
+                a.deletedAt = CURRENT_TIMESTAMP
+            WHERE a.id = :id
+            """)
+    int softDeleteById(@Param("id") Long id);
 }

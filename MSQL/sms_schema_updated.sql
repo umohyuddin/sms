@@ -142,6 +142,103 @@ CREATE TABLE school_types (
 CREATE INDEX idx_school_type_code ON school_types (code);
 CREATE INDEX idx_school_type_name ON school_types (name);
 
+
+
+DROP TABLE IF EXISTS languages;
+CREATE TABLE languages (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    iso_code VARCHAR(10) UNIQUE,   -- en, ur, ar
+    name VARCHAR(50) NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    CONSTRAINT chk_language_name_not_empty CHECK (LENGTH(name) > 0)
+);
+CREATE INDEX idx_language_iso_code ON languages (iso_code);
+CREATE INDEX idx_language_name ON languages (name);
+
+
+DROP TABLE IF EXISTS currencies;
+CREATE TABLE currencies (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    iso_code VARCHAR(10) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    symbol VARCHAR(10),
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+DROP TABLE IF EXISTS education_levels;
+CREATE TABLE education_levels (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(10) UNIQUE,       -- e.g., PS, P, M, S, HS
+    name VARCHAR(50) NOT NULL,     -- e.g., Primary, Secondary
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+DROP TABLE IF EXISTS curricula;
+CREATE TABLE curricula (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(20) UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+DROP TABLE IF EXISTS facility_types;
+CREATE TABLE facility_types (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(50) UNIQUE NOT NULL,      -- e.g., LAB, LIBRARY, PLAYGROUND
+    name VARCHAR(100) NOT NULL,            -- e.g., "Computer Lab", "Library", "Playground"
+    description VARCHAR(255),
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+DROP TABLE IF EXISTS tax_types;
+CREATE TABLE tax_types (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(20) UNIQUE NOT NULL,   -- VAT, GST, SALES_TAX
+    name VARCHAR(50),
+    country_id BIGINT,                   -- reference to countries table
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    CONSTRAINT fk_tax_country FOREIGN KEY (country_id) REFERENCES country(id)
+);
+
 DROP TABLE IF EXISTS education_boards;
 CREATE TABLE education_boards (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -166,17 +263,6 @@ CREATE INDEX idx_education_board_name ON education_boards (name);
 CREATE INDEX idx_education_board_country ON education_boards (country_id);
 
 
-DROP TABLE IF EXISTS languages;
-CREATE TABLE languages (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    iso_code VARCHAR(10) UNIQUE,   -- en, ur, ar
-    name VARCHAR(50) NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-
-    CONSTRAINT chk_language_name_not_empty CHECK (LENGTH(name) > 0)
-);
-CREATE INDEX idx_language_iso_code ON languages (iso_code);
-CREATE INDEX idx_language_name ON languages (name);
 
 DROP TABLE IF EXISTS institute_languages;
 CREATE TABLE institute_languages (
@@ -187,6 +273,8 @@ CREATE TABLE institute_languages (
     FOREIGN KEY (institute_id) REFERENCES institutes(id),
     FOREIGN KEY (language_id) REFERENCES languages(id)
 );
+
+
 
 DROP TABLE IF EXISTS institute_contacts;
 

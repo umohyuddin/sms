@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.school.model;
 
+import com.smartsolutions.eschool.lookups.model.LanguageEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

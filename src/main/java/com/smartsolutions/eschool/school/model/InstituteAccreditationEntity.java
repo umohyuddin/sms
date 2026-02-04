@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE institute_accreditations SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE institute_accreditations SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @Where(clause = "is_deleted = false")
 public class InstituteAccreditationEntity extends ScopeAuditableEntity {
 
@@ -45,5 +45,5 @@ public class InstituteAccreditationEntity extends ScopeAuditableEntity {
     private Boolean isActive = true;
 
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
+    private boolean deleted = false;
 }
