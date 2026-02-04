@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.model;
 
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
+import com.smartsolutions.eschool.user.model.RoleEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,8 +30,9 @@ public class InstituteContactEntity extends ScopeAuditableEntity {
     @Column(name = "contact_person_name", length = 100)
     private String contactPersonName;
 
-    @Column(name = "role", length = 50)
-    private String role;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = false)
+    private RoleEntity role;
 
     @Column(name = "phone", length = 20)
     private String phone;

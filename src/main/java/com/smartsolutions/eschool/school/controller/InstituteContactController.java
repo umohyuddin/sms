@@ -41,36 +41,30 @@ public class InstituteContactController {
     }
 
     @GetMapping(value = "/{contactId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteContactResponseDTO> getById(
-            @PathVariable Long contactId,
-            @RequestParam Long instituteId) { // added instituteId
+    public ResponseEntity<InstituteContactResponseDTO> getById(@PathVariable Long contactId, @RequestParam Long instituteId) { // added instituteId
         return ResponseEntity.ok(instituteContactFacade.getById(contactId, instituteId));
     }
 
     @PutMapping(value = "/{contactId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteContactResponseDTO> updateContact(
-            @PathVariable Long contactId,
-            @RequestParam Long instituteId,
-            @Valid @RequestBody InstituteContactUpdateRequestDTO requestDTO) {
+    public ResponseEntity<InstituteContactResponseDTO> updateContact(@PathVariable Long contactId, @RequestParam Long instituteId, @Valid @RequestBody InstituteContactUpdateRequestDTO requestDTO) {
 
         InstituteContactResponseDTO updated = instituteContactFacade.updateContact(contactId, instituteId, requestDTO);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{contactId}")
-    public ResponseEntity<String> deleteContact(
-            @PathVariable Long contactId,
-            @RequestParam Long organizationId) {
+    public ResponseEntity<String> deleteContact(@PathVariable Long contactId, @RequestParam Long organizationId) {
         instituteContactFacade.deleteById(contactId, organizationId);
         return ResponseEntity.ok().build();
     }
 
-
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteContactResponseDTO>> search(@RequestParam(name = "keyword") String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
+    public ResponseEntity<List<InstituteContactResponseDTO>> search(@RequestParam(name = "keyword") String keyword, @RequestParam(name = "instituteId") Long instituteId) {
+        // Validate inputs
+        if (instituteId == null || keyword == null || keyword.trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(instituteContactFacade.searchByKeyword(keyword.trim()));
+        List<InstituteContactResponseDTO> contacts = instituteContactFacade.searchByKeyword(instituteId, keyword.trim());
+        return ResponseEntity.ok(contacts);
     }
 }

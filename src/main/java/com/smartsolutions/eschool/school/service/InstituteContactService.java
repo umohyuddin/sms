@@ -18,5 +18,5 @@ public interface InstituteContactService {
 
     void deleteById(Long id, Long organizationId);
 
-    List<InstituteContactResponseDTO> searchByKeyword(String keyword);
+    List<InstituteContactResponseDTO> searchByKeyword(Long instituteId,String keyword);
 }

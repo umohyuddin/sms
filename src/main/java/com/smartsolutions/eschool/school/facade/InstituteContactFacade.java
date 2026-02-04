@@ -43,8 +43,8 @@ public class InstituteContactFacade {
         instituteContactService.deleteById(contactId, organizationId);
     }
 
-    public List<InstituteContactResponseDTO> searchByKeyword(String keyword) {
-        return instituteContactService.searchByKeyword(keyword);
+    public List<InstituteContactResponseDTO> searchByKeyword(Long instituteId,String keyword) {
+        return instituteContactService.searchByKeyword(instituteId,keyword);
     }
 
     public InstituteContactResponseDTO getById(Long contactId, Long instituteId) {

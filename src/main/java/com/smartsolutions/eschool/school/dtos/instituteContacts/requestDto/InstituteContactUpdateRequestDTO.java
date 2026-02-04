@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class InstituteContactUpdateRequestDTO {
     private String contactPersonName;
-    private String role;
+    private Long roleId;
     private String phone;
     private String email;
     private Boolean isPrimary;
