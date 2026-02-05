@@ -60,6 +60,17 @@ public class TaxTypeService {
         }
     }
 
+    public List<TaxTypeResponseDTO> getByCountryId(Long countryId) {
+        try {
+            log.info("Fetching TaxTypes for country id={}", countryId);
+            List<TaxTypeEntity> result = taxTypeRepository.findByCountryId(countryId);
+            return MapperUtil.mapList(result, TaxTypeResponseDTO.class);
+        } catch (Exception e) {
+            log.error("Error fetching tax types for country id={}", countryId, e);
+            throw new CustomServiceException("Failed to fetch TaxTypes for country", e);
+        }
+    }
+
     public TaxTypeResponseDTO getById(Long id) {
         log.info("Fetching TaxType with id={}", id);
         TaxTypeEntity entity = taxTypeRepository.findByIdAndDeletedFalse(id)
@@ -75,6 +86,7 @@ public class TaxTypeService {
         
         entity.setName(requestDTO.getName());
         entity.setCode(requestDTO.getCode());
+        entity.setTaxPercentage(requestDTO.getTaxPercentage() != null ? requestDTO.getTaxPercentage() : java.math.BigDecimal.ZERO);
         entity.setIsActive(requestDTO.getIsActive());
         
         if (requestDTO.getCountryId() != null) {

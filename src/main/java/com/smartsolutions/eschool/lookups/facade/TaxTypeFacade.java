@@ -24,6 +24,10 @@ public class TaxTypeFacade {
         return taxTypeService.getAllActive();
     }
 
+    public List<TaxTypeResponseDTO> getByCountryId(Long countryId) {
+        return taxTypeService.getByCountryId(countryId);
+    }
+
     public TaxTypeResponseDTO getById(Long id) {
         return taxTypeService.getById(id);
     }

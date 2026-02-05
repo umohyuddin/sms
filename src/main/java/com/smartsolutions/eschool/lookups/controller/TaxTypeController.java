@@ -35,6 +35,12 @@ public class TaxTypeController {
         return ResponseEntity.ok(taxTypeFacade.getAllActive());
     }
 
+    @GetMapping(value = "/country/{countryId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TaxTypeResponseDTO>> getByCountryId(@PathVariable Long countryId) {
+        log.info("GET /api/lookups/tax-types/country/{} called", countryId);
+        return ResponseEntity.ok(taxTypeFacade.getByCountryId(countryId));
+    }
+
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TaxTypeResponseDTO> getById(@PathVariable Long id) {
         log.info("GET /api/lookups/tax-types/{} called", id);

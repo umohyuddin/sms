@@ -23,6 +23,9 @@ public class TaxTypeEntity extends ScopeAuditableEntity {
     @Column(name = "name", length = 50)
     private String name;
 
+    @Column(name = "tax_percentage", nullable = false, precision = 5, scale = 2)
+    private java.math.BigDecimal taxPercentage = java.math.BigDecimal.ZERO;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     private CountryEntity country;

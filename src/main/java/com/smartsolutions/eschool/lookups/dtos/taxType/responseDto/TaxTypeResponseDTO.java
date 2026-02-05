@@ -7,6 +7,7 @@ public class TaxTypeResponseDTO {
     private Long id;
     private String code;
     private String name;
+    private java.math.BigDecimal taxPercentage;
     private Long countryId;
     private Boolean isActive;
 }

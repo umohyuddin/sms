@@ -6,6 +6,171 @@ USE
 sms;
 
 
+DROP TABLE IF EXISTS academic_years;
+CREATE TABLE academic_years (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(50) NOT NULL,            -- e.g. "2024-2025"
+    code VARCHAR(20) NOT NULL,
+
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+
+    total_months BIGINT NOT NULL,
+
+    is_current BOOLEAN NOT NULL DEFAULT FALSE,
+
+    status VARCHAR(20) NOT NULL,          -- AcademicYearStatus (ENUM stored as STRING)
+
+    remarks VARCHAR(255),
+
+    is_locked BOOLEAN NOT NULL DEFAULT FALSE,
+    locked_at DATETIME,
+    locked_by BIGINT,
+
+    organization_id BIGINT NOT NULL,
+
+    -- Audit fields (from AuditableEntity)
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    -- Constraints
+    CONSTRAINT uk_academic_year_code UNIQUE (code),
+    CONSTRAINT uk_academic_year_date_range UNIQUE (start_date, end_date)
+);
+
+-- Indexes
+CREATE INDEX idx_academic_year_status ON academic_years (status);
+CREATE INDEX idx_academic_year_is_current ON academic_years (is_current);
+
+DROP TABLE IF EXISTS school_types;
+CREATE TABLE school_types (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(30) UNIQUE NOT NULL,   -- PRIVATE, PUBLIC, CHARTER
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    CONSTRAINT chk_school_type_code_not_empty CHECK (LENGTH(code) > 0),
+    CONSTRAINT chk_school_type_name_not_empty CHECK (LENGTH(name) > 0)
+);
+CREATE INDEX idx_school_type_code ON school_types (code);
+CREATE INDEX idx_school_type_name ON school_types (name);
+
+DROP TABLE IF EXISTS languages;
+CREATE TABLE languages (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    iso_code VARCHAR(10) UNIQUE,   -- en, ur, ar
+    name VARCHAR(50) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    CONSTRAINT chk_language_name_not_empty CHECK (LENGTH(name) > 0)
+);
+CREATE INDEX idx_language_iso_code ON languages (iso_code);
+CREATE INDEX idx_language_name ON languages (name);
+
+DROP TABLE IF EXISTS currencies;
+CREATE TABLE currencies (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    iso_code VARCHAR(10) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    symbol VARCHAR(10),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+DROP TABLE IF EXISTS education_levels;
+CREATE TABLE education_levels (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(10) UNIQUE,       -- e.g., PS, P, M, S, HS
+    name VARCHAR(50) NOT NULL,     -- e.g., Primary, Secondary
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+DROP TABLE IF EXISTS curricula;
+CREATE TABLE curricula (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(20) UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+DROP TABLE IF EXISTS facility_types;
+CREATE TABLE facility_types (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(50) UNIQUE NOT NULL,      -- e.g., LAB, LIBRARY, PLAYGROUND
+    name VARCHAR(100) NOT NULL,            -- e.g., "Computer Lab", "Library", "Playground"
+    description VARCHAR(255),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+DROP TABLE IF EXISTS fee_recurrence_rules;
+CREATE TABLE fee_recurrence_rules (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(30) UNIQUE NOT NULL,   -- ONE_TIME, MONTHLY, QUARTERLY, etc.
+    name VARCHAR(100) NOT NULL,         -- One Time, Monthly, Quarterly, etc.
+    description VARCHAR(255),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+CREATE INDEX idx_fee_recurrence_rule_code ON fee_recurrence_rules (code);
+
+
 CREATE TABLE country (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     country_code VARCHAR(5) NOT NULL,
@@ -85,6 +250,9 @@ CREATE TABLE roles (
       deleted_by  BIGINT,
       deleted     BOOLEAN      NOT NULL DEFAULT FALSE
 );
+
+
+
 -- TODO_
 -- institutes TABLE
 DROP TABLE IF EXISTS institutes;
@@ -122,113 +290,16 @@ CREATE TABLE institutes (
             FOREIGN KEY (city_id) REFERENCES cities(id)
 );
 
-DROP TABLE IF EXISTS school_types;
-CREATE TABLE school_types (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(30) UNIQUE NOT NULL,   -- PRIVATE, PUBLIC, CHARTER
-    name VARCHAR(100) NOT NULL,
-    description VARCHAR(255),
-    is_active BOOLEAN DEFAULT TRUE,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT,
-    CONSTRAINT chk_school_type_code_not_empty CHECK (LENGTH(code) > 0),
-    CONSTRAINT chk_school_type_name_not_empty CHECK (LENGTH(name) > 0)
-);
-CREATE INDEX idx_school_type_code ON school_types (code);
-CREATE INDEX idx_school_type_name ON school_types (name);
 
-
-
-DROP TABLE IF EXISTS languages;
-CREATE TABLE languages (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    iso_code VARCHAR(10) UNIQUE,   -- en, ur, ar
-    name VARCHAR(50) NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT,
-    CONSTRAINT chk_language_name_not_empty CHECK (LENGTH(name) > 0)
-);
-CREATE INDEX idx_language_iso_code ON languages (iso_code);
-CREATE INDEX idx_language_name ON languages (name);
-
-
-DROP TABLE IF EXISTS currencies;
-CREATE TABLE currencies (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    iso_code VARCHAR(10) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL,
-    symbol VARCHAR(10),
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT
-);
-
-
-DROP TABLE IF EXISTS education_levels;
-CREATE TABLE education_levels (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(10) UNIQUE,       -- e.g., PS, P, M, S, HS
-    name VARCHAR(50) NOT NULL,     -- e.g., Primary, Secondary
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT
-);
-
-
-DROP TABLE IF EXISTS curricula;
-CREATE TABLE curricula (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(20) UNIQUE,
-    name VARCHAR(100) NOT NULL,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT
-);
-
-
-DROP TABLE IF EXISTS facility_types;
-CREATE TABLE facility_types (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(50) UNIQUE NOT NULL,      -- e.g., LAB, LIBRARY, PLAYGROUND
-    name VARCHAR(100) NOT NULL,            -- e.g., "Computer Lab", "Library", "Playground"
-    description VARCHAR(255),
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT
-);
 
 DROP TABLE IF EXISTS tax_types;
 CREATE TABLE tax_types (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     code VARCHAR(20) UNIQUE NOT NULL,   -- VAT, GST, SALES_TAX
     name VARCHAR(50),
+    tax_percentage DECIMAL(5,2) NOT NULL DEFAULT 0.00,
     country_id BIGINT,                   -- reference to countries table
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by BIGINT,
@@ -257,7 +328,6 @@ CREATE TABLE education_boards (
     CONSTRAINT chk_education_board_name_not_empty CHECK (LENGTH(name) > 0),
     CONSTRAINT fk_education_board_country FOREIGN KEY (country_id) REFERENCES country(id)
 );
-
 CREATE INDEX idx_education_board_code ON education_boards (code);
 CREATE INDEX idx_education_board_name ON education_boards (name);
 CREATE INDEX idx_education_board_country ON education_boards (country_id);
@@ -302,6 +372,33 @@ CREATE TABLE institute_contacts (
     FOREIGN KEY (institute_id) REFERENCES institutes(id),
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
+DROP TABLE IF EXISTS refund_policies;
+CREATE TABLE refund_policies (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,           -- FK to institutes
+    academic_year_id BIGINT,                -- FK to academic_years
+
+    name VARCHAR(100),
+    description TEXT,
+
+    max_refund_percentage DECIMAL(5,2),    -- e.g., 50.00 for 50%
+    max_refund_amount DECIMAL(10,2),       -- e.g., 1000.00
+    allowed_after_days INT,                 -- e.g., 30 days after payment
+
+    is_active BOOLEAN DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
+);
+
 
 -- Indexes for faster lookup
 CREATE INDEX idx_institute_contacts_institute ON institute_contacts (institute_id);
@@ -460,6 +557,60 @@ CREATE TABLE institute_accreditations (
 );
 CREATE INDEX idx_institute_accreditations_institute ON institute_accreditations (institute_id);
 
+DROP TABLE IF EXISTS institute_financial_settings;
+CREATE TABLE institute_financial_settings (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+    academic_year_id BIGINT NOT NULL,
+    fee_recurrence_rule_id BIGINT,
+    -- Currency and Language Settings
+    currency_id INT,
+    language_id BIGINT,
+    locale VARCHAR(10),
+
+    allow_partial_payments BOOLEAN DEFAULT FALSE,
+    late_fee_applicable BOOLEAN DEFAULT FALSE,
+    late_fee_type VARCHAR(20),              -- Fixed, Percentage
+    late_fee_amount DECIMAL(10, 2),
+
+    -- Tax Rules
+    is_tax_applicable BOOLEAN DEFAULT FALSE,
+    tax_type_id BIGINT,
+    is_tax_inclusive BOOLEAN DEFAULT FALSE,
+
+    -- Refund Rules
+    allow_refunds BOOLEAN DEFAULT FALSE,
+    refund_policy_url VARCHAR(255),
+    refund_window_days INT,
+    refund_percentage DECIMAL(5, 2),
+    refund_fixed_amount DECIMAL(10, 2),
+
+    -- Compliance
+    invoice_mandatory BOOLEAN DEFAULT TRUE,
+    receipt_mandatory BOOLEAN DEFAULT TRUE,
+
+    is_active BOOLEAN DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (institute_id) REFERENCES institutes(id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
+    FOREIGN KEY (currency_id) REFERENCES currencies(id),
+    FOREIGN KEY (tax_type_id) REFERENCES tax_types(id),
+    FOREIGN KEY (fee_recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
+);
+CREATE INDEX idx_institute_financial_settings_institute ON institute_financial_settings (institute_id);
+CREATE INDEX idx_institute_financial_settings_academic_year ON institute_financial_settings (academic_year_id);
+
+
 DROP TABLE IF EXISTS institute_profiles;
 CREATE TABLE institute_profiles (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -614,49 +765,6 @@ CREATE INDEX idx_campus_name ON campuses (campus_name);
 
 
 
-DROP TABLE IF EXISTS academic_years;
-
-CREATE TABLE academic_years (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-
-    name VARCHAR(50) NOT NULL,            -- e.g. "2024-2025"
-    code VARCHAR(20) NOT NULL,
-
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-
-    total_months BIGINT NOT NULL,
-
-    is_current BOOLEAN NOT NULL DEFAULT FALSE,
-
-    status VARCHAR(20) NOT NULL,          -- AcademicYearStatus (ENUM stored as STRING)
-
-    remarks VARCHAR(255),
-
-    is_locked BOOLEAN NOT NULL DEFAULT FALSE,
-    locked_at DATETIME,
-    locked_by BIGINT,
-
-    organization_id BIGINT NOT NULL,
-
-    -- Audit fields (from AuditableEntity)
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-
-    deleted_at DATETIME,
-    deleted_by BIGINT,
-
-    -- Constraints
-    CONSTRAINT uk_academic_year_code UNIQUE (code),
-    CONSTRAINT uk_academic_year_date_range UNIQUE (start_date, end_date)
-);
-
--- Indexes
-CREATE INDEX idx_academic_year_status ON academic_years (status);
-CREATE INDEX idx_academic_year_is_current ON academic_years (is_current);
 
 
 CREATE TABLE admission_type

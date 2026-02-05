@@ -13,6 +13,8 @@ public class TaxTypeRequestDTO {
     @Size(max = 50, message = "Name must be at most 50 characters")
     private String name;
 
+    private java.math.BigDecimal taxPercentage;
+
     private Long countryId;
 
     private Boolean isActive = true;

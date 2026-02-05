@@ -32,6 +32,16 @@ public interface TaxTypeRepository extends JpaRepository<TaxTypeEntity, Long> {
             """)
     List<TaxTypeEntity> findAllActive();
 
+    @Query("""
+            SELECT t
+            FROM TaxTypeEntity t
+            WHERE t.country.id = :countryId
+              AND t.isActive = true
+              AND t.deleted = false
+            ORDER BY t.name ASC
+            """)
+    List<TaxTypeEntity> findByCountryId(@Param("countryId") Long countryId);
+
     @Modifying
     @Transactional
     @Query("""
