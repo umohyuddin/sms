@@ -137,7 +137,7 @@ CREATE TABLE curricula (
 
 
 DROP TABLE IF EXISTS facility_types;
-CREATE TABLE facility_types (
+CREATE TABLE `facility_types` (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     code VARCHAR(50) UNIQUE NOT NULL,      -- e.g., LAB, LIBRARY, PLAYGROUND
     name VARCHAR(100) NOT NULL,            -- e.g., "Computer Lab", "Library", "Playground"
@@ -428,6 +428,37 @@ CREATE TABLE institute_social_links (
 );
 CREATE INDEX idx_institute_social_links_institute ON institute_social_links (institute_id);
 
+
+DROP TABLE IF EXISTS institute_facilities;
+
+CREATE TABLE institute_facilities (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    institute_id BIGINT NOT NULL,
+    facility_type_id BIGINT NOT NULL,   -- FK → facility_types
+
+    description VARCHAR(255),
+    capacity INT,
+
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    CONSTRAINT fk_facility_institute
+        FOREIGN KEY (institute_id) REFERENCES institutes(id),
+
+    CONSTRAINT fk_facility_type
+        FOREIGN KEY (facility_type_id) REFERENCES facility_types(id)
+);
+
+
 DROP TABLE IF EXISTS institute_academic_offerings;
 CREATE TABLE institute_academic_offerings (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -452,29 +483,6 @@ CREATE TABLE institute_academic_offerings (
 );
 CREATE INDEX idx_institute_academic_offerings_institute ON institute_academic_offerings (institute_id);
 
-DROP TABLE IF EXISTS institute_facilities;
-CREATE TABLE institute_facilities (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    institute_id BIGINT NOT NULL,
-
-    facility_type VARCHAR(50),   -- Lab, Library, Playground
-    description VARCHAR(255),
-    capacity INT,
-
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-
-    deleted_at DATETIME,
-    deleted_by BIGINT,
-
-    FOREIGN KEY (institute_id) REFERENCES institutes(id)
-);
-CREATE INDEX idx_institute_facilities_institute ON institute_facilities (institute_id);
 
 DROP TABLE IF EXISTS institute_billing;
 CREATE TABLE institute_billing (
@@ -1219,24 +1227,64 @@ CREATE TABLE system_users
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-DROP TABLE IF EXISTS permission;
-CREATE TABLE permission
-(
-    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-    permission_name  VARCHAR(255) NOT NULL,
-    code             VARCHAR(100) UNIQUE,
-    module           VARCHAR(255),
-    description      TEXT,
 
-    created_at       BIGINT,
-    updated_at       BIGINT,
-    is_deleted       BOOLEAN NOT NULL DEFAULT FALSE,
+CREATE TABLE modules (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
 
-    CONSTRAINT chk_permission_name_not_empty CHECK (LENGTH(permission_name) > 0),
-    CONSTRAINT chk_permission_code_not_empty CHECK (code IS NULL OR LENGTH(code) > 0)
+    -- Module Identity
+    code VARCHAR(50) UNIQUE NOT NULL,   -- FINANCE, STUDENTS, HR
+    name VARCHAR(100) NOT NULL,         -- Finance Management
+    description VARCHAR(255),
+
+    -- UI / Navigation
+    icon VARCHAR(50),                   -- UI icon reference
+    route VARCHAR(100),                 -- /finance
+    display_order INT,
+
+    -- Status & Type
+    system_module BOOLEAN NOT NULL DEFAULT TRUE,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at DATETIME NOT NULL,
+    created_by BIGINT,
+
+    updated_at DATETIME,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
-CREATE INDEX idx_permission_name ON permission (permission_name);
-CREATE INDEX idx_permission_code ON permission (code);
+
+DROP TABLE IF EXISTS permission;
+CREATE TABLE permission (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
+
+    code VARCHAR(100) UNIQUE NOT NULL,     -- VIEW_STUDENT, CREATE_INVOICE
+    name VARCHAR(255) NOT NULL,            -- Human readable name
+     module_id BIGINT NOT NULL,                   -- STUDENT, FINANCE, HR
+    description VARCHAR(255),
+
+    is_system_permission BOOLEAN DEFAULT FALSE,
+    active BOOLEAN DEFAULT TRUE,
+
+    created_at DATETIME NOT NULL,
+    created_by BIGINT,
+
+    updated_at DATETIME,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+ FOREIGN KEY (module_id) REFERENCES modules(id),
+    CONSTRAINT chk_permission_name_not_empty CHECK (LENGTH(name) > 0),
+    CONSTRAINT chk_permission_code_not_empty CHECK (LENGTH(code) > 0)
+);
 
 CREATE TABLE employee_type (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,

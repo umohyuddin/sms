@@ -42,41 +42,51 @@ public class RoleService {
         }
     }
 
-    public List<RoleResponseDTO> getAll() {
+    public List<RoleResponseDTO> getAll(Long organizationId) {
         try {
-            log.info("Fetching all Roles from database");
-            List<RoleEntity> result = roleRepository.findAll();
+            log.info("Fetching all Roles for organizationId: {} from database", organizationId);
+            List<RoleEntity> result = roleRepository.findByOrganizationId(organizationId);
             List<RoleResponseDTO> responseDTOS = MapperUtil.mapList(result, RoleResponseDTO.class);
-            log.info("Successfully fetched {} Roles", responseDTOS.size());
+            log.info("Successfully fetched {} Roles for organizationId: {}", responseDTOS.size(), organizationId);
             return responseDTOS;
         } catch (DataAccessException dae) {
-            log.error("Database error while fetching Roles", dae);
+            log.error("Database error while fetching Roles for organizationId: {}", organizationId, dae);
         } catch (MappingException me) {
-            log.error("Error mapping RoleEntity to RoleResponseDTO", me);
+            log.error("Error mapping RoleEntity to RoleResponseDTO for organizationId: {}", organizationId, me);
         } catch (Exception e) {
-            log.error("Unexpected error while fetching Roles", e);
+            log.error("Unexpected error while fetching Roles for organizationId: {}", organizationId, e);
         }
         return Collections.emptyList();
     }
 
-    public RoleResponseDTO getById(Long id) {
-        log.info("Fetching Role with id: {}", id);
-        RoleEntity entity = roleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
+    public RoleResponseDTO getById(Long id, Long organizationId) {
+        log.info("Fetching Role with id: {} and organizationId: {}", id, organizationId);
+        RoleEntity entity = roleRepository.findByIdAndOrganizationId(id, organizationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id + " for organizationId: " + organizationId));
         RoleResponseDTO responseDTO = MapperUtil.mapObject(entity, RoleResponseDTO.class);
         log.info("Successfully fetched Role: id={}", responseDTO.getId());
         return responseDTO;
     }
 
-    public RoleResponseDTO updateRole(Long id, RoleRequestDTO requestDTO) {
-        log.info("Updating Role with id {} using DTO {}", id, requestDTO);
-        RoleEntity existing = roleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
+    public RoleResponseDTO updateRole(Long id, Long organizationId, RoleRequestDTO requestDTO) {
+        log.info("Updating Role with id {} for organizationId {} using DTO {}", id, organizationId, requestDTO);
+        RoleEntity existing = roleRepository.findByIdAndOrganizationId(id, organizationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id + " for organizationId: " + organizationId));
 
+        if (requestDTO.getCode() != null && !requestDTO.getCode().isBlank()) {
+            existing.setCode(requestDTO.getCode());
+        }
         if (requestDTO.getName() != null && !requestDTO.getName().isBlank()) {
             existing.setName(requestDTO.getName());
         }
         if (requestDTO.getDescription() != null) {
             existing.setDescription(requestDTO.getDescription());
+        }
+        if (requestDTO.getSystemRole() != null) {
+            existing.setSystemRole(requestDTO.getSystemRole());
+        }
+        if (requestDTO.getActive() != null) {
+            existing.setActive(requestDTO.getActive());
         }
 
         RoleEntity updated = roleRepository.save(existing);
@@ -85,17 +95,16 @@ public class RoleService {
         return response;
     }
 
-    public void deleteById(Long id) {
-        log.info("Delete request received for Role ID: {}", id);
-        if (!roleRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Role not found with id: " + id);
-        }
-        roleRepository.deleteById(id);
+    public void deleteById(Long id, Long organizationId) {
+        log.info("Delete request received for Role ID: {} and organizationId: {}", id, organizationId);
+        RoleEntity existing = roleRepository.findByIdAndOrganizationId(id, organizationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id + " for organizationId: " + organizationId));
+        roleRepository.delete(existing);
     }
 
-    public List<RoleResponseDTO> searchByKeyword(String keyword) {
-        log.info("Searching Roles with keyword: {}", keyword);
-        List<RoleEntity> result = roleRepository.searchByKeyword(keyword == null ? "" : keyword.trim());
+    public List<RoleResponseDTO> searchByKeyword(Long organizationId, String keyword) {
+        log.info("Searching Roles with keyword: {} for organizationId: {}", keyword, organizationId);
+        List<RoleEntity> result = roleRepository.searchByKeyword(organizationId, keyword == null ? "" : keyword.trim());
         return MapperUtil.mapList(result, RoleResponseDTO.class);
     }
     public List<RoleResponseDTO> getByOrganizationId(Long organizationId) {

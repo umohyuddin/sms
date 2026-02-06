@@ -11,9 +11,21 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PermissionRequestDTO {
+    @jakarta.validation.constraints.NotNull
+    private Long organizationId;
+
     @NotBlank
-    private String permissionName;
+    private String name;
+
+    @NotBlank
     private String code;
-    private String module;
+
+    @jakarta.validation.constraints.NotNull
+    private Long moduleId;
+
     private String description;
+
+    private Boolean systemPermission = false;
+
+    private Boolean active = true;
 }

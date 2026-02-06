@@ -13,11 +13,14 @@ public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
 
     @Query("""
             SELECT r FROM RoleEntity r
-            WHERE (:keyword IS NULL OR :keyword = ''
+            WHERE r.organizationId = :organizationId
+              AND (:keyword IS NULL OR :keyword = ''
                 OR LOWER(r.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(r.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
             """)
-    List<RoleEntity> searchByKeyword(@Param("keyword") String keyword);
+    List<RoleEntity> searchByKeyword(@Param("organizationId") Long organizationId, @Param("keyword") String keyword);
+
+    java.util.Optional<RoleEntity> findByIdAndOrganizationId(Long id, Long organizationId);
 
     @Query("""
         SELECT r

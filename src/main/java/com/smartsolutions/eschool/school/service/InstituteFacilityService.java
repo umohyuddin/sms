@@ -6,7 +6,7 @@ import com.smartsolutions.eschool.school.dtos.instituteFacilities.responseDto.In
 import java.util.List;
 
 public interface InstituteFacilityService {
-    InstituteFacilityResponseDTO createFacility(InstituteFacilityCreateRequestDTO requestDTO);
+    List<InstituteFacilityResponseDTO> createFacility(InstituteFacilityCreateRequestDTO requestDTO);
 
     List<InstituteFacilityResponseDTO> getAll();
 

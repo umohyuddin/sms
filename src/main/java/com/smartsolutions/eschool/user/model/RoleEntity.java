@@ -52,13 +52,13 @@ public class RoleEntity extends AuditableEntity {
     // ============================
     // RELATIONSHIPS
     // ============================
-    @OneToMany(
-            mappedBy = "role",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @JsonIgnore
-    private Set<UserRolesEntity> userRoles = new HashSet<>();
+//    @OneToMany(
+//            mappedBy = "role",
+//            fetch = FetchType.LAZY,
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true
+//    )
+//    @JsonIgnore
+//    private Set<UserRolesEntity> userRoles = new HashSet<>();
 }
 

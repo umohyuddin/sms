@@ -1,15 +1,15 @@
 package com.smartsolutions.eschool.user.service;
 
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.global.responseMappers.PermissionMapper;
 import com.smartsolutions.eschool.user.dtos.permissions.request.PermissionRequestDTO;
 import com.smartsolutions.eschool.user.dtos.permissions.response.PermissionResponseDTO;
 import com.smartsolutions.eschool.user.model.PermissionEntity;
 import com.smartsolutions.eschool.user.repository.PermissionRepository;
-import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,19 +19,26 @@ import java.util.List;
 public class PermissionService {
 
     private final PermissionRepository permissionRepository;
+    private final com.smartsolutions.eschool.user.repository.ModuleRepository moduleRepository;
 
-    public PermissionService(PermissionRepository permissionRepository) {
+    public PermissionService(PermissionRepository permissionRepository, com.smartsolutions.eschool.user.repository.ModuleRepository moduleRepository) {
         this.permissionRepository = permissionRepository;
+        this.moduleRepository = moduleRepository;
     }
 
+    @Transactional
     public PermissionResponseDTO createPermission(PermissionRequestDTO requestDTO) {
-        log.info("Creating new Permission: {}", requestDTO.getPermissionName());
+        log.info("Creating new Permission: {} for organizationId: {}", requestDTO.getName(), requestDTO.getOrganizationId());
         try {
-            PermissionEntity entity = MapperUtil.mapObject(requestDTO, PermissionEntity.class);
-            entity.setId(null);
+            PermissionEntity entity = PermissionMapper.toEntity(requestDTO);
+            
+            com.smartsolutions.eschool.user.model.ModuleEntity module = moduleRepository.findById(requestDTO.getModuleId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Module not found with id: " + requestDTO.getModuleId()));
+            entity.setModule(module);
+
             PermissionEntity saved = permissionRepository.save(entity);
-            PermissionResponseDTO response = MapperUtil.mapObject(saved, PermissionResponseDTO.class);
-            log.info("Permission created successfully with ID: {}", response.getId());
+            PermissionResponseDTO response = PermissionMapper.toResponseDTO(saved);
+            log.info("Permission created successfully with ID: {} for organizationId: {}", response.getId(), response.getOrganizationId());
             return response;
         } catch (DataAccessException dae) {
             log.error("Database error while creating Permission", dae);
@@ -42,67 +49,62 @@ public class PermissionService {
         }
     }
 
-    public List<PermissionResponseDTO> getAll() {
+    @Transactional(readOnly = true)
+    public List<PermissionResponseDTO> getAll(Long organizationId) {
         try {
-            log.info("Fetching all Permissions from database");
-            List<PermissionEntity> result = permissionRepository.findAll();
-            List<PermissionResponseDTO> responseDTOS = MapperUtil.mapList(result, PermissionResponseDTO.class);
-            log.info("Successfully fetched {} Permissions", responseDTOS.size());
+            log.info("Fetching all Permissions for organizationId: {} from database", organizationId);
+            List<PermissionEntity> result = permissionRepository.findByOrganizationId(organizationId);
+            List<PermissionResponseDTO> responseDTOS = PermissionMapper.toResponseDTOList(result);
+            log.info("Successfully fetched {} Permissions for organizationId: {}", responseDTOS.size(), organizationId);
             return responseDTOS;
         } catch (DataAccessException dae) {
-            log.error("Database error while fetching Permissions", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping PermissionEntity to PermissionResponseDTO", me);
+            log.error("Database error while fetching Permissions for organizationId: {}", organizationId, dae);
         } catch (Exception e) {
-            log.error("Unexpected error while fetching Permissions", e);
+            log.error("Unexpected error while fetching Permissions for organizationId: {}", organizationId, e);
         }
         return Collections.emptyList();
     }
 
-    public PermissionResponseDTO getById(Long id) {
-        log.info("Fetching Permission with id: {}", id);
-        PermissionEntity entity = permissionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Permission not found with id: " + id));
-        PermissionResponseDTO responseDTO = MapperUtil.mapObject(entity, PermissionResponseDTO.class);
-        log.info("Successfully fetched Permission: id={}", responseDTO.getId());
-        return responseDTO;
+    @Transactional(readOnly = true)
+    public PermissionResponseDTO getById(Long id, Long organizationId) {
+        log.info("Fetching Permission with id: {} and organizationId: {}", id, organizationId);
+        PermissionEntity entity = permissionRepository.findByIdAndOrganizationId(id, organizationId)
+                .orElseThrow(() -> new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Permission not found with id: " + id + " for organizationId: " + organizationId));
+        return PermissionMapper.toResponseDTO(entity);
     }
 
-    public PermissionResponseDTO updatePermission(Long id, PermissionRequestDTO requestDTO) {
-        log.info("Updating Permission with id {} using DTO {}", id, requestDTO);
-        PermissionEntity existing = permissionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Permission not found with id: " + id));
+    @Transactional
+    public PermissionResponseDTO updatePermission(Long id, Long organizationId, PermissionRequestDTO requestDTO) {
+        log.info("Updating Permission with id {} for organizationId {} using DTO {}", id, organizationId, requestDTO);
+        PermissionEntity existing = permissionRepository.findByIdAndOrganizationId(id, organizationId)
+                .orElseThrow(() -> new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Permission not found with id: " + id + " for organizationId: " + organizationId));
 
-        if (requestDTO.getPermissionName() != null && !requestDTO.getPermissionName().isBlank()) {
-            existing.setPermissionName(requestDTO.getPermissionName());
-        }
-        if (requestDTO.getCode() != null) {
-            existing.setCode(requestDTO.getCode());
-        }
-        if (requestDTO.getModule() != null) {
-            existing.setModule(requestDTO.getModule());
-        }
-        if (requestDTO.getDescription() != null) {
-            existing.setDescription(requestDTO.getDescription());
+        PermissionMapper.updateEntity(existing, requestDTO);
+
+        if (requestDTO.getModuleId() != null) {
+            com.smartsolutions.eschool.user.model.ModuleEntity module = moduleRepository.findById(requestDTO.getModuleId())
+                    .orElseThrow(() -> new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Module not found with id: " + requestDTO.getModuleId()));
+            existing.setModule(module);
         }
 
         PermissionEntity updated = permissionRepository.save(existing);
-        PermissionResponseDTO response = MapperUtil.mapObject(updated, PermissionResponseDTO.class);
+        PermissionResponseDTO response = PermissionMapper.toResponseDTO(updated);
         log.info("Permission updated successfully: {}", response.getId());
         return response;
     }
 
-    public void deleteById(Long id) {
-        log.info("Delete request received for Permission ID: {}", id);
-        if (!permissionRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Permission not found with id: " + id);
-        }
-        permissionRepository.deleteById(id);
+    @Transactional
+    public void deleteById(Long id, Long organizationId) {
+        log.info("Delete request received for Permission ID: {} and organizationId: {}", id, organizationId);
+        PermissionEntity existing = permissionRepository.findByIdAndOrganizationId(id, organizationId)
+                .orElseThrow(() -> new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Permission not found with id: " + id + " for organizationId: " + organizationId));
+        permissionRepository.delete(existing);
     }
 
-    public List<PermissionResponseDTO> searchByKeyword(String keyword) {
-        log.info("Searching Permissions with keyword: {}", keyword);
-        List<PermissionEntity> result = permissionRepository.searchByKeyword(keyword == null ? "" : keyword.trim());
-        return MapperUtil.mapList(result, PermissionResponseDTO.class);
+    @Transactional(readOnly = true)
+    public List<PermissionResponseDTO> searchByKeyword(Long organizationId, String keyword) {
+        log.info("Searching Permissions with keyword: {} for organizationId: {}", keyword, organizationId);
+        List<PermissionEntity> result = permissionRepository.searchByKeyword(organizationId, keyword == null ? "" : keyword.trim());
+        return PermissionMapper.toResponseDTOList(result);
     }
 }

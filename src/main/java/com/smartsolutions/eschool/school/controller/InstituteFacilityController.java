@@ -25,9 +25,9 @@ public class InstituteFacilityController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteFacilityResponseDTO> createFacility(@Valid @RequestBody InstituteFacilityCreateRequestDTO requestDTO) {
-        InstituteFacilityResponseDTO responseDTO = instituteFacilityFacade.createFacility(requestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    public ResponseEntity<List<InstituteFacilityResponseDTO>> createFacility(@Valid @RequestBody InstituteFacilityCreateRequestDTO requestDTO) {
+        List<InstituteFacilityResponseDTO> responseDTOs = instituteFacilityFacade.createFacility(requestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTOs);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

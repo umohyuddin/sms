@@ -21,6 +21,8 @@ public class SystemUserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "organization_id", nullable = false)
+    private Long organizationId;
     // Authentication
     @Column(nullable = false, unique = true, length = 50)
     private String username;

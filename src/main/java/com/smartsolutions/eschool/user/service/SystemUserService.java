@@ -25,10 +25,12 @@ public class SystemUserService {
         SystemUserEntity result = systemUserRepository.findByEmail(loginRequestDTO.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         // Validate password
 //        if (!passwordEncoder.matches(loginRequestDTO.getPassword(), result.getPasswordHash())) {
-//            throw new RuntimeException("Invalid credentials"); // you can create custom exception
+//            throw new RuntimeException("Invalid credentials");
 //        }
         LoginResponseDTO responseDTO = new LoginResponseDTO();
         responseDTO.setEmail(result.getEmail());
+        responseDTO.setOrganizationId(result.getOrganizationId());
+        responseDTO.setUserId(result.getId().toString());
         return responseDTO;
     }
 }

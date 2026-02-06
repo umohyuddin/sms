@@ -22,24 +22,24 @@ public class RoleFacade {
         return roleService.createRole(requestDTO);
     }
 
-    public List<RoleResponseDTO> getAll() {
-        return roleService.getAll();
+    public List<RoleResponseDTO> getAll(Long organizationId) {
+        return roleService.getAll(organizationId);
     }
 
-    public RoleResponseDTO getById(Long id) {
-        return roleService.getById(id);
+    public RoleResponseDTO getById(Long id, Long organizationId) {
+        return roleService.getById(id, organizationId);
     }
 
-    public RoleResponseDTO updateRole(Long id, RoleRequestDTO requestDTO) {
-        return roleService.updateRole(id, requestDTO);
+    public RoleResponseDTO updateRole(Long id, Long organizationId, RoleRequestDTO requestDTO) {
+        return roleService.updateRole(id, organizationId, requestDTO);
     }
 
-    public void deleteById(Long id) {
-        roleService.deleteById(id);
+    public void deleteById(Long id, Long organizationId) {
+        roleService.deleteById(id, organizationId);
     }
 
-    public List<RoleResponseDTO> searchByKeyword(String keyword) {
-        return roleService.searchByKeyword(keyword);
+    public List<RoleResponseDTO> searchByKeyword(Long organizationId, String keyword) {
+        return roleService.searchByKeyword(organizationId, keyword);
     }
 
     public List<RoleResponseDTO> getByOrganizationId(Long organizationId) {

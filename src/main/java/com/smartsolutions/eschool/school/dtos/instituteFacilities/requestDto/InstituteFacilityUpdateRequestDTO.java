@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InstituteFacilityUpdateRequestDTO {
-    private String facilityType;
+    private Long facilityTypeId;
     private String description;
     private Integer capacity;
 }

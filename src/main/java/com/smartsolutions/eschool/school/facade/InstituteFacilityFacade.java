@@ -19,7 +19,7 @@ public class InstituteFacilityFacade {
         this.instituteFacilityService = instituteFacilityService;
     }
 
-    public InstituteFacilityResponseDTO createFacility(InstituteFacilityCreateRequestDTO requestDTO) {
+    public List<InstituteFacilityResponseDTO> createFacility(InstituteFacilityCreateRequestDTO requestDTO) {
         return instituteFacilityService.createFacility(requestDTO);
     }
 

@@ -22,23 +22,23 @@ public class PermissionFacade {
         return permissionService.createPermission(requestDTO);
     }
 
-    public List<PermissionResponseDTO> getAll() {
-        return permissionService.getAll();
+    public List<PermissionResponseDTO> getAll(Long organizationId) {
+        return permissionService.getAll(organizationId);
     }
 
-    public PermissionResponseDTO getById(Long id) {
-        return permissionService.getById(id);
+    public PermissionResponseDTO getById(Long id, Long organizationId) {
+        return permissionService.getById(id, organizationId);
     }
 
-    public PermissionResponseDTO updatePermission(Long id, PermissionRequestDTO requestDTO) {
-        return permissionService.updatePermission(id, requestDTO);
+    public PermissionResponseDTO updatePermission(Long id, Long organizationId, PermissionRequestDTO requestDTO) {
+        return permissionService.updatePermission(id, organizationId, requestDTO);
     }
 
-    public void deleteById(Long id) {
-        permissionService.deleteById(id);
+    public void deleteById(Long id, Long organizationId) {
+        permissionService.deleteById(id, organizationId);
     }
 
-    public List<PermissionResponseDTO> searchByKeyword(String keyword) {
-        return permissionService.searchByKeyword(keyword);
+    public List<PermissionResponseDTO> searchByKeyword(Long organizationId, String keyword) {
+        return permissionService.searchByKeyword(organizationId, keyword);
     }
 }

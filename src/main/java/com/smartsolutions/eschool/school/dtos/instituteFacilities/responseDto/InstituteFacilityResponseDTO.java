@@ -12,7 +12,9 @@ import lombok.Setter;
 public class InstituteFacilityResponseDTO {
     private Long id;
     private Long instituteId;
-    private String facilityType;
+    private Long facilityTypeId;
+    private String facilityTypeCode;
+    private String facilityTypeName;
     private String description;
     private Integer capacity;
 }

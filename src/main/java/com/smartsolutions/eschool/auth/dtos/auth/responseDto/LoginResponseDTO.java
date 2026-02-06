@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResponseDTO {
+    private Long organizationId;
     private String accessToken;
     private String tokenType = "Bearer";
     private Long expiresIn; // in seconds

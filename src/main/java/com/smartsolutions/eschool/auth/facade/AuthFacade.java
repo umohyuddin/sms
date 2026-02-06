@@ -29,7 +29,7 @@ public class AuthFacade {
 
     public LoginResponseDTO authenticateUser(@Valid LoginRequestDTO requestDTO) {
         LoginResponseDTO loginResponseDTO = systemUserService.getUserByUserName(requestDTO);
-        String jwtToken =   authService.auth(requestDTO);
+        String jwtToken =   authService.auth(loginResponseDTO);
         loginResponseDTO.setAccessToken(jwtToken);
         return loginResponseDTO;
     }

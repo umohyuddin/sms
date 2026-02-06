@@ -27,8 +27,9 @@ public class InstituteFacilityEntity extends ScopeAuditableEntity {
     @JoinColumn(name = "institute_id", nullable = false)
     private InstituteEntity institute;
 
-    @Column(name = "facility_type", length = 50)
-    private String facilityType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "facility_type_id", nullable = false)
+    private com.smartsolutions.eschool.lookups.model.FacilityTypeEntity facilityType;
 
     @Column(name = "description", length = 255)
     private String description;

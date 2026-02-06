@@ -55,6 +55,80 @@ VALUES
  'Fee charged when a service is used (transport, lab, activity)',
  TRUE, FALSE, 1);
 
+INSERT INTO modules
+(
+    code,
+    name,
+    description,
+    icon,
+    route,
+    display_order,
+    system_module,
+    active,
+    created_at,
+    created_by
+)
+VALUES
+('DASHBOARD', 'Dashboard', 'System overview and analytics', 'dashboard', '/dashboard', 1, TRUE, TRUE, NOW(), 1),
+('USER', 'User Management', 'Manage users and accounts', 'people', '/users', 2, TRUE, TRUE, NOW(), 1),
+('ROLE', 'Role & Permissions', 'Manage roles and permissions', 'security', '/roles', 3, TRUE, TRUE, NOW(), 1),
+('ACADEMIC', 'Academic Management', 'Academic years, classes, sections', 'school', '/academics', 4, TRUE, TRUE, NOW(), 1),
+('STUDENT', 'Student Management', 'Student profiles and enrollment', 'groups', '/students', 5, FALSE, TRUE, NOW(), 1),
+('TEACHER', 'Teacher Management', 'Teacher profiles and assignments', 'person', '/teachers', 6, FALSE, TRUE, NOW(), 1),
+('FEE', 'Fee Management', 'Fee setup, collection and reports', 'payments', '/fees', 7, FALSE, TRUE, NOW(), 1),
+('EXAM', 'Examination', 'Exam scheduling and results', 'assignment', '/exams', 8, FALSE, TRUE, NOW(), 1),
+('REPORT', 'Reports', 'System and academic reports', 'bar_chart', '/reports', 9, TRUE, TRUE, NOW(), 1),
+('SETTINGS', 'System Settings', 'Application configuration', 'settings', '/settings', 10, TRUE, TRUE, NOW(), 1);
+
+INSERT INTO permission
+(
+    organization_id,
+    code,
+    name,
+    module_id,
+    description,
+    is_system_permission,
+    active,
+    created_at,
+    created_by
+)
+VALUES
+-- Dashboard
+(1, 'DASHBOARD_VIEW', 'View Dashboard', (SELECT id FROM modules WHERE code='DASHBOARD'), 'Access dashboard overview', TRUE, TRUE, NOW(), 1),
+
+-- User Management
+(1, 'USER_VIEW', 'View Users', (SELECT id FROM modules WHERE code='USER'), 'View user list and details', TRUE, TRUE, NOW(), 1),
+(1, 'USER_CREATE', 'Create User', (SELECT id FROM modules WHERE code='USER'), 'Create new users', TRUE, TRUE, NOW(), 1),
+(1, 'USER_UPDATE', 'Update User', (SELECT id FROM modules WHERE code='USER'), 'Edit user information', TRUE, TRUE, NOW(), 1),
+(1, 'USER_DELETE', 'Delete User', (SELECT id FROM modules WHERE code='USER'), 'Deactivate or delete users', TRUE, TRUE, NOW(), 1),
+
+-- Roles & Permissions
+(1, 'ROLE_VIEW', 'View Roles', (SELECT id FROM modules WHERE code='ROLE'), 'View roles and permissions', TRUE, TRUE, NOW(), 1),
+(1, 'ROLE_CREATE', 'Create Role', (SELECT id FROM modules WHERE code='ROLE'), 'Create new roles', TRUE, TRUE, NOW(), 1),
+(1, 'ROLE_UPDATE', 'Update Role', (SELECT id FROM modules WHERE code='ROLE'), 'Modify role permissions', TRUE, TRUE, NOW(), 1),
+
+-- Academic Management
+(1, 'ACADEMIC_YEAR_VIEW', 'View Academic Year', (SELECT id FROM modules WHERE code='ACADEMIC'), 'View academic years', TRUE, TRUE, NOW(), 1),
+(1, 'ACADEMIC_YEAR_CREATE', 'Create Academic Year', (SELECT id FROM modules WHERE code='ACADEMIC'), 'Create academic year', TRUE, TRUE, NOW(), 1),
+(1, 'ACADEMIC_YEAR_UPDATE', 'Update Academic Year', (SELECT id FROM modules WHERE code='ACADEMIC'), 'Edit academic year', TRUE, TRUE, NOW(), 1),
+(1, 'ACADEMIC_YEAR_LOCK', 'Lock Academic Year', (SELECT id FROM modules WHERE code='ACADEMIC'), 'Lock academic year', TRUE, TRUE, NOW(), 1),
+
+-- Student
+(1, 'STUDENT_VIEW', 'View Students', (SELECT id FROM modules WHERE code='STUDENT'), 'View student profiles', FALSE, TRUE, NOW(), 1),
+(1, 'STUDENT_CREATE', 'Create Student', (SELECT id FROM modules WHERE code='STUDENT'), 'Enroll new student', FALSE, TRUE, NOW(), 1),
+(1, 'STUDENT_UPDATE', 'Update Student', (SELECT id FROM modules WHERE code='STUDENT'), 'Edit student information', FALSE, TRUE, NOW(), 1),
+
+-- Teacher
+(1, 'TEACHER_VIEW', 'View Teachers', (SELECT id FROM modules WHERE code='TEACHER'), 'View teacher profiles', FALSE, TRUE, NOW(), 1),
+(1, 'TEACHER_ASSIGN', 'Assign Teacher', (SELECT id FROM modules WHERE code='TEACHER'), 'Assign teachers to classes', FALSE, TRUE, NOW(), 1),
+
+-- Fee
+(1, 'FEE_VIEW', 'View Fees', (SELECT id FROM modules WHERE code='FEE'), 'View fee records', FALSE, TRUE, NOW(), 1),
+(1, 'FEE_COLLECT', 'Collect Fee', (SELECT id FROM modules WHERE code='FEE'), 'Collect student fees', FALSE, TRUE, NOW(), 1),
+
+-- Reports
+(1, 'REPORT_VIEW', 'View Reports', (SELECT id FROM modules WHERE code='REPORT'), 'View system reports', TRUE, TRUE, NOW(), 1);
+
 
 INSERT INTO roles
 (
@@ -76,6 +150,8 @@ VALUES
 (1, 'ORG_ADMIN', 'Organization Administrator',
  'Manages institute-level configuration, campuses, and users',
  TRUE, TRUE, FALSE, 1, NOW()),
+
+
 
 
 -- ===============================

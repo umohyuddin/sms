@@ -32,43 +32,43 @@ public class RoleController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RoleResponseDTO>> getAllRoles() {
-        log.info("GET /api/users/roles called");
-        List<RoleResponseDTO> roles = roleFacade.getAll();
+    public ResponseEntity<List<RoleResponseDTO>> getAllRoles(@RequestParam Long organizationId) {
+        log.info("GET /api/users/roles called for organizationId: {}", organizationId);
+        List<RoleResponseDTO> roles = roleFacade.getAll(organizationId);
         log.info("Returned {} roles", roles.size());
         return ResponseEntity.ok(roles);
     }
 
     @GetMapping(value = "/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RoleResponseDTO> getRoleById(@PathVariable Long roleId) {
-        log.info("GET /api/users/roles/{} called", roleId);
-        RoleResponseDTO role = roleFacade.getById(roleId);
+    public ResponseEntity<RoleResponseDTO> getRoleById(@PathVariable Long roleId, @RequestParam Long organizationId) {
+        log.info("GET /api/users/roles/{} called for organizationId: {}", roleId, organizationId);
+        RoleResponseDTO role = roleFacade.getById(roleId, organizationId);
         return ResponseEntity.ok(role);
     }
 
     @PutMapping(value = "/{roleId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RoleResponseDTO> updateRole(@PathVariable Long roleId, @Valid @RequestBody RoleRequestDTO requestDTO) {
-        log.info("Received request to update Role with id: {}", roleId);
-        RoleResponseDTO updated = roleFacade.updateRole(roleId, requestDTO);
+    public ResponseEntity<RoleResponseDTO> updateRole(@PathVariable Long roleId, @RequestParam Long organizationId, @Valid @RequestBody RoleRequestDTO requestDTO) {
+        log.info("Received request to update Role with id: {} for organizationId: {}", roleId, organizationId);
+        RoleResponseDTO updated = roleFacade.updateRole(roleId, organizationId, requestDTO);
         log.info("Role updated successfully with id: {}", updated.getId());
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{roleId}")
-    public ResponseEntity<String> deleteRole(@PathVariable Long roleId) {
-        log.info("DELETE /api/users/roles/{} called", roleId);
-        roleFacade.deleteById(roleId);
+    public ResponseEntity<String> deleteRole(@PathVariable Long roleId, @RequestParam Long organizationId) {
+        log.info("DELETE /api/users/roles/{} called for organizationId: {}", roleId, organizationId);
+        roleFacade.deleteById(roleId, organizationId);
         log.info("Role deleted successfully with id: {}", roleId);
-        return ResponseEntity.ok("Role deleted successfully");
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RoleResponseDTO>> searchRoles(@RequestParam(name = "keyword") String keyword) {
-        log.info("Searching Roles with keyword: {}", keyword);
+    public ResponseEntity<List<RoleResponseDTO>> searchRoles(@RequestParam(name = "keyword") String keyword, @RequestParam Long organizationId) {
+        log.info("Searching Roles with keyword: {} for organizationId: {}", keyword, organizationId);
         if (keyword == null || keyword.trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        List<RoleResponseDTO> results = roleFacade.searchByKeyword(keyword.trim());
+        List<RoleResponseDTO> results = roleFacade.searchByKeyword(organizationId, keyword.trim());
         log.info("Found {} roles matching keyword '{}'", results.size(), keyword);
         return ResponseEntity.ok(results);
     }
