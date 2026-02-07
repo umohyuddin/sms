@@ -69,7 +69,7 @@ public class ModuleService {
         ModuleEntity existing = moduleRepository.findById(id)
                 .orElseThrow(() -> new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Module not found with id: " + id));
 
-        ModuleMapper.updateEntity(existing, requestDTO);
+        ModuleMapper.updateEntityFromDTO(existing, requestDTO);
 
         ModuleEntity updated = moduleRepository.save(existing);
         return ModuleMapper.toResponseDTO(updated);

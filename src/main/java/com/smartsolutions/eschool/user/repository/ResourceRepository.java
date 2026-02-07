@@ -15,8 +15,6 @@ public interface ResourceRepository extends JpaRepository<ResourceEntity, Long> 
             SELECT r FROM ResourceEntity r
             WHERE (:keyword IS NULL OR :keyword = ''
                 OR LOWER(r.resourceName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(r.resourceEndpoint) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(r.methodType) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(r.owner) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(r.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
             """)

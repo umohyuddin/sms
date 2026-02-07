@@ -30,4 +30,6 @@ public class RoleRequestDTO {
     private Boolean systemRole = false;
 
     private Boolean active = true;
+
+    private java.util.Set<Long> permissionIds;
 }

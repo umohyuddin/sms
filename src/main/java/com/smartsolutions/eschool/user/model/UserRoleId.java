@@ -7,6 +7,11 @@ import java.io.Serializable;
 
 
 @Embeddable
+@lombok.Getter
+@lombok.Setter
+@lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
+@lombok.EqualsAndHashCode
 public class UserRoleId implements Serializable {
 
     @Column(name = "user_id")
@@ -14,6 +19,4 @@ public class UserRoleId implements Serializable {
 
     @Column(name = "role_id")
     private Long roleId;
-
-    // Constructors, Getters, Setters, hashCode, equals
 }

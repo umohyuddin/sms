@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModuleEntity extends ScopeAuditableEntity {
+public class ModuleEntity extends AuditableEntity { // Changed context to AuditableEntity for global master
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,12 +1,11 @@
 package com.smartsolutions.eschool.user.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 @Getter
 @Setter
@@ -14,56 +13,44 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 @Table(name = "resources")
-public class ResourceEntity  {
+public class ResourceEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
-    @Column(name = "resource_name",nullable = false)
-
+    @Column(name = "resource_name", nullable = false)
     private String resourceName;
 
-    @Column(name="resource_endpoint",nullable = false)
-    private String resourceEndpoint;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "module_id")
+    private ModuleEntity module;
 
-    @Column(name = "version",nullable = false)
-
+    @Column(name = "version", nullable = false)
     private String version;
 
-    @Column(nullable = false)
-    private boolean isActive;
-
-    @Column(nullable = false)
-    private String methodType;  // GET, POST, PUT, DELETE, etc.
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
 
     @Column(nullable = true)
     private String description;
 
-    @Column(nullable = false)
-    private boolean isAuthRequired;
+    @Column(name = "is_auth_required", nullable = false)
+    private boolean isAuthRequired = true;
 
     @Column(nullable = true)
     private Integer rateLimit;
 
-    @Column(nullable = false)
-    private boolean isDeprecated;
+    @Column(name = "is_deprecated", nullable = false)
+    private boolean isDeprecated = false;
 
-    @Column(nullable = true)
+    @Column(name = "documentation_url", nullable = true)
     private String documentationUrl;
 
     @Column(nullable = true)
     private String owner;
 
-
-
-//    @ManyToMany
-//    @JoinTable(
-//            name = "resource_permissions",
-//            joinColumns = @JoinColumn(name = "resource_id"),
-//            inverseJoinColumns = @JoinColumn(name = "permission_id")
-//    )
-//    private List<Permission> permissions;
-
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
 }
 

@@ -1,6 +1,5 @@
 package com.smartsolutions.eschool.user.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,7 @@ import java.util.Set;
 @Table(
         name = "roles",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"code"})
+                @UniqueConstraint(columnNames = {"code", "organization_id"})
         }
 )
 public class RoleEntity extends AuditableEntity {
@@ -49,16 +48,12 @@ public class RoleEntity extends AuditableEntity {
     @Column(name = "deleted")
     private Boolean deleted = false;
 
-    // ============================
-    // RELATIONSHIPS
-    // ============================
-//    @OneToMany(
-//            mappedBy = "role",
-//            fetch = FetchType.LAZY,
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true
-//    )
-//    @JsonIgnore
-//    private Set<UserRolesEntity> userRoles = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "role_permissions",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<PermissionEntity> permissions = new HashSet<>();
 }
 

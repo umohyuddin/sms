@@ -1,9 +1,11 @@
 package com.smartsolutions.eschool.global.responseMappers;
 
-import com.smartsolutions.eschool.user.model.PermissionEntity;
-import com.smartsolutions.eschool.user.dtos.permissions.response.PermissionResponseDTO;
 import com.smartsolutions.eschool.user.dtos.permissions.request.PermissionRequestDTO;
-import com.smartsolutions.eschool.global.responseMappers.ModuleMapper;
+import com.smartsolutions.eschool.user.dtos.permissions.response.PermissionResponseDTO;
+import com.smartsolutions.eschool.user.model.PermissionEntity;
+import com.smartsolutions.eschool.user.model.ModuleEntity;
+import com.smartsolutions.eschool.user.model.ResourceEntity;
+import com.smartsolutions.eschool.user.model.ActionEntity;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,20 +26,24 @@ public class PermissionMapper {
         dto.setName(entity.getName());
         dto.setCode(entity.getCode());
         dto.setDescription(entity.getDescription());
-        dto.setSystemPermission(entity.getSystemPermission());
+        //dto.setSystemPermission(entity.getSystemPermission());
         dto.setActive(entity.getActive());
         dto.setDeleted(entity.getDeleted());
 
-        // Standard metadata
+        if (entity.getModule() != null) {
+            dto.setModule(ModuleMapper.toResponseDTO(entity.getModule()));
+        }
+        if (entity.getResource() != null) {
+            dto.setResource(ResourceMapper.toResponseDTO(entity.getResource()));
+        }
+        if (entity.getAction() != null) {
+            dto.setAction(ActionMapper.toResponseDTO(entity.getAction()));
+        }
+
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setCreatedBy(entity.getCreatedBy());
         dto.setUpdatedAt(entity.getUpdatedAt());
         dto.setUpdatedBy(entity.getUpdatedBy());
-
-        // Module relationship
-        if (entity.getModule() != null) {
-            dto.setModule(ModuleMapper.toResponseDTO(entity.getModule()));
-        }
 
         return dto;
     }
@@ -51,43 +57,67 @@ public class PermissionMapper {
                 .collect(Collectors.toList());
     }
 
-    public static PermissionEntity toEntity(PermissionRequestDTO requestDTO) {
-        if (requestDTO == null) {
+    public static PermissionEntity toEntity(PermissionRequestDTO dto) {
+        if (dto == null) {
             return null;
         }
 
         PermissionEntity entity = new PermissionEntity();
-        entity.setOrganizationId(requestDTO.getOrganizationId());
-        entity.setName(requestDTO.getName());
-        entity.setCode(requestDTO.getCode());
-        entity.setDescription(requestDTO.getDescription());
-        entity.setSystemPermission(requestDTO.getSystemPermission());
-        entity.setActive(requestDTO.getActive());
-        // moduleId is handled in service
+        entity.setOrganizationId(dto.getOrganizationId());
+        entity.setName(dto.getName());
+        entity.setCode(dto.getCode());
+        entity.setDescription(dto.getDescription());
+        if (dto.getSystemPermission() != null) {
+            //entity.setSystemPermission(dto.getSystemPermission());
+        }
+        if (dto.getActive() != null) {
+            entity.setActive(dto.getActive());
+        }
+
+        if (dto.getModuleId() != null) {
+            ModuleEntity module = new ModuleEntity();
+            module.setId(dto.getModuleId());
+            entity.setModule(module);
+        }
+        if (dto.getResourceId() != null) {
+            ResourceEntity resource = new ResourceEntity();
+            resource.setId(dto.getResourceId());
+            entity.setResource(resource);
+        }
+        if (dto.getActionId() != null) {
+            ActionEntity action = new ActionEntity();
+            action.setId(dto.getActionId());
+            entity.setAction(action);
+        }
+
         return entity;
     }
 
-    public static void updateEntity(PermissionEntity entity, PermissionRequestDTO requestDTO) {
-        if (entity == null || requestDTO == null) {
+    public static void updateEntityFromDTO(PermissionEntity entity, PermissionRequestDTO dto) {
+        if (entity == null || dto == null) {
             return;
         }
 
-        if (requestDTO.getName() != null && !requestDTO.getName().isBlank()) {
-            entity.setName(requestDTO.getName());
+        if (dto.getName() != null) entity.setName(dto.getName());
+        if (dto.getCode() != null) entity.setCode(dto.getCode());
+        if (dto.getDescription() != null) entity.setDescription(dto.getDescription());
+        //if (dto.getSystemPermission() != null) entity.setSystemPermission(dto.getSystemPermission());
+        if (dto.getActive() != null) entity.setActive(dto.getActive());
+
+        if (dto.getModuleId() != null) {
+            ModuleEntity module = new ModuleEntity();
+            module.setId(dto.getModuleId());
+            entity.setModule(module);
         }
-        if (requestDTO.getCode() != null && !requestDTO.getCode().isBlank()) {
-            entity.setCode(requestDTO.getCode());
+        if (dto.getResourceId() != null) {
+            ResourceEntity resource = new ResourceEntity();
+            resource.setId(dto.getResourceId());
+            entity.setResource(resource);
         }
-        if (requestDTO.getDescription() != null) {
-            entity.setDescription(requestDTO.getDescription());
+        if (dto.getActionId() != null) {
+            ActionEntity action = new ActionEntity();
+            action.setId(dto.getActionId());
+            entity.setAction(action);
         }
-        if (requestDTO.getSystemPermission() != null) {
-            entity.setSystemPermission(requestDTO.getSystemPermission());
-        }
-        if (requestDTO.getActive() != null) {
-            entity.setActive(requestDTO.getActive());
-        }
-        // organizationId and deleted are usually not updated via standard request
-        // moduleId is updated in service
     }
 }

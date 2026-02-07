@@ -2,11 +2,12 @@ package com.smartsolutions.eschool.security;
 
 import com.smartsolutions.eschool.user.model.SystemUserEntity;
 import com.smartsolutions.eschool.user.repository.SystemUserRepository;
-import lombok.RequiredArgsConstructor;
+import com.smartsolutions.eschool.util.jwt.UserDetailsImp;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -18,19 +19,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-        SystemUserEntity user = userRepository.findByUsername(username)
+        SystemUserEntity user = userRepository.findByEmail(username)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found: " + username));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPasswordHash())
-                .disabled(!Boolean.TRUE.equals(user.getIsActive()))
-                .authorities("USER") // later map roles properly
-                .build();
+        return UserDetailsImp.build(user);
     }
 }
 

@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+import com.smartsolutions.eschool.user.dtos.permissions.response.PermissionResponseDTO;
 
 @Getter
 @Setter
@@ -28,6 +30,8 @@ public class RoleResponseDTO {
     private Boolean active;
 
     private Boolean deleted;
+
+    private Set<PermissionResponseDTO> permissions;
 
     private LocalDateTime createdAt;
 

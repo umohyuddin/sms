@@ -15,17 +15,14 @@ public class ResourceRequestDTO {
     @NotBlank
     private String resourceName;
 
-    @NotBlank
-    private String resourceEndpoint;
+    @NotNull
+    private Long moduleId;
 
     @NotBlank
     private String version;
 
     @NotNull
     private Boolean isActive;
-
-    @NotBlank
-    private String methodType;
 
     private String description;
 

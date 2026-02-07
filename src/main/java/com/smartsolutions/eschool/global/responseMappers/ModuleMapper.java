@@ -29,7 +29,6 @@ public class ModuleMapper {
         dto.setActive(entity.getActive());
         dto.setDeleted(entity.getDeleted());
 
-        // Standard metadata
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setCreatedBy(entity.getCreatedBy());
         dto.setUpdatedAt(entity.getUpdatedAt());
@@ -47,51 +46,39 @@ public class ModuleMapper {
                 .collect(Collectors.toList());
     }
 
-    public static ModuleEntity toEntity(ModuleRequestDTO requestDTO) {
-        if (requestDTO == null) {
+    public static ModuleEntity toEntity(ModuleRequestDTO dto) {
+        if (dto == null) {
             return null;
         }
 
         ModuleEntity entity = new ModuleEntity();
-        entity.setCode(requestDTO.getCode());
-        entity.setName(requestDTO.getName());
-        entity.setDescription(requestDTO.getDescription());
-        entity.setIcon(requestDTO.getIcon());
-        entity.setRoute(requestDTO.getRoute());
-        entity.setDisplayOrder(requestDTO.getDisplayOrder());
-        entity.setSystemModule(requestDTO.getSystemModule());
-        entity.setActive(requestDTO.getActive());
+        entity.setCode(dto.getCode());
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
+        entity.setIcon(dto.getIcon());
+        entity.setRoute(dto.getRoute());
+        entity.setDisplayOrder(dto.getDisplayOrder());
+        if (dto.getSystemModule() != null) {
+            entity.setSystemModule(dto.getSystemModule());
+        }
+        if (dto.getActive() != null) {
+            entity.setActive(dto.getActive());
+        }
         return entity;
     }
 
-    public static void updateEntity(ModuleEntity entity, ModuleRequestDTO requestDTO) {
-        if (entity == null || requestDTO == null) {
+    public static void updateEntityFromDTO(ModuleEntity entity, ModuleRequestDTO dto) {
+        if (entity == null || dto == null) {
             return;
         }
 
-        if (requestDTO.getName() != null && !requestDTO.getName().isBlank()) {
-            entity.setName(requestDTO.getName());
-        }
-        if (requestDTO.getCode() != null && !requestDTO.getCode().isBlank()) {
-            entity.setCode(requestDTO.getCode());
-        }
-        if (requestDTO.getDescription() != null) {
-            entity.setDescription(requestDTO.getDescription());
-        }
-        if (requestDTO.getIcon() != null) {
-            entity.setIcon(requestDTO.getIcon());
-        }
-        if (requestDTO.getRoute() != null) {
-            entity.setRoute(requestDTO.getRoute());
-        }
-        if (requestDTO.getDisplayOrder() != null) {
-            entity.setDisplayOrder(requestDTO.getDisplayOrder());
-        }
-        if (requestDTO.getSystemModule() != null) {
-            entity.setSystemModule(requestDTO.getSystemModule());
-        }
-        if (requestDTO.getActive() != null) {
-            entity.setActive(requestDTO.getActive());
-        }
+        if (dto.getName() != null) entity.setName(dto.getName());
+        if (dto.getCode() != null) entity.setCode(dto.getCode());
+        if (dto.getDescription() != null) entity.setDescription(dto.getDescription());
+        if (dto.getIcon() != null) entity.setIcon(dto.getIcon());
+        if (dto.getRoute() != null) entity.setRoute(dto.getRoute());
+        if (dto.getDisplayOrder() != null) entity.setDisplayOrder(dto.getDisplayOrder());
+        if (dto.getSystemModule() != null) entity.setSystemModule(dto.getSystemModule());
+        if (dto.getActive() != null) entity.setActive(dto.getActive());
     }
 }
