@@ -36,6 +36,7 @@ public class PermissionController {
     @GetMapping("/organization/{organizationId}")
     public ResponseEntity<List<PermissionResponseDTO>> getAllPermissions(@PathVariable Long organizationId) {
         log.info("Fetching all permissions for organization: {}", organizationId);
+        List<PermissionResponseDTO> result = permissionFacade.getAll(organizationId);
         return ResponseEntity.ok(permissionFacade.getAll(organizationId));
     }
 
