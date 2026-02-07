@@ -80,7 +80,7 @@ VALUES
 ('REPORT', 'Reports', 'System and academic reports', 'bar_chart', '/reports', 9, TRUE, TRUE, NOW(), 1),
 ('SETTINGS', 'System Settings', 'Application configuration', 'settings', '/settings', 10, TRUE, TRUE, NOW(), 1);
 
-INSERT INTO permission
+INSERT INTO permissions
 (
     organization_id,
     code,

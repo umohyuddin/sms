@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Entity
 @Table(
-        name = "permission",
+        name = "permissions",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"code"}),
                 @UniqueConstraint(name = "uq_mod_res_act", columnNames = {"module_id", "resource_id", "action_id", "organization_id"})

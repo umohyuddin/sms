@@ -270,7 +270,7 @@ CREATE TABLE institutes (
     province_id BIGINT NOT NULL,
     city_id BIGINT NOT NULL,
     established_date DATE,
-    
+
     logo_url VARCHAR(255),
 
 
@@ -1227,9 +1227,37 @@ CREATE TABLE system_users
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- RBAC Tables
+DROP TABLE IF EXISTS actions;
+CREATE TABLE actions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL, -- e.g., VIEW, CREATE, UPDATE, DELETE, APPROVE, EXPORT
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+is_active          BOOLEAN DEFAULT TRUE,
+    -- Audit fields
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE
+);
 
+INSERT INTO actions (code, name, description) VALUES
+('VIEW', 'View', 'Read access to the resource'),
+('CREATE', 'Create', 'Ability to create new records'),
+('UPDATE', 'Update', 'Ability to modify existing records'),
+('DELETE', 'Delete', 'Ability to remove records'),
+('APPROVE', 'Approve', 'Ability to approve workflows'),
+('EXPORT', 'Export', 'Ability to export data to Excel/PDF');
+
+
+DROP TABLE IF EXISTS modules;
 CREATE TABLE modules (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NULL, -- Deprecated (Dual support)
 
     -- Module Identity
     code VARCHAR(50) UNIQUE NOT NULL,   -- FINANCE, STUDENTS, HR
@@ -1257,33 +1285,80 @@ CREATE TABLE modules (
     deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-DROP TABLE IF EXISTS permission;
-CREATE TABLE permission (
+DROP TABLE IF EXISTS resources;
+CREATE TABLE resources (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    module_id BIGINT,
 
-    organization_id BIGINT NOT NULL,
+    resource_name VARCHAR(150) NOT NULL,
+    resource_endpoint VARCHAR(255) NULL,
+    methodType VARCHAR(50) NULL,
+    version VARCHAR(20) NOT NULL DEFAULT '1.0',
 
-    code VARCHAR(100) UNIQUE NOT NULL,     -- VIEW_STUDENT, CREATE_INVOICE
-    name VARCHAR(255) NOT NULL,            -- Human readable name
-     module_id BIGINT NOT NULL,                   -- STUDENT, FINANCE, HR
     description VARCHAR(255),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_auth_required BOOLEAN NOT NULL DEFAULT TRUE,
+    rate_limit INT,
+    is_deprecated BOOLEAN NOT NULL DEFAULT FALSE,
+    documentation_url VARCHAR(255),
+    owner VARCHAR(100),
 
-    is_system_permission BOOLEAN DEFAULT FALSE,
-    active BOOLEAN DEFAULT TRUE,
-
-    created_at DATETIME NOT NULL,
+    -- Audit fields
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by BIGINT,
-
-    updated_at DATETIME,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     updated_by BIGINT,
-
     deleted_at DATETIME,
     deleted_by BIGINT,
-
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
- FOREIGN KEY (module_id) REFERENCES modules(id),
-    CONSTRAINT chk_permission_name_not_empty CHECK (LENGTH(name) > 0),
-    CONSTRAINT chk_permission_code_not_empty CHECK (LENGTH(code) > 0)
+
+    FOREIGN KEY (module_id) REFERENCES modules(id)
+);
+
+DROP TABLE IF EXISTS permissions;
+CREATE TABLE permissions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    module_id BIGINT NOT NULL,
+    resource_id BIGINT NOT NULL,
+    action_id BIGINT NOT NULL,
+    organization_id BIGINT NULL, -- Optional for tenant-specific variations
+
+    code VARCHAR(150) UNIQUE NOT NULL, -- e.g., FINANCE_FEE_VIEW
+    name VARCHAR(255) NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
+    description     VARCHAR(255),
+    is_system_permission BOOLEAN DEFAULT FALSE,
+    -- Audit fields
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    FOREIGN KEY (module_id) REFERENCES modules(id),
+    FOREIGN KEY (resource_id) REFERENCES resources(id),
+    FOREIGN KEY (action_id) REFERENCES actions(id),
+    UNIQUE KEY uq_mod_res_act (module_id, resource_id, action_id, organization_id)
+);
+
+DROP TABLE IF EXISTS role_permissions;
+CREATE TABLE role_permissions (
+    role_id BIGINT NOT NULL,
+    permission_id BIGINT NOT NULL,
+    PRIMARY KEY (role_id, permission_id),
+    FOREIGN KEY (role_id) REFERENCES roles(id),
+    FOREIGN KEY (permission_id) REFERENCES permissions(id)
+);
+
+DROP TABLE IF EXISTS user_roles;
+CREATE TABLE user_roles (
+    user_id BIGINT NOT NULL,
+    role_id BIGINT NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES system_users(id),
+    FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
 CREATE TABLE employee_type (
