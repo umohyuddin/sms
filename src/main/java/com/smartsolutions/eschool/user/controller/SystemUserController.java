@@ -16,7 +16,7 @@ public class SystemUserController {
     private final SystemUserService systemUserService;
 
     @PutMapping("/{userId}/roles")
-    @PreAuthorize("hasAuthority('USER_ASSIGN_ROLE')")
+    //@PreAuthorize("hasAuthority('USER_ASSIGN_ROLE')")
     public ResponseEntity<?> assignRoles(@PathVariable Long userId, @RequestBody Set<Long> roleIds) {
         systemUserService.assignRoles(userId, roleIds);
         return ResponseEntity.ok().build();

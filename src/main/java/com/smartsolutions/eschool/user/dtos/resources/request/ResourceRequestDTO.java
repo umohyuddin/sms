@@ -31,7 +31,6 @@ public class ResourceRequestDTO {
 
     private Integer rateLimit;
 
-    @NotNull
     private Boolean isDeprecated;
 
     private String documentationUrl;

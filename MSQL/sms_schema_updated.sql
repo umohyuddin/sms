@@ -1245,15 +1245,6 @@ is_active          BOOLEAN DEFAULT TRUE,
     deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-INSERT INTO actions (code, name, description) VALUES
-('VIEW', 'View', 'Read access to the resource'),
-('CREATE', 'Create', 'Ability to create new records'),
-('UPDATE', 'Update', 'Ability to modify existing records'),
-('DELETE', 'Delete', 'Ability to remove records'),
-('APPROVE', 'Approve', 'Ability to approve workflows'),
-('EXPORT', 'Export', 'Ability to export data to Excel/PDF');
-
-
 DROP TABLE IF EXISTS modules;
 CREATE TABLE modules (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,

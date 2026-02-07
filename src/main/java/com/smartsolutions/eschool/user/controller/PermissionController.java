@@ -26,7 +26,7 @@ public class PermissionController {
 
     @Operation(summary = "Create a new permission")
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN_PERMISSIONS_CREATE')")
+    //@PreAuthorize("hasAuthority('ADMIN_PERMISSIONS_CREATE')")
     public ResponseEntity<PermissionResponseDTO> createPermission(@Valid @RequestBody PermissionRequestDTO requestDTO) {
         log.info("Received request to create Permission");
         PermissionResponseDTO responseDTO = permissionFacade.createPermission(requestDTO);
