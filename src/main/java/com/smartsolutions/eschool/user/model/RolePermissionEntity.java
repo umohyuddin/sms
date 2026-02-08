@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.user.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import lombok.Setter;
                 @UniqueConstraint(columnNames = {"role_id", "permission_id"})
         }
 )
-public class RolePermissionEntity {
+public class RolePermissionEntity extends AuditableEntity {
 
     @EmbeddedId
     private RolePermissionId id;

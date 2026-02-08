@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,4 +16,10 @@ public class RolePermissionResponseDTO {
     private Long permissionId;
     private String roleName;
     private String permissionName;
+
+    private Long organizationId;
+    private LocalDateTime createdAt;
+    private Long createdBy;
+    private LocalDateTime updatedAt;
+    private Long updatedBy;
 }

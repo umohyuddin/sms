@@ -1339,6 +1339,17 @@ DROP TABLE IF EXISTS role_permissions;
 CREATE TABLE role_permissions (
     role_id BIGINT NOT NULL,
     permission_id BIGINT NOT NULL,
+    organization_id BIGINT NOT NULL,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
     PRIMARY KEY (role_id, permission_id),
     FOREIGN KEY (role_id) REFERENCES roles(id),
     FOREIGN KEY (permission_id) REFERENCES permissions(id)

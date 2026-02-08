@@ -23,6 +23,14 @@ public class RolePermissionMapper {
         if (entity.getPermission() != null) {
             dto.setPermissionName(entity.getPermission().getName());
         }
+
+        // Audit fields
+        dto.setOrganizationId(entity.getOrganizationId());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setCreatedBy(entity.getCreatedBy());
+        dto.setUpdatedAt(entity.getUpdatedAt());
+        dto.setUpdatedBy(entity.getUpdatedBy());
+
         return dto;
     }
 
