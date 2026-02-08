@@ -83,4 +83,12 @@ public class BankDaoImp implements  BankDao{
         TypedQuery<BankEntity> query = entityManager.createQuery(hql,BankEntity.class);
         return query.getResultList();
     }
+
+    @Override
+    public List<BankEntity> searchByKeyword(String keyword) {
+        String hql = "FROM BankEntity e WHERE LOWER(e.name) LIKE LOWER(:keyword) OR LOWER(e.branchName) LIKE LOWER(:keyword)";
+        TypedQuery<BankEntity> query = entityManager.createQuery(hql, BankEntity.class);
+        query.setParameter("keyword", "%" + keyword + "%");
+        return query.getResultList();
+    }
 }

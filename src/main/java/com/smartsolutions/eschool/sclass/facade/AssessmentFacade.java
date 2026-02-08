@@ -29,7 +29,7 @@ public class AssessmentFacade {
     }
 
     public List<AssessmentEntity> getByCourseId(Long id) {
-        return assessmentService.getByCourseId(id);
+        return assessmentService.getByCourseId(id.intValue());
     }
 
     public List<AssessmentEntity> getByStudentId(Long id) {
@@ -37,7 +37,7 @@ public class AssessmentFacade {
     }
 
     public List<AssessmentEntity> getStudentWithinCourse(Long std_id, Long course_id ) {
-        return assessmentService.getStudentWithinCourse(std_id, course_id);
+        return assessmentService.getStudentWithinCourse(std_id, course_id.intValue());
     }
 
     public String create(AssessmentEntity pAssessmentEntity) {

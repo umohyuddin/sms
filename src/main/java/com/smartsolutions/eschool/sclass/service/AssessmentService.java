@@ -1,50 +1,56 @@
 package com.smartsolutions.eschool.sclass.service;
 
 import com.smartsolutions.eschool.sclass.model.AssessmentEntity;
-import com.smartsolutions.eschool.sclass.repository.AssessmentDao;
+import com.smartsolutions.eschool.sclass.repository.AssessmentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class AssessmentService {
 
-    private final AssessmentDao assessmentDao;
+    private final AssessmentRepository assessmentRepository;
 
-    public AssessmentService(AssessmentDao pAssessmentDao) {
-        this.assessmentDao = pAssessmentDao;
+    public AssessmentService(AssessmentRepository assessmentRepository) {
+        this.assessmentRepository = assessmentRepository;
     }
 
-
     public List<AssessmentEntity> getAll() {
-        return assessmentDao.findAll();
+        return assessmentRepository.findAll();
     }
 
     public AssessmentEntity getById(Long id) {
-        return assessmentDao.findById(id);
+        return assessmentRepository.findById(id).orElse(null);
     }
 
-    public List<AssessmentEntity> getByCourseId(Long id) {
-        return assessmentDao.findByCourseId(id);
+    public List<AssessmentEntity> getByCourseId(Integer id) {
+        return assessmentRepository.findByCourseId(id);
     }
 
     public List<AssessmentEntity> getByStudentId(Long id) {
-        return assessmentDao.findByStudentId(id);
+        return assessmentRepository.findByStudentId(id);
     }
 
-    public List<AssessmentEntity> getStudentWithinCourse(Long std_id, Long course_id ) {
-        return assessmentDao.findStudentWithinCourse(std_id, course_id);
+    public List<AssessmentEntity> getStudentWithinCourse(Long std_id, Integer course_id ) {
+        return assessmentRepository.findStudentWithinCourse(std_id, course_id);
     }
 
+    @Transactional
     public String create(AssessmentEntity pAssessmentEntity) {
-        return assessmentDao.save(pAssessmentEntity) == 1 ? "Assessment created" : "Error creating Assessment";
+        assessmentRepository.save(pAssessmentEntity);
+        return "Assessment created";
     }
 
+    @Transactional
     public String update(AssessmentEntity pAssessmentEntity) {
-        return assessmentDao.update(pAssessmentEntity) == 1 ? "Assessment updated" : "Error updating Assessment";
+        assessmentRepository.save(pAssessmentEntity);
+        return "Assessment updated";
     }
 
+    @Transactional
     public String delete(Long id) {
-        return assessmentDao.delete(id) == 1 ? "Assessment deleted" : "Error deleting Assessment";
+        assessmentRepository.deleteById(id);
+        return "Assessment deleted";
     }
 }

@@ -28,9 +28,10 @@ public class AuthController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO requestDTO) {
-        log.info("Received request to login {}", requestDTO );
-        LoginResponseDTO responseDTO = authFacade.authenticateUser(requestDTO);
-        return new ResponseEntity<>(responseDTO,HttpStatus.OK);
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO requestDTO) {
+        log.info("POST /sms/auth called for user: {}", requestDTO.getEmail());
+        LoginResponseDTO result = authFacade.authenticateUser(requestDTO);
+        log.info("POST /sms/auth succeeded for user: {}", requestDTO.getEmail());
+        return ResponseEntity.ok(result);
     }
 }

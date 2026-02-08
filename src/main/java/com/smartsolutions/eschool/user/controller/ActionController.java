@@ -7,6 +7,7 @@ import com.smartsolutions.eschool.user.facade.ActionFacade;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,45 +17,56 @@ import java.util.List;
 @RequestMapping("/api/v1/actions")
 @RequiredArgsConstructor
 @Tag(name = "Action Management", description = "Endpoints for managing global actions")
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class ActionController {
 
     private final ActionFacade actionFacade;
 
     @PostMapping
     public ResponseEntity<?> createAction(@Valid @RequestBody ActionRequestDTO dto) {
-        log.info("[ACTION_CONTROLLER] POST /api/v1/actions - Create Action: {}", dto.getName());
-        return ResponseEntity.ok(actionFacade.createAction(dto));
+        log.info("POST /api/v1/actions called for action: {}", dto.getName());
+        ActionResponseDTO result = actionFacade.createAction(dto);
+        log.info("POST /api/v1/actions succeeded, created action with ID: {}", result.getId());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping
     public ResponseEntity<?> getAllActions() {
-        log.info("[ACTION_CONTROLLER] GET /api/v1/actions - Fetch all Actions");
-        return ResponseEntity.ok(actionFacade.getAllActions());
+        log.info("GET /api/v1/actions called");
+        List<ActionResponseDTO> resources = actionFacade.getAllActions();
+        log.info("GET /api/v1/actions succeeded, returned {} resources", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
     @GetMapping("/search")
     public ResponseEntity<?> searchActions(@RequestParam(required = false) String keyword) {
-        log.info("[ACTION_CONTROLLER] GET /api/v1/actions/search - Search Keyword: '{}'", keyword);
-        return ResponseEntity.ok(actionFacade.searchActions(keyword));
+        log.info("GET /api/v1/actions/search called with keyword: {}", keyword);
+        List<ActionResponseDTO> resources = actionFacade.searchActions(keyword);
+        log.info("GET /api/v1/actions/search succeeded, returned {} resources", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getActionById(@PathVariable Long id) {
-        log.info("[ACTION_CONTROLLER] GET /api/v1/actions/{} - Fetch Action by ID", id);
-        return ResponseEntity.ok(actionFacade.getActionById(id));
+        log.info("GET /api/v1/actions/{} called", id);
+        ActionResponseDTO resource = actionFacade.getActionById(id);
+        log.info("GET /api/v1/actions/{} succeeded", id);
+        return ResponseEntity.ok(resource);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAction(@PathVariable Long id, @Valid @RequestBody ActionRequestDTO dto) {
-        log.info("[ACTION_CONTROLLER] PUT /api/v1/actions/{} - Update Action", id);
-        return ResponseEntity.ok(actionFacade.updateAction(id, dto));
+        log.info("PUT /api/v1/actions/{} called", id);
+        ActionResponseDTO result = actionFacade.updateAction(id, dto);
+        log.info("PUT /api/v1/actions/{} succeeded", id);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAction(@PathVariable Long id) {
-        log.info("[ACTION_CONTROLLER] DELETE /api/v1/actions/{} - Delete Action", id);
+        log.info("DELETE /api/v1/actions/{} called", id);
         actionFacade.deleteAction(id);
+        log.info("DELETE /api/v1/actions/{} succeeded", id);
         return ResponseEntity.ok().build();
     }
 }

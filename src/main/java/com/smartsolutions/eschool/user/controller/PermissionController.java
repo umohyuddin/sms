@@ -25,47 +25,55 @@ public class PermissionController {
 
     @Operation(summary = "Create a new permission")
     @PostMapping
-    //@PreAuthorize("hasAuthority('ADMIN_PERMISSIONS_CREATE')")
     public ResponseEntity<PermissionResponseDTO> createPermission(@Valid @RequestBody PermissionRequestDTO requestDTO) {
-        log.info("Received request to create Permission");
-        PermissionResponseDTO responseDTO = permissionFacade.createPermission(requestDTO);
-        return new ResponseEntity<>((responseDTO), HttpStatus.CREATED);
+        log.info("POST /api/v1/permissions called for permission: {}", requestDTO.getName());
+        PermissionResponseDTO result = permissionFacade.createPermission(requestDTO);
+        log.info("POST /api/v1/permissions succeeded, created permission with ID: {}", result.getId());
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Get all permissions for an organization")
     @GetMapping("/organization/{organizationId}")
     public ResponseEntity<List<PermissionResponseDTO>> getAllPermissions(@PathVariable Long organizationId) {
-        log.info("Fetching all permissions for organization: {}", organizationId);
-        List<PermissionResponseDTO> result = permissionFacade.getAll(organizationId);
-        return ResponseEntity.ok(permissionFacade.getAll(organizationId));
+        log.info("GET /api/v1/permissions/organization/{} called", organizationId);
+        List<PermissionResponseDTO> resources = permissionFacade.getAll(organizationId);
+        log.info("GET /api/v1/permissions/organization/{} succeeded, returned {} resources", organizationId, resources.size());
+        return ResponseEntity.ok(resources);
     }
 
     @Operation(summary = "Get a permission by ID and organization ID")
     @GetMapping("/{id}/organization/{organizationId}")
     public ResponseEntity<PermissionResponseDTO> getPermissionById(@PathVariable Long id, @PathVariable Long organizationId) {
-        log.info("Fetching permission with id: {} and organization: {}", id, organizationId);
-        return ResponseEntity.ok(permissionFacade.getById(id, organizationId));
+        log.info("GET /api/v1/permissions/{}/organization/{} called", id, organizationId);
+        PermissionResponseDTO resource = permissionFacade.getById(id, organizationId);
+        log.info("GET /api/v1/permissions/{}/organization/{} succeeded", id, organizationId);
+        return ResponseEntity.ok(resource);
     }
 
     @Operation(summary = "Update a permission")
     @PutMapping("/{id}/organization/{organizationId}")
     public ResponseEntity<PermissionResponseDTO> updatePermission(@PathVariable Long id, @PathVariable Long organizationId, @Valid @RequestBody PermissionRequestDTO requestDTO) {
-        log.info("Updating permission with id: {} for organization: {}", id, organizationId);
-        return ResponseEntity.ok(permissionFacade.updatePermission(id, organizationId, requestDTO));
+        log.info("PUT /api/v1/permissions/{}/organization/{} called", id, organizationId);
+        PermissionResponseDTO result = permissionFacade.updatePermission(id, organizationId, requestDTO);
+        log.info("PUT /api/v1/permissions/{}/organization/{} succeeded", id, organizationId);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(summary = "Delete a permission")
     @DeleteMapping("/{id}/organization/{organizationId}")
     public ResponseEntity<?> deletePermission(@PathVariable Long id, @PathVariable Long organizationId) {
-        log.info("Deleting permission with id: {} for organization: {}", id, organizationId);
+        log.info("DELETE /api/v1/permissions/{}/organization/{} called", id, organizationId);
         permissionFacade.deleteById(id, organizationId);
+        log.info("DELETE /api/v1/permissions/{}/organization/{} succeeded", id, organizationId);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Search permissions by keyword")
     @GetMapping("/search")
     public ResponseEntity<?> searchPermissions(@RequestParam Long organizationId, @RequestParam(required = false) String keyword) {
-        log.info("Searching permissions with keyword: {} for organization: {}", keyword, organizationId);
-        return ResponseEntity.ok(permissionFacade.searchByKeyword(organizationId, keyword));
+        log.info("GET /api/v1/permissions/search called for organization: {} with keyword: {}", organizationId, keyword);
+        List<PermissionResponseDTO> resources = permissionFacade.searchByKeyword(organizationId, keyword);
+        log.info("GET /api/v1/permissions/search succeeded, returned {} resources", resources.size());
+        return ResponseEntity.ok(resources);
     }
 }

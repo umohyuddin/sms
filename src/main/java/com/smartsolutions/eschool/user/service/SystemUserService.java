@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -35,36 +36,70 @@ public class SystemUserService {
 
     @jakarta.transaction.Transactional
     public void assignRoles(Long userId, java.util.Set<Long> roleIds) {
-        log.info("Assigning roles {} to user {}", roleIds, userId);
-        SystemUserEntity user = systemUserRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+        log.info("Assigning roles to user ID: {} in database", userId);
+        try {
+            SystemUserEntity user = systemUserRepository.findById(userId)
+                    .orElseThrow(() -> {
+                        log.warn("User not found with ID: {}", userId);
+                        return new UsernameNotFoundException("User not found with id: " + userId);
+                    });
 
-        // Remove existing roles
-        userRolesRepository.deleteByUserId(userId);
+            // Remove existing roles
+            log.info("Removing existing roles for user ID: {}", userId);
+            userRolesRepository.deleteByUserId(userId);
 
-        if (roleIds != null && !roleIds.isEmpty()) {
-            java.util.List<UserRolesEntity> newRoles = roleIds.stream()
-                    .map(roleId -> {
-                        RoleEntity role = roleRepository.findById(roleId)
-                                .orElseThrow(() -> new RuntimeException("Role not found with id: " + roleId));
-                        UserRolesEntity userRole = new UserRolesEntity();
-                        userRole.setUser(user);
-                        userRole.setRole(role);
-                        userRole.setId(new UserRoleId(userId, roleId));
-                        return userRole;
-                    })
-                    .toList();
-            userRolesRepository.saveAll(newRoles);
+            if (roleIds != null && !roleIds.isEmpty()) {
+                log.info("Assigning {} new roles to user ID: {}", roleIds.size(), userId);
+                java.util.List<UserRolesEntity> newRoles = roleIds.stream()
+                        .map(roleId -> {
+                            RoleEntity role = roleRepository.findById(roleId)
+                                    .orElseThrow(() -> {
+                                        log.warn("Role not found with ID: {}", roleId);
+                                        return new RuntimeException("Role not found with id: " + roleId);
+                                    });
+                            UserRolesEntity userRole = new UserRolesEntity();
+                            userRole.setUser(user);
+                            userRole.setRole(role);
+                            userRole.setId(new UserRoleId(userId, roleId));
+                            return userRole;
+                        })
+                        .toList();
+                userRolesRepository.saveAll(newRoles);
+            }
+            log.info("Successfully assigned roles to user ID: {}", userId);
+        } catch (Exception e) {
+            log.error("Unexpected error while assigning roles to user ID: {}", userId, e);
+            throw e;
+        }
+    }
+
+@Transactional(readOnly = true)
+    public java.util.List<SystemUserEntity> searchByKeyword(String keyword) {
+        try {
+            String searchKey = keyword == null ? "" : keyword.trim();
+            log.info("Fetching Users based on search from database with keyword: '{}'", searchKey);
+            java.util.List<SystemUserEntity> result = systemUserRepository.searchByKeyword(searchKey);
+            log.info("Successfully fetched {} Users based on search", result.size());
+            return result;
+        } catch (Exception e) {
+            log.error("Unexpected error while searching Users", e);
+            return java.util.Collections.emptyList();
         }
     }
 
     public LoginResponseDTO getUserByUserName(LoginRequestDTO loginRequestDTO) {
-        SystemUserEntity result = systemUserRepository.findByEmail(loginRequestDTO.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        // ... existing code ...
+        log.info("Fetching user by email: {}", loginRequestDTO.getEmail());
+        SystemUserEntity result = systemUserRepository.findByEmail(loginRequestDTO.getEmail())
+                .orElseThrow(() -> {
+                    log.warn("User not found with email: {}", loginRequestDTO.getEmail());
+                    return new UsernameNotFoundException("User not found");
+                });
+        
         LoginResponseDTO responseDTO = new LoginResponseDTO();
         responseDTO.setEmail(result.getEmail());
         responseDTO.setOrganizationId(result.getOrganizationId());
         responseDTO.setUserId(result.getId().toString());
+        log.info("Successfully fetched user data for email: {}", loginRequestDTO.getEmail());
         return responseDTO;
     }
 }

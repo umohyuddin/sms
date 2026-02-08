@@ -34,169 +34,176 @@ public class StandardService {
     }
 
     public List<StandardDTO> getAll() {
+        log.info("Fetching all Standards from database");
         try {
-            log.info("Fetching all Standards from database");
-            //List<CampusEntity> result = campusDao.findAll();
             List<StandardEntity> result = standardRepository.findByDeletedFalse();
-            log.info("Successfully fetched {} Standards", result.size());
-            List<StandardDTO> campusDTOList = MapperUtil.mapList(result, StandardDTO.class);
-            log.info("Successfully fetched {} Standards", campusDTOList);
-            return campusDTOList;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Standards", dae);
-            //throw new CustomServiceException("Unable to fetch students from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to Standards", me);
-            //throw new CustomServiceException("Error converting student data", me);
+            List<StandardDTO> response = MapperUtil.mapList(result, StandardDTO.class);
+            log.info("Successfully fetched {} Standards", response.size());
+            return response;
         } catch (Exception e) {
             log.error("Unexpected error while fetching Standards", e);
-            //throw new ("Unexpected error occurred", e);
+            throw new CustomServiceException("Failed to fetch all Standards");
         }
-        return Collections.emptyList();
     }
 
     public StandardDTO getById(Long id) {
-        log.info("Fetching Standard with id: {}", id);
-        StandardEntity standardEntity = standardRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
-            log.info("Fetching Standard with id: {}", id);
-            return new ResourceNotFoundException("Standard not found with id: " + id);
-        });
-        StandardDTO standardDTO = MapperUtil.mapObject(standardEntity, StandardDTO.class);
-        log.info("Successfully fetched Standard: id={}", standardDTO.getId());
-        return standardDTO;
+        log.info("Fetching Standard with id {} from database", id);
+        try {
+            StandardEntity standardEntity = standardRepository.findByIdAndDeletedFalse(id)
+                    .orElseThrow(() -> {
+                        log.warn("Standard not found with id: {}", id);
+                        return new ResourceNotFoundException("Standard not found with id: " + id);
+                    });
+            StandardDTO response = MapperUtil.mapObject(standardEntity, StandardDTO.class);
+            log.info("Successfully fetched Standard: id={}", response.getId());
+            return response;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Standard ID: {}", id, e);
+            throw new CustomServiceException("Failed to fetch Standard by ID");
+        }
     }
 
     public List<StandardDTO> findByCampusId(Long id) {
-        log.info("Fetching Standard by campus ID: {}", id);
-        if (id == null) {
-            log.error("Campus ID is null");
-            throw new IllegalArgumentException("Campus ID must not be null");
+        log.info("Fetching Standards with campus ID {} from database", id);
+        try {
+            if (id == null) {
+                log.error("Campus ID is null");
+                throw new IllegalArgumentException("Campus ID must not be null");
+            }
+            List<StandardEntity> results = standardRepository.findByCampusId(id);
+            List<StandardDTO> response = MapperUtil.mapList(results, StandardDTO.class);
+            log.info("Successfully fetched {} Standards for campus ID: {}", response.size(), id);
+            return response;
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Standards for campus ID: {}", id, e);
+            throw new CustomServiceException("Failed to fetch Standards by campus ID");
         }
-
-        List<StandardEntity> standardEntities = standardRepository.findByCampusId(id);
-        if (standardEntities.isEmpty()) {
-            log.warn("No Standard found for Campus ID: {}", id);
-            return List.of(); // safe empty list
-        }
-        List<StandardDTO> standardDTOList = MapperUtil.mapList(standardEntities, StandardDTO.class);
-        log.info("Found {} standards for campus ID: {}", standardDTOList.size(), id);
-        return standardDTOList;
     }
 
+    @Transactional
     public StandardCreateRequestDTO create(StandardCreateRequestDTO standardDTO) {
-        log.info("Creating new Standard: {}", standardDTO);
+        log.info("Creating new Standard: {} in database", standardDTO.getStandardName());
         try {
             StandardEntity entity = MapperUtil.mapObject(standardDTO, StandardEntity.class);
             entity.setId(null);
-            entity.getCampus().setId(standardDTO.getCampusId());
+            
+            if (standardDTO.getCampusId() != null) {
+                CampusEntity campus = campusRepository.findById(standardDTO.getCampusId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + standardDTO.getCampusId()));
+                entity.setCampus(campus);
+            }
 
             StandardEntity saved = standardRepository.save(entity);
             StandardCreateRequestDTO responseDTO = MapperUtil.mapObject(saved, StandardCreateRequestDTO.class);
-
-            log.info("Standard created successfully with ID: {}", responseDTO.getId());
-
+            log.info("Standard created successfully with id: {}", responseDTO.getId());
             return responseDTO;
-
-        } catch (DataAccessException dae) {
-            log.error("Database error while creating standard", dae);
-            throw dae;
+        } catch (ResourceNotFoundException e) {
+            throw e;
         } catch (Exception ex) {
-            log.error("Unexpected error creating standard", ex);
-            throw ex;
+            log.error("Unexpected error while creating Standard: {}", standardDTO.getStandardName(), ex);
+            throw new CustomServiceException("Failed to create Standard");
         }
     }
 
+    @Transactional
     public int softDeleteById(Long id) {
-        log.info("Soft delete request received for Standard ID: {}", id);
+        log.info("Soft deleting Standard with id {} from database", id);
         try {
-            return standardRepository.softDeleteById(id);
-        } catch (Exception e) {
-            log.error("Error while soft deleting Standard with ID {}", id, e);
+            if (standardRepository.findByIdAndDeletedFalse(id).isEmpty()) {
+                log.warn("Standard not found for soft deletion with id: {}", id);
+                throw new ResourceNotFoundException("Standard not found with id: " + id);
+            }
+            int result = standardRepository.softDeleteById(id);
+            log.info("Standard soft deleted successfully: id={}, rows updated={}", id, result);
+            return result;
+        } catch (ResourceNotFoundException e) {
             throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while soft deleting Standard ID: {}", id, e);
+            throw new CustomServiceException("Failed to soft delete Standard");
         }
     }
 
     @Transactional
     public StandardDTO updateStandard(Long id, StandardCreateRequestDTO dto) {
-        log.info("Updating Standard with id {} using DTO {}", id, dto);
+        log.info("Updating Standard with id {} in database", id);
+        try {
+            StandardEntity entity = standardRepository.findByIdAndDeletedFalse(id)
+                    .orElseThrow(() -> {
+                        log.warn("Standard not found for update with id: {}", id);
+                        return new ResourceNotFoundException("Standard not found with id: " + id);
+                    });
 
-        StandardEntity entity = standardRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Standard not found with id: " + id));
+            if (dto.getStandardName() != null && !dto.getStandardName().isBlank()) {
+                entity.setStandardName(dto.getStandardName());
+            }
+            if (dto.getStandardCode() != null) {
+                entity.setStandardCode(dto.getStandardCode());
+            }
+            if (dto.getDescription() != null) {
+                entity.setDescription(dto.getDescription());
+            }
 
-        if (dto.getStandardName() != null && !dto.getStandardName().isBlank()) {
-            entity.setStandardName(dto.getStandardName());
+            if (dto.getCampusId() != null && (entity.getCampus() == null || !entity.getCampus().getId().equals(dto.getCampusId()))) {
+                CampusEntity campus = campusRepository.findById(dto.getCampusId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + dto.getCampusId()));
+                entity.setCampus(campus);
+            }
+
+            StandardEntity updated = standardRepository.save(entity);
+            StandardDTO response = MapperUtil.mapObject(updated, StandardDTO.class);
+            log.info("Standard updated successfully: id={}", response.getId());
+            return response;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception ex) {
+            log.error("Unexpected error while updating Standard id: {}", id, ex);
+            throw new CustomServiceException("Failed to update Standard");
         }
-        if (dto.getStandardCode() != null) {
-            entity.setStandardCode(dto.getStandardCode());
-        }
-        if (dto.getDescription() != null) {
-            entity.setDescription(dto.getDescription());
-        }
-
-        if (dto.getCampusId() != null && (entity.getCampus() == null || !entity.getCampus().getId().equals(dto.getCampusId()))) {
-            CampusEntity campus = campusRepository.findById(dto.getCampusId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + dto.getCampusId()));
-            entity.setCampus(campus);
-        }
-
-        StandardEntity updated = standardRepository.save(entity);
-
-        StandardDTO response = MapperUtil.mapObject(updated, StandardDTO.class);
-
-        log.info("Standard updated successfully: {}", response.getId());
-        return response;
     }
 
     public List<StandardDTO> searchByKeyword(String keyword) {
-        log.info("Fetching all Standard by keyword: {}", keyword);
-        if (keyword == null || keyword.trim().isEmpty()) {
-            log.error("Keyword is null or empty");
-            throw new ValidationException("Keyword must not be empty");
+        String searchKey = keyword == null ? "" : keyword.trim();
+        log.info("Searching Standards with keyword: '{}' in database", searchKey);
+        try {
+            List<StandardEntity> result = standardRepository.searchByKeyword(searchKey);
+            List<StandardDTO> response = MapperUtil.mapList(result, StandardDTO.class);
+            log.info("Successfully fetched {} Standards based on search", response.size());
+            return response;
+        } catch (Exception e) {
+            log.error("Unexpected error while searching Standards", e);
+            throw new CustomServiceException("Failed to search Standards");
         }
-        List<StandardEntity> result = standardRepository.searchByKeyword(keyword);
-        if (result.isEmpty()) {
-            log.warn("No Standard found for keyword: {}", keyword);
-            throw new ResourceNotFoundException("No Standard found matching: " + keyword);
-        }
-        List<StandardDTO> standardDTOS = MapperUtil.mapList(result, StandardDTO.class);
-        log.info("Successfully fetched {} Standard", standardDTOS.size());
-        return standardDTOS;
     }
 
+    @Transactional
     public int sofDeleteByCampusId(Long campusId) {
-        log.info("Delete requested for Standard under Campus ID: {}", campusId);
+        log.info("Soft deleting Standards for campus ID {} from database", campusId);
         try {
             int rows = standardRepository.softDeleteByCampusId(campusId);
-            if (rows == 0) {
-                log.warn("No Standard found for Campus ID {}. Nothing was updated.", campusId);
-            } else {
-                log.info("delete succeeded. {} Standards deleted for Campus ID {}", rows, campusId);
-            }
+            log.info("Soft deleted {} Standards for campus ID: {}", rows, campusId);
             return rows;
         } catch (Exception e) {
-            log.error("Error while deleting Standards for Campus ID {}", campusId, e);
-            throw e;
+            log.error("Unexpected error while soft deleting Standards for campus ID: {}", campusId, e);
+            throw new CustomServiceException("Failed to soft delete Standards by campus ID");
         }
     }
 
     public List<StandardDTO> getStandardByFilter(Long campusId, String keyword) {
-        log.info("Fetching Standards for campusId={} with keyword='{}'", campusId, keyword);
-
+        String searchKey = keyword == null ? "" : keyword.trim();
+        log.info("Searching Standards with campus ID {} and keyword '{}' in database", campusId, searchKey);
         try {
-            String search = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
-            List<StandardEntity> result = standardRepository.searchStandards(campusId, search);
-            if (result.isEmpty()) {
-                log.warn("No Standards found for campusId={} with keyword='{}'", campusId, keyword);
-//                throw new ResourceNotFoundException("No Standards found matching the criteria");
-                return Collections.emptyList();
-            }
-            List<StandardDTO> standardDTOS = MapperUtil.mapList(result, StandardDTO.class);
-            log.info("Successfully fetched {} Standards by filter", standardDTOS.size());
-            return standardDTOS;
-
+            List<StandardEntity> result = standardRepository.searchStandards(campusId, searchKey.isEmpty() ? null : searchKey);
+            List<StandardDTO> response = MapperUtil.mapList(result, StandardDTO.class);
+            log.info("Successfully fetched {} Standards by filter", response.size());
+            return response;
         } catch (Exception e) {
-            log.error("Error fetching Standards for campusId={} with keyword='{}'", campusId, keyword, e);
-            throw new CustomServiceException("Failed to fetch Standards", e);
+            log.error("Unexpected error while searching Standards by filter", e);
+            throw new CustomServiceException("Failed to search Standards by filter");
         }
     }
 }

@@ -17,6 +17,7 @@ public interface ResourceRepository extends JpaRepository<ResourceEntity, Long> 
                 OR LOWER(r.resourceName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(r.owner) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 OR LOWER(r.description) LIKE LOWER(CONCAT('%', :keyword, '%')))
+              AND r.deleted = false
             """)
     List<ResourceEntity> searchByKeyword(@Param("keyword") String keyword);
 }

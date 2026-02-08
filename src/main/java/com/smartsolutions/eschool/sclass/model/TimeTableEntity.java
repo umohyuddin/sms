@@ -23,6 +23,9 @@ public class TimeTableEntity {
     @Column(name = "cls_id")
     private Integer classId;
 
+    @Column(name = "teacher_id")
+    private Long teacherId;
+
     @Column(name = "duration", length = 100)
     private String duration;
 

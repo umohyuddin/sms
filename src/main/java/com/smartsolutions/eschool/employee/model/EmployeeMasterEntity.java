@@ -3,6 +3,8 @@ package com.smartsolutions.eschool.employee.model;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,10 +28,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE employee_master SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 public class EmployeeMasterEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private Boolean deleted = false;
 
     // =========================
     // Link to User (Login)

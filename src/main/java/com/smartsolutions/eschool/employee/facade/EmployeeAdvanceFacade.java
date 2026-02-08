@@ -40,9 +40,9 @@ public class EmployeeAdvanceFacade {
         return employeeService.getByEmployeeCode(code);
     }
 
-    public List<EmployeeMasterResponseDto> searchEmployeesByName(String name) {
-        return employeeService.searchByName(name);
-    }
+//    public List<EmployeeMasterResponseDto> searchEmployeesByName(String name) {
+//        return employeeService.searchByName(name);
+//    }
 
     public List<EmployeeMasterResponseDto> getEmployeesByGender(String gender) {
         return employeeService.getByGender(gender);

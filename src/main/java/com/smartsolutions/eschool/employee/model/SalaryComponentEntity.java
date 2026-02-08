@@ -9,12 +9,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 @Entity
 @Table(name = "salary_component")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE salary_component SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 public class SalaryComponentEntity  extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

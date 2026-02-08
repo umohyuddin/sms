@@ -26,15 +26,15 @@ public class AcademicYearController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createAcademicYear(@RequestBody @Valid AcademicYearRequestDTO requestDTO) {
-        log.info("Received request to create academic year");
-        AcademicYearResponseDTO academicYearRequestDTO = academicYearFacade.createAcademicYear(requestDTO);
-        log.info("Academic year created successfully with id");
-        return ResponseEntity.status(HttpStatus.CREATED).body(academicYearRequestDTO);
+    public ResponseEntity<AcademicYearResponseDTO> createAcademicYear(@RequestBody @Valid AcademicYearRequestDTO requestDTO) {
+        log.info("POST /api/school/academic called for year: {}", requestDTO.getName());
+        AcademicYearResponseDTO result = academicYearFacade.createAcademicYear(requestDTO);
+        log.info("POST /api/school/academic succeeded, created academic year with id: {}", result.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll() throws Exception {
+    public ResponseEntity<List<AcademicYearResponseDTO>> getAll() throws Exception {
         log.info("GET /api/school/academic called");
         List<AcademicYearResponseDTO> resources = academicYearFacade.getAll();
         log.info("GET /api/school/academic succeeded, returned {} resources", resources.size());
@@ -42,18 +42,18 @@ public class AcademicYearController {
     }
 
     @GetMapping(value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCurrentAcademicYear() throws Exception {
+    public ResponseEntity<AcademicYearResponseDTO> getCurrentAcademicYear() throws Exception {
         log.info("GET /api/school/academic/current called");
         AcademicYearResponseDTO resources = academicYearFacade.getCurrentAcademicYear();
-        log.info("GET /api/school/academic/current succeeded, returned {} resources", resources.getId());
+        log.info("GET /api/school/academic/current succeeded, returned academic year id: {}", resources.getId());
         return ResponseEntity.ok().body(resources);
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> searchAcademicYears(@RequestParam(required = false) String keyword) {
+    public ResponseEntity<List<AcademicYearResponseDTO>> searchAcademicYears(@RequestParam(required = false) String keyword) {
         log.info("GET /api/school/academic/search called with keyword: {}", keyword);
         List<AcademicYearResponseDTO> resources = academicYearFacade.searchAcademicYears(keyword);
-        log.info("Search completed, returned {} resources", resources.size());
+        log.info("GET /api/school/academic/search succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
 
@@ -61,7 +61,7 @@ public class AcademicYearController {
     public ResponseEntity<AcademicYearResponseDTO> getAcademicYearById(@PathVariable Long id) {
         log.info("GET /api/school/academic/{} called", id);
         AcademicYearResponseDTO response = academicYearFacade.getAcademicYearById(id);
-        log.info("GET by id succeeded for academic year id: {}", id);
+        log.info("GET /api/school/academic/{} succeeded", id);
         return ResponseEntity.ok(response);
     }
 
@@ -69,34 +69,35 @@ public class AcademicYearController {
     public ResponseEntity<AcademicYearResponseDTO> updateAcademicYear(
             @PathVariable Long id,
             @RequestBody @Valid AcademicYearRequestDTO requestDTO) {
-        log.info("Received request to update academic year with id: {}", id);
+        log.info("PUT /api/school/academic/{} called", id);
         AcademicYearResponseDTO response = academicYearFacade.updateAcademicYear(id, requestDTO);
-        log.info("Academic year updated successfully with id: {}", response.getId());
+        log.info("PUT /api/school/academic/{} succeeded", id);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping(value = "/{id}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> activateAcademicYear(@PathVariable Long id) {
-        log.info("Received request to activate academic year with id: {}", id);
+    public ResponseEntity<Void> activateAcademicYear(@PathVariable Long id) {
+        log.info("PUT /api/school/academic/{}/activate called", id);
         academicYearFacade.makeAcademicYearCurrent(id);
-        log.info("Academic year activated successfully with id: {}", id);
+        log.info("PUT /api/school/academic/{}/activate succeeded", id);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteAcademicYear(@PathVariable Long id) {
-        log.info("Received request to delete Academic Year with id: {}", id);
+    public ResponseEntity<Void> deleteAcademicYear(@PathVariable Long id) {
+        log.info("DELETE /api/school/academic/{} called", id);
         academicYearFacade.deleteAcademicYear(id);
-        log.info("Academic Year deleted successfully with id: {}", id);
+        log.info("DELETE /api/school/academic/{} succeeded", id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/lock")
-    public ResponseEntity<?> lockAcademicYear(
+    public ResponseEntity<Void> lockAcademicYear(
             @PathVariable Long id,
             @RequestBody AcademicYearRequestDTO request) {
-
+        log.info("PUT /api/school/academic/{}/lock called", id);
         academicYearFacade.lockAcademicYear(id, request);
+        log.info("PUT /api/school/academic/{}/lock succeeded", id);
         return ResponseEntity.ok().build();
     }
 
@@ -104,8 +105,9 @@ public class AcademicYearController {
     public ResponseEntity<Void> archiveAcademicYear(
             @PathVariable Long id,
             @RequestBody AcademicYearRequestDTO request) {
-
+        log.info("PUT /api/school/academic/{}/archive called", id);
         academicYearFacade.archiveAcademicYear(id, request);
+        log.info("PUT /api/school/academic/{}/archive succeeded", id);
         return ResponseEntity.ok().build();
     }
 
@@ -113,9 +115,9 @@ public class AcademicYearController {
     public ResponseEntity<?> closeAcademicYear(
             @PathVariable Long id,
             @RequestBody AcademicYearRequestDTO request) {
-
+        log.info("PUT /api/school/academic/{}/close called", id);
         academicYearFacade.closeAcademicYear(id, request);
-
+        log.info("PUT /api/school/academic/{}/close succeeded", id);
         return ResponseEntity.ok(Map.of(
                 "message", "Academic Year closed successfully",
                 "academicYearId", id
@@ -124,16 +126,13 @@ public class AcademicYearController {
 
     @PutMapping("/default")
     public ResponseEntity<?> createDefaultAcademicYear() {
-        log.info("Request received to create default academic year if none exists");
-
+        log.info("PUT /api/school/academic/default called");
         AcademicYearResponseDTO response = academicYearFacade.createDefaultAcademicYear();
-
         if (response == null) {
-            log.info("Academic year already exists, no default created");
+            log.info("PUT /api/school/academic/default: Academic year already exists, no default created");
             return ResponseEntity.ok(Map.of("message", "Academic Year(s) already exist"));
         }
-
-        log.info("Default academic year created successfully with id: {}", response.getId());
+        log.info("PUT /api/school/academic/default succeeded, default year created with id: {}", response.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

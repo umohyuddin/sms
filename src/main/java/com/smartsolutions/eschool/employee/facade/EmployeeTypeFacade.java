@@ -9,6 +9,7 @@ import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.Employee
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import com.smartsolutions.eschool.employee.service.EmployeeTypeService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class EmployeeTypeFacade {
 
     private final EmployeeTypeService employeeTypeService;
@@ -30,56 +32,61 @@ public class EmployeeTypeFacade {
         this.employeeTypeService = employeeTypeService;
     }
 
-    // -------------------------
-    // Create
-    // -------------------------
     public EmployeeTypeResponseDTO create(@Valid EmployeeTypeRequestDTO requestDTO) {
-        return employeeTypeService.create(requestDTO);
+        log.info("Facade: Request to create EmployeeType: {}", requestDTO.getName());
+        EmployeeTypeResponseDTO result = employeeTypeService.create(requestDTO);
+        log.info("Facade: Successfully created EmployeeType: id={}", result.getId());
+        return result;
     }
 
-    // -------------------------
-    // Read
-    // -------------------------
     public EmployeeTypeResponseDTO getById(Long id) {
-        return employeeTypeService.getById(id);
+        log.info("Facade: Request to fetch EmployeeType by id: {}", id);
+        EmployeeTypeResponseDTO result = employeeTypeService.getById(id);
+        log.info("Facade: Successfully fetched EmployeeType: id={}", id);
+        return result;
     }
 
     public List<EmployeeTypeResponseDTO> getAll() {
-        return employeeTypeService.getAll();
+        log.info("Facade: Request to fetch all EmployeeTypes");
+        List<EmployeeTypeResponseDTO> result = employeeTypeService.getAll();
+        log.info("Facade: Successfully fetched {} EmployeeTypes", result.size());
+        return result;
     }
 
     public List<EmployeeTypeResponseDTO> getAllActive() {
-        return employeeTypeService.getAllActive();
+        log.info("Facade: Request to fetch all active EmployeeTypes");
+        List<EmployeeTypeResponseDTO> result = employeeTypeService.getAllActive();
+        log.info("Facade: Successfully fetched {} active EmployeeTypes", result.size());
+        return result;
     }
 
     public List<EmployeeTypeResponseDTO> getAllInactive() {
-        return employeeTypeService.getAllInactive();
+        log.info("Facade: Request to fetch all inactive EmployeeTypes");
+        List<EmployeeTypeResponseDTO> result = employeeTypeService.getAllInactive();
+        log.info("Facade: Successfully fetched {} inactive EmployeeTypes", result.size());
+        return result;
     }
 
-    // -------------------------
-    // Update
-    // -------------------------
     public EmployeeTypeResponseDTO update(Long id, @Valid EmployeeTypeRequestDTO requestDTO) {
-        return employeeTypeService.update(id, requestDTO);
+        log.info("Facade: Request to update EmployeeType id: {}", id);
+        EmployeeTypeResponseDTO result = employeeTypeService.update(id, requestDTO);
+        log.info("Facade: Successfully updated EmployeeType: id={}", id);
+        return result;
     }
 
-    // -------------------------
-    // Delete (Soft Delete)
-    // -------------------------
-//    public int softDelete(Long id) {
-//        return employeeTypeService.softDeleteById(id);
-//    }
+    public void delete(Long id) {
+        log.info("Facade: Request to delete EmployeeType by id: {}", id);
+        employeeTypeService.delete(id);
+        log.info("Facade: Successfully deleted EmployeeType: id={}", id);
+    }
 
-    // -------------------------
-    // Search
-    // -------------------------
-//    public List<EmployeeTypeResponseDTO> searchByKeyword(String keyword) {
-//        return employeeTypeService.searchByKeyword(keyword);
-//    }
+    public List<EmployeeTypeResponseDTO> searchByKeyword(String keyword) {
+        log.info("Facade: Request to search EmployeeTypes by keyword: '{}'", keyword);
+        List<EmployeeTypeResponseDTO> result = employeeTypeService.search(keyword);
+        log.info("Facade: Search completed, found {} EmployeeTypes", result.size());
+        return result;
+    }
 
-    // -------------------------
-    // Metrics
-    // -------------------------
     public long countAll() {
         return employeeTypeService.countAll();
     }

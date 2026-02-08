@@ -5,12 +5,17 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "payroll_period")
+@SQLDelete(sql = "UPDATE payroll_period SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 public class PayrollPeriodEntity  extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

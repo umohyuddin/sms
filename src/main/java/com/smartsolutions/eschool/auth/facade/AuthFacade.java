@@ -8,6 +8,7 @@ import com.smartsolutions.eschool.school.dtos.academicYear.responseDto.AcademicY
 import com.smartsolutions.eschool.school.service.AcademicYearService;
 import com.smartsolutions.eschool.user.service.SystemUserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class AuthFacade {
 
 
@@ -28,9 +30,11 @@ public class AuthFacade {
     }
 
     public LoginResponseDTO authenticateUser(@Valid LoginRequestDTO requestDTO) {
+        log.info("Facade: Request to authenticate user: {}", requestDTO.getEmail());
         LoginResponseDTO loginResponseDTO = systemUserService.getUserByUserName(requestDTO);
         String jwtToken =   authService.auth(loginResponseDTO);
         loginResponseDTO.setAccessToken(jwtToken);
+        log.info("Facade: User authenticated successfully: {}", requestDTO.getEmail());
         return loginResponseDTO;
     }
 

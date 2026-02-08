@@ -13,71 +13,32 @@ import java.util.Optional;
 @Repository
 public interface SalaryStructureComponentRepository extends JpaRepository<SalaryStructureComponentEntity, Long> {
 
-    // -------------------------
-    // Find all active components
-    // -------------------------
-    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.deleted = false")
-    List<SalaryStructureComponentEntity> findAllActive();
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.id = :id")
+    Optional<SalaryStructureComponentEntity> findById(@Param("id") Long id);
 
-    // -------------------------
-    // Find by ID if not deleted
-    // -------------------------
-    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.id = :id AND ssc.deleted = false")
-    Optional<SalaryStructureComponentEntity> findByIdActive(Long id);
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc")
+    List<SalaryStructureComponentEntity> findAllNonDeleted();
 
-    // -------------------------
-    // Find all components by salary structure
-    // -------------------------
-    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.deleted = false")
-    List<SalaryStructureComponentEntity> findBySalaryStructureId(Long salaryStructureId);
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId")
+    List<SalaryStructureComponentEntity> findBySalaryStructureId(@Param("salaryStructureId") Long salaryStructureId);
 
-    // -------------------------
-    // Find all components by component
-    // -------------------------
-    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.component.id = :componentId AND ssc.deleted = false")
-    List<SalaryStructureComponentEntity> findByComponentId(Long componentId);
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.component.id = :componentId")
+    List<SalaryStructureComponentEntity> findByComponentId(@Param("componentId") Long componentId);
 
-    // -------------------------
-    // Find specific component in salary structure
-    // -------------------------
-    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.component.id = :componentId AND ssc.deleted = false")
-    Optional<SalaryStructureComponentEntity> findBySalaryStructureIdAndComponentId(Long salaryStructureId, Long componentId);
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.component.id = :componentId")
+    Optional<SalaryStructureComponentEntity> findBySalaryStructureIdAndComponentId(@Param("salaryStructureId") Long salaryStructureId, @Param("componentId") Long componentId);
 
-    // -------------------------
-    // Soft delete by ID
-    // -------------------------
     @Modifying
     @Query("UPDATE SalaryStructureComponentEntity ssc SET ssc.deleted = true WHERE ssc.id = :id")
-    int softDeleteById(Long id);
+    int softDeleteById(@Param("id") Long id);
 
-    // -------------------------
-    // Soft delete all components for a salary structure
-    // -------------------------
     @Modifying
     @Query("UPDATE SalaryStructureComponentEntity ssc SET ssc.deleted = true WHERE ssc.salaryStructure.id = :salaryStructureId")
-    int softDeleteBySalaryStructureId(Long salaryStructureId);
+    int softDeleteBySalaryStructureId(@Param("salaryStructureId") Long salaryStructureId);
 
-    // -------------------------
-    // Search by component name within salary structure
-    // -------------------------
-    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.component.name LIKE %:keyword% AND ssc.deleted = false")
-    List<SalaryStructureComponentEntity> searchByComponentName(Long salaryStructureId, String keyword);
+    @Query("SELECT ssc FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND LOWER(ssc.component.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<SalaryStructureComponentEntity> searchByKeyword(@Param("salaryStructureId") Long salaryStructureId, @Param("keyword") String keyword);
 
-    // -------------------------
-    // Count active components for a salary structure
-    // -------------------------
-    @Query("SELECT COUNT(ssc) FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId AND ssc.deleted = false")
-    Long countActiveBySalaryStructureId(Long salaryStructureId);
-
-
-    @Query("""
-    SELECT ssc
-    FROM SalaryStructureComponentEntity ssc
-    WHERE ssc.salaryStructure.id = :salaryStructureId
-      AND ssc.deleted = false
-""")
-    List<SalaryStructureComponentEntity>
-    findActiveBySalaryStructureId(@Param("salaryStructureId") Long salaryStructureId);
-
-
+    @Query("SELECT COUNT(ssc) FROM SalaryStructureComponentEntity ssc WHERE ssc.salaryStructure.id = :salaryStructureId")
+    Long countBySalaryStructureId(@Param("salaryStructureId") Long salaryStructureId);
 }

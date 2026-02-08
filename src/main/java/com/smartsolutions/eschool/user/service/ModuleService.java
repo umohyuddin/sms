@@ -25,69 +25,99 @@ public class ModuleService {
 
     @Transactional
     public ModuleResponseDTO createModule(ModuleRequestDTO requestDTO) {
-        log.info("Creating new Module: {}", requestDTO.getName());
+        log.info("Creating new Module in database: {}", requestDTO.getName());
         try {
             ModuleEntity entity = ModuleMapper.toEntity(requestDTO);
             ModuleEntity saved = moduleRepository.save(entity);
-            ModuleResponseDTO response = ModuleMapper.toResponseDTO(saved);
-            log.info("Module created successfully with ID: {}", response.getId());
-            return response;
-        } catch (DataAccessException dae) {
-            log.error("Database error while creating Module", dae);
-            throw dae;
-        } catch (Exception ex) {
-            log.error("Unexpected error creating Module", ex);
-            throw ex;
+            log.info("Successfully created Module with ID: {}", saved.getId());
+            return ModuleMapper.toResponseDTO(saved);
+        } catch (Exception e) {
+            log.error("Unexpected error while creating Module", e);
+            throw e;
         }
     }
 
     @Transactional(readOnly = true)
     public List<ModuleResponseDTO> getAll() {
+        log.info("Fetching all active Modules from database");
         try {
-            log.info("Fetching all active Modules");
             List<ModuleEntity> result = moduleRepository.findByActiveTrueAndDeletedFalseOrderByDisplayOrderAsc();
-            List<ModuleResponseDTO> responseDTOS = ModuleMapper.toResponseDTOList(result);
-            log.info("Successfully fetched {} Modules", responseDTOS.size());
-            return responseDTOS;
+            log.info("Successfully fetched {} active Modules", result.size());
+            return ModuleMapper.toResponseDTOList(result);
         } catch (Exception e) {
             log.error("Unexpected error while fetching Modules", e);
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
     }
 
     @Transactional(readOnly = true)
     public ModuleResponseDTO getById(Long id) {
-        log.info("Fetching Module with id: {}", id);
-        ModuleEntity entity = moduleRepository.findById(id)
-                .orElseThrow(() -> new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Module not found with id: " + id));
-        return ModuleMapper.toResponseDTO(entity);
+        log.info("Fetching Module with ID: {} from database", id);
+        try {
+            ModuleEntity entity = moduleRepository.findById(id)
+                    .orElseThrow(() -> {
+                        log.warn("Module not found with ID: {}", id);
+                        return new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Module not found with id: " + id);
+                    });
+            log.info("Successfully fetched Module: id={}", entity.getId());
+            return ModuleMapper.toResponseDTO(entity);
+        } catch (com.smartsolutions.eschool.global.exception.ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Module ID: {}", id, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ModuleResponseDTO updateModule(Long id, ModuleRequestDTO requestDTO) {
-        log.info("Updating Module with id {}", id);
-        ModuleEntity existing = moduleRepository.findById(id)
-                .orElseThrow(() -> new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Module not found with id: " + id));
+        log.info("Updating Module with ID: {} in database", id);
+        try {
+            ModuleEntity existing = moduleRepository.findById(id)
+                    .orElseThrow(() -> {
+                        log.warn("Module not found for update with ID: {}", id);
+                        return new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Module not found with id: " + id);
+                    });
 
-        ModuleMapper.updateEntityFromDTO(existing, requestDTO);
-
-        ModuleEntity updated = moduleRepository.save(existing);
-        return ModuleMapper.toResponseDTO(updated);
+            ModuleMapper.updateEntityFromDTO(existing, requestDTO);
+            ModuleEntity updated = moduleRepository.save(existing);
+            log.info("Successfully updated Module ID: {}", id);
+            return ModuleMapper.toResponseDTO(updated);
+        } catch (Exception e) {
+            log.error("Unexpected error while updating Module ID: {}", id, e);
+            throw e;
+        }
     }
 
     @Transactional
     public void deleteById(Long id) {
-        log.info("Delete request received for Module ID: {}", id);
-        ModuleEntity entity = moduleRepository.findById(id)
-                .orElseThrow(() -> new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Module not found with id: " + id));
-        entity.setDeleted(true);
-        moduleRepository.save(entity);
+        log.info("Soft delete request received for Module ID: {}", id);
+        try {
+            ModuleEntity entity = moduleRepository.findById(id)
+                    .orElseThrow(() -> {
+                        log.warn("Module not found for deletion with ID: {}", id);
+                        return new com.smartsolutions.eschool.global.exception.ResourceNotFoundException("Module not found with id: " + id);
+                    });
+            entity.setDeleted(true);
+            moduleRepository.save(entity);
+            log.info("Module ID: {} marked as deleted successfully", id);
+        } catch (Exception e) {
+            log.error("Error while soft deleting Module with ID: {}", id, e);
+            throw e;
+        }
     }
 
     @Transactional(readOnly = true)
     public List<ModuleResponseDTO> searchByKeyword(String keyword) {
-        log.info("Searching Modules with keyword: {}", keyword);
-        List<ModuleEntity> result = moduleRepository.searchByKeyword(keyword == null ? "" : keyword.trim());
-        return ModuleMapper.toResponseDTOList(result);
+        try {
+            String searchKey = keyword == null ? "" : keyword.trim();
+            log.info("Fetching Modules based on search from database with keyword: '{}'", searchKey);
+            List<ModuleEntity> result = moduleRepository.searchByKeyword(searchKey);
+            log.info("Successfully fetched {} Modules based on search", result.size());
+            return ModuleMapper.toResponseDTOList(result);
+        } catch (Exception e) {
+            log.error("Unexpected error while searching Modules", e);
+            return Collections.emptyList();
+        }
     }
 }

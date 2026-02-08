@@ -39,7 +39,7 @@ public class LookUpFacade {
     }
 
     public DashboardCountsDTO DashboardCounts() {
-        Long totalEmployees = employeeMasterFacade.countAll();
+        Long totalEmployees = employeeMasterFacade.getTotalActiveEmployees();
         Map<String, Long> empByGender = employeeMasterFacade.getEmployeeCountByGender();
         return DashboardCountsDTO.builder()
                 .totalEmployees(totalEmployees)

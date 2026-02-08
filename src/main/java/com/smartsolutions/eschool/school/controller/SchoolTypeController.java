@@ -26,40 +26,41 @@ public class SchoolTypeController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SchoolTypeResponseDTO> createSchoolType(@Valid @RequestBody SchoolTypeCreateRequestDTO requestDTO) {
-        log.info("Received request to create SchoolType");
+        log.info("POST /api/institute/school-types called for: {}", requestDTO.getCode());
         SchoolTypeResponseDTO responseDTO = schoolTypeFacade.createSchoolType(requestDTO);
-        log.info("SchoolType created successfully with id: {}", responseDTO.getId());
+        log.info("POST /api/institute/school-types succeeded, created with id: {}", responseDTO.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SchoolTypeResponseDTO>> getAllSchoolTypes() {
         log.info("GET /api/institute/school-types called");
-        List<SchoolTypeResponseDTO> schoolTypes = schoolTypeFacade.getAll();
-        log.info("Returned {} school types", schoolTypes.size());
-        return ResponseEntity.ok(schoolTypes);
+        List<SchoolTypeResponseDTO> result = schoolTypeFacade.getAll();
+        log.info("GET /api/institute/school-types succeeded, returned {} resources", result.size());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SchoolTypeResponseDTO>> getAllActiveSchoolTypes() {
         log.info("GET /api/institute/school-types/active called");
-        List<SchoolTypeResponseDTO> schoolTypes = schoolTypeFacade.getAllActive();
-        log.info("Returned {} active school types", schoolTypes.size());
-        return ResponseEntity.ok(schoolTypes);
+        List<SchoolTypeResponseDTO> result = schoolTypeFacade.getAllActive();
+        log.info("GET /api/institute/school-types/active succeeded, returned {} resources", result.size());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping(value = "/{schoolTypeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SchoolTypeResponseDTO> getSchoolTypeById(@PathVariable Long schoolTypeId) {
         log.info("GET /api/institute/school-types/{} called", schoolTypeId);
-        SchoolTypeResponseDTO schoolType = schoolTypeFacade.getById(schoolTypeId);
-        return ResponseEntity.ok(schoolType);
+        SchoolTypeResponseDTO result = schoolTypeFacade.getById(schoolTypeId);
+        log.info("GET /api/institute/school-types/{} succeeded", schoolTypeId);
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping(value = "/{schoolTypeId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SchoolTypeResponseDTO> updateSchoolType(@PathVariable Long schoolTypeId, @Valid @RequestBody SchoolTypeUpdateRequestDTO requestDTO) {
-        log.info("Received request to update SchoolType with id: {}", schoolTypeId);
+        log.info("PUT /api/institute/school-types/{} called", schoolTypeId);
         SchoolTypeResponseDTO updated = schoolTypeFacade.updateSchoolType(schoolTypeId, requestDTO);
-        log.info("SchoolType updated successfully with id: {}", updated.getId());
+        log.info("PUT /api/institute/school-types/{} succeeded", schoolTypeId);
         return ResponseEntity.ok(updated);
     }
 
@@ -67,30 +68,31 @@ public class SchoolTypeController {
     public ResponseEntity<String> deleteSchoolType(@PathVariable Long schoolTypeId) {
         log.info("DELETE /api/institute/school-types/{} called", schoolTypeId);
         schoolTypeFacade.deleteById(schoolTypeId);
-        log.info("SchoolType deleted successfully with id: {}", schoolTypeId);
+        log.info("DELETE /api/institute/school-types/{} succeeded", schoolTypeId);
         return ResponseEntity.ok("SchoolType deleted successfully");
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SchoolTypeResponseDTO>> searchSchoolTypes(@RequestParam(name = "keyword") String keyword) {
-        log.info("Searching SchoolTypes with keyword: {}", keyword);
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        List<SchoolTypeResponseDTO> results = schoolTypeFacade.searchByKeyword(keyword.trim());
-        log.info("Found {} school types matching keyword '{}'", results.size(), keyword);
+        log.info("GET /api/institute/school-types/search called with keyword: {}", keyword);
+        List<SchoolTypeResponseDTO> results = schoolTypeFacade.searchByKeyword(keyword);
+        log.info("GET /api/institute/school-types/search succeeded, returned {} resources", results.size());
         return ResponseEntity.ok(results);
     }
 
     @PutMapping(value = "/{schoolTypeId}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SchoolTypeResponseDTO> activate(@PathVariable Long schoolTypeId) {
+        log.info("PUT /api/institute/school-types/{}/activate called", schoolTypeId);
         SchoolTypeResponseDTO response = schoolTypeFacade.activate(schoolTypeId);
+        log.info("PUT /api/institute/school-types/{}/activate succeeded", schoolTypeId);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping(value = "/{schoolTypeId}/deactivate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SchoolTypeResponseDTO> deactivate(@PathVariable Long schoolTypeId) {
+        log.info("PUT /api/institute/school-types/{}/deactivate called", schoolTypeId);
         SchoolTypeResponseDTO response = schoolTypeFacade.deactivate(schoolTypeId);
+        log.info("PUT /api/institute/school-types/{}/deactivate succeeded", schoolTypeId);
         return ResponseEntity.ok(response);
     }
 }

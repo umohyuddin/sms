@@ -33,14 +33,16 @@ public class DepartmentService {
     }
 
     public DepartmentResponseDTO createDepartment(@Valid DepartmentRequestDTO requestDTO) {
-        log.info("Creating new Department: {}", requestDTO.getDepartmentName());
+        log.info("Creating new Department in database: {}", requestDTO.getDepartmentName());
         try {
             DepartmentEntity entity = DepartmentMapper.INSTANCE.toEntity(requestDTO);
             // Fetch and set parent department if provided
             if (requestDTO.getParentDepartmentId() != null) {
                 DepartmentEntity parent = departmentRepository.findById(requestDTO.getParentDepartmentId())
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Parent Department not found with id: " + requestDTO.getParentDepartmentId()));
+                        .orElseThrow(() -> {
+                            log.warn("Parent Department not found with ID: {}", requestDTO.getParentDepartmentId());
+                            return new ResourceNotFoundException("Parent Department not found with id: " + requestDTO.getParentDepartmentId());
+                        });
                 entity.setParentDepartment(parent);
             } else {
                 entity.setParentDepartment(null);
@@ -49,19 +51,20 @@ public class DepartmentService {
             // Fetch and set head employee if provided, else set null
             if (requestDTO.getHeadEmployeeId() != null) {
                 EmployeeMasterEntity headEmployee = employeeMasterRepository.findById(requestDTO.getHeadEmployeeId())
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Employee not found with id: " + requestDTO.getHeadEmployeeId()));
+                        .orElseThrow(() -> {
+                            log.warn("Employee not found with ID: {}", requestDTO.getHeadEmployeeId());
+                            return new ResourceNotFoundException("Employee not found with id: " + requestDTO.getHeadEmployeeId());
+                        });
                 entity.setHeadEmployee(headEmployee);
             } else {
                 entity.setHeadEmployee(null);
             }
 
-            departmentRepository.save(entity);
-            log.info("Department saved with id: {}", entity.getId());
-            return MapperUtil.mapObject(entity, DepartmentResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while creating Department", dae);
-            throw new CustomServiceException("Failed to create Department due to database error");
+            DepartmentEntity saved = departmentRepository.save(entity);
+            log.info("Department saved successfully with ID: {}", saved.getId());
+            return MapperUtil.mapObject(saved, DepartmentResponseDTO.class);
+        } catch (ResourceNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Unexpected error while creating Department", e);
             throw new CustomServiceException("Failed to create Department");
@@ -69,31 +72,37 @@ public class DepartmentService {
     }
 
     public List<DepartmentResponseDTO> getAllDepartments() {
+        log.info("Fetching all active Departments from database");
         try {
-            log.info("Fetching all Departments from database");
             List<DepartmentEntity> departments = departmentRepository.findAllActiveDepartments();
+            log.info("Successfully fetched {} active Departments", departments.size());
             return departments.stream().map(this::toDto).collect(Collectors.toList());
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Departments", dae);
-            throw new CustomServiceException("Unable to fetch Departments from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping Department Entity to DTO", me);
-            throw new CustomServiceException("Error converting Department data", me);
         } catch (Exception e) {
             log.error("Unexpected error while fetching Departments", e);
-            throw new CustomServiceException("Unexpected error occurred", e);
+            throw new CustomServiceException("Unexpected error occurred while fetching departments", e);
         }
     }
 
     public DepartmentResponseDTO getDepartmentById(Long id) {
-        log.info("Fetching Department with id={}", id);
-        DepartmentEntity entity = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
-        return toDto(entity);
+        log.info("Fetching Department with ID: {} from database", id);
+        try {
+            DepartmentEntity entity = departmentRepository.findById(id)
+                    .orElseThrow(() -> {
+                        log.warn("Department not found with ID: {}", id);
+                        return new ResourceNotFoundException("Department not found with id: " + id);
+                    });
+            log.info("Successfully fetched Department: id={}", entity.getId());
+            return toDto(entity);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Department ID: {}", id, e);
+            throw new CustomServiceException("Unexpected error occurred while fetching department", e);
+        }
     }
 
     public DepartmentResponseDTO updateDepartment(Long id, @Valid DepartmentRequestDTO requestDTO) {
-        log.info("Updating Department with id={} with data={}", id, requestDTO);
+        log.info("Updating Department with ID: {} in database", id);
         try {
             // Fetch existing department
             DepartmentEntity existing = findDepartmentOrThrow(id);
@@ -103,8 +112,10 @@ public class DepartmentService {
 
             if (requestDTO.getHeadEmployeeId() != null) {
                 EmployeeMasterEntity headEmployee = employeeMasterRepository.findById(requestDTO.getHeadEmployeeId())
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Head Employee not found with id: " + requestDTO.getHeadEmployeeId()));
+                        .orElseThrow(() -> {
+                            log.warn("Head Employee not found for department update with ID: {}", requestDTO.getHeadEmployeeId());
+                            return new ResourceNotFoundException("Head Employee not found with id: " + requestDTO.getHeadEmployeeId());
+                        });
                 existing.setHeadEmployee(headEmployee);
             } else {
                 existing.setHeadEmployee(null);
@@ -119,14 +130,13 @@ public class DepartmentService {
 
             // Save changes
             DepartmentEntity updated = departmentRepository.save(existing);
-            log.info("Department updated successfully with id={}", updated.getId());
+            log.info("Department updated successfully with ID: {}", updated.getId());
 
             return toDto(updated);
-        } catch (DataAccessException dae) {
-            log.error("Database error while updating Department with id={}", id, dae);
-            throw new CustomServiceException("Failed to update Department due to database error", dae);
+        } catch (ResourceNotFoundException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Unexpected error while updating Department with id={}", id, e);
+            log.error("Unexpected error while updating Department ID: {}", id, e);
             throw new CustomServiceException("Unexpected error occurred while updating Department", e);
         }
     }
@@ -134,7 +144,10 @@ public class DepartmentService {
     // Helper: Fetch department or throw exception
     private DepartmentEntity findDepartmentOrThrow(Long id) {
         return departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+                .orElseThrow(() -> {
+                    log.warn("Department not found with ID: {}", id);
+                    return new ResourceNotFoundException("Department not found with id: " + id);
+                });
     }
 
     // Helper: Map DTO to entity
@@ -146,29 +159,32 @@ public class DepartmentService {
     }
 
     public void deleteDepartment(Long id) {
-        log.info("Soft deleting Department with id={}", id);
+        log.info("Soft delete request received for Department ID: {}", id);
         try {
             DepartmentEntity existing = departmentRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+                    .orElseThrow(() -> {
+                        log.warn("Department not found for deletion with ID: {}", id);
+                        return new ResourceNotFoundException("Department not found with id: " + id);
+                    });
             existing.setDeleted(true);
             departmentRepository.save(existing);
-            log.info("Department soft deleted with id={}", id);
-        } catch (DataAccessException dae) {
-            log.error("Database error while deleting Department with id={}", id, dae);
-            throw new CustomServiceException("Failed to delete Department due to database error", dae);
+            log.info("Department ID: {} marked as deleted successfully", id);
+        } catch (ResourceNotFoundException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Unexpected error while deleting Department with id={}", id, e);
+            log.error("Unexpected error while soft deleting Department ID: {}", id, e);
             throw new CustomServiceException("Unexpected error occurred while deleting Department", e);
         }
     }
 
     public List<DepartmentResponseDTO> getAllActiveDepartments() {
+        log.info("Fetching all active Departments from database");
         try {
-            log.info("Fetching all active Departments");
             List<DepartmentEntity> departments = departmentRepository.findAllActiveDepartments();
+            log.info("Successfully fetched {} active Departments", departments.size());
             return departments.stream().map(this::toDto).collect(Collectors.toList());
         } catch (Exception e) {
-            log.error("Error fetching active Departments", e);
+            log.error("Error while fetching active Departments", e);
             throw new CustomServiceException("Failed to fetch active Departments", e);
         }
     }
@@ -176,22 +192,11 @@ public class DepartmentService {
 
     public List<DepartmentResponseDTO> searchDepartments(String keyword) {
         try {
-            log.info("Searching Departments with keyword={}", keyword);
-
-            // If keyword is null or empty, return all active departments
-            if (keyword == null || keyword.trim().isEmpty()) {
-                return getAllActiveDepartments();
-            }
-
-            // Call repository search
-            List<DepartmentEntity> results = departmentRepository.searchDepartments(keyword.trim());
-
-            log.info("Found {} departments matching keyword={}", results.size(), keyword);
+            String searchKey = keyword == null ? "" : keyword.trim();
+            log.info("Fetching Departments based on search from database with keyword: '{}'", searchKey);
+            List<DepartmentEntity> results = departmentRepository.searchDepartments(searchKey);
+            log.info("Successfully fetched {} Departments based on search", results.size());
             return results.stream().map(this::toDto).collect(Collectors.toList());
-
-        } catch (DataAccessException dae) {
-            log.error("Database error while searching Departments", dae);
-            throw new CustomServiceException("Failed to search Departments due to database error", dae);
         } catch (Exception e) {
             log.error("Unexpected error while searching Departments", e);
             throw new CustomServiceException("Unexpected error occurred while searching Departments", e);

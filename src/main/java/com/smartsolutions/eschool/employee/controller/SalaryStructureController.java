@@ -29,110 +29,97 @@ public class SalaryStructureController {
     // -------------------------
     // Get all active salary structures
     // -------------------------
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SalaryStructureResponseDTO>> getAllActive() {
-        log.info("GET /api/institute/salary-structures called");
-        List<SalaryStructureResponseDTO> structures = salaryStructureFacade.getAllActive();
-        log.info("Returned {} active salary structures", structures.size());
-        return ResponseEntity.ok(structures);
+    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SalaryStructureResponseDTO>> getAll() {
+        log.info("REST: Request to fetch all non-deleted SalaryStructures");
+        List<SalaryStructureResponseDTO> result = salaryStructureFacade.getAllNonDeleted();
+        log.info("REST: Returning {} SalaryStructures", result.size());
+        return ResponseEntity.ok(result);
     }
 
-    @GetMapping(value = "/detail", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> findSalaryDetail
-            () {
-        log.info("GET /api/institute/salary-structures called");
-        List<SalaryStructureDetailDTO> structures = salaryStructureFacade.findSalaryDetail();
-        log.info("Returned {} active salary structures", structures.size());
-        return ResponseEntity.ok(structures);
+    @GetMapping(value = "/list/detail", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SalaryStructureDetailDTO>> getAllWithDetails() {
+        log.info("REST: Request to fetch all SalaryStructures with details");
+        List<SalaryStructureDetailDTO> result = salaryStructureFacade.getAllSalaryStructuresWithDetails();
+        log.info("REST: Returning {} Detailed SalaryStructures", result.size());
+        return ResponseEntity.ok(result);
     }
 
-    // Get by Employee Type ID
-    @GetMapping("/by-employee-type/{employeeTypeId}")
+    @GetMapping(value = "/by-employee-type/{employeeTypeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SalaryStructureDetailDTO> getByEmployeeType(@PathVariable Long employeeTypeId) {
-        SalaryStructureDetailDTO dto = salaryStructureFacade.getSalaryStructureByEmployeeType(employeeTypeId);
-        return ResponseEntity.ok(dto);
+        log.info("REST: Request to fetch current SalaryStructure details for employeeTypeID: {}", employeeTypeId);
+        SalaryStructureDetailDTO result = salaryStructureFacade.getSalaryStructureByEmployeeType(employeeTypeId);
+        log.info("REST: Returning current SalaryStructure details for employeeTypeID: {}", employeeTypeId);
+        return ResponseEntity.ok(result);
     }
 
-    // -------------------------
-    // Get by ID
-    // -------------------------
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SalaryStructureResponseDTO> getById(@PathVariable Long id) {
-        log.info("GET /api/institute/salary-structures/{} called", id);
-        SalaryStructureResponseDTO structure = salaryStructureFacade.getById(id);
-        log.info("Returning Salary Structure with id={}", structure.getId());
-        return ResponseEntity.ok(structure);
+        log.info("REST: Request to fetch SalaryStructure by ID: {}", id);
+        SalaryStructureResponseDTO result = salaryStructureFacade.getById(id);
+        log.info("REST: Returning SalaryStructure with id={}", id);
+        return ResponseEntity.ok(result);
     }
 
-    // -------------------------
-    // Create
-    // -------------------------
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SalaryStructureResponseDTO> createSalaryStructure(@Valid @RequestBody SalaryStructureRequestDTO requestDTO) {
-        log.info("POST /api/institute/salary-structures called for EmployeeTypeId={}", requestDTO.getEmployeeTypeId());
-        SalaryStructureResponseDTO created = salaryStructureFacade.createSalaryStructure(requestDTO);
-        log.info("Salary Structure created successfully with id={}", created.getId());
-        return ResponseEntity.ok(created);
+    public ResponseEntity<SalaryStructureResponseDTO> create(@Valid @RequestBody SalaryStructureRequestDTO requestDTO) {
+        log.info("REST: Request to create SalaryStructure for employeeTypeID: {}", requestDTO.getEmployeeTypeId());
+        SalaryStructureResponseDTO result = salaryStructureFacade.create(requestDTO);
+        log.info("REST: SalaryStructure created successfully with id={}", result.getId());
+        return ResponseEntity.ok(result);
     }
 
-    // -------------------------
-    // Update
-    // -------------------------
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SalaryStructureResponseDTO> updateSalaryStructure(@PathVariable Long id, @Valid @RequestBody SalaryStructureRequestDTO requestDTO) {
-        log.info("PUT /api/institute/salary-structures/{} called", id);
-        SalaryStructureResponseDTO updated = salaryStructureFacade.updateSalaryStructure(id, requestDTO);
-        log.info("Salary Structure updated successfully with id={}", updated.getId());
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<SalaryStructureResponseDTO> update(@PathVariable Long id, @Valid @RequestBody SalaryStructureRequestDTO requestDTO) {
+        log.info("REST: Request to update SalaryStructure ID: {}", id);
+        SalaryStructureResponseDTO result = salaryStructureFacade.update(id, requestDTO);
+        log.info("REST: SalaryStructure updated successfully with id={}", id);
+        return ResponseEntity.ok(result);
     }
 
-    // -------------------------
-    // Soft delete
-    // -------------------------
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> softDelete(@PathVariable Long id) {
-        log.info("DELETE /api/institute/salary-structures/{} called", id);
-        salaryStructureFacade.softDelete(id);
-        log.info("Salary Structure soft-deleted with id={}", id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("REST: Request to delete SalaryStructure ID: {}", id);
+        salaryStructureFacade.delete(id);
+        log.info("REST: SalaryStructure deleted with id={}", id);
         return ResponseEntity.noContent().build();
     }
 
-    // -------------------------
-    // Get effective on a specific date
-    // -------------------------
-//    @GetMapping(value = "/effective", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<List<SalaryStructureResponseDTO>> getEffectiveOn(
-//            @RequestParam("date") String dateStr) {
-//        LocalDate date = LocalDate.parse(dateStr);
-//        log.info("GET /api/institute/salary-structures/effective called with date={}", date);
-//        List<SalaryStructureResponseDTO> structures = salaryStructureFacade.getEffectiveOn(date);
-//        log.info("Returned {} salary structures effective on {}", structures.size(), date);
-//        return ResponseEntity.ok(structures);
-//    }
-
-    // -------------------------
-    // Get within a date range
-    // -------------------------
-//    @GetMapping(value = "/range", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<List<SalaryStructureResponseDTO>> getWithinDateRange(
-//            @RequestParam("startDate") String startDateStr,
-//            @RequestParam("endDate") String endDateStr) {
-//        LocalDate startDate = LocalDate.parse(startDateStr);
-//        LocalDate endDate = LocalDate.parse(endDateStr);
-//        log.info("GET /api/institute/salary-structures/range called with {} - {}", startDate, endDate);
-//        List<SalaryStructureResponseDTO> structures = salaryStructureFacade.getWithinDateRange(startDate, endDate);
-//        log.info("Returned {} salary structures within date range", structures.size());
-//        return ResponseEntity.ok(structures);
-//    }
-
-
-    @PutMapping("/{id}/close")
-    public ResponseEntity<SalaryStructureResponseDTO> closeSalaryStructure(@PathVariable Long id) {
-        return ResponseEntity.ok(salaryStructureFacade.closeSalaryStructure(id));
+    @PutMapping(value = "/{id}/close", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SalaryStructureResponseDTO> close(@PathVariable Long id) {
+        log.info("REST: Request to close SalaryStructure ID: {}", id);
+        SalaryStructureResponseDTO result = salaryStructureFacade.closeSalaryStructure(id);
+        log.info("REST: SalaryStructure closed with id={}", id);
+        return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/search")
-    public List<SalaryStructureResponseDTO> searchSalaryStructures(@RequestParam(required = false) Long employeeTypeId, @RequestParam(required = false) String employeeTypeName, @RequestParam(required = false) BigDecimal minSalary, @RequestParam(required = false) BigDecimal maxSalary, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate, @RequestParam(required = false) Boolean isCurrent) {
-        return salaryStructureFacade.searchSalaryStructures(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SalaryStructureResponseDTO>> searchByKeyword(@RequestParam String keyword) {
+        log.info("REST: Request to search SalaryStructures by keyword: '{}'", keyword);
+        List<SalaryStructureResponseDTO> result = salaryStructureFacade.searchByKeyword(keyword);
+        log.info("REST: Search completed, returning {} SalaryStructures", result.size());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(value = "/search/complex", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SalaryStructureResponseDTO>> searchComplex(
+            @RequestParam(required = false) Long employeeTypeId,
+            @RequestParam(required = false) String employeeTypeName,
+            @RequestParam(required = false) BigDecimal minSalary,
+            @RequestParam(required = false) BigDecimal maxSalary,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Boolean isCurrent) {
+        log.info("REST: Request for complex search for SalaryStructures");
+        List<SalaryStructureResponseDTO> result = salaryStructureFacade.searchComplex(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
+        log.info("REST: Complex search completed, returning {} SalaryStructures", result.size());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(value = "/count", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Long> getTotalCount() {
+        log.info("REST: Request to fetch total count of SalaryStructures");
+        return ResponseEntity.ok(salaryStructureFacade.getTotalCount());
     }
 }
+

@@ -33,50 +33,50 @@ public class AcademicSubjectController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable Long id) {
-        log.info("Received request to fetch Subject with id: {}", id);
+        log.info("GET /api/institute/subjects/{} called", id);
         SubjectResponse subject = subjectFacade.getById(id);
-        log.info("Returning Subject: id={}", subject.getId());
+        log.info("GET /api/institute/subjects/{} succeeded", id);
         return ResponseEntity.ok(subject);
     }
 
     @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> searchByKeyword(@PathVariable String keyword) {
-        log.info("GET /api/institute/subjects/search by keyword called: {}", keyword);
+        log.info("GET /api/institute/subjects/search/{} called", keyword);
         List<SubjectResponse> subjects = subjectFacade.searchByKeyword(keyword);
-        log.info("GET /api/institute/subjects/search succeeded, found {} subjects", subjects.size());
+        log.info("GET /api/institute/subjects/search/{} succeeded, returned {} resources", keyword, subjects.size());
         return ResponseEntity.ok(subjects);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> softDeleteById(@PathVariable Long id) {
-        log.info("API Request: Soft delete Subject ID: {}", id);
+        log.info("DELETE /api/institute/subjects/{} called", id);
         try {
             int result = subjectFacade.softDeleteById(id);
             if (result == 0) {
-                log.warn("Delete failed — Subject not found: {}", id);
+                log.warn("DELETE /api/institute/subjects/{} failed - not found", id);
                 return ResponseEntity.notFound().build();
             }
-            log.info("Subject deleted successfully: {}", id);
+            log.info("DELETE /api/institute/subjects/{} succeeded", id);
             return ResponseEntity.ok("Subject deleted successfully");
         } catch (Exception ex) {
-            log.error("Error deleting Subject ID: {}", id, ex);
+            log.error("DELETE /api/institute/subjects/{} failed: {}", id, ex.getMessage(), ex);
             return ResponseEntity.internalServerError().body("Failed to delete Subject");
         }
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SubjectResponse> createSubject(@Valid @RequestBody SubjectRequest dto) {
-        log.info("Received request to create new Subject: {}", dto.getName());
+        log.info("POST /api/institute/subjects called for subject: {}", dto.getName());
         SubjectResponse createdSubject = subjectFacade.createSubject(dto);
-        log.info("Subject created successfully with id: {}", createdSubject.getId());
+        log.info("POST /api/institute/subjects succeeded, created with id: {}", createdSubject.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSubject);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SubjectResponse> updateSubject(@PathVariable Long id, @Valid @RequestBody SubjectRequest dto) {
-        log.info("Received request to update Subject with id: {}", id);
+        log.info("PUT /api/institute/subjects/{} called", id);
         SubjectResponse updatedSubject = subjectFacade.updateSubject(id, dto);
-        log.info("Returning updated Subject: id={}", updatedSubject.getId());
+        log.info("PUT /api/institute/subjects/{} succeeded", id);
         return ResponseEntity.ok(updatedSubject);
     }
 }

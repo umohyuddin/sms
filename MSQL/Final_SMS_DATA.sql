@@ -19,3 +19,17 @@ VALUES
 -- System Control
 ('ACTIVATE', 'Activate', 'Activate a disabled record', TRUE, 1, FALSE),
 ('DEACTIVATE', 'Deactivate', 'Deactivate an active record', TRUE, 1, FALSE);
+---------------------------------------------------------------------------------
+
+INSERT INTO modules(code,name,description,icon,route,display_order,system_module,active,created_at,created_by)
+VALUES
+('DASHBOARD', 'Dashboard', 'System overview and analytics', 'dashboard', '/dashboard', 1, TRUE, TRUE, NOW(), 1),
+('USER', 'User Management', 'Manage users and accounts', 'people', '/users', 2, TRUE, TRUE, NOW(), 1),
+('ROLE', 'Role & Permissions', 'Manage roles and permissions', 'security', '/roles', 3, TRUE, TRUE, NOW(), 1),
+('ACADEMIC', 'Academic Management', 'Academic years, classes, sections', 'school', '/academics', 4, TRUE, TRUE, NOW(), 1),
+('STUDENT', 'Student Management', 'Student profiles and enrollment', 'groups', '/students', 5, FALSE, TRUE, NOW(), 1),
+('TEACHER', 'Teacher Management', 'Teacher profiles and assignments', 'person', '/teachers', 6, FALSE, TRUE, NOW(), 1),
+('FEE', 'Fee Management', 'Fee setup, collection and reports', 'payments', '/fees', 7, FALSE, TRUE, NOW(), 1),
+('EXAM', 'Examination', 'Exam scheduling and results', 'assignment', '/exams', 8, FALSE, TRUE, NOW(), 1),
+('REPORT', 'Reports', 'System and academic reports', 'bar_chart', '/reports', 9, TRUE, TRUE, NOW(), 1),
+('SETTINGS', 'System Settings', 'Application configuration', 'settings', '/settings', 10, TRUE, TRUE, NOW(), 1);

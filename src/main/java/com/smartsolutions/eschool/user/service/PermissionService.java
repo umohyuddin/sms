@@ -32,58 +32,105 @@ public class PermissionService {
 
     @Transactional
     public PermissionResponseDTO createPermission(PermissionRequestDTO dto) {
-        log.info("Creating new Permission: {}", dto.getName());
-        
-        PermissionEntity entity = PermissionMapper.toEntity(dto);
-        
-        loadEntityRelationships(entity, dto);
+        log.info("Creating new Permission in database: {}", dto.getName());
+        try {
+            PermissionEntity entity = PermissionMapper.toEntity(dto);
+            
+            loadEntityRelationships(entity, dto);
 
-        PermissionEntity saved = permissionRepository.save(entity);
-        return PermissionMapper.toResponseDTO(saved);
+            PermissionEntity saved = permissionRepository.save(entity);
+            log.info("Successfully created Permission with ID: {}", saved.getId());
+            return PermissionMapper.toResponseDTO(saved);
+        } catch (Exception e) {
+            log.error("Unexpected error while creating Permission", e);
+            throw e;
+        }
     }
 
     @Transactional(readOnly = true)
     public List<PermissionResponseDTO> getAll(Long organizationId) {
-        log.info("Fetching all Permissions for organization: {}", organizationId);
-        List<PermissionEntity> entities = permissionRepository.findByOrganizationId(organizationId);
-        return PermissionMapper.toResponseDTOList(entities);
+        log.info("Fetching all Permissions for organization: {} from database", organizationId);
+        try {
+            List<PermissionEntity> entities = permissionRepository.findByOrganizationId(organizationId);
+            log.info("Successfully fetched {} Permissions for organization: {}", entities.size(), organizationId);
+            return PermissionMapper.toResponseDTOList(entities);
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Permissions", e);
+            return java.util.Collections.emptyList();
+        }
     }
 
     @Transactional(readOnly = true)
     public List<PermissionResponseDTO> searchByKeyword(Long organizationId, String keyword) {
-        log.info("Searching Permissions with keyword: {} for organization: {}", keyword, organizationId);
-        List<PermissionEntity> result = permissionRepository.searchByKeyword(organizationId, keyword == null ? "" : keyword.trim());
-        return PermissionMapper.toResponseDTOList(result);
+        try {
+            String searchKey = keyword == null ? "" : keyword.trim();
+            log.info("Fetching Permissions based on search from database for organization: {} with keyword: '{}'", organizationId, searchKey);
+            List<PermissionEntity> result = permissionRepository.searchByKeyword(organizationId, searchKey);
+            log.info("Successfully fetched {} Permissions based on search", result.size());
+            return PermissionMapper.toResponseDTOList(result);
+        } catch (Exception e) {
+            log.error("Unexpected error while searching Permissions", e);
+            return java.util.Collections.emptyList();
+        }
     }
 
     @Transactional(readOnly = true)
     public PermissionResponseDTO getById(Long id, Long organizationId) {
-        log.info("Fetching Permission with id: {} and organizationId: {}", id, organizationId);
-        PermissionEntity entity = permissionRepository.findByIdAndOrganizationId(id, organizationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Permission not found with id: " + id + " for organizationId: " + organizationId));
-        return PermissionMapper.toResponseDTO(entity);
+        log.info("Fetching Permission with ID: {} and organizationId: {} from database", id, organizationId);
+        try {
+            PermissionEntity entity = permissionRepository.findByIdAndOrganizationId(id, organizationId)
+                    .orElseThrow(() -> {
+                        log.warn("Permission not found with ID: {} and organizationId: {}", id, organizationId);
+                        return new ResourceNotFoundException("Permission not found with id: " + id + " for organizationId: " + organizationId);
+                    });
+            log.info("Successfully fetched Permission: id={}", entity.getId());
+            return PermissionMapper.toResponseDTO(entity);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Permission ID: {}", id, e);
+            throw e;
+        }
     }
 
     @Transactional
     public PermissionResponseDTO updatePermission(Long id, Long organizationId, PermissionRequestDTO dto) {
-        log.info("Updating Permission with id: {} for organizationId: {}", id, organizationId);
-        PermissionEntity existing = permissionRepository.findByIdAndOrganizationId(id, organizationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Permission not found with id: " + id + " for organizationId: " + organizationId));
+        log.info("Updating Permission with ID: {} for organizationId: {} in database", id, organizationId);
+        try {
+            PermissionEntity existing = permissionRepository.findByIdAndOrganizationId(id, organizationId)
+                    .orElseThrow(() -> {
+                        log.warn("Permission not found for update with ID: {} and organizationId: {}", id, organizationId);
+                        return new ResourceNotFoundException("Permission not found with id: " + id + " for organizationId: " + organizationId);
+                    });
 
-        PermissionMapper.updateEntityFromDTO(existing, dto);
-        loadEntityRelationships(existing, dto);
+            PermissionMapper.updateEntityFromDTO(existing, dto);
+            loadEntityRelationships(existing, dto);
 
-        PermissionEntity updated = permissionRepository.save(existing);
-        return PermissionMapper.toResponseDTO(updated);
+            PermissionEntity updated = permissionRepository.save(existing);
+            log.info("Successfully updated Permission ID: {}", id);
+            return PermissionMapper.toResponseDTO(updated);
+        } catch (Exception e) {
+            log.error("Unexpected error while updating Permission ID: {}", id, e);
+            throw e;
+        }
     }
 
     @Transactional
     public void deleteById(Long id, Long organizationId) {
-        log.info("Deleting Permission with ID: {} and organizationId: {}", id, organizationId);
-        PermissionEntity existing = permissionRepository.findByIdAndOrganizationId(id, organizationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Permission not found with id: " + id + " for organizationId: " + organizationId));
-        existing.setDeleted(true);
-        permissionRepository.save(existing);
+        log.info("Soft delete request received for Permission ID: {} and organizationId: {}", id, organizationId);
+        try {
+            PermissionEntity existing = permissionRepository.findByIdAndOrganizationId(id, organizationId)
+                    .orElseThrow(() -> {
+                        log.warn("Permission not found for deletion with ID: {} and organizationId: {}", id, organizationId);
+                        return new ResourceNotFoundException("Permission not found with id: " + id + " for organizationId: " + organizationId);
+                    });
+            existing.setDeleted(true);
+            permissionRepository.save(existing);
+            log.info("Permission ID: {} marked as deleted successfully", id);
+        } catch (Exception e) {
+            log.error("Error while soft deleting Permission with ID: {}", id, e);
+            throw e;
+        }
     }
 
     private void loadEntityRelationships(PermissionEntity entity, PermissionRequestDTO dto) {

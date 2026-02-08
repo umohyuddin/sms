@@ -1,44 +1,51 @@
 package com.smartsolutions.eschool.sclass.service;
 
 import com.smartsolutions.eschool.sclass.model.TimeTableEntity;
-import com.smartsolutions.eschool.sclass.repository.TimeTableDao;
+import com.smartsolutions.eschool.sclass.repository.TimeTableRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class TimeTableService {
-    private final TimeTableDao timeTableDao;
+    private final TimeTableRepository timeTableRepository;
 
-    public TimeTableService(TimeTableDao pTimeTableDao) {
-        this.timeTableDao = pTimeTableDao;
+    public TimeTableService(TimeTableRepository timeTableRepository) {
+        this.timeTableRepository = timeTableRepository;
     }
 
     public List<TimeTableEntity> getAll() {
-        return timeTableDao.findAll();
+        return timeTableRepository.findAll();
     }
 
     public TimeTableEntity getById(Long id) {
-        return timeTableDao.findById(id);
+        return timeTableRepository.findById(id).orElse(null);
     }
 
     public List<TimeTableEntity> getByTeacherId(Long id) {
-        return timeTableDao.findByTeacherId(id);
+        return timeTableRepository.findByTeacherId(id);
     }
 
-    public List<TimeTableEntity> getByClassId(Long id) {
-        return timeTableDao.findByClassId(id);
+    public List<TimeTableEntity> getByClassId(Integer id) {
+        return timeTableRepository.findByClsId(id);
     }
 
+    @Transactional
     public String create(TimeTableEntity pTimeTableEntity) {
-        return timeTableDao.save(pTimeTableEntity) == 1 ? "TimeTable created" : "Error creating TimeTable";
+        timeTableRepository.save(pTimeTableEntity);
+        return "TimeTable created";
     }
 
+    @Transactional
     public String update(TimeTableEntity pTimeTableEntity) {
-        return timeTableDao.update(pTimeTableEntity) == 1 ? "TimeTable updated" : "Error updating TimeTable";
+        timeTableRepository.save(pTimeTableEntity);
+        return "TimeTable updated";
     }
 
+    @Transactional
     public String delete(Long id) {
-        return timeTableDao.delete(id) == 1 ? "TimeTable deleted" : "Error deleting TimeTable";
+        timeTableRepository.deleteById(id);
+        return "TimeTable deleted";
     }
 }

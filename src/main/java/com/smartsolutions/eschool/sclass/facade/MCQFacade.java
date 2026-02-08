@@ -29,11 +29,11 @@ public class MCQFacade {
     }
 
     public List<MCQEntity> getByChapter(Long id, Long chp) {
-        return nMCQService.getByChapter(id, chp);
+        return nMCQService.getByChapter(id.intValue(), chp.intValue());
     }
 
     public List<MCQEntity> getBySubjectId(Long id) {
-        return nMCQService.getBySubjectId(id);
+        return nMCQService.getBySubjectId(id.intValue());
     }
 
     public String create(MCQEntity pMCQEntity) {

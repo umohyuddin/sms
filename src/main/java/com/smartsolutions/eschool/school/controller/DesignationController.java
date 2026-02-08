@@ -32,10 +32,10 @@ public class DesignationController {
        CREATE
        ========================= */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createDesignation(@RequestBody @Valid DesignationRequestDTO requestDTO) {
-        log.info("Received request to create Designation");
+    public ResponseEntity<DesignationResponseDTO> createDesignation(@RequestBody @Valid DesignationRequestDTO requestDTO) {
+        log.info("POST /api/institute/designations called for designation: {}", requestDTO.getDesignationName());
         DesignationResponseDTO responseDTO = designationFacade.createDesignation(requestDTO);
-        log.info("Designation created successfully with id: {}", responseDTO.getId());
+        log.info("POST /api/institute/designations succeeded, created designation with id: {}", responseDTO.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
@@ -43,64 +43,40 @@ public class DesignationController {
        GET ALL
        ========================= */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll() {
-        log.info("GET /api/school/designations called");
+    public ResponseEntity<List<DesignationResponseDTO>> getAll() {
+        log.info("GET /api/institute/designations called");
         List<DesignationResponseDTO> resources = designationFacade.getAll();
-        log.info("GET /api/school/designations succeeded, returned {} resources", resources.size());
+        log.info("GET /api/institute/designations succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllActive() {
-        log.info("GET /api/school/designations/active called");
+    public ResponseEntity<List<DesignationResponseDTO>> getAllActive() {
+        log.info("GET /api/institute/designations/active called");
         List<DesignationResponseDTO> resources = designationFacade.getAllActive();
-        log.info("GET /api/school/designations/active succeeded, returned {} resources", resources.size());
+        log.info("GET /api/institute/designations/active succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
-
-//    @GetMapping(value = "/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> getAllInactive() {
-//        log.info("GET /api/school/designations/inactive called");
-//        List<DesignationResponseDTO> resources = designationFacade.getAllInactive();
-//        log.info("GET /api/school/designations/inactive succeeded, returned {} resources", resources.size());
-//        return ResponseEntity.ok().body(resources);
-//    }
 
     /* =========================
        GET BY ID
        ========================= */
     @GetMapping(value = "/{designationId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable Long designationId) {
-        log.info("GET /api/school/designations by id called");
+    public ResponseEntity<DesignationResponseDTO> getById(@PathVariable Long designationId) {
+        log.info("GET /api/institute/designations/{} called", designationId);
         DesignationResponseDTO resource = designationFacade.getById(designationId);
-        log.info("GET /api/school/designations by id succeeded, returned resource id: {}", resource.getId());
+        log.info("GET /api/institute/designations/{} succeeded", designationId);
         return ResponseEntity.ok().body(resource);
     }
 
     /* =========================
-       SOFT DELETE
-       ========================= */
-//    @DeleteMapping("/{designationId}")
-//    public ResponseEntity<?> softDeleteById(@PathVariable Long designationId) {
-//        log.info("DELETE /api/school/designations by id called {}", designationId);
-//        int result = designationFacade.softDeleteById(designationId);
-//        if (result == 0) {
-//            log.warn("Delete failed — Designation not found: {}", designationId);
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("Designation not found with id: " + designationId);
-//        }
-//        log.info("Designation deleted successfully: {}", designationId);
-//        return ResponseEntity.ok("Designation deleted successfully");
-//    }
-
-    /* =========================
        SEARCH
        ========================= */
-    @GetMapping(value = "/search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
-        log.info("GET /api/school/designations/search by keyword called");
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DesignationResponseDTO>> getBySearch(@RequestParam(name = "keyword") String keyword) {
+        log.info("GET /api/institute/designations/search called with keyword: {}", keyword);
         List<DesignationResponseDTO> resources = designationFacade.searchByKeyword(keyword);
-        log.info("GET /api/school/designations/search succeeded, returned {} resources", resources.size());
+        log.info("GET /api/institute/designations/search succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
 
@@ -108,17 +84,11 @@ public class DesignationController {
        UPDATE
        ========================= */
     @PutMapping(value = "/{designationId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateDesignation(@PathVariable Long designationId,
-                                               @RequestBody @Valid DesignationRequestDTO requestDTO) {
-        log.info("Received request to update Designation with id: {}", designationId);
+    public ResponseEntity<DesignationResponseDTO> updateDesignation(@PathVariable Long designationId,
+                                                                   @RequestBody @Valid DesignationRequestDTO requestDTO) {
+        log.info("PUT /api/institute/designations/{} called", designationId);
         DesignationResponseDTO updated = designationFacade.updateDesignation(designationId, requestDTO);
-
-        if (updated == null) {
-            log.warn("Designation not found for id: {}", designationId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Designation not found with id: " + designationId);
-        }
-        log.info("Designation updated successfully with id: {}", updated.getId());
+        log.info("PUT /api/institute/designations/{} succeeded", designationId);
         return ResponseEntity.ok(updated);
     }
 
@@ -126,7 +96,7 @@ public class DesignationController {
    GET BY DEPARTMENT
    ========================= */
     @GetMapping(value = "/by-department/{departmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getByDepartmentId(@PathVariable Long departmentId) {
+    public ResponseEntity<List<DesignationResponseDTO>> getByDepartmentId(@PathVariable Long departmentId) {
         log.info("GET /api/institute/designations/by-department/{} called", departmentId);
         List<DesignationResponseDTO> resources = designationFacade.getByDepartmentId(departmentId);
         log.info("GET /api/institute/designations/by-department/{} succeeded, returned {} resources", departmentId, resources.size());

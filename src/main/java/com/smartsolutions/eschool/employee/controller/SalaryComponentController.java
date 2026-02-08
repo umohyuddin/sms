@@ -28,100 +28,76 @@ public class SalaryComponentController {
         this.salaryComponentFacade = salaryComponentFacade;
     }
 
-    // -------------------------
-    // Get all active components
-    // -------------------------
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SalaryComponentResponseDTO>> getAllActiveComponents() {
-        log.info("GET /api/institute/salary-components called");
-        List<SalaryComponentResponseDTO> components = salaryComponentFacade.getAllActive();
-        log.info("Returned {} active components", components.size());
-        return ResponseEntity.ok(components);
+    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SalaryComponentResponseDTO>> getAllComponents() {
+        log.info("GET /api/institute/salary-components/list called");
+        List<SalaryComponentResponseDTO> list = salaryComponentFacade.getAllNonDeleted();
+        log.info("GET /api/institute/salary-components/list succeeded, returned {} resources", list.size());
+        return ResponseEntity.ok(list);
     }
 
-    // -------------------------
-    // Get component by ID
-    // -------------------------
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SalaryComponentResponseDTO> getComponentById(@PathVariable Long id) {
         log.info("GET /api/institute/salary-components/{} called", id);
         SalaryComponentResponseDTO component = salaryComponentFacade.getById(id);
-        log.info("Returning component with id={}", id);
+        log.info("GET /api/institute/salary-components/{} succeeded", id);
         return ResponseEntity.ok(component);
     }
 
-    // -------------------------
-    // Search by name
-    // -------------------------
-    @GetMapping(value = "/search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SalaryComponentResponseDTO>> searchComponents( @PathVariable("keyword") String keyword) {
-        log.info("GET /api/institute/salary-components/search called with keyword={}", keyword);
-        List<SalaryComponentResponseDTO> components = salaryComponentFacade.searchByName(keyword);
-        log.info("Returned {} components matching keyword={}", components.size(), keyword);
-        return ResponseEntity.ok(components);
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SalaryComponentResponseDTO>> search(@RequestParam String keyword) {
+        log.info("GET /api/institute/salary-components/search called with keyword='{}'", keyword);
+        List<SalaryComponentResponseDTO> list = salaryComponentFacade.searchByKeyword(keyword);
+        log.info("GET /api/institute/salary-components/search succeeded, returned {} resources", list.size());
+        return ResponseEntity.ok(list);
     }
 
-    // -------------------------
-    // Filter by type (EARNING / DEDUCTION)
-    // -------------------------
-//    @GetMapping(value = "/type/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<List<SalaryComponentResponseDTO>> getComponentsByType(@PathVariable ComponentType type) {
-//        log.info("GET /api/institute/salary-components/type/{} called", type);
-//        List<SalaryComponentResponseDTO> components = salaryComponentFacade.getByType(type);
-//        log.info("Returned {} components for type={}", components.size(), type);
-//        return ResponseEntity.ok(components);
-//    }
+    @GetMapping(value = "/search/complex", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SalaryComponentResponseDTO>> complexSearch(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) ComponentType type,
+            @RequestParam(required = false) Boolean isPercentage) {
+        log.info("GET /api/institute/salary-components/search/complex called with name='{}', type='{}', isPercentage={}", name, type, isPercentage);
+        SalaryComponentSearchDto searchDto = new SalaryComponentSearchDto(name, type, isPercentage);
+        List<SalaryComponentResponseDTO> list = salaryComponentFacade.searchComplex(searchDto);
+        log.info("GET /api/institute/salary-components/search/complex succeeded, returned {} resources", list.size());
+        return ResponseEntity.ok(list);
+    }
 
-    // -------------------------
-    // Create a new component
-    // -------------------------
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SalaryComponentResponseDTO> createComponent(@Valid @RequestBody SalaryComponentRequestDTO requestDTO) {
-        log.info("POST /api/institute/salary-components called to create component: {}", requestDTO);
+        log.info("POST /api/institute/salary-components/create called with name='{}'", requestDTO.getName());
         SalaryComponentResponseDTO created = salaryComponentFacade.createComponent(requestDTO);
-        log.info("Salary Component created with id={}", created.getId());
-        return ResponseEntity.ok(created);
+        log.info("POST /api/institute/salary-components/create succeeded, created resource with id={}", created.getId());
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(created);
     }
 
-    // -------------------------
-    // Update existing component
-    // -------------------------
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SalaryComponentResponseDTO> updateComponent(@PathVariable Long id, @Valid @RequestBody SalaryComponentRequestDTO requestDTO) {
-        log.info("PUT /api/institute/salary-components/{} called to update component: {}", id, requestDTO);
+        log.info("PUT /api/institute/salary-components/{} called", id);
         SalaryComponentResponseDTO updated = salaryComponentFacade.updateComponent(id, requestDTO);
-        log.info("Salary Component updated with id={}", updated.getId());
+        log.info("PUT /api/institute/salary-components/{} succeeded", id);
         return ResponseEntity.ok(updated);
     }
 
-    // -------------------------
-    // Soft delete component
-    // -------------------------
-//    @DeleteMapping(value = "/{id}")
-//    public ResponseEntity<Map<String, String>> softDeleteComponent(@PathVariable Long id) {
-//        log.info("DELETE /api/institute/salary-components/{} called", id);
-//        salaryComponentFacade.softDelete(id);
-//        log.info("Salary Component soft deleted with id={}", id);
-//        return ResponseEntity.ok(Map.of("message", "Salary Component deleted successfully"));
-//    }
-
-    // -------------------------
-    // Metrics / counts
-    // -------------------------
-    @GetMapping(value = "/count/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Long> countActiveComponents() {
-        log.info("GET /api/institute/salary-components/count/active called");
-        return ResponseEntity.ok(salaryComponentFacade.countActive());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("DELETE /api/institute/salary-components/{} called", id);
+        salaryComponentFacade.delete(id);
+        log.info("DELETE /api/institute/salary-components/{} succeeded", id);
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(value = "/count/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Long> countInactiveComponents() {
-        log.info("GET /api/institute/salary-components/count/inactive called");
-        return ResponseEntity.ok(salaryComponentFacade.countInactive());
+    @GetMapping(value = "/count", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Long> getTotalCount() {
+        log.info("GET /api/institute/salary-components/count called");
+        Long count = salaryComponentFacade.getTotalCount();
+        log.info("GET /api/institute/salary-components/count succeeded, total={}", count);
+        return ResponseEntity.ok(count);
     }
+}
 
 //    @GetMapping("/salary-components")
 //    public List<SalaryComponentResponseDTO> search(@RequestParam(required = false) String name, @RequestParam(required = false) ComponentType type, @RequestParam(required = false) Boolean isPercentage) {
 //        return salaryComponentFacade.searchComponents(new SalaryComponentSearchDto(name, type, isPercentage));
 //    }
-}

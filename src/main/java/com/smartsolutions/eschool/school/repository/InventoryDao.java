@@ -13,4 +13,5 @@ public interface InventoryDao {
     List<InventoryEntity> findByCampus(Long id);
     List<InventoryEntity> findByInstitute(Long id);
     List<InventoryEntity> findAll();
+    List<InventoryEntity> searchByKeyword(String keyword);
 }

@@ -1,47 +1,55 @@
 package com.smartsolutions.eschool.sclass.service;
+
 import com.smartsolutions.eschool.sclass.model.ResultEntity;
-import com.smartsolutions.eschool.sclass.repository.ResultDao;
+import com.smartsolutions.eschool.sclass.repository.ResultRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class ResultService {
-    private final ResultDao nResultDao;
+    private final ResultRepository resultRepository;
 
-    public ResultService(ResultDao pResultDao) {
-        this.nResultDao = pResultDao;
+    public ResultService(ResultRepository resultRepository) {
+        this.resultRepository = resultRepository;
     }
 
     public List<ResultEntity> getAll() {
-        return nResultDao.findAll();
+        return resultRepository.findAll();
     }
 
     public ResultEntity getById(Long id) {
-        return nResultDao.findById(id);
+        return resultRepository.findById(id).orElse(null);
     }
 
-    public List<ResultEntity> getByClassId(Long id) {
-        return nResultDao.findByClassId(id);
+    public List<ResultEntity> getByClassId(Integer id) {
+        return resultRepository.findByClsId(id);
     }
 
-    public List<ResultEntity> getBySubjectId(Long id) {
-        return nResultDao.findBySubjectId(id);
+    public List<ResultEntity> getBySubjectId(Integer id) {
+        return resultRepository.findBySubjectId(id);
     }
 
     public List<ResultEntity> getByStudentId(Long id) {
-        return nResultDao.findByStudentId(id);
+        return resultRepository.findByStudentId(id);
     }
 
+    @Transactional
     public String create(ResultEntity pResultEntity) {
-        return nResultDao.save(pResultEntity) == 1 ? "result created" : "Error creating result";
+        resultRepository.save(pResultEntity);
+        return "result created";
     }
 
+    @Transactional
     public String update(ResultEntity pResultEntity) {
-        return nResultDao.update(pResultEntity) == 1 ? "result updated" : "Error updating result";
+        resultRepository.save(pResultEntity);
+        return "result updated";
     }
 
+    @Transactional
     public String delete(Long id) {
-        return nResultDao.delete(id) == 1 ? "result deleted" : "Error deleting result";
+        resultRepository.deleteById(id);
+        return "result deleted";
     }
 }

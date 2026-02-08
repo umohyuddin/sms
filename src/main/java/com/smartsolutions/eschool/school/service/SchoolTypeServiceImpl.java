@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.school.service;
 
+import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.dtos.schoolTypes.requestDto.SchoolTypeCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.schoolTypes.requestDto.SchoolTypeUpdateRequestDTO;
@@ -49,91 +50,161 @@ public class SchoolTypeServiceImpl implements SchoolTypeService {
 
     @Override
     public List<SchoolTypeResponseDTO> getAll() {
+        log.info("Fetching all SchoolTypes from database");
         try {
-            log.info("Fetching all SchoolTypes from database");
             List<SchoolTypeEntity> result = schoolTypeRepository.findAllJpql();
-            return MapperUtil.mapList(result, SchoolTypeResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching SchoolTypes", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping SchoolTypeEntity to SchoolTypeResponseDTO", me);
+            List<SchoolTypeResponseDTO> response = MapperUtil.mapList(result, SchoolTypeResponseDTO.class);
+            log.info("Successfully fetched {} SchoolTypes", response.size());
+            return response;
         } catch (Exception e) {
             log.error("Unexpected error while fetching SchoolTypes", e);
+            throw new CustomServiceException("Failed to fetch all SchoolTypes");
         }
-        return Collections.emptyList();
     }
 
     @Override
     public List<SchoolTypeResponseDTO> getAllActive() {
-        log.info("Fetching active SchoolTypes");
-        List<SchoolTypeEntity> result = schoolTypeRepository.findAllActive();
-        return MapperUtil.mapList(result, SchoolTypeResponseDTO.class);
+        log.info("Fetching all active SchoolTypes from database");
+        try {
+            List<SchoolTypeEntity> result = schoolTypeRepository.findAllActive();
+            List<SchoolTypeResponseDTO> response = MapperUtil.mapList(result, SchoolTypeResponseDTO.class);
+            log.info("Successfully fetched {} active SchoolTypes", response.size());
+            return response;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching active SchoolTypes", e);
+            throw new CustomServiceException("Failed to fetch active SchoolTypes");
+        }
     }
 
     @Override
     public SchoolTypeResponseDTO getById(Long id) {
-        log.info("Fetching SchoolType with id: {}", id);
-        SchoolTypeEntity entity = schoolTypeRepository.findByIdJpql(id)
-                .orElseThrow(() -> new ResourceNotFoundException("SchoolType not found with id: " + id));
-        SchoolTypeResponseDTO responseDTO = MapperUtil.mapObject(entity, SchoolTypeResponseDTO.class);
-        log.info("Successfully fetched SchoolType: id={}", responseDTO.getId());
-        return responseDTO;
+        log.info("Fetching SchoolType with id {} from database", id);
+        try {
+            SchoolTypeEntity entity = schoolTypeRepository.findByIdJpql(id)
+                    .orElseThrow(() -> {
+                        log.warn("SchoolType not found with id: {}", id);
+                        return new ResourceNotFoundException("SchoolType not found with id: " + id);
+                    });
+            SchoolTypeResponseDTO response = MapperUtil.mapObject(entity, SchoolTypeResponseDTO.class);
+            log.info("Successfully fetched SchoolType: id={}", response.getId());
+            return response;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching SchoolType ID: {}", id, e);
+            throw new CustomServiceException("Failed to fetch SchoolType by ID");
+        }
     }
 
     @Override
     public SchoolTypeResponseDTO updateSchoolType(Long id, SchoolTypeUpdateRequestDTO requestDTO) {
-        log.info("Updating SchoolType with id {} using DTO {}", id, requestDTO);
-        SchoolTypeEntity existing = schoolTypeRepository.findByIdJpql(id)
-                .orElseThrow(() -> new ResourceNotFoundException("SchoolType not found with id: " + id));
+        log.info("Updating SchoolType with id {} in database", id);
+        try {
+            SchoolTypeEntity existing = schoolTypeRepository.findByIdJpql(id)
+                    .orElseThrow(() -> {
+                        log.warn("SchoolType not found for update with id: {}", id);
+                        return new ResourceNotFoundException("SchoolType not found with id: " + id);
+                    });
 
-        if (requestDTO.getCode() != null && !requestDTO.getCode().isBlank()) {
-            existing.setCode(requestDTO.getCode());
-        }
-        if (requestDTO.getName() != null && !requestDTO.getName().isBlank()) {
-            existing.setName(requestDTO.getName());
-        }
-        if (requestDTO.getDescription() != null) {
-            existing.setDescription(requestDTO.getDescription());
-        }
-        if (requestDTO.getIsActive() != null) {
-            existing.setIsActive(requestDTO.getIsActive());
-        }
+            if (requestDTO.getCode() != null && !requestDTO.getCode().isBlank()) {
+                existing.setCode(requestDTO.getCode());
+            }
+            if (requestDTO.getName() != null && !requestDTO.getName().isBlank()) {
+                existing.setName(requestDTO.getName());
+            }
+            if (requestDTO.getDescription() != null) {
+                existing.setDescription(requestDTO.getDescription());
+            }
+            if (requestDTO.getIsActive() != null) {
+                existing.setIsActive(requestDTO.getIsActive());
+            }
 
-        SchoolTypeEntity updated = schoolTypeRepository.save(existing);
-        SchoolTypeResponseDTO response = MapperUtil.mapObject(updated, SchoolTypeResponseDTO.class);
-        log.info("SchoolType updated successfully: {}", response.getId());
-        return response;
+            SchoolTypeEntity updated = schoolTypeRepository.save(existing);
+            SchoolTypeResponseDTO response = MapperUtil.mapObject(updated, SchoolTypeResponseDTO.class);
+            log.info("SchoolType updated successfully: id={}", response.getId());
+            return response;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception ex) {
+            log.error("Unexpected error while updating SchoolType id: {}", id, ex);
+            throw new CustomServiceException("Failed to update SchoolType");
+        }
     }
 
     @Override
     public void deleteById(Long id) {
-        log.info("Delete request received for SchoolType ID: {}", id);
-        if (schoolTypeRepository.findByIdJpql(id).isEmpty()) {
-            throw new ResourceNotFoundException("SchoolType not found with id: " + id);
+        log.info("Deleting SchoolType with id {} from database", id);
+        try {
+            if (schoolTypeRepository.findByIdJpql(id).isEmpty()) {
+                log.warn("SchoolType not found for deletion with id: {}", id);
+                throw new ResourceNotFoundException("SchoolType not found with id: " + id);
+            }
+            schoolTypeRepository.deleteById(id);
+            log.info("SchoolType deleted successfully with id: {}", id);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while deleting SchoolType ID: {}", id, e);
+            throw new CustomServiceException("Failed to delete SchoolType");
         }
-        schoolTypeRepository.deleteById(id);
     }
 
     @Override
     public List<SchoolTypeResponseDTO> searchByKeyword(String keyword) {
-        log.info("Searching SchoolTypes with keyword: {}", keyword);
-        List<SchoolTypeEntity> result = schoolTypeRepository.searchByKeyword(keyword == null ? "" : keyword.trim());
-        return MapperUtil.mapList(result, SchoolTypeResponseDTO.class);
+        String searchKey = keyword == null ? "" : keyword.trim();
+        log.info("Searching SchoolTypes with keyword: '{}' in database", searchKey);
+        try {
+            List<SchoolTypeEntity> result = schoolTypeRepository.searchByKeyword(searchKey);
+            List<SchoolTypeResponseDTO> response = MapperUtil.mapList(result, SchoolTypeResponseDTO.class);
+            log.info("Successfully fetched {} SchoolTypes based on search", response.size());
+            return response;
+        } catch (Exception e) {
+            log.error("Unexpected error while searching SchoolTypes", e);
+            throw new CustomServiceException("Failed to search SchoolTypes");
+        }
     }
 
     @Override
     public SchoolTypeResponseDTO activate(Long id) {
-        SchoolTypeEntity entity = schoolTypeRepository.findByIdJpql(id)
-                .orElseThrow(() -> new ResourceNotFoundException("SchoolType not found with id: " + id));
-        entity.setIsActive(true);
-        return MapperUtil.mapObject(schoolTypeRepository.save(entity), SchoolTypeResponseDTO.class);
+        log.info("Activating SchoolType with id {} in database", id);
+        try {
+            SchoolTypeEntity entity = schoolTypeRepository.findByIdJpql(id)
+                    .orElseThrow(() -> {
+                        log.warn("SchoolType not found for activation with id: {}", id);
+                        return new ResourceNotFoundException("SchoolType not found with id: " + id);
+                    });
+            entity.setIsActive(true);
+            SchoolTypeEntity saved = schoolTypeRepository.save(entity);
+            SchoolTypeResponseDTO response = MapperUtil.mapObject(saved, SchoolTypeResponseDTO.class);
+            log.info("SchoolType activated successfully: id={}", response.getId());
+            return response;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while activating SchoolType ID: {}", id, e);
+            throw new CustomServiceException("Failed to activate SchoolType");
+        }
     }
 
     @Override
     public SchoolTypeResponseDTO deactivate(Long id) {
-        SchoolTypeEntity entity = schoolTypeRepository.findByIdJpql(id)
-                .orElseThrow(() -> new ResourceNotFoundException("SchoolType not found with id: " + id));
-        entity.setIsActive(false);
-        return MapperUtil.mapObject(schoolTypeRepository.save(entity), SchoolTypeResponseDTO.class);
+        log.info("Deactivating SchoolType with id {} in database", id);
+        try {
+            SchoolTypeEntity entity = schoolTypeRepository.findByIdJpql(id)
+                    .orElseThrow(() -> {
+                        log.warn("SchoolType not found for deactivation with id: {}", id);
+                        return new ResourceNotFoundException("SchoolType not found with id: " + id);
+                    });
+            entity.setIsActive(false);
+            SchoolTypeEntity saved = schoolTypeRepository.save(entity);
+            SchoolTypeResponseDTO response = MapperUtil.mapObject(saved, SchoolTypeResponseDTO.class);
+            log.info("SchoolType deactivated successfully: id={}", response.getId());
+            return response;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while deactivating SchoolType ID: {}", id, e);
+            throw new CustomServiceException("Failed to deactivate SchoolType");
+        }
     }
 }

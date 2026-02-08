@@ -10,6 +10,7 @@ import com.smartsolutions.eschool.employee.model.SalaryComponentEntity;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import com.smartsolutions.eschool.employee.service.SalaryComponentService;
 import com.smartsolutions.eschool.global.enums.ComponentType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class SalaryComponentFacade {
 
     private final SalaryComponentService salaryComponentService;
@@ -31,71 +33,57 @@ public class SalaryComponentFacade {
         this.salaryComponentService = salaryComponentService;
     }
 
-    // -------------------------
-    // Create a new component
-    // -------------------------
     public SalaryComponentResponseDTO createComponent(SalaryComponentRequestDTO requestDTO) {
-        return salaryComponentService.createComponent(requestDTO);
+        log.info("Facade: Request to create SalaryComponent: {}", requestDTO.getName());
+        SalaryComponentResponseDTO result = salaryComponentService.createComponent(requestDTO);
+        log.info("Facade: Successfully created SalaryComponent: id={}", result.getId());
+        return result;
     }
 
-    // -------------------------
-    // Get component by ID
-    // -------------------------
     public SalaryComponentResponseDTO getById(Long id) {
-        return salaryComponentService.getById(id);
+        log.info("Facade: Request to fetch SalaryComponent by id: {}", id);
+        SalaryComponentResponseDTO result = salaryComponentService.getById(id);
+        log.info("Facade: Successfully fetched SalaryComponent: id={}", id);
+        return result;
     }
 
-    // -------------------------
-    // Get all active / inactive components
-    // -------------------------
-    public List<SalaryComponentResponseDTO> getAllActive() {
-        return salaryComponentService.getAllActive();
+    public List<SalaryComponentResponseDTO> getAllNonDeleted() {
+        log.info("Facade: Request to fetch all non-deleted SalaryComponents");
+        List<SalaryComponentResponseDTO> result = salaryComponentService.getAllNonDeleted();
+        log.info("Facade: Successfully fetched {} SalaryComponents", result.size());
+        return result;
     }
 
-    public List<SalaryComponentResponseDTO> getAllInactive() {
-        return salaryComponentService.getAllInactive();
+    public List<SalaryComponentResponseDTO> searchByKeyword(String keyword) {
+        log.info("Facade: Request to search SalaryComponents by keyword: '{}'", keyword);
+        List<SalaryComponentResponseDTO> result = salaryComponentService.searchByKeyword(keyword);
+        log.info("Facade: Search completed, found {} SalaryComponents", result.size());
+        return result;
     }
 
-    // -------------------------
-    // Search by name
-    // -------------------------
-    public List<SalaryComponentResponseDTO> searchByName(String keyword) {
-        return salaryComponentService.searchByName(keyword);
+    public List<SalaryComponentResponseDTO> searchComplex(SalaryComponentSearchDto searchDto) {
+        log.info("Facade: Request for complex search for SalaryComponents");
+        List<SalaryComponentResponseDTO> result = salaryComponentService.searchComplex(
+                searchDto.getName(), searchDto.getType(), searchDto.getIsPercentage());
+        log.info("Facade: Complex search completed, found {} SalaryComponents", result.size());
+        return result;
     }
 
-    // -------------------------
-    // Get by type (EARNING / DEDUCTION)
-    // -------------------------
-//    public List<SalaryComponentResponseDTO> getByType(ComponentType type) {
-//        return salaryComponentService.getByType(type);
-//    }
-
-    // -------------------------
-    // Update component
-    // -------------------------
     public SalaryComponentResponseDTO updateComponent(Long id, SalaryComponentRequestDTO requestDTO) {
-        return salaryComponentService.updateComponent(id, requestDTO);
+        log.info("Facade: Request to update SalaryComponent ID: {}", id);
+        SalaryComponentResponseDTO result = salaryComponentService.updateComponent(id, requestDTO);
+        log.info("Facade: Successfully updated SalaryComponent: id={}", result.getId());
+        return result;
     }
 
-    // -------------------------
-    // Soft delete component
-    // -------------------------
-    public void softDelete(Long id) {
-        salaryComponentService.softDelete(id);
+    public void delete(Long id) {
+        log.info("Facade: Request to delete SalaryComponent by id: {}", id);
+        salaryComponentService.delete(id);
+        log.info("Facade: Successfully deleted SalaryComponent: id={}", id);
     }
 
-    // -------------------------
-    // Metrics / counts
-    // -------------------------
-    public Long countActive() {
-        return salaryComponentService.countActive();
+    public Long getTotalCount() {
+        log.info("Facade: Request to fetch total SalaryComponent count");
+        return salaryComponentService.getTotalCount();
     }
-
-    public Long countInactive() {
-        return salaryComponentService.countInactive();
-    }
-
-//    public List<SalaryComponentResponseDTO> searchComponents(SalaryComponentSearchDto salaryComponentSearchDto) {
-//        return salaryComponentService.searchComponents(salaryComponentSearchDto.getName(),salaryComponentSearchDto.getType(),salaryComponentSearchDto.getIsPercentage());
-//    }
 }

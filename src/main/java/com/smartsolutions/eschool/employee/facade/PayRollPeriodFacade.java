@@ -8,6 +8,7 @@ import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.Employee
 import com.smartsolutions.eschool.employee.model.PayrollPeriodEntity;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import com.smartsolutions.eschool.employee.service.PayRollPeriodService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class PayRollPeriodFacade {
 
     private final PayRollPeriodService payrollService;
@@ -30,27 +32,51 @@ public class PayRollPeriodFacade {
     }
 
     public PayrollPeriodResponseDTO createPayrollPeriod(PayrollPeriodRequestDTO requestDTO) {
-        return payrollService.createPayrollPeriod(requestDTO);
+        log.info("Facade: Request to create PayrollPeriod: {} to {}", requestDTO.getStartDate(), requestDTO.getEndDate());
+        PayrollPeriodResponseDTO result = payrollService.createPayrollPeriod(requestDTO);
+        log.info("Facade: Successfully created PayrollPeriod: id={}", result.getId());
+        return result;
     }
 
     public PayrollPeriodResponseDTO updatePayrollPeriod(Long id, PayrollPeriodRequestDTO requestDTO) {
-        return payrollService.updatePayrollPeriod(id, requestDTO);
+        log.info("Facade: Request to update PayrollPeriod ID: {}", id);
+        PayrollPeriodResponseDTO result = payrollService.updatePayrollPeriod(id, requestDTO);
+        log.info("Facade: Successfully updated PayrollPeriod: id={}", result.getId());
+        return result;
     }
 
     public PayrollPeriodResponseDTO getPayrollPeriodById(Long id) {
-        return payrollService.getPayrollPeriodById(id);
+        log.info("Facade: Request to fetch PayrollPeriod by id: {}", id);
+        PayrollPeriodResponseDTO result = payrollService.getPayrollPeriodById(id);
+        log.info("Facade: Successfully fetched PayrollPeriod: id={}", id);
+        return result;
     }
 
     public List<PayrollPeriodResponseDTO> getAllPayrollPeriods() {
-        return payrollService.getAllPayrollPeriods();
+        log.info("Facade: Request to fetch all PayrollPeriods");
+        List<PayrollPeriodResponseDTO> result = payrollService.getAllPayrollPeriods();
+        log.info("Facade: Successfully fetched {} PayrollPeriods", result.size());
+        return result;
     }
 
     public List<PayrollPeriodResponseDTO> getPayrollPeriodsByStatus(PayrollPeriodEntity.PayrollStatus status) {
-        return payrollService.getPayrollPeriodsByStatus(status);
+        log.info("Facade: Request to fetch PayrollPeriods by status: {}", status);
+        List<PayrollPeriodResponseDTO> result = payrollService.getPayrollPeriodsByStatus(status);
+        log.info("Facade: Successfully fetched {} PayrollPeriods", result.size());
+        return result;
     }
 
-    public void softDeletePayrollPeriod(Long id) {
-        payrollService.softDeletePayrollPeriod(id);
+    public List<PayrollPeriodResponseDTO> searchByKeyword(String keyword) {
+        log.info("Facade: Request to search PayrollPeriods by keyword: '{}'", keyword);
+        List<PayrollPeriodResponseDTO> result = payrollService.searchByKeyword(keyword);
+        log.info("Facade: Search completed, found {} PayrollPeriods", result.size());
+        return result;
+    }
+
+    public void delete(Long id) {
+        log.info("Facade: Request to delete PayrollPeriod by id: {}", id);
+        payrollService.delete(id);
+        log.info("Facade: Successfully deleted PayrollPeriod: id={}", id);
     }
 }
 

@@ -33,11 +33,11 @@ public class ResultFacade {
     }
 
     public List<ResultEntity> getByClassId(Long id) {
-        return nResultService.getByClassId(id);
+        return nResultService.getByClassId(id.intValue());
     }
 
     public List<ResultEntity> getBySubjectId(Long id) {
-        return nResultService.getBySubjectId(id);
+        return nResultService.getBySubjectId(id.intValue());
     }
 
     public String create(ResultEntity pResultEntity) {

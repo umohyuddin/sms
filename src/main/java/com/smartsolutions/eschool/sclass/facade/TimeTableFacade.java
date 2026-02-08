@@ -32,7 +32,7 @@ public class TimeTableFacade {
     }
 
     public List<TimeTableEntity> getByClassId(Long id) {
-        return timeTableService.getByClassId(id);
+        return timeTableService.getByClassId(id.intValue());
     }
 
     public String create(TimeTableEntity pTimeTableEntity) {

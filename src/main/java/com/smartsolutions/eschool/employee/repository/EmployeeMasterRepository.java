@@ -16,60 +16,38 @@ import java.util.Optional;
 public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEntity, Long> {
 
 
+    @Query("SELECT e FROM EmployeeMasterEntity e LEFT JOIN FETCH e.employeeType")
+    List<EmployeeMasterEntity> findAllNonDeleted();
 
-    @Query("SELECT e FROM EmployeeMasterEntity e " +
-            "LEFT JOIN FETCH e.employeeType " +
-            "WHERE e.active = true")
-    List<EmployeeMasterEntity> findAllWithEmployeeType();    // -------------------------
-    // Find by ID
-    // -------------------------
     @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.id = :id")
     Optional<EmployeeMasterEntity> findById(@Param("id") Long id);
 
-    // -------------------------
-    // Find by employee code
-    // -------------------------
     @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.employeeCode = :code")
     Optional<EmployeeMasterEntity> findByEmployeeCode(@Param("code") String code);
 
-    // -------------------------
-    // Search by  name
-    // -------------------------
+    @Query("""
+        SELECT e FROM EmployeeMasterEntity e
+        WHERE LOWER(e.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.employeeCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.primaryPhone) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    """)
+    List<EmployeeMasterEntity> searchByKeyword(@Param("keyword") String keyword);
 
-    @Query("SELECT e FROM EmployeeMasterEntity e " +
-            "WHERE LOWER(e.firstName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<EmployeeMasterEntity> searchByName(@Param("name") String name);
-
-    // -------------------------
-    // Filter by gender
-    // -------------------------
     @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.gender = :gender")
     List<EmployeeMasterEntity> findByGender(@Param("gender") String gender);
 
-    // -------------------------
-    // Filter by active status
-    // -------------------------
     @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.active = :status")
     List<EmployeeMasterEntity> findByActiveStatus(@Param("status") Boolean status);
 
-    // -------------------------
-    // Filter by joining date range
-    // -------------------------
     @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.joiningDate BETWEEN :start AND :end")
     List<EmployeeMasterEntity> findByJoiningDateBetween(@Param("start") Date start, @Param("end") Date end);
 
-    // -------------------------
-    // Filter by probation end date
-    // -------------------------
     @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.probationEndDate < :date")
     List<EmployeeMasterEntity> findProbationEndedBefore(@Param("date") Date date);
 
-
-    // -------------------------
-    // Count queries
-    // -------------------------
     @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e")
     long countAllEmployees();
 
@@ -82,15 +60,11 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEn
     @Query("SELECT e.gender, COUNT(e) FROM EmployeeMasterEntity e GROUP BY e.gender")
     List<Object[]> countEmployeesByGender();
 
-    // -------------------------
-    // Ordering / Sorting
-    // -------------------------
     @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.joiningDate DESC")
     List<EmployeeMasterEntity> findAllOrderByJoiningDateDesc();
 
     @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.dateOfBirth ASC")
     List<EmployeeMasterEntity> findAllOrderByDateOfBirthAsc();
-
 
     @Query("""
         SELECT 
@@ -103,6 +77,10 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEn
         GROUP BY et.id, et.name
     """)
     List<EmployeeTypeCountDTO> countEmployeesByType();
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE EmployeeMasterEntity e SET e.deleted = true WHERE e.id = :id")
+    int softDeleteById(@Param("id") Long id);
 }
 
 

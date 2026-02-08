@@ -45,23 +45,25 @@ public class DesignationService {
        CREATE
        ========================= */
     public DesignationResponseDTO createDesignation(@Valid DesignationRequestDTO requestDTO) {
-        log.info("Creating new Designation: {}", requestDTO.getDesignationName());
+        log.info("Creating new Designation in database: {}", requestDTO.getDesignationName());
         try {
             DesignationEntity entity = MapperUtil.mapObject(requestDTO, DesignationEntity.class);
             if (requestDTO.getDepartmentId() != null && requestDTO.getDepartmentId() > 0) {
                 DepartmentEntity dept = departmentRepository.findById(requestDTO.getDepartmentId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+                        .orElseThrow(() -> {
+                            log.warn("Department not found with ID: {}", requestDTO.getDepartmentId());
+                            return new ResourceNotFoundException("Department not found");
+                        });
                 entity.setDepartment(dept);
             } else {
                 entity.setDepartment(null); // optional department
             }
 
-            designationRepository.save(entity);
-            log.info("Designation saved with id: {}", entity.getId());
-            return MapperUtil.mapObject(entity, DesignationResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while creating Designation", dae);
-            throw new CustomServiceException("Failed to create Designation due to database error");
+            DesignationEntity saved = designationRepository.save(entity);
+            log.info("Designation saved successfully with ID: {}", saved.getId());
+            return MapperUtil.mapObject(saved, DesignationResponseDTO.class);
+        } catch (ResourceNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Unexpected error while creating Designation", e);
             throw new CustomServiceException("Failed to create Designation");
@@ -72,17 +74,20 @@ public class DesignationService {
        GET BY ID
        ========================= */
     public DesignationResponseDTO getById(Long id) {
-        log.info("Fetching Designation by ID: {}", id);
+        log.info("Fetching Designation with ID: {} from database", id);
         try {
             DesignationEntity entity = designationRepository.findByIdWithDetails(id)
                     .orElseThrow(() -> {
-                        log.warn("Designation not found for id={}", id);
+                        log.warn("Designation not found for ID: {}", id);
                         return new ResourceNotFoundException("Designation not found with id: " + id);
                     });
+            log.info("Successfully fetched Designation: id={}", entity.getId());
             return toDto(entity);
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Designation", dae);
-            throw new CustomServiceException("Unable to fetch Designation from database", dae);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Designation ID: {}", id, e);
+            throw new CustomServiceException("Unable to fetch Designation from database", e);
         }
     }
 
@@ -90,16 +95,14 @@ public class DesignationService {
        GET ALL
        ========================= */
     public List<DesignationResponseDTO> getAll() {
-        log.info("Fetching all Designations");
+        log.info("Fetching all active Designations from database");
         try {
             List<DesignationEntity> entities = designationRepository.findAllActive();
+            log.info("Successfully fetched {} active Designations", entities.size());
             return entities.stream().map(this::toDto).collect(Collectors.toList());
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Designations", dae);
-            throw new CustomServiceException("Unable to fetch Designations", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping Designation Entity to DTO", me);
-            throw new CustomServiceException("Error converting Designation data", me);
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Designations", e);
+            throw new CustomServiceException("Unexpected error occurred while fetching designations", e);
         }
     }
 
@@ -107,33 +110,23 @@ public class DesignationService {
        GET ALL ACTIVE / INACTIVE
        ========================= */
     public List<DesignationResponseDTO> getAllActive() {
-        log.info("Fetching all active Designations");
+        log.info("Fetching all enabled Designations from database");
         try {
-            List<DesignationEntity> entities = designationRepository.findAllActive();
+            List<DesignationEntity> entities = designationRepository.findAllEnabled();
+            log.info("Successfully fetched {} enabled Designations", entities.size());
             return MapperUtil.mapList(entities, DesignationResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching active Designations", dae);
-            throw new CustomServiceException("Unable to fetch active Designations", dae);
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching enabled Designations", e);
+            throw new CustomServiceException("Unable to fetch enabled Designations", e);
         }
     }
-
-//    public List<DesignationResponseDTO> getAllInactive() {
-//        log.info("Fetching all inactive Designations");
-//        try {
-//            List<DesignationEntity> entities = designationRepository.findAllNonActive();
-//            return MapperUtil.mapList(entities, DesignationResponseDTO.class);
-//        } catch (DataAccessException dae) {
-//            log.error("Database error while fetching inactive Designations", dae);
-//            throw new CustomServiceException("Unable to fetch inactive Designations", dae);
-//        }
-//    }
 
     /* =========================
        UPDATE
        ========================= */
     @Transactional
     public DesignationResponseDTO updateDesignation(Long id, @Valid DesignationRequestDTO requestDTO) {
-        log.info("Updating Designation with ID: {}", id);
+        log.info("Updating Designation with ID: {} in database", id);
 
         try {
             // Validate ID
@@ -143,7 +136,10 @@ public class DesignationService {
 
             //  Fetch existing designation
             DesignationEntity existing = designationRepository.findByIdAndDeletedFalse(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Designation not found with ID: " + id));
+                    .orElseThrow(() -> {
+                        log.warn("Designation not found for update with ID: {}", id);
+                        return new ResourceNotFoundException("Designation not found with ID: " + id);
+                    });
 
             //  Validate mandatory fields
             if (requestDTO.getDesignationName() == null || requestDTO.getDesignationName().trim().isEmpty()) {
@@ -156,15 +152,19 @@ public class DesignationService {
 
             //  Fetch associated EmployeeType entity
             EmployeeTypeEntity employeeType = employeeTypeRepository.findById(requestDTO.getEmployeeTypeId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Employee Type not found with ID: " + requestDTO.getEmployeeTypeId()
-                    ));
+                    .orElseThrow(() -> {
+                        log.warn("Employee Type not found with ID: {}", requestDTO.getEmployeeTypeId());
+                        return new ResourceNotFoundException("Employee Type not found with ID: " + requestDTO.getEmployeeTypeId());
+                    });
 
             // Fetch Department if provided
             DepartmentEntity department = null;
             if (requestDTO.getDepartmentId() != null && requestDTO.getDepartmentId() > 0) {
                  department = departmentRepository.findById(requestDTO.getDepartmentId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+                        .orElseThrow(() -> {
+                            log.warn("Department not found with ID: {}", requestDTO.getDepartmentId());
+                            return new ResourceNotFoundException("Department not found");
+                        });
                 existing.setDepartment(department);
             } else {
                 existing.setDepartment(null); // optional department
@@ -179,48 +179,32 @@ public class DesignationService {
             existing.setDepartment(department);
 
             // 7️⃣ Save updated entity
-            designationRepository.save(existing);
-            log.info("Designation updated successfully with ID: {}", existing.getId());
+            DesignationEntity saved = designationRepository.save(existing);
+            log.info("Designation updated successfully with ID: {}", saved.getId());
 
-            return toDto(existing);
+            return toDto(saved);
 
-        } catch (IllegalArgumentException | CustomServiceException | ResourceNotFoundException ex) {
-            log.warn("Validation error while updating Designation: {}", ex.getMessage());
+        } catch (ResourceNotFoundException | IllegalArgumentException | CustomServiceException ex) {
             throw ex;
-        } catch (DataAccessException dae) {
-            log.error("Database error while updating Designation", dae);
-            throw new CustomServiceException("Failed to update Designation due to database error", dae);
         } catch (Exception e) {
-            log.error("Unexpected error while updating Designation", e);
+            log.error("Unexpected error while updating Designation ID: {}", id, e);
             throw new CustomServiceException("Unexpected error while updating Designation", e);
         }
     }
 
     /* =========================
-       SOFT DELETE
-       ========================= */
-//    @Transactional
-//    public int softDeleteById(Long id) {
-//        log.info("Soft delete request received for Designation ID: {}", id);
-//        try {
-//            return designationRepository.softDeleteById(id);
-//        } catch (DataAccessException dae) {
-//            log.error("Database error while deleting Designation with ID {}", id, dae);
-//            throw new CustomServiceException("Failed to delete Designation due to database error", dae);
-//        }
-//    }
-
-    /* =========================
        SEARCH
        ========================= */
     public List<DesignationResponseDTO> searchByKeyword(String keyword) {
-        log.info("Searching Designations by keyword: {}", keyword);
         try {
-            List<DesignationEntity> entities = designationRepository.search(keyword);
+            String searchKey = keyword == null ? "" : keyword.trim();
+            log.info("Fetching Designations based on search from database with keyword: '{}'", searchKey);
+            List<DesignationEntity> entities = designationRepository.search(searchKey);
+            log.info("Successfully fetched {} Designations based on search", entities.size());
             return MapperUtil.mapList(entities, DesignationResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while searching Designations", dae);
-            throw new CustomServiceException("Unable to search Designations", dae);
+        } catch (Exception e) {
+            log.error("Unexpected error while searching Designations", e);
+            throw new CustomServiceException("Unable to search Designations", e);
         }
     }
 
@@ -228,25 +212,23 @@ public class DesignationService {
    GET BY DEPARTMENT
    ========================= */
     public List<DesignationResponseDTO> getByDepartmentId(Long departmentId) {
-        log.info("Fetching Designations for Department ID: {}", departmentId);
+        log.info("Fetching Designations for Department ID: {} from database", departmentId);
 
         try {
             List<DesignationEntity> entities =
                     designationRepository.findActiveByDepartmentOrGlobal(departmentId);
 
-            if (entities.isEmpty()) {
-                log.warn("No Designations found for Department ID: {}", departmentId);
-            }
+            log.info("Successfully fetched {} Designations for Department ID: {}", entities.size(), departmentId);
 
             return entities.stream()
                     .map(this::toDto)
                     .collect(Collectors.toList());
 
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Designations by Department ID: {}", departmentId, dae);
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching Designations by Department ID: {}", departmentId, e);
             throw new CustomServiceException(
                     "Unable to fetch Designations for department id: " + departmentId,
-                    dae
+                    e
             );
         }
     }
