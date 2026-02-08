@@ -1281,6 +1281,7 @@ CREATE TABLE resources (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     module_id BIGINT,
 
+    resource_code VARCHAR(150) UNIQUE NOT NULL,
     resource_name VARCHAR(150) NOT NULL,
     resource_endpoint VARCHAR(255) NULL,
     methodType VARCHAR(50) NULL,

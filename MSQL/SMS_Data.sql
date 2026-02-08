@@ -1,121 +1,10 @@
-INSERT INTO system_users
-(username, email, phone, password_hash, is_active, is_verified, organization_id)
-VALUES
-('admin.user', 'admin@gmail.com', '03001234567',
- '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
- TRUE, TRUE, 1),
-
-('teacher.user', 'teacher@example.com', '03007654321',
- '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
- TRUE, FALSE, 1),
-
-('student.user', 'student@example.com', '03111223344',
- '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
- TRUE, FALSE, 1);
-
-INSERT INTO school_types (code, name, description, is_active, is_deleted) VALUES
-('PUBLIC', 'Public School', 'Funded and operated by the government, free for students.', TRUE, FALSE),
-('PRIVATE', 'Private School', 'Privately funded school, requires tuition fees.', TRUE, FALSE),
-('CHARTER', 'Charter School', 'Publicly funded independent school with special curriculum.', TRUE, FALSE),
-('TRUST', 'Trust School', 'Managed by charitable trusts or foundations.', TRUE, FALSE),
-('INTERNATIONAL', 'International School', 'Follows international curriculum like IB or Cambridge.', TRUE, FALSE),
-('GOVERNMENT', 'Government School', 'Directly run by local or federal government authorities.', TRUE, FALSE),
-('MONTESSORI', 'Montessori School', 'Focuses on child-led learning and early education.', TRUE, FALSE),
-('VOCATIONAL', 'Vocational School', 'Specializes in skill-based education for trades and professions.', TRUE, FALSE);
 
 
-INSERT INTO fee_recurrence_rules
-(code, name, description, is_active, is_deleted, created_by)
-VALUES
-('ONE_TIME', 'One Time',
- 'Fee charged only once (e.g., admission or registration fee)',
- TRUE, FALSE, 1),
-
-('MONTHLY', 'Monthly',
- 'Fee charged every month (common for tuition fees)',
- TRUE, FALSE, 1),
-
-('QUARTERLY', 'Quarterly',
- 'Fee charged every three months',
- TRUE, FALSE, 1),
-
-('HALF_YEARLY', 'Half Yearly',
- 'Fee charged twice in an academic year',
- TRUE, FALSE, 1),
-
-('ANNUAL', 'Annual',
- 'Fee charged once per academic year',
- TRUE, FALSE, 1),
-
-('PER_TERM', 'Per Term',
- 'Fee charged per academic term or semester',
- TRUE, FALSE, 1),
-
-('ON_DEMAND', 'On Demand',
- 'Fee charged when a service is used (transport, lab, activity)',
- TRUE, FALSE, 1);
-
-INSERT INTO modules
-(
-    code,
-    name,
-    description,
-    icon,
-    route,
-    display_order,
-    system_module,
-    active,
-    created_at,
-    created_by
-)
-VALUES
-('DASHBOARD', 'Dashboard', 'System overview and analytics', 'dashboard', '/dashboard', 1, TRUE, TRUE, NOW(), 1),
-('USER', 'User Management', 'Manage users and accounts', 'people', '/users', 2, TRUE, TRUE, NOW(), 1),
-('ROLE', 'Role & Permissions', 'Manage roles and permissions', 'security', '/roles', 3, TRUE, TRUE, NOW(), 1),
-('ACADEMIC', 'Academic Management', 'Academic years, classes, sections', 'school', '/academics', 4, TRUE, TRUE, NOW(), 1),
-('STUDENT', 'Student Management', 'Student profiles and enrollment', 'groups', '/students', 5, FALSE, TRUE, NOW(), 1),
-('TEACHER', 'Teacher Management', 'Teacher profiles and assignments', 'person', '/teachers', 6, FALSE, TRUE, NOW(), 1),
-('FEE', 'Fee Management', 'Fee setup, collection and reports', 'payments', '/fees', 7, FALSE, TRUE, NOW(), 1),
-('EXAM', 'Examination', 'Exam scheduling and results', 'assignment', '/exams', 8, FALSE, TRUE, NOW(), 1),
-('REPORT', 'Reports', 'System and academic reports', 'bar_chart', '/reports', 9, TRUE, TRUE, NOW(), 1),
-('SETTINGS', 'System Settings', 'Application configuration', 'settings', '/settings', 10, TRUE, TRUE, NOW(), 1);
 
 
-INSERT INTO actions
-(code, name, description, is_active, created_by, deleted)
-VALUES
--- Core CRUD
-('VIEW', 'View', 'Read access to the resource', TRUE, 1, FALSE),
-('CREATE', 'Create', 'Ability to create new records', TRUE, 1, FALSE),
-('UPDATE', 'Update', 'Ability to modify existing records', TRUE, 1, FALSE),
-('DELETE', 'Delete', 'Ability to remove records', TRUE, 1, FALSE),
-
--- Workflow & Utility
-('APPROVE', 'Approve', 'Ability to approve workflows', TRUE, 1, FALSE),
-('EXPORT', 'Export', 'Ability to export data to Excel or PDF', TRUE, 1, FALSE),
-('IMPORT', 'Import', 'Ability to import data from files', TRUE, 1, FALSE),
-
--- Management
-('ASSIGN', 'Assign', 'Assign roles or resources', TRUE, 1, FALSE),
-('UNASSIGN', 'Unassign', 'Remove assigned roles or resources', TRUE, 1, FALSE),
-
--- System Control
-('ACTIVATE', 'Activate', 'Activate a disabled record', TRUE, 1, FALSE),
-('DEACTIVATE', 'Deactivate', 'Deactivate an active record', TRUE, 1, FALSE);
 
 
-INSERT INTO permissions
-(
-    organization_id,
-    code,
-    name,
-    module_id,
-    description,
-    is_system_permission,
-    active,
-    created_at,
-    created_by
-)
+INSERT INTO permissions( organization_id,code,name,module_id,description,is_system_permission,active,created_at,created_by)
 VALUES
 -- Dashboard
 (1, 'DASHBOARD_VIEW', 'View Dashboard', (SELECT id FROM modules WHERE code='DASHBOARD'), 'Access dashboard overview', TRUE, TRUE, NOW(), 1),
@@ -154,126 +43,56 @@ VALUES
 (1, 'REPORT_VIEW', 'View Reports', (SELECT id FROM modules WHERE code='REPORT'), 'View system reports', TRUE, TRUE, NOW(), 1);
 
 
-INSERT INTO roles
-(
-    organization_id,
-    code,
-    name,
-    description,
-    is_system_role,
-    active,
-    deleted,
-    created_by,
-    created_at
-)
+INSERT INTO roles(organization_id,code,name,description,is_system_role,active,deleted,created_by,created_at)
 VALUES
-(1, 'SUPER_ADMIN', 'Super Administrator',
- 'Full system access across all modules and organizations',
- TRUE, TRUE, FALSE, 1, NOW()),
-
-(1, 'ORG_ADMIN', 'Organization Administrator',
- 'Manages institute-level configuration, campuses, and users',
- TRUE, TRUE, FALSE, 1, NOW()),
-
-
-
-
+(1, 'SUPER_ADMIN', 'Super Administrator', 'Full system access across all modules and organizations',TRUE, TRUE, FALSE, 1, NOW()),
+(1, 'ORG_ADMIN', 'Organization Administrator', 'Manages institute-level configuration, campuses, and users',TRUE, TRUE, FALSE, 1, NOW()),
 -- ===============================
 -- ACADEMIC LEADERSHIP
 -- ===============================
-(1, 'PRINCIPAL', 'Principal',
- 'Overall academic and administrative head of the school',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'VICE_PRINCIPAL', 'Vice Principal',
- 'Assists principal in academic and disciplinary matters',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'HEAD_OF_DEPARTMENT', 'Head of Department',
- 'Manages academic department and teaching staff',
- FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'PRINCIPAL', 'Principal', 'Overall academic and administrative head of the school',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'VICE_PRINCIPAL', 'Vice Principal', 'Assists principal in academic and disciplinary matters',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'HEAD_OF_DEPARTMENT', 'Head of Department', 'Manages academic department and teaching staff', FALSE, TRUE, FALSE, 1, NOW()),
 
 -- ===============================
 -- TEACHING STAFF
 -- ===============================
-(1, 'TEACHER', 'Teacher',
- 'Teaches assigned classes and manages student academics',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'CLASS_TEACHER', 'Class Teacher',
- 'Responsible for a specific class and student coordination',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'SUBSTITUTE_TEACHER', 'Substitute Teacher',
- 'Temporary teacher assigned to cover classes',
- FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'TEACHER', 'Teacher', 'Teaches assigned classes and manages student academics',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'CLASS_TEACHER', 'Class Teacher', 'Responsible for a specific class and student coordination',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'SUBSTITUTE_TEACHER', 'Substitute Teacher', 'Temporary teacher assigned to cover classes',FALSE, TRUE, FALSE, 1, NOW()),
 
 -- ===============================
 -- STUDENT & PARENT PORTALS
 -- ===============================
-(1, 'STUDENT', 'Student',
- 'Student portal access for academics, attendance, and fees',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'PARENT', 'Parent / Guardian',
- 'Parent portal access to monitor student progress and fees',
- FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'STUDENT', 'Student', 'Student portal access for academics, attendance, and fees',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'PARENT', 'Parent / Guardian', 'Parent portal access to monitor student progress and fees',FALSE, TRUE, FALSE, 1, NOW()),
 
 -- ===============================
 -- ADMISSIONS & EXAMINATION
 -- ===============================
-(1, 'ADMISSIONS_OFFICER', 'Admissions Officer',
- 'Handles student admissions and enrollment process',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'EXAM_CONTROLLER', 'Examination Controller',
- 'Manages exams, grading, and result publication',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'EXAMINER', 'Examiner',
- 'Creates exams and evaluates student performance',
- FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'ADMISSIONS_OFFICER', 'Admissions Officer', 'Handles student admissions and enrollment process',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'EXAM_CONTROLLER', 'Examination Controller', 'Manages exams, grading, and result publication',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'EXAMINER', 'Examiner', 'Creates exams and evaluates student performance',FALSE, TRUE, FALSE, 1, NOW()),
 
 -- ===============================
 -- FINANCE & ACCOUNTS
 -- ===============================
-(1, 'ACCOUNTANT', 'Accountant',
- 'Manages fee collection, payments, and accounting reports',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'FINANCE_MANAGER', 'Finance Manager',
- 'Oversees financial operations and approvals',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'FEE_COLLECTION_OFFICER', 'Fee Collection Officer',
- 'Handles daily fee collection and receipts',
- FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'ACCOUNTANT', 'Accountant', 'Manages fee collection, payments, and accounting reports',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'FINANCE_MANAGER', 'Finance Manager', 'Oversees financial operations and approvals',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'FEE_COLLECTION_OFFICER', 'Fee Collection Officer', 'Handles daily fee collection and receipts',FALSE, TRUE, FALSE, 1, NOW()),
 
 -- ===============================
 -- HR & PAYROLL
 -- ===============================
-(1, 'HR_MANAGER', 'HR Manager',
- 'Manages employees, payroll, and HR policies',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'HR_OFFICER', 'HR Officer',
- 'Handles employee records, attendance, and documentation',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'PAYROLL_OFFICER', 'Payroll Officer',
- 'Processes salaries and payroll cycles',
- FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'HR_MANAGER', 'HR Manager', 'Manages employees, payroll, and HR policies',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'HR_OFFICER', 'HR Officer', 'Handles employee records, attendance, and documentation',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'PAYROLL_OFFICER', 'Payroll Officer', 'Processes salaries and payroll cycles',FALSE, TRUE, FALSE, 1, NOW()),
 
 -- ===============================
 -- IT & SUPPORT
 -- ===============================
-(1, 'IT_ADMIN', 'IT Administrator',
- 'Manages system configuration, users, and technical support',
- FALSE, TRUE, FALSE, 1, NOW()),
-
-(1, 'SUPPORT_STAFF', 'Support Staff',
- 'Limited access for operational and support activities',
- FALSE, TRUE, FALSE, 1, NOW());
+(1, 'IT_ADMIN', 'IT Administrator', 'Manages system configuration, users, and technical support',FALSE, TRUE, FALSE, 1, NOW()),
+(1, 'SUPPORT_STAFF', 'Support Staff', 'Limited access for operational and support activities',FALSE, TRUE, FALSE, 1, NOW());
 
 
 -- ============================================
