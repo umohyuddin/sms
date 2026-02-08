@@ -1,8 +1,8 @@
 package com.smartsolutions.eschool.user.facade;
 
+import com.smartsolutions.eschool.user.dtos.permissions.response.PermissionResponseDTO;
 import com.smartsolutions.eschool.user.dtos.rolepermissions.request.RolePermissionRequestDTO;
 import com.smartsolutions.eschool.user.dtos.rolepermissions.response.RolePermissionResponseDTO;
-import com.smartsolutions.eschool.user.model.PermissionEntity;
 import com.smartsolutions.eschool.user.service.RolePermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -21,7 +21,7 @@ public class RolePermissionFacade {
         return rolePermissionService.assignPermissionsToRole(requestDTO);
     }
 
-    public List<PermissionEntity> getPermissionsByRoleId(Long roleId) {
+    public List<PermissionResponseDTO> getPermissionsByRoleId(Long roleId) {
         return rolePermissionService.getPermissionsByRoleId(roleId);
     }
 

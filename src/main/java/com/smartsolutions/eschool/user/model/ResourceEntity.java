@@ -53,5 +53,6 @@ public class ResourceEntity extends ScopeAuditableEntity {
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
+
 }
 

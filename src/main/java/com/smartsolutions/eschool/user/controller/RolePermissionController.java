@@ -1,9 +1,9 @@
 package com.smartsolutions.eschool.user.controller;
 
+import com.smartsolutions.eschool.user.dtos.permissions.response.PermissionResponseDTO;
 import com.smartsolutions.eschool.user.dtos.rolepermissions.request.RolePermissionRequestDTO;
 import com.smartsolutions.eschool.user.dtos.rolepermissions.response.RolePermissionResponseDTO;
 import com.smartsolutions.eschool.user.facade.RolePermissionFacade;
-import com.smartsolutions.eschool.user.model.PermissionEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +23,7 @@ public class RolePermissionController {
     }
 
     @GetMapping("/role/{roleId}")
-    public ResponseEntity<List<PermissionEntity>> getPermissionsByRoleId(@PathVariable Long roleId) {
+    public ResponseEntity<List<PermissionResponseDTO>> getPermissionsByRoleId(@PathVariable Long roleId) {
         return ResponseEntity.ok(rolePermissionFacade.getPermissionsByRoleId(roleId));
     }
 

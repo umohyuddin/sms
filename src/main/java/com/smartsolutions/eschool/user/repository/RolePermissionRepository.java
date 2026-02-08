@@ -14,7 +14,14 @@ import java.util.List;
 @Repository
 public interface RolePermissionRepository extends JpaRepository<RolePermissionEntity, RolePermissionId> {
 
-    @Query("SELECT rp.permission FROM RolePermissionEntity rp WHERE rp.id.roleId = :roleId")
+    @Query("""
+            SELECT p FROM RolePermissionEntity rp
+            JOIN rp.permission p
+            JOIN FETCH p.module
+            JOIN FETCH p.resource
+            JOIN FETCH p.action
+            WHERE rp.id.roleId = :roleId
+            """)
     List<PermissionEntity> findPermissionsByRoleId(@Param("roleId") Long roleId);
 
 
