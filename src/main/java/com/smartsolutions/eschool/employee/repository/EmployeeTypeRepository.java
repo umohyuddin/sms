@@ -20,11 +20,11 @@ public interface EmployeeTypeRepository extends JpaRepository<EmployeeTypeEntity
        BASIC FINDS
        ========================= */
 
-    Optional<EmployeeTypeEntity> findByIdAndDeletedFalse(Long id);
+    Optional<EmployeeTypeEntity> findByIdAndOrganizationIdAndDeletedFalse(Long id, Long organizationId);
 
-    Optional<EmployeeTypeEntity> findByNameIgnoreCaseAndDeletedFalse(String name);
+    Optional<EmployeeTypeEntity> findByNameIgnoreCaseAndOrganizationIdAndDeletedFalse(String name, Long organizationId);
 
-    boolean existsByNameIgnoreCaseAndDeletedFalse(String name);
+    boolean existsByNameIgnoreCaseAndOrganizationIdAndDeletedFalse(String name, Long organizationId);
 
     /* =========================
        LISTING
@@ -32,24 +32,24 @@ public interface EmployeeTypeRepository extends JpaRepository<EmployeeTypeEntity
 
     @Query("""
                 SELECT e FROM EmployeeTypeEntity e
-                WHERE e.deleted = false
+                WHERE e.deleted = false AND e.organizationId = :organizationId
                 ORDER BY e.name ASC
             """)
-    List<EmployeeTypeEntity> findAllNonDeleted();
+    List<EmployeeTypeEntity> findAllNonDeleted(@Param("organizationId") Long organizationId);
 
     @Query("""
                 SELECT e FROM EmployeeTypeEntity e
-                WHERE e.active = true AND e.deleted = false
+                WHERE e.active = true AND e.deleted = false AND e.organizationId = :organizationId
                 ORDER BY e.name ASC
             """)
-    List<EmployeeTypeEntity> findAllActive();
+    List<EmployeeTypeEntity> findAllActive(@Param("organizationId") Long organizationId);
 
     @Query("""
                 SELECT e FROM EmployeeTypeEntity e
-                WHERE e.active = false AND e.deleted = false
+                WHERE e.active = false AND e.deleted = false AND e.organizationId = :organizationId
                 ORDER BY e.name ASC
             """)
-    List<EmployeeTypeEntity> findAllInactive();
+    List<EmployeeTypeEntity> findAllInactive(@Param("organizationId") Long organizationId);
 
     /* =========================
        SEARCH
@@ -57,27 +57,27 @@ public interface EmployeeTypeRepository extends JpaRepository<EmployeeTypeEntity
 
     @Query("""
                 SELECT e FROM EmployeeTypeEntity e
-                WHERE e.deleted = false
+                WHERE e.deleted = false AND e.organizationId = :organizationId
                   AND (
                     LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
                     OR LOWER(e.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
                   )
                 ORDER BY e.name ASC
             """)
-    List<EmployeeTypeEntity> searchByKeyword(@Param("keyword") String keyword);
+    List<EmployeeTypeEntity> searchByKeyword(@Param("keyword") String keyword, @Param("organizationId") Long organizationId);
 
     /* =========================
        COUNTING
        ========================= */
 
-    @Query("SELECT COUNT(e) FROM EmployeeTypeEntity e WHERE e.deleted = false")
-    long countAll();
+    @Query("SELECT COUNT(e) FROM EmployeeTypeEntity e WHERE e.deleted = false AND e.organizationId = :organizationId")
+    long countAll(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT COUNT(e) FROM EmployeeTypeEntity e WHERE e.active = true AND e.deleted = false")
-    long countActive();
+    @Query("SELECT COUNT(e) FROM EmployeeTypeEntity e WHERE e.active = true AND e.deleted = false AND e.organizationId = :organizationId")
+    long countActive(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT COUNT(e) FROM EmployeeTypeEntity e WHERE e.active = false AND e.deleted = false")
-    long countInactive();
+    @Query("SELECT COUNT(e) FROM EmployeeTypeEntity e WHERE e.active = false AND e.deleted = false AND e.organizationId = :organizationId")
+    long countInactive(@Param("organizationId") Long organizationId);
 
     /* =========================
        SOFT DELETE
@@ -87,9 +87,9 @@ public interface EmployeeTypeRepository extends JpaRepository<EmployeeTypeEntity
     @Query("""
                 UPDATE EmployeeTypeEntity e
                 SET e.deleted = true
-                WHERE e.id = :id
+                WHERE e.id = :id AND e.organizationId = :organizationId
             """)
-    int softDeleteById(@Param("id") Long id);
+    int softDeleteByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
     /* =========================
        ACTIVATE / DEACTIVATE
@@ -99,15 +99,15 @@ public interface EmployeeTypeRepository extends JpaRepository<EmployeeTypeEntity
     @Query("""
                 UPDATE EmployeeTypeEntity e
                 SET e.active = true
-                WHERE e.id = :id AND e.deleted = false
+                WHERE e.id = :id AND e.organizationId = :organizationId AND e.deleted = false
             """)
-    int activateById(@Param("id") Long id);
+    int activateByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
     @Modifying
     @Query("""
                 UPDATE EmployeeTypeEntity e
                 SET e.active = false
-                WHERE e.id = :id AND e.deleted = false
+                WHERE e.id = :id AND e.organizationId = :organizationId AND e.deleted = false
             """)
-    int deactivateById(@Param("id") Long id);
+    int deactivateByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 }

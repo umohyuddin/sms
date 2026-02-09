@@ -241,6 +241,7 @@ VALUES
 
 INSERT INTO roles(organization_id,code,name,description,is_system_role,active,deleted,created_by,created_at)
 VALUES
+(1, 'MASTER_ADMIN', 'Master Administrator', 'Alias of SUPER_ADMIN', TRUE, TRUE, FALSE, 1, NOW()),
 (1, 'SUPER_ADMIN', 'Super Administrator', 'Full system access across all modules and organizations',TRUE, TRUE, FALSE, 1, NOW()),
 (1, 'ORG_ADMIN', 'Organization Administrator', 'Manages institute-level configuration, campuses, and users',TRUE, TRUE, FALSE, 1, NOW()),
 -- ===============================
@@ -566,3 +567,49 @@ VALUES
 (244,'LK','Sri Lanka','LKA','+94', NOW(), 1, NULL, NULL, NULL, NULL),
 (245,'SD','Sudan','SDN','+249', NOW(), 1, NULL, NULL, NULL, NULL),
 (246,'ZW','Zimbabwe','ZWE','+263', NOW(), 1, NULL, NULL, NULL, NULL);
+
+
+
+
+
+
+INSERT INTO employee_type
+(organization_id, name, description, active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+VALUES
+(1, 'Teacher', 'General teaching staff', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Head of Department', 'Leads a specific academic department', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Principal', 'Overall in charge of school administration', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Vice Principal', 'Assists the principal in administration', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Lab Instructor', 'Handles lab sessions and practical classes', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Special Education Teacher', 'Works with students requiring special education', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Sports Coach', 'Manages sports and physical activities', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Music Teacher', 'Handles music and arts subjects', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Art Teacher', 'Handles art-related subjects', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Librarian', 'Manages library operations', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Administrator', 'Handles general administration', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Accountant', 'Manages accounts, fees, and payroll', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Receptionist', 'First point of contact for visitors and parents', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'HR Officer', 'Handles recruitment, payroll, and employee welfare', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Clerk', 'General office work', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'IT Support', 'Maintains school IT infrastructure', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Counselor', 'Provides student counseling services', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Nurse', 'Handles student health needs', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Security Guard', 'Maintains school security', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Driver', 'For school transport vehicles', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Janitor', 'Handles cleaning and maintenance', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Cafeteria Staff', 'Manages school cafeteria operations', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Bus Attendant', 'Assists in student transport', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'School Board Member', 'Part of the school board or governing body', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'School Coordinator', 'Coordinates programs and school events', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'Project Manager', 'Handles special projects and development activities', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL);
+
+
+
+INSERT INTO employee_master(organization_id,employee_code,first_name,last_name,full_name,gender,date_of_birth,marital_status,joining_date,primary_phone,email,active,created_by,created_at,updated_by,updated_at,employee_type_id)
+VALUES
+(1, 'EMP000','System','Admin','System Admin','MALE','1985-01-01','SINGLE','2020-01-01','03000000000','admin@eschool.com',TRUE,1,NOW(),1,NOW(),11);
+
+
+
+INSERT INTO system_users(organization_id,username,email,password_hash,active,created_at,created_by)
+VALUES(1,'admin','admin@eschool.com','$2a$10$XyzHashedPasswordHere',TRUE,NOW(),1);

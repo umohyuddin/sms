@@ -32,8 +32,9 @@ public class EmployeeTypeService {
     public EmployeeTypeResponseDTO create(@Valid EmployeeTypeRequestDTO requestDTO) {
         log.info("Creating new EmployeeType: {} in database", requestDTO.getName());
         try {
-            if (employeeTypeRepository.existsByNameIgnoreCaseAndDeletedFalse(requestDTO.getName())) {
-                log.warn("EmployeeType already exists with name: {}", requestDTO.getName());
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            if (employeeTypeRepository.existsByNameIgnoreCaseAndOrganizationIdAndDeletedFalse(requestDTO.getName(), orgId)) {
+                log.warn("EmployeeType already exists with name: {} for org: {}", requestDTO.getName(), orgId);
                 throw new CustomServiceException("Employee Type already exists with name: " + requestDTO.getName());
             }
 
@@ -57,7 +58,8 @@ public class EmployeeTypeService {
     public List<EmployeeTypeResponseDTO> getAll() {
         log.info("Fetching all non-deleted EmployeeTypes from database");
         try {
-            List<EmployeeTypeEntity> entities = employeeTypeRepository.findAllNonDeleted();
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeTypeEntity> entities = employeeTypeRepository.findAllNonDeleted(orgId);
             List<EmployeeTypeResponseDTO> response = MapperUtil.mapList(entities, EmployeeTypeResponseDTO.class);
             log.info("Successfully fetched {} EmployeeTypes", response.size());
             return response;
@@ -70,7 +72,8 @@ public class EmployeeTypeService {
     public EmployeeTypeResponseDTO getById(Long id) {
         log.info("Fetching EmployeeType with id {} from database", id);
         try {
-            EmployeeTypeEntity entity = employeeTypeRepository.findByIdAndDeletedFalse(id)
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            EmployeeTypeEntity entity = employeeTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(id, orgId)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee Type not found with id: " + id));
             log.info("Successfully fetched EmployeeType: id={}", entity.getId());
             return MapperUtil.mapObject(entity, EmployeeTypeResponseDTO.class);
@@ -85,7 +88,8 @@ public class EmployeeTypeService {
     public List<EmployeeTypeResponseDTO> getAllActive() {
         log.info("Fetching all active EmployeeTypes from database");
         try {
-            List<EmployeeTypeEntity> entities = employeeTypeRepository.findAllActive();
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeTypeEntity> entities = employeeTypeRepository.findAllActive(orgId);
             log.info("Successfully fetched {} active EmployeeTypes", entities.size());
             return MapperUtil.mapList(entities, EmployeeTypeResponseDTO.class);
         } catch (Exception e) {
@@ -97,7 +101,8 @@ public class EmployeeTypeService {
     public List<EmployeeTypeResponseDTO> getAllInactive() {
         log.info("Fetching all inactive EmployeeTypes from database");
         try {
-            List<EmployeeTypeEntity> entities = employeeTypeRepository.findAllInactive();
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeTypeEntity> entities = employeeTypeRepository.findAllInactive(orgId);
             log.info("Successfully fetched {} inactive EmployeeTypes", entities.size());
             return MapperUtil.mapList(entities, EmployeeTypeResponseDTO.class);
         } catch (Exception e) {
@@ -112,7 +117,8 @@ public class EmployeeTypeService {
     public EmployeeTypeResponseDTO update(Long id, @Valid EmployeeTypeRequestDTO requestDTO) {
         log.info("Updating EmployeeType ID: {} in database", id);
         try {
-            EmployeeTypeEntity entity = employeeTypeRepository.findByIdAndDeletedFalse(id)
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            EmployeeTypeEntity entity = employeeTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(id, orgId)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee Type not found with id: " + id));
 
             entity.setName(requestDTO.getName());
@@ -137,7 +143,8 @@ public class EmployeeTypeService {
     public void delete(Long id) {
         log.info("Soft deleting EmployeeType ID: {} from database", id);
         try {
-            int affected = employeeTypeRepository.softDeleteById(id);
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            int affected = employeeTypeRepository.softDeleteByIdAndOrganizationId(id, orgId);
             if (affected == 0) {
                 log.warn("EmployeeType not found for deletion: id={}", id);
                 throw new ResourceNotFoundException("Employee Type not found with id: " + id);
@@ -157,7 +164,8 @@ public class EmployeeTypeService {
         String searchKey = keyword == null ? "" : keyword.trim();
         log.info("Searching EmployeeTypes with keyword: '{}' in database", searchKey);
         try {
-            List<EmployeeTypeEntity> result = employeeTypeRepository.searchByKeyword(searchKey);
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeTypeEntity> result = employeeTypeRepository.searchByKeyword(searchKey, orgId);
             List<EmployeeTypeResponseDTO> response = MapperUtil.mapList(result, EmployeeTypeResponseDTO.class);
             log.info("Successfully fetched {} EmployeeTypes based on search", response.size());
             return response;
@@ -170,15 +178,18 @@ public class EmployeeTypeService {
     /* ================= METRICS ================= */
 
     public long countAll() {
-        return employeeTypeRepository.countAll();
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        return employeeTypeRepository.countAll(orgId);
     }
 
     public long countActive() {
-        return employeeTypeRepository.countActive();
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        return employeeTypeRepository.countActive(orgId);
     }
 
     public long countInactive() {
-        return employeeTypeRepository.countInactive();
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        return employeeTypeRepository.countInactive(orgId);
     }
 
     /* ================= STATUS ================= */
@@ -186,12 +197,14 @@ public class EmployeeTypeService {
     @Transactional
     public void activate(Long id) {
         log.info("Activating EmployeeType ID: {}", id);
-        employeeTypeRepository.activateById(id);
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        employeeTypeRepository.activateByIdAndOrganizationId(id, orgId);
     }
 
     @Transactional
     public void deactivate(Long id) {
         log.info("Deactivating EmployeeType ID: {}", id);
-        employeeTypeRepository.deactivateById(id);
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        employeeTypeRepository.deactivateByIdAndOrganizationId(id, orgId);
     }
 }

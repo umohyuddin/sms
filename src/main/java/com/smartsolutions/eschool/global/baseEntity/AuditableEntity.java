@@ -35,7 +35,7 @@ public abstract class AuditableEntity {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.createdBy = getCurrentUser();
-        this.organizationId = 1L;
+        this.organizationId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
     }
 
     @PreUpdate
@@ -46,7 +46,6 @@ public abstract class AuditableEntity {
 
 
     private Long getCurrentUser() {
-        // Integrate with Spring Security or any auth system
-        return 1L;
+        return com.smartsolutions.eschool.util.SecurityUtils.getCurrentUserId();
     }
 }

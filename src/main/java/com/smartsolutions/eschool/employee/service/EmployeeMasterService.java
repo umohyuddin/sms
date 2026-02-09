@@ -57,7 +57,8 @@ public class EmployeeMasterService {
     public List<EmployeeMasterResponseDto> getAll() {
         log.info("Fetching all non-deleted Employees from database");
         try {
-            List<EmployeeMasterEntity> employees = employeeRepository.findAllNonDeleted();
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeMasterEntity> employees = employeeRepository.findAllNonDeleted(orgId);
             List<EmployeeMasterResponseDto> dtoList = employees.stream()
                     .map(this::toDTO)
                     .collect(Collectors.toList());
@@ -73,7 +74,8 @@ public class EmployeeMasterService {
     public EmployeeMasterResponseDto getById(Long id) {
         log.info("Fetching Employee with id {} from database", id);
         try {
-            EmployeeMasterEntity employee = employeeRepository.findById(id)
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            EmployeeMasterEntity employee = employeeRepository.findByIdAndOrganizationId(id, orgId)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
             log.info("Successfully fetched Employee: id={}", employee.getId());
             return toDTO(employee);
@@ -88,7 +90,8 @@ public class EmployeeMasterService {
     public EmployeeMasterResponseDto getByEmployeeCode(String code) {
         log.info("Fetching Employee with code '{}' from database", code);
         try {
-            EmployeeMasterEntity employee = employeeRepository.findByEmployeeCode(code)
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            EmployeeMasterEntity employee = employeeRepository.findByEmployeeCodeAndOrganizationId(code, orgId)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee not found with code: " + code));
             log.info("Successfully fetched Employee: code={}", code);
             return toDTO(employee);
@@ -104,7 +107,8 @@ public class EmployeeMasterService {
         String searchKey = keyword == null ? "" : keyword.trim();
         log.info("Searching Employees with keyword: '{}' in database", searchKey);
         try {
-            List<EmployeeMasterEntity> result = employeeRepository.searchByKeyword(searchKey);
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeMasterEntity> result = employeeRepository.searchByKeyword(searchKey, orgId);
             List<EmployeeMasterResponseDto> dtoList = result.stream()
                     .map(this::toDTO)
                     .collect(Collectors.toList());
@@ -119,7 +123,8 @@ public class EmployeeMasterService {
     public List<EmployeeMasterResponseDto> getByGender(String gender) {
         log.info("Fetching Employees by gender: '{}'", gender);
         try {
-            List<EmployeeMasterEntity> result = employeeRepository.findByGender(gender);
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeMasterEntity> result = employeeRepository.findByGender(gender, orgId);
             log.info("Successfully fetched {} Employees for gender: '{}'", result.size(), gender);
             return result.stream().map(this::toDTO).collect(Collectors.toList());
         } catch (Exception e) {
@@ -131,7 +136,8 @@ public class EmployeeMasterService {
     public List<EmployeeMasterResponseDto> getByActiveStatus(Boolean status) {
         log.info("Fetching Employees by active status: {}", status);
         try {
-            List<EmployeeMasterEntity> result = employeeRepository.findByActiveStatus(status);
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeMasterEntity> result = employeeRepository.findByActiveStatus(status, orgId);
             log.info("Successfully fetched {} Employees for active status: {}", result.size(), status);
             return result.stream().map(this::toDTO).collect(Collectors.toList());
         } catch (Exception e) {
@@ -143,7 +149,8 @@ public class EmployeeMasterService {
     public List<EmployeeMasterResponseDto> getProbationEndedBefore(Date date) {
         log.info("Fetching Employees probation ended before: {}", date);
         try {
-            List<EmployeeMasterEntity> result = employeeRepository.findProbationEndedBefore(date);
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeMasterEntity> result = employeeRepository.findProbationEndedBefore(date, orgId);
             log.info("Successfully fetched {} Employees with probation ended", result.size());
             return result.stream().map(this::toDTO).collect(Collectors.toList());
         } catch (Exception e) {
@@ -174,7 +181,8 @@ public class EmployeeMasterService {
     public String saveProfilePhoto(Long employeeId, String file) {
         log.info("Saving profile photo path for Employee ID: {}", employeeId);
         try {
-            EmployeeMasterEntity employee = employeeRepository.findById(employeeId)
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            EmployeeMasterEntity employee = employeeRepository.findByIdAndOrganizationId(employeeId, orgId)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + employeeId));
             employee.setProfilePicture(file);
             employeeRepository.save(employee);
@@ -189,22 +197,26 @@ public class EmployeeMasterService {
     }
 
     public long countAllEmployees() {
-        return employeeRepository.countAllEmployees();
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        return employeeRepository.countAllEmployees(orgId);
     }
 
     public long countActiveEmployees() {
-        return employeeRepository.countActiveEmployees();
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        return employeeRepository.countActiveEmployees(orgId);
     }
 
     public long countInactiveEmployees() {
-        return employeeRepository.countInactiveEmployees();
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        return employeeRepository.countInactiveEmployees(orgId);
     }
 
     @Transactional
     public void delete(Long id) {
         log.info("Soft deleting Employee ID: {} from database", id);
         try {
-            int affected = employeeRepository.softDeleteById(id);
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            int affected = employeeRepository.softDeleteByIdAndOrganizationId(id, orgId);
             if (affected == 0) {
                 log.warn("Employee not found for deletion: id={}", id);
                 throw new ResourceNotFoundException("Employee not found with id: " + id);
@@ -303,7 +315,8 @@ public class EmployeeMasterService {
     public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto dto) {
         log.info("Updating Employee ID: {} in database", id);
         try {
-            EmployeeMasterEntity entity = employeeRepository.findById(id)
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            EmployeeMasterEntity entity = employeeRepository.findByIdAndOrganizationId(id, orgId)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
 
             if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) entity.setFirstName(dto.getFirstName());
@@ -341,7 +354,8 @@ public class EmployeeMasterService {
     public Map<String, Long> getEmployeeCountByGender() {
         log.info("Fetching employee count by gender");
         try {
-            List<Object[]> results = employeeRepository.countEmployeesByGender();
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<Object[]> results = employeeRepository.countEmployeesByGender(orgId);
             Map<String, Long> genderCountMap = new HashMap<>();
             for (Object[] row : results) {
                 genderCountMap.put((String) row[0], (Long) row[1]);
@@ -394,7 +408,8 @@ public class EmployeeMasterService {
     public List<EmployeeTypeCountDTO> getEmployeeCountByType() {
         log.info("Fetching employee count by type");
         try {
-            List<EmployeeTypeCountDTO> counts = employeeRepository.countEmployeesByType();
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeTypeCountDTO> counts = employeeRepository.countEmployeesByType(orgId);
             log.info("Successfully fetched employee count by type: {}", counts.size());
             return counts;
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Table(name = "employee_deduction")
-public class EmployeeDeductionEntity {
+public class EmployeeDeductionEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
