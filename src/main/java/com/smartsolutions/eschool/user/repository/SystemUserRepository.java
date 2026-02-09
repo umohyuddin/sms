@@ -10,6 +10,18 @@ public interface SystemUserRepository extends JpaRepository<SystemUserEntity, Lo
 
     Optional<SystemUserEntity> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+    
+    boolean existsByUsername(String username);
+    
+    boolean existsByStudentId(Long studentId);
+    
+    boolean existsByEmployeeId(Long employeeId);
+    
+    Optional<SystemUserEntity> findByStudentId(Long studentId);
+    
+    Optional<SystemUserEntity> findByEmployeeId(Long employeeId);
+
     @org.springframework.data.jpa.repository.Query("""
             SELECT u FROM SystemUserEntity u
             WHERE (:keyword IS NULL OR :keyword = ''

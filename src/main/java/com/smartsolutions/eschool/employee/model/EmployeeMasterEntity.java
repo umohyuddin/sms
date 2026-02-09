@@ -1,6 +1,8 @@
 package com.smartsolutions.eschool.employee.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.user.model.SystemUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -168,6 +170,10 @@ public class EmployeeMasterEntity extends AuditableEntity {
     @JoinColumn(name = "employee_type_id") // FK → employee_type.id
     private EmployeeTypeEntity employeeType;
 
+    // One-to-One relationship with System User
+    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private SystemUserEntity systemUser;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<EmployeeDeductionEntity> deductions;

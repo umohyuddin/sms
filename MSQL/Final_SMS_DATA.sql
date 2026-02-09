@@ -1,19 +1,44 @@
 
-
-INSERT INTO system_users
-(username, email, phone, password_hash, is_active, is_verified, organization_id)
+-- ==========================================
+-- EMPLOYEE MASTER DATA (Required before system_users)
+-- ==========================================
+INSERT INTO employee_master
+(organization_id, employee_code, first_name, last_name, full_name, gender, date_of_birth, marital_status, joining_date, probation_end_date, primary_phone, email, active, created_by)
 VALUES
-('admin.user', 'admin@gmail.com', '03001234567',
- '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
- TRUE, TRUE, 1),
+(1, 'EMP001', 'Uzair', 'Anwar', 'Uzair Anwar', 'MALE', '1990-05-12', 'SINGLE', '2022-01-10', '2022-07-10', '03001234567', 'uzair.anwar@example.com', TRUE, 1),
+(1, 'EMP002', 'Ayesha', 'Khan', 'Ayesha Khan', 'FEMALE', '1988-11-25', 'MARRIED', '2021-06-15', '2021-12-15', '03009876543', 'ayesha.khan@example.com', TRUE, 1),
+(1, 'EMP003', 'Ali', 'Raza', 'Ali Raza', 'MALE', '1992-03-30', 'SINGLE', '2023-03-01', '2023-09-01', '03004567890', 'ali.raza@example.com', TRUE, 1);
 
-('teacher.user', 'teacher@example.com', '03007654321',
+-- ==========================================
+-- SYSTEM USERS WITH USER TYPE
+-- ==========================================
+INSERT INTO system_users
+(organization_id, username, email, phone, password_hash, employee_id, student_id, user_type, is_active, is_verified, created_at, updated_at)
+VALUES
+-- Admin User (No employee or student link)
+(1, 'admin.user', 'admin@gmail.com', '03001234567',
  '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
- TRUE, FALSE, 1),
+ NULL, NULL, 'ADMIN', TRUE, TRUE, NOW(), NOW()),
 
-('student.user', 'student@example.com', '03111223344',
+-- Employee User (Teacher) - References employee_id 1 (Uzair Anwar)
+(1, 'teacher.user', 'teacher@example.com', '03007654321',
  '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
- TRUE, FALSE, 1);
+ 1, NULL, 'EMPLOYEE', TRUE, FALSE, NOW(), NOW()),
+
+-- Employee User (HR Officer) - References employee_id 2 (Ayesha Khan)
+(1, 'hr.officer', 'hr.officer@example.com', '03012345678',
+ '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
+ 2, NULL, 'EMPLOYEE', TRUE, FALSE, NOW(), NOW()),
+
+-- Student User (No employee link)
+(1, 'student.user', 'student@example.com', '03111223344',
+ '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
+ NULL, NULL, 'STUDENT', TRUE, FALSE, NOW(), NOW()),
+
+-- Student User (No employee link)
+(1, 'ayesha.student', 'ayesha.student@example.com', '03117654321',
+ '$2a$10$6rM4qYjGf1MWpzIvS5G72uFXtHTh0VqxGNpZVvBLlXuI9v5snjF6y',
+ NULL, NULL, 'STUDENT', TRUE, FALSE, NOW(), NOW());
 
 
 INSERT INTO actions(code, name, description, is_active, created_by, deleted)
@@ -603,13 +628,3 @@ VALUES
 (1, 'School Coordinator', 'Coordinates programs and school events', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
 (1, 'Project Manager', 'Handles special projects and development activities', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL);
 
-
-
-INSERT INTO employee_master(organization_id,employee_code,first_name,last_name,full_name,gender,date_of_birth,marital_status,joining_date,primary_phone,email,active,created_by,created_at,updated_by,updated_at,employee_type_id)
-VALUES
-(1, 'EMP000','System','Admin','System Admin','MALE','1985-01-01','SINGLE','2020-01-01','03000000000','admin@eschool.com',TRUE,1,NOW(),1,NOW(),11);
-
-
-
-INSERT INTO system_users(organization_id,username,email,password_hash,active,created_at,created_by)
-VALUES(1,'admin','admin@eschool.com','$2a$10$XyzHashedPasswordHere',TRUE,NOW(),1);

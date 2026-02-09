@@ -5,6 +5,7 @@ import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
+import com.smartsolutions.eschool.user.model.SystemUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -115,6 +116,12 @@ public class StudentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id", nullable = false)
     private AcademicYearEntity academicYear;
+    
+    // One-to-One relationship with System User
+    @OneToOne(mappedBy = "student", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private SystemUserEntity systemUser;
+    
     // Optional: bidirectional mapping to fees
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

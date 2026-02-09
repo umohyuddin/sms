@@ -97,8 +97,21 @@ public class SystemUserService {
         
         LoginResponseDTO responseDTO = new LoginResponseDTO();
         responseDTO.setEmail(result.getEmail());
+        responseDTO.setUsername(result.getUsername());
         responseDTO.setOrganizationId(result.getOrganizationId());
         responseDTO.setUserId(result.getId().toString());
+        responseDTO.setUserType(result.getUserType());
+        
+        // Set employee or student information
+        if (result.getEmployee() != null) {
+            responseDTO.setEmployeeId(result.getEmployee().getId());
+            responseDTO.setEmployeeCode(result.getEmployee().getEmployeeCode());
+        }
+        if (result.getStudent() != null) {
+            responseDTO.setStudentId(result.getStudent().getId());
+            responseDTO.setStudentCode(result.getStudent().getStudentCode());
+        }
+        
         log.info("Successfully fetched user data for email: {}", loginRequestDTO.getEmail());
         return responseDTO;
     }

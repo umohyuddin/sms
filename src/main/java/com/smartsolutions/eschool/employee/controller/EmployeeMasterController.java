@@ -42,7 +42,7 @@ public class EmployeeMasterController {
         this.employeeAddressFacade = employeeAddressFacade;
     }
 
-    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"", "/list"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<EmployeeMasterResponseDto>> getAllEmployees() {
         log.info("GET /api/institute/employees/list called");
         List<EmployeeMasterResponseDto> list = employeeFacade.getAllEmployees();

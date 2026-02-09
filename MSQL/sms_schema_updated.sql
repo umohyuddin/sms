@@ -850,75 +850,6 @@ CREATE TABLE sections
             ON UPDATE CASCADE
 );
 
--- students TABLE
-DROP TABLE IF EXISTS `students`;
-CREATE TABLE students
-(
-    id                BIGINT AUTO_INCREMENT PRIMARY KEY,
-
-    organization_id   BIGINT NOT NULL,
-
-    first_name        VARCHAR(50)  NOT NULL,
-    full_name         VARCHAR(100) NOT NULL,
-    last_name         VARCHAR(50)  NOT NULL,
-    student_code      VARCHAR(50)  NOT NULL UNIQUE,
-    date_of_birth     DATE         NOT NULL,
-    gender            VARCHAR(10)  NOT NULL,
-    email             VARCHAR(100) UNIQUE,
-    phone             VARCHAR(15),
-    address           VARCHAR(200),
-    cnic              VARCHAR(20),
-    passport_number   VARCHAR(20),
-    religion          VARCHAR(50),
-    nationality       VARCHAR(50),
-    blood_group       VARCHAR(10),
-    is_active         TINYINT(1) DEFAULT 1,
-    status            VARCHAR(50),
-    enrollment_date   DATE         NOT NULL,
-    deleted           TINYINT(1) DEFAULT 0,
-    deleted_at        DATETIME,
-    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    -- Foreign keys
-    campus_id         BIGINT,
-    standard_id       BIGINT,
-    section_id        BIGINT,
-    admission_type_id BIGINT,
-    academic_year_id  BIGINT       NOT NULL,
-
-    FOREIGN KEY (campus_id) REFERENCES campuses (id),
-    FOREIGN KEY (standard_id) REFERENCES standards (id),
-    FOREIGN KEY (section_id) REFERENCES sections (id),
-    FOREIGN KEY (admission_type_id) REFERENCES admission_type (id),
-    FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
-);
-
-CREATE TABLE student_document (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-
-    organization_id BIGINT NOT NULL,
-
-    student_id BIGINT NOT NULL,
-
-    file_name VARCHAR(255) NOT NULL,
-    file_path VARCHAR(500) NOT NULL,
-    file_type VARCHAR(50),
-    document_type VARCHAR(100) NOT NULL,
-
-           deleted BOOLEAN DEFAULT FALSE,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            created_by BIGINT,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            updated_by BIGINT,
-            deleted_at DATETIME,
-            deleted_by BIGINT,
-    CONSTRAINT fk_student_document_student
-        FOREIGN KEY (student_id)
-        REFERENCES students(id)
-        ON DELETE CASCADE
-);
-
 
 DROP TABLE IF EXISTS `fee_catalog`;
 CREATE TABLE fee_catalog
@@ -999,68 +930,6 @@ CREATE TABLE fee_rates
     CONSTRAINT fk_fee_rates_component FOREIGN KEY (fee_component_id) REFERENCES fee_component (id),
     CONSTRAINT fk_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );
-
-DROP TABLE IF EXISTS student_fee_assignments;
-CREATE TABLE student_fee_assignments
-(
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-
-    organization_id BIGINT NOT NULL,
-
-    student_id    BIGINT NOT NULL,
-    fee_rate_id   BIGINT NOT NULL,
-
-    total_amount DOUBLE NOT NULL,
-    due_date      DATE,
-    assigned_date DATE,
-
-    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_sfa_student FOREIGN KEY (student_id) REFERENCES students (id),
-    CONSTRAINT fk_sfa_fee_rate FOREIGN KEY (fee_rate_id) REFERENCES fee_rates (id)
-);
-ALTER TABLE student_fee_assignments ADD CONSTRAINT uq_student_fee_unique UNIQUE (student_id, fee_rate_id);
-
-
-DROP TABLE IF EXISTS student_fee_payments;
-CREATE TABLE student_fee_payments
-(
-    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-    organization_id  BIGINT NOT NULL,
-    academic_year_id BIGINT      NOT NULL,
-    student_id       BIGINT      NOT NULL,
-    payment_date     DATE,
-    amount_paid DOUBLE NOT NULL,
-    payment_month    VARCHAR(20) NOT NULL,
-    payment_year     INT         NOT NULL,
-    payment_mode     VARCHAR(50),
-
-    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_fee_payment_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
-    CONSTRAINT fk_sfp_student FOREIGN KEY (student_id) REFERENCES students (id)
-);
-
-
-DROP TABLE IF EXISTS student_fee_summary;
-CREATE TABLE student_fee_summary
-(
-    id                 BIGINT PRIMARY KEY AUTO_INCREMENT,
-    organization_id    BIGINT NOT NULL,
-    student_id         BIGINT         NOT NULL,
-    academic_year_id   BIGINT         NOT NULL,
-    total_assigned_fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
-    total_paid         DECIMAL(10, 2) NOT NULL DEFAULT 0,
-    balance            DECIMAL(10, 2) NOT NULL DEFAULT 0,
-    updated_at         TIMESTAMP               DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_student_fee_summary_student
-        FOREIGN KEY (student_id) REFERENCES students (id),
-    CONSTRAINT fk_Student_fee_academic_year
-        FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
-);
-ALTER TABLE student_fee_summary ADD CONSTRAINT uq_student_fee_summary UNIQUE (student_id, academic_year_id);
-
 DROP TABLE IF EXISTS discount_type;
 CREATE TABLE discount_type
 (
@@ -1172,7 +1041,180 @@ CREATE TABLE discount_rate
     CONSTRAINT fk_discount_rate_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
     CONSTRAINT fk_discount_rate_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
 );
+DROP TABLE IF EXISTS employee_type;
+CREATE TABLE employee_type (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255),
+    active          BOOLEAN NOT NULL DEFAULT TRUE,
+    deleted         BOOLEAN DEFAULT FALSE,
+    created_at      DATETIME,
+    created_by      BIGINT,
+    updated_at      DATETIME,
+    updated_by      BIGINT,
+    deleted_at      DATETIME,
+    deleted_by      BIGINT
+);
+CREATE TABLE employee_master
+(
+    id                 BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    organization_id    BIGINT NOT NULL,
+    employee_code      VARCHAR(50)  NOT NULL UNIQUE,
 
+    -- Personal Information
+    first_name         VARCHAR(100) NOT NULL,
+    last_name          VARCHAR(100) NOT NULL,
+    full_name          VARCHAR(100) NOT NULL,
+    middle_Name        VARCHAR(100),
+    gender             VARCHAR(10),
+    date_of_birth      DATE,
+    marital_status     VARCHAR(20),
+    cnic               VARCHAR(20),
+    passport_number    VARCHAR(20),
+    religion           VARCHAR(50),
+    nationality        VARCHAR(50),
+    blood_group        VARCHAR(10),
+
+    -- Contact Information
+    email              VARCHAR(100) NOT NULL,
+    primary_phone      VARCHAR(20),
+    secondary_phone    VARCHAR(20),
+    work_phone         VARCHAR(20),
+
+    -- Employment Details
+    joining_date       DATE,
+    probation_end_date DATE,
+
+    -- Employee Type (current)
+    employee_type_id   BIGINT, -- FK → employee_type.id
+
+    -- Profile
+    profile_picture    VARCHAR(255),
+    bio                TEXT,
+
+    -- Status
+    active             BOOLEAN      NOT NULL DEFAULT TRUE,
+
+    deleted            BOOLEAN      DEFAULT FALSE,
+    created_at         DATETIME,
+    created_by         BIGINT,
+    updated_at         DATETIME,
+    updated_by         BIGINT,
+    deleted_at         DATETIME,
+    deleted_by         BIGINT,
+
+    UNIQUE KEY uq_employee_code (employee_code),
+    -- Indexes
+    INDEX idx_employee_code (employee_code),
+    INDEX idx_employee_active (active),
+    INDEX idx_employee_type (employee_type_id),
+
+    -- Foreign Key
+    CONSTRAINT fk_employee_type FOREIGN KEY (employee_type_id) REFERENCES employee_type(id)
+);
+-- students TABLE
+DROP TABLE IF EXISTS `students`;
+CREATE TABLE students
+(
+    id                BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id   BIGINT NOT NULL,
+
+    first_name        VARCHAR(50)  NOT NULL,
+    full_name         VARCHAR(100) NOT NULL,
+    last_name         VARCHAR(50)  NOT NULL,
+    student_code      VARCHAR(50)  NOT NULL UNIQUE,
+    date_of_birth     DATE         NOT NULL,
+    gender            VARCHAR(10)  NOT NULL,
+    email             VARCHAR(100) UNIQUE,
+    phone             VARCHAR(15),
+    address           VARCHAR(200),
+    cnic              VARCHAR(20),
+    passport_number   VARCHAR(20),
+    religion          VARCHAR(50),
+    nationality       VARCHAR(50),
+    blood_group       VARCHAR(10),
+    is_active         TINYINT(1) DEFAULT 1,
+    status            VARCHAR(50),
+    enrollment_date   DATE         NOT NULL,
+    deleted           TINYINT(1) DEFAULT 0,
+    deleted_at        DATETIME,
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Foreign keys
+    campus_id         BIGINT,
+    standard_id       BIGINT,
+    section_id        BIGINT,
+    admission_type_id BIGINT,
+    academic_year_id  BIGINT       NOT NULL,
+
+    FOREIGN KEY (campus_id) REFERENCES campuses (id),
+    FOREIGN KEY (standard_id) REFERENCES standards (id),
+    FOREIGN KEY (section_id) REFERENCES sections (id),
+    FOREIGN KEY (admission_type_id) REFERENCES admission_type (id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
+);
+
+DROP TABLE IF EXISTS student_fee_payments;
+CREATE TABLE student_fee_payments
+(
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id  BIGINT NOT NULL,
+    academic_year_id BIGINT      NOT NULL,
+    student_id       BIGINT      NOT NULL,
+    payment_date     DATE,
+    amount_paid DOUBLE NOT NULL,
+    payment_month    VARCHAR(20) NOT NULL,
+    payment_year     INT         NOT NULL,
+    payment_mode     VARCHAR(50),
+
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_fee_payment_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
+    CONSTRAINT fk_sfp_student FOREIGN KEY (student_id) REFERENCES students (id)
+);
+
+DROP TABLE IF EXISTS student_fee_summary;
+CREATE TABLE student_fee_summary
+(
+    id                 BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id    BIGINT NOT NULL,
+    student_id         BIGINT         NOT NULL,
+    academic_year_id   BIGINT         NOT NULL,
+    total_assigned_fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    total_paid         DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    balance            DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    updated_at         TIMESTAMP               DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_student_fee_summary_student
+        FOREIGN KEY (student_id) REFERENCES students (id),
+    CONSTRAINT fk_Student_fee_academic_year
+        FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
+);
+ALTER TABLE student_fee_summary ADD CONSTRAINT uq_student_fee_summary UNIQUE (student_id, academic_year_id);
+
+DROP TABLE IF EXISTS student_fee_assignments;
+CREATE TABLE student_fee_assignments
+(
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
+
+    student_id    BIGINT NOT NULL,
+    fee_rate_id   BIGINT NOT NULL,
+
+    total_amount DOUBLE NOT NULL,
+    due_date      DATE,
+    assigned_date DATE,
+
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_sfa_student FOREIGN KEY (student_id) REFERENCES students (id),
+    CONSTRAINT fk_sfa_fee_rate FOREIGN KEY (fee_rate_id) REFERENCES fee_rates (id)
+);
+ALTER TABLE student_fee_assignments ADD CONSTRAINT uq_student_fee_unique UNIQUE (student_id, fee_rate_id);
 
 CREATE TABLE student_discount_assignment
 (
@@ -1206,6 +1248,31 @@ CREATE TABLE student_discount_assignment
 );
 ALTER TABLE student_discount_assignment ADD CONSTRAINT uq_student_discount_unique UNIQUE (student_id, discount_rate_id, academic_year_id);
 
+CREATE TABLE student_document (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
+
+    student_id BIGINT NOT NULL,
+
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    file_type VARCHAR(50),
+    document_type VARCHAR(100) NOT NULL,
+
+    deleted BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    CONSTRAINT fk_student_document_student
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE
+);
+
 CREATE TABLE system_users
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -1218,13 +1285,28 @@ CREATE TABLE system_users
     phone         VARCHAR(20) UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
 
+    -- User Type References (One-to-One)
+    employee_id   BIGINT NULL UNIQUE,
+    student_id    BIGINT NULL UNIQUE,
+    user_type     VARCHAR(20) NOT NULL, -- 'EMPLOYEE', 'STUDENT', 'ADMIN'
+
     -- Status
     is_active     BOOLEAN  DEFAULT TRUE,
     is_verified   BOOLEAN  DEFAULT FALSE,
 
     -- Audit
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Foreign Keys
+    CONSTRAINT fk_system_user_employee FOREIGN KEY (employee_id) REFERENCES employee_master(id) ON DELETE SET NULL,
+    CONSTRAINT fk_system_user_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
+    
+    -- Indexes for lookup
+    INDEX idx_user_type (user_type),
+    INDEX idx_user_email (email),
+    INDEX idx_user_employee (employee_id),
+    INDEX idx_user_student (student_id)
 );
 
 -- RBAC Tables
@@ -1362,81 +1444,6 @@ CREATE TABLE user_roles (
     PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES system_users(id),
     FOREIGN KEY (role_id) REFERENCES roles(id)
-);
-
-CREATE TABLE employee_type (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    organization_id BIGINT NOT NULL,
-    name VARCHAR(50) NOT NULL UNIQUE,
-    description VARCHAR(255),
-  active          BOOLEAN NOT NULL DEFAULT TRUE,
-          deleted         BOOLEAN DEFAULT FALSE,
-          created_at      DATETIME,
-          created_by      BIGINT,
-          updated_at      DATETIME,
-          updated_by      BIGINT,
-          deleted_at      DATETIME,
-          deleted_by      BIGINT
-);
-
-
-
-CREATE TABLE employee_master
-(
-    id                 BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    organization_id    BIGINT NOT NULL,
-    employee_code      VARCHAR(50)  NOT NULL UNIQUE,
-
-    -- Personal Information
-    first_name         VARCHAR(100) NOT NULL,
-    last_name          VARCHAR(100) NOT NULL,
-    full_name          VARCHAR(100) NOT NULL,
-    middle_Name        VARCHAR(100),
-    gender             VARCHAR(10),
-    date_of_birth      DATE,
-    marital_status     VARCHAR(20),
-    cnic               VARCHAR(20),
-    passport_number    VARCHAR(20),
-    religion           VARCHAR(50),
-    nationality        VARCHAR(50),
-    blood_group        VARCHAR(10),
-
-    -- Contact Information
-    email              VARCHAR(100) NOT NULL,
-    primary_phone      VARCHAR(20),
-    secondary_phone    VARCHAR(20),
-    work_phone         VARCHAR(20),
-
-    -- Employment Details
-    joining_date       DATE,
-    probation_end_date DATE,
-
-    -- Employee Type (current)
-    employee_type_id   BIGINT, -- FK → employee_type.id
-
-    -- Profile
-    profile_picture    VARCHAR(255),
-    bio                TEXT,
-
-    -- Status
-    active             BOOLEAN      NOT NULL DEFAULT TRUE,
-
-    deleted            BOOLEAN      DEFAULT FALSE,
-    created_at         DATETIME,
-    created_by         BIGINT,
-    updated_at         DATETIME,
-    updated_by         BIGINT,
-    deleted_at         DATETIME,
-    deleted_by         BIGINT,
-
-    UNIQUE KEY uq_employee_code (employee_code),
-    -- Indexes
-    INDEX idx_employee_code (employee_code),
-    INDEX idx_employee_active (active),
-    INDEX idx_employee_type (employee_type_id),
-
-    -- Foreign Key
-    CONSTRAINT fk_employee_type FOREIGN KEY (employee_type_id) REFERENCES employee_type(id)
 );
 
 
