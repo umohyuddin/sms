@@ -792,23 +792,7 @@ CREATE INDEX idx_campus_province ON campuses (province_id);
 CREATE INDEX idx_campus_city ON campuses (city_id);
 CREATE INDEX idx_campus_name ON campuses (campus_name);
 
-DROP TABLE IF EXISTS subjects;
-CREATE TABLE subjects (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    organization_id BIGINT NOT NULL,
-    code VARCHAR(50) NOT NULL UNIQUE,
-    name VARCHAR(150) NOT NULL,
-    description VARCHAR(255),
-    is_core BOOLEAN NOT NULL DEFAULT TRUE,
-    active BOOLEAN NOT NULL DEFAULT TRUE,
-    deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME,
-    created_by BIGINT,
-    updated_at DATETIME,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT
-);
+
 
 DROP TABLE IF EXISTS admission_type;
 CREATE TABLE admission_type (
@@ -1602,3 +1586,611 @@ CREATE TABLE salary_slip (
 );
 CREATE INDEX idx_salary_slip_employee_salary_id ON salary_slip (employee_salary_id);
 CREATE INDEX idx_salary_slip_payroll_period_id ON salary_slip (payroll_period_id);
+
+
+
+DROP TABLE IF EXISTS subject_groups;
+CREATE TABLE subject_groups (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(20) UNIQUE,
+    name VARCHAR(100) NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+
+DROP TABLE IF EXISTS subjects;
+CREATE TABLE subjects (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(150) NOT NULL,
+    description VARCHAR(255),
+    is_core BOOLEAN NOT NULL DEFAULT TRUE,
+
+    subject_group_id BIGINT,  -- link to subject_groups
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (subject_group_id) REFERENCES subject_groups(id)
+);
+
+
+
+
+DROP TABLE IF EXISTS standard_subjects;
+CREATE TABLE standard_subjects (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
+    standard_id BIGINT NOT NULL,
+    subject_id BIGINT NOT NULL,
+    academic_year_id BIGINT NOT NULL,
+
+    is_optional BOOLEAN NOT NULL DEFAULT FALSE,
+    weekly_hours INT,
+    theory_marks INT,
+    practical_marks INT,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (organization_id, standard_id, subject_id, academic_year_id),
+
+    FOREIGN KEY (standard_id) REFERENCES standards(id),
+    FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
+);
+
+
+
+
+DROP TABLE IF EXISTS teacher_subject_assignment;
+CREATE TABLE teacher_subject_assignment (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
+    employee_id BIGINT NOT NULL,
+    standard_id BIGINT NOT NULL,
+    section_id BIGINT NOT NULL,
+    subject_id BIGINT NOT NULL,
+    academic_year_id BIGINT NOT NULL,
+
+    teaching_role VARCHAR(30) DEFAULT 'PRIMARY', -- PRIMARY, ASSISTANT, SUBSTITUTE
+    effective_from DATE NOT NULL,
+    effective_to DATE,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (
+        organization_id,
+        employee_id,
+        standard_id,
+        section_id,
+        subject_id,
+        academic_year_id,
+        effective_from
+    ),
+
+    FOREIGN KEY (employee_id) REFERENCES employee_master(id),
+    FOREIGN KEY (standard_id) REFERENCES standards(id),
+    FOREIGN KEY (section_id) REFERENCES sections(id),
+    FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
+);
+
+
+
+
+DROP TABLE IF EXISTS student_attendance;
+CREATE TABLE student_attendance (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    standard_id BIGINT NOT NULL,
+    section_id BIGINT NOT NULL,
+    attendance_date DATE NOT NULL,
+    status ENUM('PRESENT','ABSENT','LEAVE') NOT NULL,
+    marked_by BIGINT,
+    remarks VARCHAR(255),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (organization_id, student_id, attendance_date),
+
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (standard_id) REFERENCES standards(id),
+    FOREIGN KEY (section_id) REFERENCES sections(id),
+    FOREIGN KEY (marked_by) REFERENCES employee_master(id) -- who marked the attendance
+);
+
+
+
+
+DROP TABLE IF EXISTS employee_attendance;
+CREATE TABLE employee_attendance (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    employee_id BIGINT NOT NULL,
+    attendance_date DATE NOT NULL,
+    status ENUM('PRESENT','ABSENT','LEAVE','HALF_DAY') NOT NULL,
+    remarks VARCHAR(255),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (organization_id, employee_id, attendance_date),
+
+    FOREIGN KEY (employee_id) REFERENCES employee_master(id),
+    FOREIGN KEY (created_by) REFERENCES employee_master(id)
+);
+
+
+
+
+
+
+DROP TABLE IF EXISTS exam_type;
+CREATE TABLE exam_type (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(50) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    UNIQUE (organization_id, code)
+);
+
+
+
+DROP TABLE IF EXISTS exam_terms;
+CREATE TABLE exam_terms (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    name VARCHAR(50) NOT NULL,          -- Mid Term, Final Term
+    sequence_no INT NOT NULL,           -- order of the term in academic year
+    academic_year_id BIGINT NOT NULL,   -- FK to academic_years table
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (organization_id, name, academic_year_id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
+);
+
+
+
+DROP TABLE IF EXISTS assessment_types;
+CREATE TABLE assessment_types (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(20) NOT NULL,   -- QUIZ, ASSIGNMENT
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(255),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    UNIQUE (organization_id, code)
+);
+
+DROP TABLE IF EXISTS grade_scales;
+CREATE TABLE grade_scales (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    min_percentage DECIMAL(5,2) NOT NULL,
+    max_percentage DECIMAL(5,2) NOT NULL,
+    grade VARCHAR(5) NOT NULL,
+    remarks VARCHAR(50),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+DROP TABLE IF EXISTS assessments;
+CREATE TABLE assessments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    teacher_subject_assignment_id BIGINT NOT NULL,
+    assessment_type_id BIGINT NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    description TEXT,
+    total_marks DECIMAL(6,2) NOT NULL,
+    passing_marks DECIMAL(6,2),
+    assessment_date DATE,
+    due_date DATE,
+    is_published BOOLEAN NOT NULL DEFAULT FALSE,
+    academic_year_id BIGINT NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (teacher_subject_assignment_id) REFERENCES teacher_subject_assignment(id),
+    FOREIGN KEY (assessment_type_id) REFERENCES assessment_types(id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
+);
+
+DROP TABLE IF EXISTS student_assessments;
+CREATE TABLE student_assessments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    assessment_id BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    obtained_marks DECIMAL(6,2),
+    grade VARCHAR(5),
+    remarks VARCHAR(255),
+    submission_status ENUM('SUBMITTED','NOT_SUBMITTED') DEFAULT 'NOT_SUBMITTED',
+    evaluated_by BIGINT,
+    evaluated_at DATETIME,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (organization_id, assessment_id, student_id),
+
+    FOREIGN KEY (assessment_id) REFERENCES assessments(id),
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (evaluated_by) REFERENCES employee_master(id)
+);
+
+
+DROP TABLE IF EXISTS assessment_attachments;
+CREATE TABLE assessment_attachments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    assessment_id BIGINT NOT NULL,
+    file_url VARCHAR(255) NOT NULL,
+    file_type VARCHAR(50),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (assessment_id) REFERENCES assessments(id)
+);
+
+
+DROP TABLE IF EXISTS exams;
+CREATE TABLE exams (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    academic_year_id BIGINT NOT NULL,
+    exam_term_id BIGINT NOT NULL,
+    campus_id BIGINT NOT NULL,
+    standard_id BIGINT NOT NULL,
+    section_id BIGINT NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status ENUM('DRAFT','SCHEDULED','IN_PROGRESS','LOCKED','PUBLISHED') DEFAULT 'DRAFT',
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (organization_id, academic_year_id, exam_term_id, standard_id, section_id),
+
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
+    FOREIGN KEY (exam_term_id) REFERENCES exam_terms(id),
+    FOREIGN KEY (campus_id) REFERENCES campuses(id),
+    FOREIGN KEY (standard_id) REFERENCES standards(id),
+    FOREIGN KEY (section_id) REFERENCES sections(id)
+);
+
+DROP TABLE IF EXISTS exam_subjects;
+CREATE TABLE exam_subjects (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    exam_id BIGINT NOT NULL,
+    subject_id BIGINT NOT NULL,
+    total_marks DECIMAL(6,2) NOT NULL,
+    passing_marks DECIMAL(6,2) NOT NULL,
+    exam_date DATE NOT NULL,
+    start_time TIME,
+    end_time TIME,
+    evaluator_id BIGINT,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (organization_id, exam_id, subject_id),
+    FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    FOREIGN KEY (evaluator_id) REFERENCES employee_master(id)
+);
+
+DROP TABLE IF EXISTS student_exam_attendance;
+CREATE TABLE student_exam_attendance (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    exam_subject_id BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    status ENUM('PRESENT','ABSENT','UFM') NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (organization_id, exam_subject_id, student_id),
+    FOREIGN KEY (exam_subject_id) REFERENCES exam_subjects(id),
+    FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+DROP TABLE IF EXISTS student_exam_marks;
+CREATE TABLE student_exam_marks (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    exam_subject_id BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    obtained_marks DECIMAL(6,2),
+    grace_marks DECIMAL(6,2) DEFAULT 0,
+    is_locked BOOLEAN DEFAULT FALSE,
+    remarks VARCHAR(255),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    UNIQUE (organization_id, exam_subject_id, student_id),
+    FOREIGN KEY (exam_subject_id) REFERENCES exam_subjects(id),
+    FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+DROP TABLE IF EXISTS exam_weightage;
+CREATE TABLE exam_weightage (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    standard_id BIGINT NOT NULL,
+    subject_id BIGINT NOT NULL,
+    exam_term_id BIGINT NOT NULL,
+    weight_percentage DECIMAL(5,2) NOT NULL,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    UNIQUE (organization_id, standard_id, subject_id, exam_term_id),
+    FOREIGN KEY (standard_id) REFERENCES standards(id),
+    FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    FOREIGN KEY (exam_term_id) REFERENCES exam_terms(id)
+);
+
+DROP TABLE IF EXISTS student_term_result;
+CREATE TABLE student_term_result (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    academic_year_id BIGINT NOT NULL,
+    exam_term_id BIGINT NOT NULL,
+    total_marks DECIMAL(8,2),
+    obtained_marks DECIMAL(8,2),
+    percentage DECIMAL(5,2),
+    grade VARCHAR(10),
+    gpa DECIMAL(3,2),
+    generated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    UNIQUE (organization_id, student_id, academic_year_id, exam_term_id),
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
+    FOREIGN KEY (exam_term_id) REFERENCES exam_terms(id)
+);
+
+DROP TABLE IF EXISTS report_card;
+CREATE TABLE report_card (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    academic_year_id BIGINT NOT NULL,
+    generated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    file_url VARCHAR(255),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
+);
+
+DROP TABLE IF EXISTS student_activity;
+CREATE TABLE student_activity (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    activity_type VARCHAR(100),
+    description VARCHAR(255),
+    activity_date DATE,
+    grade VARCHAR(10),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (student_id) REFERENCES students(id)
+);
+
+CREATE TABLE student_academic_history (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organization_id BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    standard_id BIGINT NOT NULL,
+    section_id BIGINT NOT NULL,
+    academic_year_id BIGINT NOT NULL,
+    status ENUM('PROMOTED','RETAINED','WITHDRAWN') NOT NULL,
+    remarks VARCHAR(255),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (standard_id) REFERENCES standards(id),
+    FOREIGN KEY (section_id) REFERENCES sections(id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
+);
+
+
+CREATE TABLE timetable (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    standard_id BIGINT NOT NULL,
+    section_id BIGINT NOT NULL,
+    subject_id BIGINT NOT NULL,
+    teacher_id BIGINT NOT NULL,
+    day_of_week ENUM('MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY') NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    room VARCHAR(50),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    FOREIGN KEY (standard_id) REFERENCES standards(id),
+    FOREIGN KEY (section_id) REFERENCES sections(id),
+    FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    FOREIGN KEY (teacher_id) REFERENCES employee_master(id)
+);
+
+
+
+

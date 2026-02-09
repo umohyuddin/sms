@@ -1,0 +1,76 @@
+package com.smartsolutions.sms.academic.service.impl;
+
+import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.util.SecurityUtils;
+import com.smartsolutions.sms.academic.dto.request.SubjectGroupRequestDTO;
+import com.smartsolutions.sms.academic.dto.response.SubjectGroupResponseDTO;
+import com.smartsolutions.sms.academic.entity.master.SubjectGroupEntity;
+import com.smartsolutions.sms.academic.mapper.CoreAcademicMapper;
+import com.smartsolutions.sms.academic.repository.SubjectGroupRepository;
+import com.smartsolutions.sms.academic.service.SubjectGroupService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class SubjectGroupServiceImpl implements SubjectGroupService {
+
+    private final SubjectGroupRepository subjectGroupRepository;
+    private final CoreAcademicMapper coreAcademicMapper;
+
+    @Override
+    @Transactional
+    public SubjectGroupResponseDTO create(SubjectGroupRequestDTO dto) {
+        log.info("Creating Subject Group: {}", dto.getName());
+        SubjectGroupEntity entity = coreAcademicMapper.toEntity(dto);
+        // organizationId is handled by AuditableEntity @PrePersist
+        SubjectGroupEntity saved = subjectGroupRepository.save(entity);
+        return coreAcademicMapper.toResponse(saved);
+    }
+
+    @Override
+    @Transactional
+    public SubjectGroupResponseDTO update(Long id, SubjectGroupRequestDTO dto) {
+        log.info("Updating Subject Group ID: {}", id);
+        SubjectGroupEntity entity = subjectGroupRepository.findActiveById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Subject Group not found or deleted with ID: " + id));
+        
+        entity.setName(dto.getName());
+        entity.setCode(dto.getCode());
+        entity.setActive(dto.isActive());
+        
+        SubjectGroupEntity updated = subjectGroupRepository.save(entity);
+        return coreAcademicMapper.toResponse(updated);
+    }
+
+    @Override
+    public SubjectGroupResponseDTO getById(Long id) {
+        return subjectGroupRepository.findActiveById(id)
+                .map(coreAcademicMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Subject Group not found with ID: " + id));
+    }
+
+    @Override
+    public List<SubjectGroupResponseDTO> getAllActive() {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        return subjectGroupRepository.findAllActiveByOrg(orgId).stream()
+                .map(coreAcademicMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        log.info("Soft deleting Subject Group ID: {}", id);
+        if (!subjectGroupRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Subject Group not found with ID: " + id);
+        }
+        subjectGroupRepository.softDeleteById(id);
+    }
+}
