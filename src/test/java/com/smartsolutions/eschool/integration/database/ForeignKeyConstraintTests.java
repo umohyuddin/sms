@@ -289,8 +289,13 @@ class ForeignKeyConstraintTests {
     }
 
     private Long setupFeeComponent() {
-        String feeCatalogId = jdbcTemplate.queryForObject(
-                "SELECT id FROM fee_catalog LIMIT 1", Long.class);
+        Long feeCatalogId = null;
+        try {
+            feeCatalogId = jdbcTemplate.queryForObject(
+                    "SELECT id FROM fee_catalog LIMIT 1", Long.class);
+        } catch (Exception e) {
+            // Ignore if empty
+        }
 
         if (feeCatalogId == null) {
             String catalogSql = "INSERT INTO fee_catalog (organization_id, code, name, charge_type) " +

@@ -14,13 +14,14 @@ import java.math.BigDecimal;
 public class StudentAssessmentRequestDTO {
     @NotNull
     private Long assessmentId;
-    
+
     @NotNull
     private Long studentId;
-    
+
     private BigDecimal obtainedMarks;
     private String grade;
     private String remarks;
     private StudentAssessmentEntity.SubmissionStatus submissionStatus = StudentAssessmentEntity.SubmissionStatus.NOT_SUBMITTED;
     private Long evaluatedById;
+    private boolean active = true;
 }

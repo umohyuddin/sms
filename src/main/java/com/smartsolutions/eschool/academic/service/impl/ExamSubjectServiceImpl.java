@@ -6,7 +6,6 @@ import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import com.smartsolutions.eschool.academic.dto.request.ExamSubjectRequestDTO;
 import com.smartsolutions.eschool.academic.dto.response.ExamSubjectResponseDTO;
-import com.smartsolutions.eschool.academic.entity.embeddable.ExamSubjectId;
 import com.smartsolutions.eschool.academic.entity.mapping.ExamSubjectEntity;
 import com.smartsolutions.eschool.academic.entity.master.ExamEntity;
 import com.smartsolutions.eschool.academic.entity.master.SubjectEntity;
@@ -32,7 +31,6 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
     private final ExamRepository examRepository;
     private final SubjectRepository subjectRepository;
     private final EmployeeMasterRepository employeeRepository;
-    private final ExamAssessmentMapper examMapper;
 
     @Override
     @Transactional
@@ -41,42 +39,33 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
                 .orElseThrow(() -> new ResourceNotFoundException("Exam not found"));
         SubjectEntity subject = subjectRepository.findActiveById(dto.getSubjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
-        
-        ExamSubjectEntity entity = examMapper.toEntity(dto);
+
+        ExamSubjectEntity entity = ExamAssessmentMapper.toEntity(dto);
         entity.setExam(exam);
         entity.setSubject(subject);
-        
+
         if (dto.getEvaluatorId() != null) {
             EmployeeMasterEntity evaluator = employeeRepository.findById(dto.getEvaluatorId())
                     .orElseThrow(() -> new ResourceNotFoundException("Evaluator not found"));
             entity.setEvaluator(evaluator);
         }
-        
-        if (entity.getId().getOrganizationId() == null) {
-            entity.getId().setOrganizationId(SecurityUtils.getCurrentOrganizationId());
-        }
 
-        return examMapper.toResponse(examSubjectRepository.save(entity));
+        ExamSubjectEntity saved = examSubjectRepository.save(entity);
+        return ExamAssessmentMapper.toResponse(saved);
     }
 
     @Override
     public List<ExamSubjectResponseDTO> getByExam(Long examId) {
         return examSubjectRepository.findByExamId(examId).stream()
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public void unschedule(Long examId, Long subjectId) {
-        ExamSubjectId id = ExamSubjectId.builder()
-                .organizationId(SecurityUtils.getCurrentOrganizationId())
-                .examId(examId)
-                .subjectId(subjectId)
-                .build();
-        if (!examSubjectRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Exam Subject assignment not found");
-        }
-        examSubjectRepository.softDeleteById(id);
+        ExamSubjectEntity entity = examSubjectRepository.findByExamAndSubject(examId, subjectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exam Subject assignment not found"));
+        examSubjectRepository.softDeleteById(entity.getId());
     }
 }

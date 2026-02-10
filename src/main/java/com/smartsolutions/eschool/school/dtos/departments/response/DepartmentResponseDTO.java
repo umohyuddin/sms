@@ -26,6 +26,10 @@ public class DepartmentResponseDTO {
     private String headEmployeeName;
 
     private Boolean active;
+    private Boolean deleted;
+    private Long organizationId;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
     public static DepartmentResponseDTO fromEntity(DepartmentEntity entity) {
         if (entity == null) return null;
         return DepartmentResponseDTO.builder()

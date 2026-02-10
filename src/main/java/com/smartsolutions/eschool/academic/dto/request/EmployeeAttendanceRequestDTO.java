@@ -24,4 +24,6 @@ public class EmployeeAttendanceRequestDTO {
     private EmployeeAttendanceEntity.AttendanceStatus status;
     
     private String remarks;
+    private Long organizationId;
+    private Boolean isActive;
 }

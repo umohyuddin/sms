@@ -24,16 +24,15 @@ public class ExamTermServiceImpl implements ExamTermService {
 
     private final ExamTermRepository examTermRepository;
     private final AcademicYearRepository academicYearRepository;
-    private final ExamAssessmentMapper examMapper;
 
     @Override
     @Transactional
     public ExamTermResponseDTO create(ExamTermRequestDTO dto) {
         AcademicYearEntity year = academicYearRepository.findById(dto.getAcademicYearId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found"));
-        ExamTermEntity entity = examMapper.toEntity(dto);
+        ExamTermEntity entity = ExamAssessmentMapper.toEntity(dto);
         entity.setAcademicYear(year);
-        return examMapper.toResponse(examTermRepository.save(entity));
+        return ExamAssessmentMapper.toResponse(examTermRepository.save(entity));
     }
 
     @Override
@@ -44,13 +43,13 @@ public class ExamTermServiceImpl implements ExamTermService {
         entity.setName(dto.getName());
         entity.setSequenceNo(dto.getSequenceNo());
         entity.setActive(dto.isActive());
-        return examMapper.toResponse(examTermRepository.save(entity));
+        return ExamAssessmentMapper.toResponse(examTermRepository.save(entity));
     }
 
     @Override
     public List<ExamTermResponseDTO> getActiveByYear(Long academicYearId) {
-        return examTermRepository.findByAcademicYear(academicYearId).stream()
-                .map(examMapper::toResponse)
+        return examTermRepository.findByAcademicYearId(academicYearId).stream()
+                .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

@@ -30,7 +30,6 @@ public class AssessmentServiceImpl implements AssessmentService {
     private final TeacherSubjectAssignmentRepository assignmentRepository;
     private final AssessmentTypeRepository typeRepository;
     private final AcademicYearRepository yearRepository;
-    private final ExamAssessmentMapper examMapper;
 
     @Override
     @Transactional
@@ -42,12 +41,12 @@ public class AssessmentServiceImpl implements AssessmentService {
         AcademicYearEntity year = yearRepository.findById(dto.getAcademicYearId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found"));
 
-        AssessmentEntity entity = examMapper.toEntity(dto);
+        AssessmentEntity entity = ExamAssessmentMapper.toEntity(dto);
         entity.setTeacherSubjectAssignment(assignment);
         entity.setAssessmentType(type);
         entity.setAcademicYear(year);
         
-        return examMapper.toResponse(assessmentRepository.save(entity));
+        return ExamAssessmentMapper.toResponse(assessmentRepository.save(entity));
     }
 
     @Override
@@ -65,20 +64,20 @@ public class AssessmentServiceImpl implements AssessmentService {
         entity.setPublished(dto.isPublished());
         entity.setActive(dto.isActive());
         
-        return examMapper.toResponse(assessmentRepository.save(entity));
+        return ExamAssessmentMapper.toResponse(assessmentRepository.save(entity));
     }
 
     @Override
     public AssessmentResponseDTO getById(Long id) {
         return assessmentRepository.findByIdAndDeletedFalse(id)
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Assessment not found"));
     }
 
     @Override
     public List<AssessmentResponseDTO> getByAssignment(Long teacherSubjectAssignmentId) {
         return assessmentRepository.findByAssignmentId(teacherSubjectAssignmentId).stream()
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

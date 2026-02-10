@@ -22,13 +22,12 @@ import java.util.stream.Collectors;
 public class GradeScaleServiceImpl implements GradeScaleService {
 
     private final GradeScaleRepository gradeScaleRepository;
-    private final ResultsMapper resultsMapper;
 
     @Override
     @Transactional
     public GradeScaleResponseDTO create(GradeScaleRequestDTO dto) {
-        GradeScaleEntity entity = resultsMapper.toEntity(dto);
-        return resultsMapper.toResponse(gradeScaleRepository.save(entity));
+        GradeScaleEntity entity = ResultsMapper.toEntity(dto);
+        return ResultsMapper.toResponse(gradeScaleRepository.save(entity));
     }
 
     @Override
@@ -39,15 +38,17 @@ public class GradeScaleServiceImpl implements GradeScaleService {
         entity.setGrade(dto.getGrade());
         entity.setMinPercentage(dto.getMinPercentage());
         entity.setMaxPercentage(dto.getMaxPercentage());
-        entity.setRemarks(dto.getRemarks());
-        return resultsMapper.toResponse(gradeScaleRepository.save(entity));
+        entity.setRemarks(dto.getRemarks()); // Entity has 'remarks', not 'description'
+        entity.setPoints(dto.getPoints());
+        entity.setActive(dto.isActive());
+        return ResultsMapper.toResponse(gradeScaleRepository.save(entity));
     }
 
     @Override
     public List<GradeScaleResponseDTO> getAllActive() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
-        return gradeScaleRepository.findAllActiveByOrg(orgId).stream()
-                .map(resultsMapper::toResponse)
+        return gradeScaleRepository.findAllByOrgId(orgId).stream()
+                .map(ResultsMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

@@ -15,5 +15,7 @@ public class SubjectGroupRequestDTO {
     @NotBlank(message = "Name is mandatory")
     private String name;
     
+    private String description;
     private boolean active = true;
+    private Long organizationId;
 }

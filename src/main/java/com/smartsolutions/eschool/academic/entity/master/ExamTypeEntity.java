@@ -23,9 +23,12 @@ public class ExamTypeEntity extends AuditableEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
+    private Object description;
 }

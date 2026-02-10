@@ -5,7 +5,7 @@ import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
 import com.smartsolutions.eschool.school.model.AcademicSubjectEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
-import com.smartsolutions.eschool.school.repository.SubjectRepository;
+import com.smartsolutions.eschool.school.repository.SubjectRepository_;
 import com.smartsolutions.eschool.sclass.dtos.TeacherSubjectAssignment.request.TeacherSubjectAssignmentRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.TeacherSubjectAssignment.response.TeacherSubjectAssignmentResponseDTO;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
@@ -28,7 +28,7 @@ public class TeacherSubjectAssignmentService{
     private final EmployeeMasterRepository employeeRepository;
     private final StandardRepository standardRepository;
     private final SectionRepository sectionRepository;
-    private final SubjectRepository subjectRepository;
+    private final SubjectRepository_ subjectRepository;
     private final AcademicYearRepository academicYearRepository;
 
 

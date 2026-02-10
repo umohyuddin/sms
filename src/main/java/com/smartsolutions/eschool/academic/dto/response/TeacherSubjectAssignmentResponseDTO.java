@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeacherSubjectAssignmentResponseDTO {
+    private Long id;
     private Long employeeId;
     private String employeeName;
     private Long standardId;
@@ -23,5 +24,5 @@ public class TeacherSubjectAssignmentResponseDTO {
     private LocalDate effectiveFrom;
     private LocalDate effectiveTo;
     private String teachingRole;
-    private boolean active;
+    private boolean isActive;
 }

@@ -18,4 +18,7 @@ public class ExamTypeRequestDTO {
     private String name;
     
     private boolean active = true;
+    private Long organizationId;
+    private Object description;
+
 }

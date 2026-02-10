@@ -27,7 +27,6 @@ public class ReportCardServiceImpl implements ReportCardService {
     private final ReportCardRepository reportCardRepository;
     private final StudentRepository studentRepository;
     private final AcademicYearRepository academicYearRepository;
-    private final ResultsMapper resultsMapper;
 
     @Override
     @Transactional
@@ -37,17 +36,17 @@ public class ReportCardServiceImpl implements ReportCardService {
         AcademicYearEntity year = academicYearRepository.findById(dto.getAcademicYearId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found"));
 
-        ReportCardEntity entity = resultsMapper.toEntity(dto);
+        ReportCardEntity entity = ResultsMapper.toEntity(dto);
         entity.setStudent(student);
         entity.setAcademicYear(year);
         
-        return resultsMapper.toResponse(reportCardRepository.save(entity));
+        return ResultsMapper.toResponse(reportCardRepository.save(entity));
     }
 
     @Override
     public List<ReportCardResponseDTO> getByStudent(Long studentId) {
         return reportCardRepository.findByStudentId(studentId).stream()
-                .map(resultsMapper::toResponse)
+                .map(ResultsMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

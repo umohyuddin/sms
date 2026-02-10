@@ -33,7 +33,6 @@ public class TimetableServiceImpl implements TimetableService {
     private final StandardRepository standardRepository;
     private final SectionRepository sectionRepository;
     private final SubjectRepository subjectRepository;
-    private final TeacherAssignmentMapper teacherMapper;
 
     @Override
     @Transactional
@@ -52,14 +51,14 @@ public class TimetableServiceImpl implements TimetableService {
 
         // Conflict check logic could be added here
         
-        TimetableEntity entity = teacherMapper.toEntity(dto);
+        TimetableEntity entity = TeacherAssignmentMapper.toEntity(dto);
         entity.setStandard(standard);
         entity.setSection(section);
         entity.setSubject(subject);
         entity.setTeacher(teacher);
         
         TimetableEntity saved = timetableRepository.save(entity);
-        return teacherMapper.toResponse(saved);
+        return TeacherAssignmentMapper.toResponse(saved);
     }
 
     @Override
@@ -77,20 +76,20 @@ public class TimetableServiceImpl implements TimetableService {
         // Update relations if changed...
         
         TimetableEntity updated = timetableRepository.save(entity);
-        return teacherMapper.toResponse(updated);
+        return TeacherAssignmentMapper.toResponse(updated);
     }
 
     @Override
     public List<TimetableResponseDTO> getSectionTimetable(Long standardId, Long sectionId) {
         return timetableRepository.findByStandardAndSection(standardId, sectionId).stream()
-                .map(teacherMapper::toResponse)
+                .map(TeacherAssignmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<TimetableResponseDTO> getTeacherTimetable(Long teacherId, TimetableEntity.DayOfWeek day) {
         return timetableRepository.findTeacherTimetableByDay(teacherId, day).stream()
-                .map(teacherMapper::toResponse)
+                .map(TeacherAssignmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

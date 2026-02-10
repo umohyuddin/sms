@@ -2,7 +2,7 @@ package com.smartsolutions.eschool.academic.entity.mapping;
 
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
-import com.smartsolutions.eschool.academic.entity.embeddable.ExamSubjectId;
+import com.smartsolutions.eschool.academic.entity.master.ExamEntity;
 import com.smartsolutions.eschool.academic.entity.master.ExamEntity;
 import com.smartsolutions.eschool.academic.entity.master.SubjectEntity;
 import jakarta.persistence.*;
@@ -21,16 +21,15 @@ import java.time.LocalTime;
 @Builder
 public class ExamSubjectEntity extends AuditableEntity {
 
-    @EmbeddedId
-    private ExamSubjectId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("examId")
     @JoinColumn(name = "exam_id")
     private ExamEntity exam;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("subjectId")
     @JoinColumn(name = "subject_id")
     private SubjectEntity subject;
 
@@ -53,9 +52,11 @@ public class ExamSubjectEntity extends AuditableEntity {
     @JoinColumn(name = "evaluator_id")
     private EmployeeMasterEntity evaluator;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 }

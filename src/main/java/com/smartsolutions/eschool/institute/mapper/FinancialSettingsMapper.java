@@ -5,10 +5,13 @@ import com.smartsolutions.eschool.institute.dtos.financialSettings.responseDto.F
 import com.smartsolutions.eschool.institute.entity.InstituteFinancialSettings;
 import org.springframework.stereotype.Component;
 
-@Component
 public class FinancialSettingsMapper {
 
-    public InstituteFinancialSettings toEntity(FinancialSettingsRequestDTO dto) {
+    private FinancialSettingsMapper() {
+        // prevent instantiation
+    }
+
+    public static InstituteFinancialSettings toEntity(FinancialSettingsRequestDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -40,7 +43,7 @@ public class FinancialSettingsMapper {
         return entity;
     }
 
-    public FinancialSettingsResponseDTO toDTO(InstituteFinancialSettings entity) {
+    public static FinancialSettingsResponseDTO toDTO(InstituteFinancialSettings entity) {
         if (entity == null) {
             return null;
         }
@@ -68,11 +71,14 @@ public class FinancialSettingsMapper {
         dto.setInvoiceMandatory(entity.getInvoiceMandatory());
         dto.setReceiptMandatory(entity.getReceiptMandatory());
         dto.setIsActive(entity.getIsActive());
+        //dto.setOrganizationId(entity.getOrganizationId());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
 
         return dto;
     }
 
-    public void updateEntityFromDTO(FinancialSettingsRequestDTO dto, InstituteFinancialSettings entity) {
+    public static void updateEntityFromDTO(FinancialSettingsRequestDTO dto, InstituteFinancialSettings entity) {
         if (dto == null || entity == null) {
             return;
         }
@@ -98,3 +104,4 @@ public class FinancialSettingsMapper {
         entity.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
     }
 }
+

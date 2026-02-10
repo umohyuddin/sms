@@ -25,13 +25,12 @@ public class SubjectServiceImpl implements SubjectService {
 
     private final SubjectRepository subjectRepository;
     private final SubjectGroupRepository subjectGroupRepository;
-    private final CoreAcademicMapper coreAcademicMapper;
 
     @Override
     @Transactional
     public SubjectResponseDTO create(SubjectRequestDTO dto) {
         log.info("Creating Subject: {}", dto.getName());
-        SubjectEntity entity = coreAcademicMapper.toEntity(dto);
+        SubjectEntity entity = CoreAcademicMapper.toEntity(dto);
         
         if (dto.getSubjectGroupId() != null) {
             SubjectGroupEntity group = subjectGroupRepository.findActiveById(dto.getSubjectGroupId())
@@ -40,7 +39,7 @@ public class SubjectServiceImpl implements SubjectService {
         }
         
         SubjectEntity saved = subjectRepository.save(entity);
-        return coreAcademicMapper.toResponse(saved);
+        return CoreAcademicMapper.toResponse(saved);
     }
 
     @Override
@@ -65,13 +64,13 @@ public class SubjectServiceImpl implements SubjectService {
         }
         
         SubjectEntity updated = subjectRepository.save(entity);
-        return coreAcademicMapper.toResponse(updated);
+        return CoreAcademicMapper.toResponse(updated);
     }
 
     @Override
     public SubjectResponseDTO getById(Long id) {
         return subjectRepository.findActiveById(id)
-                .map(coreAcademicMapper::toResponse)
+                .map(CoreAcademicMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found with ID: " + id));
     }
 
@@ -79,14 +78,14 @@ public class SubjectServiceImpl implements SubjectService {
     public List<SubjectResponseDTO> getAllActive() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
         return subjectRepository.findAllActiveByOrg(orgId).stream()
-                .map(coreAcademicMapper::toResponse)
+                .map(CoreAcademicMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<SubjectResponseDTO> getByGroupId(Long groupId) {
         return subjectRepository.findByGroupId(groupId).stream()
-                .map(coreAcademicMapper::toResponse)
+                .map(CoreAcademicMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

@@ -8,9 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ExamTermRepository extends JpaRepository<ExamTermEntity, Long> {
+
+    @Query("SELECT et FROM ExamTermEntity et WHERE et.id = :id AND et.deleted = false")
+    Optional<ExamTermEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
     @Query("SELECT et FROM ExamTermEntity et JOIN FETCH et.academicYear WHERE et.academicYear.id = :academicYearId AND et.deleted = false")
     List<ExamTermEntity> findByAcademicYearId(@Param("academicYearId") Long academicYearId);

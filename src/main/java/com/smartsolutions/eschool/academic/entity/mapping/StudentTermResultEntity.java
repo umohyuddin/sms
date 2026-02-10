@@ -3,7 +3,7 @@ package com.smartsolutions.eschool.academic.entity.mapping;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.academic.entity.embeddable.StudentTermResultId;
+import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.academic.entity.master.ExamTermEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,21 +20,19 @@ import java.time.LocalDateTime;
 @Builder
 public class StudentTermResultEntity extends AuditableEntity {
 
-    @EmbeddedId
-    private StudentTermResultId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("studentId")
     @JoinColumn(name = "student_id")
     private StudentEntity student;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("academicYearId")
     @JoinColumn(name = "academic_year_id")
     private AcademicYearEntity academicYear;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("examTermId")
     @JoinColumn(name = "exam_term_id")
     private ExamTermEntity examTerm;
 
@@ -56,9 +54,11 @@ public class StudentTermResultEntity extends AuditableEntity {
     @Column(name = "generated_at")
     private LocalDateTime generatedAt;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 }

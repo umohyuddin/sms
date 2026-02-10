@@ -12,6 +12,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExamSubjectResponseDTO {
+    private Long id;
     private Long examId;
     private String examName;
     private Long subjectId;
@@ -21,6 +22,8 @@ public class ExamSubjectResponseDTO {
     private LocalDate examDate;
     private LocalTime startTime;
     private LocalTime endTime;
+    private Integer durationMinutes;
     private Long evaluatorId;
     private String evaluatorName;
+    private boolean isActive;
 }

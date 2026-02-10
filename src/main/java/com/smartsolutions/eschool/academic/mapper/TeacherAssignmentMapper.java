@@ -6,55 +6,165 @@ import com.smartsolutions.eschool.academic.dto.response.TeacherSubjectAssignment
 import com.smartsolutions.eschool.academic.dto.response.TimetableResponseDTO;
 import com.smartsolutions.eschool.academic.entity.mapping.TeacherSubjectAssignmentEntity;
 import com.smartsolutions.eschool.academic.entity.master.TimetableEntity;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
+import com.smartsolutions.eschool.school.model.AcademicYearEntity;
+import com.smartsolutions.eschool.sclass.model.StandardEntity;
+import com.smartsolutions.eschool.sclass.model.SectionEntity;
+import com.smartsolutions.eschool.academic.entity.master.SubjectEntity;
 
-@Mapper(componentModel = "spring")
-public interface TeacherAssignmentMapper {
+import java.util.List;
+import java.util.stream.Collectors;
 
-    TeacherAssignmentMapper INSTANCE = Mappers.getMapper(TeacherAssignmentMapper.class);
+public class TeacherAssignmentMapper {
 
-    @Mapping(target = "id.employeeId", source = "employeeId")
-    @Mapping(target = "id.standardId", source = "standardId")
-    @Mapping(target = "id.sectionId", source = "sectionId")
-    @Mapping(target = "id.subjectId", source = "subjectId")
-    @Mapping(target = "id.academicYearId", source = "academicYearId")
-    @Mapping(target = "id.effectiveFrom", source = "effectiveFrom")
-    @Mapping(target = "teacher.id", source = "employeeId")
-    @Mapping(target = "standard.id", source = "standardId")
-    @Mapping(target = "section.id", source = "sectionId")
-    @Mapping(target = "subject.id", source = "subjectId")
-    @Mapping(target = "academicYear.id", source = "academicYearId")
-    TeacherSubjectAssignmentEntity toEntity(TeacherSubjectAssignmentRequestDTO dto);
+    private TeacherAssignmentMapper() {
+        // prevent instantiation
+    }
 
-    @Mapping(target = "employeeId", source = "id.employeeId")
-    @Mapping(target = "employeeName", source = "teacher.fullName")
-    @Mapping(target = "standardId", source = "id.standardId")
-    @Mapping(target = "standardName", source = "standard.standardName")
-    @Mapping(target = "sectionId", source = "id.sectionId")
-    @Mapping(target = "sectionName", source = "section.sectionName")
-    @Mapping(target = "subjectId", source = "id.subjectId")
-    @Mapping(target = "subjectName", source = "subject.name")
-    @Mapping(target = "academicYearId", source = "id.academicYearId")
-    @Mapping(target = "academicYearName", source = "academicYear.name")
-    @Mapping(target = "effectiveFrom", source = "id.effectiveFrom")
-    TeacherSubjectAssignmentResponseDTO toResponse(TeacherSubjectAssignmentEntity entity);
+    // TeacherSubjectAssignment
+    public static TeacherSubjectAssignmentEntity toEntity(TeacherSubjectAssignmentRequestDTO dto) {
+        if (dto == null)
+            return null;
+        TeacherSubjectAssignmentEntity entity = new TeacherSubjectAssignmentEntity();
+        // ID is auto-generated
+
+        if (dto.getEmployeeId() != null) {
+            EmployeeMasterEntity teacher = new EmployeeMasterEntity();
+            teacher.setId(dto.getEmployeeId());
+            entity.setTeacher(teacher);
+        }
+
+        if (dto.getStandardId() != null) {
+            StandardEntity standard = new StandardEntity();
+            standard.setId(dto.getStandardId());
+            entity.setStandard(standard);
+        }
+
+        if (dto.getSectionId() != null) {
+            SectionEntity section = new SectionEntity();
+            section.setId(dto.getSectionId());
+            entity.setSection(section);
+        }
+
+        if (dto.getSubjectId() != null) {
+            SubjectEntity subject = new SubjectEntity();
+            subject.setId(dto.getSubjectId());
+            entity.setSubject(subject);
+        }
+
+        if (dto.getAcademicYearId() != null) {
+            AcademicYearEntity year = new AcademicYearEntity();
+            year.setId(dto.getAcademicYearId());
+            entity.setAcademicYear(year);
+        }
+
+        entity.setEffectiveFrom(dto.getEffectiveFrom());
+        entity.setEffectiveTo(dto.getEffectiveTo());
+        entity.setActive(dto.isActive());
+        return entity;
+    }
+
+    public static TeacherSubjectAssignmentResponseDTO toResponse(TeacherSubjectAssignmentEntity entity) {
+        if (entity == null)
+            return null;
+        TeacherSubjectAssignmentResponseDTO dto = new TeacherSubjectAssignmentResponseDTO();
+        dto.setId(entity.getId());
+
+        if (entity.getTeacher() != null) {
+            dto.setEmployeeId(entity.getTeacher().getId());
+            dto.setEmployeeName(entity.getTeacher().getFullName());
+        }
+        if (entity.getStandard() != null) {
+            dto.setStandardId(entity.getStandard().getId());
+            dto.setStandardName(entity.getStandard().getStandardName());
+        }
+        if (entity.getSection() != null) {
+            dto.setSectionId(entity.getSection().getId());
+            dto.setSectionName(entity.getSection().getSectionName());
+        }
+        if (entity.getSubject() != null) {
+            dto.setSubjectId(entity.getSubject().getId());
+            dto.setSubjectName(entity.getSubject().getName());
+        }
+        if (entity.getAcademicYear() != null) {
+            dto.setAcademicYearId(entity.getAcademicYear().getId());
+            dto.setAcademicYearName(entity.getAcademicYear().getName());
+        }
+        dto.setEffectiveFrom(entity.getEffectiveFrom());
+        dto.setEffectiveTo(entity.getEffectiveTo());
+        dto.setActive(entity.isActive());
+        return dto;
+    }
+
+    public static List<TeacherSubjectAssignmentResponseDTO> toTeacherAssignmentResponseList(
+            List<TeacherSubjectAssignmentEntity> entities) {
+        return entities == null ? null
+                : entities.stream().map(TeacherAssignmentMapper::toResponse).collect(Collectors.toList());
+    }
 
     // Timetable
-    @Mapping(target = "standard.id", source = "standardId")
-    @Mapping(target = "section.id", source = "sectionId")
-    @Mapping(target = "subject.id", source = "subjectId")
-    @Mapping(target = "teacher.id", source = "teacherId")
-    TimetableEntity toEntity(TimetableRequestDTO dto);
+    public static TimetableEntity toEntity(TimetableRequestDTO dto) {
+        if (dto == null)
+            return null;
+        TimetableEntity entity = new TimetableEntity();
+        // organizationId is handled automatically by AuditableEntity
 
-    @Mapping(target = "standardId", source = "standard.id")
-    @Mapping(target = "standardName", source = "standard.standardName")
-    @Mapping(target = "sectionId", source = "section.id")
-    @Mapping(target = "sectionName", source = "section.sectionName")
-    @Mapping(target = "subjectId", source = "subject.id")
-    @Mapping(target = "subjectName", source = "subject.name")
-    @Mapping(target = "teacherId", source = "teacher.id")
-    @Mapping(target = "teacherName", source = "teacher.fullName")
-    TimetableResponseDTO toResponse(TimetableEntity entity);
+        StandardEntity standard = new StandardEntity();
+        standard.setId(dto.getStandardId());
+        entity.setStandard(standard);
+
+        SectionEntity section = new SectionEntity();
+        section.setId(dto.getSectionId());
+        entity.setSection(section);
+
+        SubjectEntity subject = new SubjectEntity();
+        subject.setId(dto.getSubjectId());
+        entity.setSubject(subject);
+
+        EmployeeMasterEntity teacher = new EmployeeMasterEntity();
+        teacher.setId(dto.getTeacherId());
+        entity.setTeacher(teacher);
+
+        entity.setDayOfWeek(dto.getDayOfWeek());
+        entity.setStartTime(dto.getStartTime());
+        entity.setEndTime(dto.getEndTime());
+        entity.setActive(dto.isActive());
+        return entity;
+    }
+
+    public static TimetableResponseDTO toResponse(TimetableEntity entity) {
+        if (entity == null)
+            return null;
+        TimetableResponseDTO dto = new TimetableResponseDTO();
+        dto.setId(entity.getId());
+        dto.setOrganizationId(entity.getOrganizationId()); // Read from entity for response
+
+        if (entity.getStandard() != null) {
+            dto.setStandardId(entity.getStandard().getId());
+            dto.setStandardName(entity.getStandard().getStandardName());
+        }
+        if (entity.getSection() != null) {
+            dto.setSectionId(entity.getSection().getId());
+            dto.setSectionName(entity.getSection().getSectionName());
+        }
+        if (entity.getSubject() != null) {
+            dto.setSubjectId(entity.getSubject().getId());
+            dto.setSubjectName(entity.getSubject().getName());
+        }
+        if (entity.getTeacher() != null) {
+            dto.setTeacherId(entity.getTeacher().getId());
+            dto.setTeacherName(entity.getTeacher().getFullName());
+        }
+
+        dto.setDayOfWeek(entity.getDayOfWeek());
+        dto.setStartTime(entity.getStartTime());
+        dto.setEndTime(entity.getEndTime());
+        dto.setIsActive(entity.isActive());
+        return dto;
+    }
+
+    public static List<TimetableResponseDTO> toTimetableResponseList(List<TimetableEntity> entities) {
+        return entities == null ? null
+                : entities.stream().map(TeacherAssignmentMapper::toResponse).collect(Collectors.toList());
+    }
 }

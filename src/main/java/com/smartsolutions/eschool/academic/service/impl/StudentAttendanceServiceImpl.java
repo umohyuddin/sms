@@ -34,7 +34,6 @@ public class StudentAttendanceServiceImpl implements StudentAttendanceService {
     private final StandardRepository standardRepository;
     private final SectionRepository sectionRepository;
     private final EmployeeMasterRepository employeeRepository;
-    private final AttendanceMapper attendanceMapper;
 
     @Override
     @Transactional
@@ -48,7 +47,7 @@ public class StudentAttendanceServiceImpl implements StudentAttendanceService {
             SectionEntity section = sectionRepository.findById(dto.getSectionId())
                     .orElseThrow(() -> new ResourceNotFoundException("Section not found: " + dto.getSectionId()));
             
-            StudentAttendanceEntity entity = attendanceMapper.toEntity(dto);
+            StudentAttendanceEntity entity = AttendanceMapper.toEntity(dto);
             entity.setStudent(student);
             entity.setStandard(standard);
             entity.setSection(section);
@@ -66,7 +65,7 @@ public class StudentAttendanceServiceImpl implements StudentAttendanceService {
     @Override
     public List<StudentAttendanceResponseDTO> getSectionAttendance(Long standardId, Long sectionId, LocalDate date) {
         return attendanceRepository.findByStandardSectionAndDate(standardId, sectionId, date).stream()
-                .map(attendanceMapper::toResponse)
+                .map(AttendanceMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -75,7 +74,7 @@ public class StudentAttendanceServiceImpl implements StudentAttendanceService {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
         return attendanceRepository.findMonthlyView(studentId, startDate, endDate).stream()
-                .map(attendanceMapper::toResponse)
+                .map(AttendanceMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

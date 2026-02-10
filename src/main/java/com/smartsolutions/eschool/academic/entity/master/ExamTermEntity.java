@@ -28,9 +28,11 @@ public class ExamTermEntity extends AuditableEntity {
     @JoinColumn(name = "academic_year_id", nullable = false)
     private AcademicYearEntity academicYear;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 }

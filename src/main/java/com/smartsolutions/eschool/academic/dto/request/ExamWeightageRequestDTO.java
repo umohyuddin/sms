@@ -13,13 +13,14 @@ import java.math.BigDecimal;
 public class ExamWeightageRequestDTO {
     @NotNull
     private Long standardId;
-    
+
     @NotNull
     private Long subjectId;
-    
+
     @NotNull
     private Long examTermId;
-    
+
     @NotNull
     private BigDecimal weightPercentage;
+    private boolean active = true;
 }

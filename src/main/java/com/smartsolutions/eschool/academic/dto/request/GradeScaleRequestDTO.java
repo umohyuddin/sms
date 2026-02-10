@@ -24,4 +24,7 @@ public class GradeScaleRequestDTO {
     private String grade;
     
     private String remarks;
+    private java.math.BigDecimal points;
+    private Long organizationId;
+    private boolean active = true;
 }

@@ -3,7 +3,6 @@ package com.smartsolutions.eschool.academic.entity.mapping;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
-import com.smartsolutions.eschool.academic.entity.embeddable.StandardSubjectId;
 import com.smartsolutions.eschool.academic.entity.master.SubjectEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,24 +16,23 @@ import lombok.*;
 @Builder
 public class StandardSubjectEntity extends AuditableEntity {
 
-    @EmbeddedId
-    private StandardSubjectId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("standardId")
     @JoinColumn(name = "standard_id")
     private StandardEntity standard;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("subjectId")
     @JoinColumn(name = "subject_id")
     private SubjectEntity subject;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("academicYearId")
     @JoinColumn(name = "academic_year_id")
     private AcademicYearEntity academicYear;
 
+    @Builder.Default
     @Column(name = "is_optional", nullable = false)
     private boolean optional = false;
 
@@ -47,9 +45,11 @@ public class StandardSubjectEntity extends AuditableEntity {
     @Column(name = "practical_marks")
     private Integer practicalMarks;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 }

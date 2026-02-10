@@ -22,4 +22,6 @@ public class StudentAttendanceResponseDTO {
     private StudentAttendanceEntity.AttendanceStatus status;
     private String markedBy;
     private String remarks;
+    private Long organizationId;
+    private Boolean isActive;
 }

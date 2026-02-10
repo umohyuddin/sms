@@ -31,7 +31,6 @@ public class StudentAssessmentServiceImpl implements StudentAssessmentService {
     private final AssessmentRepository assessmentRepository;
     private final StudentRepository studentRepository;
     private final EmployeeMasterRepository employeeRepository;
-    private final ExamAssessmentMapper examMapper;
 
     @Override
     @Transactional
@@ -43,15 +42,11 @@ public class StudentAssessmentServiceImpl implements StudentAssessmentService {
         StudentEntity student = studentRepository.findById(dto.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
-        StudentAssessmentEntity entity = examMapper.toEntity(dto);
+        StudentAssessmentEntity entity = ExamAssessmentMapper.toEntity(dto);
         entity.setAssessment(assessment);
         entity.setStudent(student);
         entity.setSubmissionStatus(StudentAssessmentEntity.SubmissionStatus.SUBMITTED);
         
-        if (entity.getId().getOrganizationId() == null) {
-            entity.getId().setOrganizationId(SecurityUtils.getCurrentOrganizationId());
-        }
-
         studentAssessmentRepository.save(entity);
     }
 
@@ -60,7 +55,7 @@ public class StudentAssessmentServiceImpl implements StudentAssessmentService {
     public void evaluateAssessment(StudentAssessmentRequestDTO dto) {
         log.info("Evaluating assessment {} for student {}", dto.getAssessmentId(), dto.getStudentId());
         
-        StudentAssessmentEntity entity = studentAssessmentRepository.findById(null) // Should use actual composite ID
+        StudentAssessmentEntity entity = studentAssessmentRepository.findByAssessmentIdAndStudentId(dto.getAssessmentId(), dto.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Submission not found"));
         
         entity.setObtainedMarks(dto.getObtainedMarks());
@@ -80,14 +75,14 @@ public class StudentAssessmentServiceImpl implements StudentAssessmentService {
     @Override
     public List<StudentAssessmentResponseDTO> getByAssessment(Long assessmentId) {
         return studentAssessmentRepository.findByAssessmentId(assessmentId).stream()
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<StudentAssessmentResponseDTO> getByStudent(Long studentId) {
         return studentAssessmentRepository.findByStudentId(studentId).stream()
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 }

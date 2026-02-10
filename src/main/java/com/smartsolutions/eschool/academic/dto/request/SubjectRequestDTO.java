@@ -22,4 +22,5 @@ public class SubjectRequestDTO {
     private boolean core = true;
     private Long subjectGroupId;
     private boolean active = true;
+    private Long organizationId;
 }

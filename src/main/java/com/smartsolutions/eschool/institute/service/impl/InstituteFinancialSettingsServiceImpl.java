@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class InstituteFinancialSettingsServiceImpl implements InstituteFinancialSettingsService {
 
     private final InstituteFinancialSettingsRepository repository;
-    private final FinancialSettingsMapper mapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -31,7 +30,7 @@ public class InstituteFinancialSettingsServiceImpl implements InstituteFinancial
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Financial settings not found for institute: " + instituteId + " and academic year: " + academicYearId));
         
-        return mapper.toDTO(settings);
+        return FinancialSettingsMapper.toDTO(settings);
     }
 
     @Override
@@ -49,11 +48,11 @@ public class InstituteFinancialSettingsServiceImpl implements InstituteFinancial
                             " and academic year: " + requestDTO.getAcademicYearId());
                 });
         
-        InstituteFinancialSettings entity = mapper.toEntity(requestDTO);
+        InstituteFinancialSettings entity = FinancialSettingsMapper.toEntity(requestDTO);
         InstituteFinancialSettings saved = repository.save(entity);
         
         log.info("Financial settings created with ID: {}", saved.getId());
-        return mapper.toDTO(saved);
+        return FinancialSettingsMapper.toDTO(saved);
     }
 
     @Override
@@ -64,11 +63,11 @@ public class InstituteFinancialSettingsServiceImpl implements InstituteFinancial
         InstituteFinancialSettings existing = repository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Financial settings not found with ID: " + id));
         
-        mapper.updateEntityFromDTO(requestDTO, existing);
+        FinancialSettingsMapper.updateEntityFromDTO(requestDTO, existing);
         InstituteFinancialSettings updated = repository.save(existing);
         
         log.info("Financial settings updated successfully with ID: {}", id);
-        return mapper.toDTO(updated);
+        return FinancialSettingsMapper.toDTO(updated);
     }
 
     @Override

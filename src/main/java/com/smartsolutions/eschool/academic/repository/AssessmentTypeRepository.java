@@ -8,9 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AssessmentTypeRepository extends JpaRepository<AssessmentTypeEntity, Long> {
+
+    @Query("SELECT at FROM AssessmentTypeEntity at WHERE at.id = :id AND at.deleted = false")
+    Optional<AssessmentTypeEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
     @Query("SELECT at FROM AssessmentTypeEntity at WHERE at.organizationId = :orgId AND at.deleted = false")
     List<AssessmentTypeEntity> findAllActiveByOrg(@Param("orgId") Long orgId);

@@ -16,4 +16,8 @@ public class SubjectResponseDTO {
     private Long subjectGroupId;
     private String subjectGroupName;
     private boolean active;
+    private boolean deleted;
+    private Long organizationId;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
 }

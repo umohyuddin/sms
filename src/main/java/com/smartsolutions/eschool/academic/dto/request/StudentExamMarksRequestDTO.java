@@ -19,6 +19,8 @@ public class StudentExamMarksRequestDTO {
     
     private BigDecimal obtainedMarks;
     private BigDecimal graceMarks = BigDecimal.ZERO;
+    private String grade;
     private boolean locked = false;
     private String remarks;
+    private Boolean isActive;
 }

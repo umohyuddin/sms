@@ -26,9 +26,11 @@ public class AssessmentTypeEntity extends AuditableEntity {
     @Column(name = "description", length = 255)
     private String description;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 }

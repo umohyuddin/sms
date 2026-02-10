@@ -1,7 +1,7 @@
 package com.smartsolutions.eschool.sclass.service;
 
 import com.smartsolutions.eschool.school.model.AcademicSubjectEntity;
-import com.smartsolutions.eschool.school.repository.SubjectRepository;
+import com.smartsolutions.eschool.school.repository.SubjectRepository_;
 import com.smartsolutions.eschool.sclass.dtos.standardSubject.request.StandardSubjectRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.standardSubject.response.StandardSubjectResponseDTO;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
@@ -21,7 +21,7 @@ public class StandardSubjectService {
 
     private final StandardSubjectRepository repository;
     private final StandardRepository standardRepository;
-    private final SubjectRepository subjectRepository;
+    private final SubjectRepository_ subjectRepository;
 
 
     public StandardSubjectResponseDTO create(StandardSubjectRequestDTO dto) {

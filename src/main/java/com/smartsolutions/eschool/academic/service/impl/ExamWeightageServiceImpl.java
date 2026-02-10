@@ -22,16 +22,12 @@ import java.util.stream.Collectors;
 public class ExamWeightageServiceImpl implements ExamWeightageService {
 
     private final ExamWeightageRepository weightageRepository;
-    private final ResultsMapper resultsMapper;
 
     @Override
     @Transactional
     public void saveWeightages(List<ExamWeightageRequestDTO> dtos) {
         for (ExamWeightageRequestDTO dto : dtos) {
-            ExamWeightageEntity entity = resultsMapper.toEntity(dto);
-            if (entity.getId().getOrganizationId() == null) {
-                entity.getId().setOrganizationId(SecurityUtils.getCurrentOrganizationId());
-            }
+            ExamWeightageEntity entity = ResultsMapper.toEntity(dto);
             weightageRepository.save(entity);
         }
     }
@@ -39,7 +35,7 @@ public class ExamWeightageServiceImpl implements ExamWeightageService {
     @Override
     public List<ExamWeightageResponseDTO> getByStandard(Long standardId, Long academicYearId) {
         return weightageRepository.findByStandardId(standardId).stream()
-                .map(resultsMapper::toResponse)
+                .map(ResultsMapper::toResponse)
                 .collect(Collectors.toList());
     }
 }

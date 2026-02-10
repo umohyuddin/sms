@@ -24,4 +24,6 @@ public class TimetableResponseDTO {
     private LocalTime startTime;
     private LocalTime endTime;
     private String room;
+    private Long organizationId;
+    private Boolean isActive;
 }

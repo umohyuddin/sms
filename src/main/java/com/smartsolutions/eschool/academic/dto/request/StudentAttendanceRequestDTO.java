@@ -31,4 +31,6 @@ public class StudentAttendanceRequestDTO {
     
     private Long markedById;
     private String remarks;
+    private Long organizationId;
+    private Boolean isActive;
 }

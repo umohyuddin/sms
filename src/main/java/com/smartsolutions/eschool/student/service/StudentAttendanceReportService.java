@@ -2,7 +2,7 @@ package com.smartsolutions.eschool.student.service;
 
 import com.smartsolutions.eschool.student.dtos.studentAttendance.response.*;
 import com.smartsolutions.eschool.student.model.StudentAttendanceEntity;
-import com.smartsolutions.eschool.student.repository.StudentAttendanceRepository;
+import com.smartsolutions.eschool.student.repository.StudentAttendanceReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +14,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StudentAttendanceReportService {
 
-    private final StudentAttendanceRepository repository;
+    private final StudentAttendanceReportRepository repository;
 
     public List<DailyAttendanceReportDTO> getDailyAttendance(LocalDate date) {
         return repository.getDailyAttendance(date);
     }
 
-    public List<ClassAttendanceReportDTO> getClassAttendance(Long standardId, Long sectionId, LocalDate startDate, LocalDate endDate) {
+    public List<ClassAttendanceReportDTO> getClassAttendance(Long standardId, Long sectionId, LocalDate startDate,
+            LocalDate endDate) {
         return repository.getClassAttendance(standardId, sectionId, startDate, endDate);
     }
 
@@ -32,13 +33,11 @@ public class StudentAttendanceReportService {
         return repository.getOverallAttendanceSummary(startDate, endDate);
     }
 
-
     public StudentAttendanceDTO markAttendance(StudentAttendanceDTO dto) {
         StudentAttendanceEntity entity = mapToEntity(dto);
         entity = repository.save(entity);
         return mapToDTO(entity);
     }
-
 
     public List<StudentAttendanceDTO> markBatchAttendance(List<StudentAttendanceDTO> dtos) {
         List<StudentAttendanceEntity> entities = dtos.stream()
@@ -47,7 +46,6 @@ public class StudentAttendanceReportService {
         entities = repository.saveAll(entities);
         return entities.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
-
 
     public StudentAttendanceDTO updateAttendance(StudentAttendanceDTO dto) {
         if (!repository.existsById(dto.getId())) {
@@ -107,8 +105,7 @@ public class StudentAttendanceReportService {
                 entity.getAttendanceDate(),
                 entity.getStatus().name(),
                 entity.getMarkedBy(),
-                entity.getRemarks()
-        );
+                entity.getRemarks());
     }
 
     private StudentAttendanceEntity mapToEntity(StudentAttendanceDTO dto) {

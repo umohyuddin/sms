@@ -58,11 +58,11 @@ class SecurityUtilsTest {
     }
 
     @Test
-    void getCurrentUserId_ShouldReturnDefault_WhenNotAuthenticated() {
+    void getCurrentUserId_ShouldReturnNull_WhenNotAuthenticated() {
         when(securityContext.getAuthentication()).thenReturn(null);
 
         Long userId = SecurityUtils.getCurrentUserId();
 
-        assertEquals(1L, userId); // Default value set in SecurityUtils
+        assertNull(userId);
     }
 }

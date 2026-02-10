@@ -15,20 +15,21 @@ import java.time.LocalTime;
 public class ExamSubjectRequestDTO {
     @NotNull
     private Long examId;
-    
+
     @NotNull
     private Long subjectId;
-    
+
     @NotNull
     private BigDecimal totalMarks;
-    
+
     @NotNull
     private BigDecimal passingMarks;
-    
+
     @NotNull
     private LocalDate examDate;
-    
+
     private LocalTime startTime;
     private LocalTime endTime;
     private Long evaluatorId;
+    private boolean active = true;
 }

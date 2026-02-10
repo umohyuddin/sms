@@ -17,4 +17,6 @@ public class EmployeeAttendanceResponseDTO {
     private LocalDate attendanceDate;
     private EmployeeAttendanceEntity.AttendanceStatus status;
     private String remarks;
+    private Long organizationId;
+    private Boolean isActive;
 }

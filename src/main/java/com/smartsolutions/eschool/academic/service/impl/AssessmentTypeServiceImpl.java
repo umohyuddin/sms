@@ -22,13 +22,12 @@ import java.util.stream.Collectors;
 public class AssessmentTypeServiceImpl implements AssessmentTypeService {
 
     private final AssessmentTypeRepository assessmentTypeRepository;
-    private final ExamAssessmentMapper examMapper;
 
     @Override
     @Transactional
     public AssessmentTypeResponseDTO create(AssessmentTypeRequestDTO dto) {
-        AssessmentTypeEntity entity = examMapper.toEntity(dto);
-        return examMapper.toResponse(assessmentTypeRepository.save(entity));
+        AssessmentTypeEntity entity = ExamAssessmentMapper.toEntity(dto);
+        return ExamAssessmentMapper.toResponse(assessmentTypeRepository.save(entity));
     }
 
     @Override
@@ -40,14 +39,14 @@ public class AssessmentTypeServiceImpl implements AssessmentTypeService {
         entity.setCode(dto.getCode());
         entity.setDescription(dto.getDescription());
         entity.setActive(dto.isActive());
-        return examMapper.toResponse(assessmentTypeRepository.save(entity));
+        return ExamAssessmentMapper.toResponse(assessmentTypeRepository.save(entity));
     }
 
     @Override
     public List<AssessmentTypeResponseDTO> getAllActive() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
         return assessmentTypeRepository.findAllActiveByOrg(orgId).stream()
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

@@ -2,7 +2,7 @@ package com.smartsolutions.eschool.academic.entity.mapping;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.academic.entity.embeddable.StudentExamMarksId;
+import com.smartsolutions.eschool.academic.entity.mapping.ExamSubjectEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,16 +17,15 @@ import java.math.BigDecimal;
 @Builder
 public class StudentExamMarksEntity extends AuditableEntity {
 
-    @EmbeddedId
-    private StudentExamMarksId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("examSubjectId")
     @JoinColumn(name = "exam_subject_id")
     private ExamSubjectEntity examSubject;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("studentId")
     @JoinColumn(name = "student_id")
     private StudentEntity student;
 
@@ -42,9 +41,11 @@ public class StudentExamMarksEntity extends AuditableEntity {
     @Column(name = "remarks", length = 255)
     private String remarks;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 }

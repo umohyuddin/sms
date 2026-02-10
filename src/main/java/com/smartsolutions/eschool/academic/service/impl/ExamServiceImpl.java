@@ -36,7 +36,6 @@ public class ExamServiceImpl implements ExamService {
     private final CampusRepository campusRepository;
     private final StandardRepository standardRepository;
     private final SectionRepository sectionRepository;
-    private final ExamAssessmentMapper examMapper;
 
     @Override
     @Transactional
@@ -52,14 +51,14 @@ public class ExamServiceImpl implements ExamService {
         SectionEntity section = sectionRepository.findById(dto.getSectionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Section not found"));
 
-        ExamEntity entity = examMapper.toEntity(dto);
+        ExamEntity entity = ExamAssessmentMapper.toEntity(dto);
         entity.setAcademicYear(year);
         entity.setExamTerm(term);
         entity.setCampus(campus);
         entity.setStandard(standard);
         entity.setSection(section);
         
-        return examMapper.toResponse(examRepository.save(entity));
+        return ExamAssessmentMapper.toResponse(examRepository.save(entity));
     }
 
     @Override
@@ -76,20 +75,20 @@ public class ExamServiceImpl implements ExamService {
         
         // Update terms/campus/standard if changed...
         
-        return examMapper.toResponse(examRepository.save(entity));
+        return ExamAssessmentMapper.toResponse(examRepository.save(entity));
     }
 
     @Override
     public ExamResponseDTO getById(Long id) {
         return examRepository.findByIdAndDeletedFalse(id)
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Exam not found"));
     }
 
     @Override
     public List<ExamResponseDTO> getBySection(Long standardId, Long sectionId, Long academicYearId) {
         return examRepository.findBySectionAndAcademicYear(standardId, sectionId, academicYearId).stream()
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

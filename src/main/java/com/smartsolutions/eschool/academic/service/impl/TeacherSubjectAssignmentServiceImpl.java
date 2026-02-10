@@ -12,7 +12,6 @@ import com.smartsolutions.eschool.sclass.repository.StandardRepository;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import com.smartsolutions.eschool.academic.dto.request.TeacherSubjectAssignmentRequestDTO;
 import com.smartsolutions.eschool.academic.dto.response.TeacherSubjectAssignmentResponseDTO;
-import com.smartsolutions.eschool.academic.entity.embeddable.TeacherSubjectAssignmentId;
 import com.smartsolutions.eschool.academic.entity.mapping.TeacherSubjectAssignmentEntity;
 import com.smartsolutions.eschool.academic.entity.master.SubjectEntity;
 import com.smartsolutions.eschool.academic.mapper.TeacherAssignmentMapper;
@@ -39,7 +38,6 @@ public class TeacherSubjectAssignmentServiceImpl implements TeacherSubjectAssign
     private final SectionRepository sectionRepository;
     private final SubjectRepository subjectRepository;
     private final AcademicYearRepository academicYearRepository;
-    private final TeacherAssignmentMapper teacherMapper;
 
     @Override
     @Transactional
@@ -58,32 +56,28 @@ public class TeacherSubjectAssignmentServiceImpl implements TeacherSubjectAssign
         AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
                 .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found: " + dto.getAcademicYearId()));
 
-        TeacherSubjectAssignmentEntity entity = teacherMapper.toEntity(dto);
+        TeacherSubjectAssignmentEntity entity = TeacherAssignmentMapper.toEntity(dto);
         entity.setTeacher(teacher);
         entity.setSubject(subject);
         entity.setStandard(standard);
         entity.setSection(section);
         entity.setAcademicYear(academicYear);
         
-        if (entity.getId().getOrganizationId() == null) {
-            entity.getId().setOrganizationId(SecurityUtils.getCurrentOrganizationId());
-        }
-
         TeacherSubjectAssignmentEntity saved = teacherAssignmentRepository.save(entity);
-        return teacherMapper.toResponse(saved);
+        return TeacherAssignmentMapper.toResponse(saved);
     }
 
     @Override
     public List<TeacherSubjectAssignmentResponseDTO> getByTeacher(Long employeeId) {
         return teacherAssignmentRepository.findByTeacherId(employeeId).stream()
-                .map(teacherMapper::toResponse)
+                .map(TeacherAssignmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<TeacherSubjectAssignmentResponseDTO> getBySection(Long standardId, Long sectionId, Long academicYearId) {
         return teacherAssignmentRepository.findByStandardSectionAndAcademicYear(standardId, sectionId, academicYearId).stream()
-                .map(teacherMapper::toResponse)
+                .map(TeacherAssignmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -91,19 +85,10 @@ public class TeacherSubjectAssignmentServiceImpl implements TeacherSubjectAssign
     @Transactional
     public void unassign(Long employeeId, Long standardId, Long sectionId, Long subjectId, Long academicYearId, LocalDate effectiveFrom) {
         log.info("Unassigning Teacher assignment");
-        TeacherSubjectAssignmentId id = TeacherSubjectAssignmentId.builder()
-                .organizationId(SecurityUtils.getCurrentOrganizationId())
-                .employeeId(employeeId)
-                .standardId(standardId)
-                .sectionId(sectionId)
-                .subjectId(subjectId)
-                .academicYearId(academicYearId)
-                .effectiveFrom(effectiveFrom)
-                .build();
+        TeacherSubjectAssignmentEntity entity = teacherAssignmentRepository.findByTeacherStandardSectionSubjectAndYear(
+                employeeId, standardId, sectionId, subjectId, academicYearId, effectiveFrom)
+                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
         
-        if (!teacherAssignmentRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Assignment not found");
-        }
-        teacherAssignmentRepository.softDeleteById(id);
+        teacherAssignmentRepository.softDeleteById(entity.getId());
     }
 }

@@ -13,8 +13,12 @@ import java.util.List;
 public interface ReportCardRepository extends JpaRepository<ReportCardEntity, Long> {
 
     @Query("SELECT rc FROM ReportCardEntity rc WHERE rc.student.id = :studentId " +
-           "AND rc.academicYear.id = :academicYearId AND rc.deleted = false")
-    List<ReportCardEntity> findByStudentAndYear(@Param("studentId") Long studentId, @Param("academicYearId") Long academicYearId);
+            "AND rc.academicYear.id = :academicYearId AND rc.deleted = false")
+    List<ReportCardEntity> findByStudentAndYear(@Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId);
+
+    @Query("SELECT rc FROM ReportCardEntity rc WHERE rc.student.id = :studentId AND rc.deleted = false")
+    List<ReportCardEntity> findByStudentId(@Param("studentId") Long studentId);
 
     @Modifying
     @Query("UPDATE ReportCardEntity rc SET rc.deleted = true, rc.deletedAt = CURRENT_TIMESTAMP WHERE rc.id = :id")

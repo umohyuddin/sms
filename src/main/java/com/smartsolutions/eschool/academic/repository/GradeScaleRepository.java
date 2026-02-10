@@ -21,6 +21,9 @@ public interface GradeScaleRepository extends JpaRepository<GradeScaleEntity, Lo
            "AND :percentage BETWEEN gs.minPercentage AND gs.maxPercentage AND gs.deleted = false")
     Optional<GradeScaleEntity> findGradeByPercentage(@Param("orgId") Long orgId, @Param("percentage") BigDecimal percentage);
 
+    @Query("SELECT gs FROM GradeScaleEntity gs WHERE gs.id = :id AND gs.deleted = false")
+    Optional<GradeScaleEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+
     @Modifying
     @Query("UPDATE GradeScaleEntity gs SET gs.deleted = true, gs.deletedAt = CURRENT_TIMESTAMP WHERE gs.id = :id")
     void softDeleteById(@Param("id") Long id);

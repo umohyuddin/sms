@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
-
     private final EmployeeMasterRepository employeeMasterRepository;
+
     public DepartmentService(DepartmentRepository departmentRepository, EmployeeMasterRepository employeeMasterRepository) {
         this.departmentRepository = departmentRepository;
         this.employeeMasterRepository = employeeMasterRepository;
@@ -35,7 +35,7 @@ public class DepartmentService {
     public DepartmentResponseDTO createDepartment(@Valid DepartmentRequestDTO requestDTO) {
         log.info("Creating new Department in database: {}", requestDTO.getDepartmentName());
         try {
-            DepartmentEntity entity = DepartmentMapper.INSTANCE.toEntity(requestDTO);
+            DepartmentEntity entity = DepartmentMapper.toEntity(requestDTO);
             // Fetch and set parent department if provided
             if (requestDTO.getParentDepartmentId() != null) {
                 DepartmentEntity parent = departmentRepository.findById(requestDTO.getParentDepartmentId())
@@ -44,11 +44,9 @@ public class DepartmentService {
                             return new ResourceNotFoundException("Parent Department not found with id: " + requestDTO.getParentDepartmentId());
                         });
                 entity.setParentDepartment(parent);
-            } else {
-                entity.setParentDepartment(null);
             }
 
-            // Fetch and set head employee if provided, else set null
+            // Fetch and set head employee if provided
             if (requestDTO.getHeadEmployeeId() != null) {
                 EmployeeMasterEntity headEmployee = employeeMasterRepository.findById(requestDTO.getHeadEmployeeId())
                         .orElseThrow(() -> {
@@ -56,13 +54,11 @@ public class DepartmentService {
                             return new ResourceNotFoundException("Employee not found with id: " + requestDTO.getHeadEmployeeId());
                         });
                 entity.setHeadEmployee(headEmployee);
-            } else {
-                entity.setHeadEmployee(null);
             }
 
             DepartmentEntity saved = departmentRepository.save(entity);
             log.info("Department saved successfully with ID: {}", saved.getId());
-            return MapperUtil.mapObject(saved, DepartmentResponseDTO.class);
+            return DepartmentMapper.toResponseDTO(saved);
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -76,7 +72,7 @@ public class DepartmentService {
         try {
             List<DepartmentEntity> departments = departmentRepository.findAllActiveDepartments();
             log.info("Successfully fetched {} active Departments", departments.size());
-            return departments.stream().map(this::toDto).collect(Collectors.toList());
+            return DepartmentMapper.toResponseDTOList(departments);
         } catch (Exception e) {
             log.error("Unexpected error while fetching Departments", e);
             throw new CustomServiceException("Unexpected error occurred while fetching departments", e);
@@ -92,7 +88,7 @@ public class DepartmentService {
                         return new ResourceNotFoundException("Department not found with id: " + id);
                     });
             log.info("Successfully fetched Department: id={}", entity.getId());
-            return toDto(entity);
+            return DepartmentMapper.toResponseDTO(entity);
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -132,7 +128,7 @@ public class DepartmentService {
             DepartmentEntity updated = departmentRepository.save(existing);
             log.info("Department updated successfully with ID: {}", updated.getId());
 
-            return toDto(updated);
+            return DepartmentMapper.toResponseDTO(updated);
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -150,7 +146,7 @@ public class DepartmentService {
                 });
     }
 
-    // Helper: Map DTO to entity
+    // Helper: Map DTO to entity - keep it internal as it's partial update
     private void updateEntityFromDto(DepartmentEntity entity, DepartmentRequestDTO dto) {
         entity.setDepartmentName(dto.getDepartmentName());
         entity.setDepartmentCode(dto.getDepartmentCode());
@@ -182,13 +178,12 @@ public class DepartmentService {
         try {
             List<DepartmentEntity> departments = departmentRepository.findAllActiveDepartments();
             log.info("Successfully fetched {} active Departments", departments.size());
-            return departments.stream().map(this::toDto).collect(Collectors.toList());
+            return DepartmentMapper.toResponseDTOList(departments);
         } catch (Exception e) {
             log.error("Error while fetching active Departments", e);
             throw new CustomServiceException("Failed to fetch active Departments", e);
         }
     }
-
 
     public List<DepartmentResponseDTO> searchDepartments(String keyword) {
         try {
@@ -196,25 +191,11 @@ public class DepartmentService {
             log.info("Fetching Departments based on search from database with keyword: '{}'", searchKey);
             List<DepartmentEntity> results = departmentRepository.searchDepartments(searchKey);
             log.info("Successfully fetched {} Departments based on search", results.size());
-            return results.stream().map(this::toDto).collect(Collectors.toList());
+            return DepartmentMapper.toResponseDTOList(results);
         } catch (Exception e) {
             log.error("Unexpected error while searching Departments", e);
             throw new CustomServiceException("Unexpected error occurred while searching Departments", e);
         }
     }
-    private DepartmentResponseDTO toDto(DepartmentEntity entity) {
-        DepartmentResponseDTO dto = new DepartmentResponseDTO();
-        dto.setId(entity.getId());
-        dto.setDepartmentCode(entity.getDepartmentCode());
-        dto.setDepartmentName(entity.getDepartmentName());
-        dto.setDescription(entity.getDescription());
-        dto.setActive(entity.getActive());
-        dto.setParentDepartmentName(entity.getParentDepartment() != null ? entity.getParentDepartment().getDepartmentName() : null);
-        dto.setParentDepartmentId(entity.getParentDepartment() != null ? entity.getParentDepartment().getId() : null);
-        dto.setHeadEmployeeId(entity.getHeadEmployee() != null ? entity.getHeadEmployee().getId() : null);
-        dto.setHeadEmployeeName(entity.getHeadEmployee() != null ? entity.getHeadEmployee().getFullName() : null);
-        dto.setHeadEmployeeCode(entity.getHeadEmployee() != null ? entity.getHeadEmployee().getEmployeeCode() : null);
-
-        return dto;
-    }
 }
+

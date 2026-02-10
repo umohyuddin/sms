@@ -5,7 +5,7 @@ import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.dtos.subjects.request.SubjectRequest;
 import com.smartsolutions.eschool.school.dtos.subjects.response.SubjectResponse;
 import com.smartsolutions.eschool.school.model.AcademicSubjectEntity;
-import com.smartsolutions.eschool.school.repository.SubjectRepository;
+import com.smartsolutions.eschool.school.repository.SubjectRepository_;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +20,9 @@ import java.util.List;
 @Slf4j
 public class AcademicSubjectService {
 
-    private final SubjectRepository subjectRepository;
+    private final SubjectRepository_ subjectRepository;
 
-    public AcademicSubjectService(SubjectRepository subjectRepository) {
+    public AcademicSubjectService(SubjectRepository_ subjectRepository) {
         this.subjectRepository = subjectRepository;
     }
 

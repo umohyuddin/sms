@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentTermResultResponseDTO {
+    private Long id;
     private Long studentId;
     private String studentName;
     private Long academicYearId;
@@ -23,4 +24,5 @@ public class StudentTermResultResponseDTO {
     private String grade;
     private BigDecimal gpa;
     private LocalDateTime generatedAt;
+    private boolean isActive;
 }

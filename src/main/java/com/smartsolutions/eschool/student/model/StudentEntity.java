@@ -30,6 +30,9 @@ public class StudentEntity {
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
+    @Column(name = "middle_name", length = 50)
+    private String middleName;
+
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 

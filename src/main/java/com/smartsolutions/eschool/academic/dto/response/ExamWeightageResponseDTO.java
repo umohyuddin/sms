@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExamWeightageResponseDTO {
+    private Long id;
     private Long standardId;
     private String standardName;
     private Long subjectId;
@@ -17,4 +18,5 @@ public class ExamWeightageResponseDTO {
     private Long examTermId;
     private String examTermName;
     private BigDecimal weightPercentage;
+    private boolean isActive;
 }

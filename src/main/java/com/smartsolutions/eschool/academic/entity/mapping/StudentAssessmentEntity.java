@@ -3,7 +3,7 @@ package com.smartsolutions.eschool.academic.entity.mapping;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.academic.entity.embeddable.StudentAssessmentId;
+import com.smartsolutions.eschool.academic.entity.master.AssessmentEntity;
 import com.smartsolutions.eschool.academic.entity.master.AssessmentEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,16 +20,15 @@ import java.time.LocalDateTime;
 @Builder
 public class StudentAssessmentEntity extends AuditableEntity {
 
-    @EmbeddedId
-    private StudentAssessmentId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("assessmentId")
     @JoinColumn(name = "assessment_id")
     private AssessmentEntity assessment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("studentId")
     @JoinColumn(name = "student_id")
     private StudentEntity student;
 
@@ -53,13 +52,15 @@ public class StudentAssessmentEntity extends AuditableEntity {
     @Column(name = "evaluated_at")
     private LocalDateTime evaluatedAt;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 
     public enum SubmissionStatus {
-        SUBMITTED, NOT_SUBMITTED
+        NOT_SUBMITTED, SUBMITTED, GRADED
     }
 }

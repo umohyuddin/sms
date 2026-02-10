@@ -13,16 +13,17 @@ import java.math.BigDecimal;
 public class StudentTermResultRequestDTO {
     @NotNull
     private Long studentId;
-    
+
     @NotNull
     private Long academicYearId;
-    
+
     @NotNull
     private Long examTermId;
-    
+
     private BigDecimal totalMarks;
     private BigDecimal obtainedMarks;
     private BigDecimal percentage;
     private String grade;
     private BigDecimal gpa;
+    private boolean active = true;
 }

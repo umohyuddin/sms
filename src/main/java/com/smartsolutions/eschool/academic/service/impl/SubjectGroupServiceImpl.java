@@ -22,16 +22,15 @@ import java.util.stream.Collectors;
 public class SubjectGroupServiceImpl implements SubjectGroupService {
 
     private final SubjectGroupRepository subjectGroupRepository;
-    private final CoreAcademicMapper coreAcademicMapper;
 
     @Override
     @Transactional
     public SubjectGroupResponseDTO create(SubjectGroupRequestDTO dto) {
         log.info("Creating Subject Group: {}", dto.getName());
-        SubjectGroupEntity entity = coreAcademicMapper.toEntity(dto);
+        SubjectGroupEntity entity = CoreAcademicMapper.toEntity(dto);
         // organizationId is handled by AuditableEntity @PrePersist
         SubjectGroupEntity saved = subjectGroupRepository.save(entity);
-        return coreAcademicMapper.toResponse(saved);
+        return CoreAcademicMapper.toResponse(saved);
     }
 
     @Override
@@ -46,13 +45,13 @@ public class SubjectGroupServiceImpl implements SubjectGroupService {
         entity.setActive(dto.isActive());
         
         SubjectGroupEntity updated = subjectGroupRepository.save(entity);
-        return coreAcademicMapper.toResponse(updated);
+        return CoreAcademicMapper.toResponse(updated);
     }
 
     @Override
     public SubjectGroupResponseDTO getById(Long id) {
         return subjectGroupRepository.findActiveById(id)
-                .map(coreAcademicMapper::toResponse)
+                .map(CoreAcademicMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Subject Group not found with ID: " + id));
     }
 
@@ -60,7 +59,7 @@ public class SubjectGroupServiceImpl implements SubjectGroupService {
     public List<SubjectGroupResponseDTO> getAllActive() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
         return subjectGroupRepository.findAllActiveByOrg(orgId).stream()
-                .map(coreAcademicMapper::toResponse)
+                .map(CoreAcademicMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

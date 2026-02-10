@@ -50,7 +50,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         
         // Create system user
         SystemUserEntity systemUser = new SystemUserEntity();
-        systemUser.setOrganizationId(student.getOrganizationId());
+        //systemUser.setOrganizationId(student.getOrganizationId());
         systemUser.setUsername(requestDTO.getUsername());
         systemUser.setEmail(requestDTO.getEmail());
         systemUser.setPhone(requestDTO.getPhone());

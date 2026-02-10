@@ -8,12 +8,20 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AssessmentRepository extends JpaRepository<AssessmentEntity, Long> {
 
+    @Query("SELECT a FROM AssessmentEntity a WHERE a.id = :id AND a.deleted = false")
+    Optional<AssessmentEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+
     @Query("SELECT a FROM AssessmentEntity a JOIN FETCH a.assessmentType JOIN FETCH a.teacherSubjectAssignment " +
-           "WHERE a.academicYear.id = :academicYearId AND a.deleted = false")
+            "WHERE a.teacherSubjectAssignment.id = :assignmentId AND a.deleted = false")
+    List<AssessmentEntity> findByAssignmentId(@Param("assignmentId") Long assignmentId);
+
+    @Query("SELECT a FROM AssessmentEntity a JOIN FETCH a.assessmentType JOIN FETCH a.teacherSubjectAssignment " +
+            "WHERE a.academicYear.id = :academicYearId AND a.deleted = false")
     List<AssessmentEntity> findByAcademicYearId(@Param("academicYearId") Long academicYearId);
 
     @Modifying

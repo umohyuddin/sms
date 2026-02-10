@@ -13,27 +13,29 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class TimetableRequestDTO {
     private Long id;
-    
+
     @NotNull
     private Long standardId;
-    
+
     @NotNull
     private Long sectionId;
-    
+
     @NotNull
     private Long subjectId;
-    
+
     @NotNull
     private Long teacherId;
-    
+
     @NotNull
     private TimetableEntity.DayOfWeek dayOfWeek;
-    
+
     @NotNull
     private LocalTime startTime;
-    
+
     @NotNull
     private LocalTime endTime;
-    
+
     private String room;
+    private Long organizationId;
+    private boolean active = true;
 }

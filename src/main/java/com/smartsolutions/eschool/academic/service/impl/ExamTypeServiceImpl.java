@@ -22,14 +22,13 @@ import java.util.stream.Collectors;
 public class ExamTypeServiceImpl implements ExamTypeService {
 
     private final ExamTypeRepository examTypeRepository;
-    private final ExamAssessmentMapper examMapper;
 
     @Override
     @Transactional
     public ExamTypeResponseDTO create(ExamTypeRequestDTO dto) {
-        ExamTypeEntity entity = examMapper.toEntity(dto);
+        ExamTypeEntity entity = ExamAssessmentMapper.toEntity(dto);
         ExamTypeEntity saved = examTypeRepository.save(entity);
-        return examMapper.toResponse(saved);
+        return ExamAssessmentMapper.toResponse(saved);
     }
 
     @Override
@@ -40,13 +39,13 @@ public class ExamTypeServiceImpl implements ExamTypeService {
         entity.setName(dto.getName());
         entity.setCode(dto.getCode());
         entity.setActive(dto.isActive());
-        return examMapper.toResponse(examTypeRepository.save(entity));
+        return ExamAssessmentMapper.toResponse(examTypeRepository.save(entity));
     }
 
     @Override
     public ExamTypeResponseDTO getById(Long id) {
         return examTypeRepository.findByIdAndDeletedFalse(id)
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Exam Type not found"));
     }
 
@@ -54,7 +53,7 @@ public class ExamTypeServiceImpl implements ExamTypeService {
     public List<ExamTypeResponseDTO> getAllActive() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
         return examTypeRepository.findAllActiveByOrg(orgId).stream()
-                .map(examMapper::toResponse)
+                .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

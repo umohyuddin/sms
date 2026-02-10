@@ -628,3 +628,181 @@ VALUES
 (1, 'School Coordinator', 'Coordinates programs and school events', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
 (1, 'Project Manager', 'Handles special projects and development activities', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL);
 
+
+
+-- 1. INSERT SUBJECT GROUPS
+INSERT INTO subject_groups (organization_id, code, name)
+VALUES
+-- Core Academic Streams
+(1, 'SCI',  'Science Group'),
+(1, 'ART',  'Arts Group'),
+(1, 'COM',  'Commerce Group'),
+
+-- Technology
+(1, 'CS',   'Computer Studies Group'),
+(1, 'IT',   'Information Technology Group'),
+(1, 'AI',   'Robotics & AI Group'),
+
+-- Creative Arts
+(1, 'FA',   'Fine Arts Group'),
+(1, 'PA',   'Performing Arts Group'),
+(1, 'DES',  'Design & Media Studies Group'),
+
+-- Physical & Health
+(1, 'PE',   'Physical Education Group'),
+(1, 'SP',   'Sports Science Group'),
+(1, 'HLT',  'Health & Wellness Group'),
+
+-- Moral & Religious
+(1, 'REL',  'Religious Studies Group'),
+(1, 'ETH',  'Ethics & Moral Education Group'),
+
+-- Foundational
+(1, 'GEN',  'General Studies Group'),
+(1, 'PRI',  'Primary Education Group'),
+(1, 'ECE',  'Early Childhood Education Group'),
+
+-- Humanities & Society
+(1, 'SOC',  'Social Sciences Group'),
+(1, 'HUM',  'Humanities Group'),
+(1, 'CIV',  'Civics & Global Studies Group'),
+
+-- Career & Practical
+(1, 'BUS',  'Business & Economics Group'),
+(1, 'VOC',  'Vocational Studies Group'),
+(1, 'LIFE', 'Life Skills & Career Guidance Group'),
+
+-- Languages
+(1, 'LANG', 'Languages Group'),
+(1, 'FL',   'Foreign Languages Group')
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    is_active = TRUE,
+    is_deleted = FALSE;
+
+-- 2. INSERT SUBJECTS
+-- Note: subject_group_id is fetched dynamically to ensure correctness regardless of ID generation.
+-- Defaulting is_core = TRUE as per user data.
+
+INSERT INTO subjects (organization_id, code, name, subject_group_id, is_core)
+VALUES
+-- Science Group
+(1, 'PHY',     'Physics',               (SELECT id FROM subject_groups WHERE code='SCI' LIMIT 1), TRUE),
+(1, 'CHEM',    'Chemistry',             (SELECT id FROM subject_groups WHERE code='SCI' LIMIT 1), TRUE),
+(1, 'BIO',     'Biology',               (SELECT id FROM subject_groups WHERE code='SCI' LIMIT 1), TRUE),
+(1, 'GEN_SCI', 'General Science',       (SELECT id FROM subject_groups WHERE code='SCI' LIMIT 1), TRUE),
+(1, 'ENV_SCI', 'Environmental Science', (SELECT id FROM subject_groups WHERE code='SCI' LIMIT 1), TRUE),
+
+-- Arts Group
+(1, 'HIST',    'History',               (SELECT id FROM subject_groups WHERE code='ART' LIMIT 1), TRUE),
+(1, 'GEO',     'Geography',             (SELECT id FROM subject_groups WHERE code='ART' LIMIT 1), TRUE),
+(1, 'PSY',     'Psychology',            (SELECT id FROM subject_groups WHERE code='ART' LIMIT 1), TRUE),
+(1, 'SOCIO',   'Sociology',             (SELECT id FROM subject_groups WHERE code='ART' LIMIT 1), TRUE),
+
+-- Commerce Group
+(1, 'ACC',     'Accounting',            (SELECT id FROM subject_groups WHERE code='COM' LIMIT 1), TRUE),
+(1, 'ECO',     'Economics',             (SELECT id FROM subject_groups WHERE code='COM' LIMIT 1), TRUE),
+(1, 'BST',     'Business Studies',      (SELECT id FROM subject_groups WHERE code='COM' LIMIT 1), TRUE),
+(1, 'STAT',    'Statistics',            (SELECT id FROM subject_groups WHERE code='COM' LIMIT 1), TRUE),
+
+-- Computer Studies Group
+(1, 'CS_FUND', 'Computer Fundamentals', (SELECT id FROM subject_groups WHERE code='CS' LIMIT 1), TRUE),
+(1, 'PROG',    'Programming',           (SELECT id FROM subject_groups WHERE code='CS' LIMIT 1), TRUE),
+(1, 'DS',      'Data Structures',       (SELECT id FROM subject_groups WHERE code='CS' LIMIT 1), TRUE),
+
+-- Information Technology Group
+(1, 'IT_BASIC', 'Information Technology', (SELECT id FROM subject_groups WHERE code='IT' LIMIT 1), TRUE),
+(1, 'NET',      'Networking Basics',      (SELECT id FROM subject_groups WHERE code='IT' LIMIT 1), TRUE),
+(1, 'DB',       'Database Concepts',      (SELECT id FROM subject_groups WHERE code='IT' LIMIT 1), TRUE),
+
+-- Robotics & AI Group
+(1, 'AI_INTRO', 'Introduction to AI',     (SELECT id FROM subject_groups WHERE code='AI' LIMIT 1), TRUE),
+(1, 'ROBO',     'Robotics',               (SELECT id FROM subject_groups WHERE code='AI' LIMIT 1), TRUE),
+
+-- Fine Arts Group
+(1, 'DRAW',   'Drawing',               (SELECT id FROM subject_groups WHERE code='FA' LIMIT 1), TRUE),
+(1, 'PAINT',  'Painting',              (SELECT id FROM subject_groups WHERE code='FA' LIMIT 1), TRUE),
+(1, 'CRAFT',  'Craft & Design',        (SELECT id FROM subject_groups WHERE code='FA' LIMIT 1), TRUE),
+
+-- Performing Arts Group
+(1, 'MUSIC',  'Music',                 (SELECT id FROM subject_groups WHERE code='PA' LIMIT 1), TRUE),
+(1, 'DRAMA',  'Drama',                 (SELECT id FROM subject_groups WHERE code='PA' LIMIT 1), TRUE),
+(1, 'DANCE',  'Dance',                 (SELECT id FROM subject_groups WHERE code='PA' LIMIT 1), TRUE),
+
+-- Design & Media Studies Group
+(1, 'GD',     'Graphic Design',        (SELECT id FROM subject_groups WHERE code='DES' LIMIT 1), TRUE),
+(1, 'MEDIA',  'Media Studies',         (SELECT id FROM subject_groups WHERE code='DES' LIMIT 1), TRUE),
+(1, 'PHOTO',  'Photography',           (SELECT id FROM subject_groups WHERE code='DES' LIMIT 1), TRUE),
+
+-- Physical Education Group
+(1, 'PE',     'Physical Education',    (SELECT id FROM subject_groups WHERE code='PE' LIMIT 1), TRUE),
+(1, 'YOGA',    'Yoga',                  (SELECT id FROM subject_groups WHERE code='PE' LIMIT 1), TRUE),
+
+-- Sports Science Group
+(1, 'SPORT_SCI', 'Sports Science',     (SELECT id FROM subject_groups WHERE code='SP' LIMIT 1), TRUE),
+(1, 'FIT',       'Fitness Training',   (SELECT id FROM subject_groups WHERE code='SP' LIMIT 1), TRUE),
+
+-- Health & Wellness Group
+(1, 'HEALTH', 'Health Education',      (SELECT id FROM subject_groups WHERE code='HLT' LIMIT 1), TRUE),
+(1, 'NUT',    'Nutrition',             (SELECT id FROM subject_groups WHERE code='HLT' LIMIT 1), TRUE),
+
+-- Religious Studies Group
+(1, 'ISL',     'Islamic Studies',      (SELECT id FROM subject_groups WHERE code='REL' LIMIT 1), TRUE),
+(1, 'REL_GEN', 'Comparative Religion', (SELECT id FROM subject_groups WHERE code='REL' LIMIT 1), TRUE),
+
+-- Ethics & Moral Education Group
+(1, 'ETHICS', 'Ethics',                (SELECT id FROM subject_groups WHERE code='ETH' LIMIT 1), TRUE),
+(1, 'MORAL',  'Moral Education',       (SELECT id FROM subject_groups WHERE code='ETH' LIMIT 1), TRUE),
+
+-- General Studies Group
+(1, 'GK',     'General Knowledge',     (SELECT id FROM subject_groups WHERE code='GEN' LIMIT 1), TRUE),
+(1, 'GS',     'General Studies',       (SELECT id FROM subject_groups WHERE code='GEN' LIMIT 1), TRUE),
+
+-- Primary Education Group
+(1, 'BASIC_MATH', 'Basic Mathematics', (SELECT id FROM subject_groups WHERE code='PRI' LIMIT 1), TRUE),
+(1, 'BASIC_LANG', 'Basic Language',    (SELECT id FROM subject_groups WHERE code='PRI' LIMIT 1), TRUE),
+
+-- Early Childhood Education Group
+(1, 'PLAY',       'Play & Learning',   (SELECT id FROM subject_groups WHERE code='ECE' LIMIT 1), TRUE),
+(1, 'DRAW_BASIC', 'Basic Drawing',     (SELECT id FROM subject_groups WHERE code='ECE' LIMIT 1), TRUE),
+
+-- Social Sciences Group
+(1, 'POL',    'Political Science',     (SELECT id FROM subject_groups WHERE code='SOC' LIMIT 1), TRUE),
+(1, 'ANTH',   'Anthropology',          (SELECT id FROM subject_groups WHERE code='SOC' LIMIT 1), TRUE),
+
+-- Humanities Group
+(1, 'PHIL',   'Philosophy',            (SELECT id FROM subject_groups WHERE code='HUM' LIMIT 1), TRUE),
+(1, 'LIT',    'Literature',            (SELECT id FROM subject_groups WHERE code='HUM' LIMIT 1), TRUE),
+
+-- Civics & Global Studies Group
+(1, 'CIVICS', 'Civics',                (SELECT id FROM subject_groups WHERE code='CIV' LIMIT 1), TRUE),
+(1, 'GLOBAL', 'Global Studies',        (SELECT id FROM subject_groups WHERE code='CIV' LIMIT 1), TRUE),
+
+-- Business & Economics Group
+(1, 'ENT',    'Entrepreneurship',      (SELECT id FROM subject_groups WHERE code='BUS' LIMIT 1), TRUE),
+(1, 'FIN',    'Finance Basics',        (SELECT id FROM subject_groups WHERE code='BUS' LIMIT 1), TRUE),
+
+-- Vocational Studies Group
+(1, 'ELEC',   'Basic Electronics',     (SELECT id FROM subject_groups WHERE code='VOC' LIMIT 1), TRUE),
+(1, 'AUTO',   'Automobile Basics',     (SELECT id FROM subject_groups WHERE code='VOC' LIMIT 1), TRUE),
+
+-- Life Skills & Career Guidance Group
+(1, 'LS',     'Life Skills',           (SELECT id FROM subject_groups WHERE code='LIFE' LIMIT 1), TRUE),
+(1, 'CAREER', 'Career Guidance',       (SELECT id FROM subject_groups WHERE code='LIFE' LIMIT 1), TRUE),
+
+-- Languages Group
+(1, 'ENG',    'English',               (SELECT id FROM subject_groups WHERE code='LANG' LIMIT 1), TRUE),
+(1, 'URD',    'Urdu',                  (SELECT id FROM subject_groups WHERE code='LANG' LIMIT 1), TRUE),
+(1, 'ARB',    'Arabic',                (SELECT id FROM subject_groups WHERE code='LANG' LIMIT 1), TRUE),
+
+-- Foreign Languages Group
+(1, 'FR',     'French',                (SELECT id FROM subject_groups WHERE code='FL' LIMIT 1), TRUE),
+(1, 'GER',    'German',                (SELECT id FROM subject_groups WHERE code='FL' LIMIT 1), TRUE),
+(1, 'CHI',    'Chinese',               (SELECT id FROM subject_groups WHERE code='FL' LIMIT 1), TRUE)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    subject_group_id = VALUES(subject_group_id),
+    is_core = VALUES(is_core),
+    is_active = TRUE,
+    is_deleted = FALSE;
+

@@ -45,4 +45,7 @@ public class FinancialSettingsResponseDTO {
     private Boolean invoiceMandatory;
     private Boolean receiptMandatory;
     private Boolean isActive;
+    private Long organizationId;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
 }

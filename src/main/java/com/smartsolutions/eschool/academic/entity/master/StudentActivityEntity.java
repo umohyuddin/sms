@@ -36,6 +36,7 @@ public class StudentActivityEntity extends AuditableEntity {
     @Column(name = "grade", length = 10)
     private String grade;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 

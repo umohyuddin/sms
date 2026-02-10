@@ -48,6 +48,7 @@ public class AssessmentEntity extends AuditableEntity {
     @Column(name = "due_date")
     private LocalDate dueDate;
 
+    @Builder.Default
     @Column(name = "is_published", nullable = false)
     private boolean published = false;
 
@@ -55,9 +56,11 @@ public class AssessmentEntity extends AuditableEntity {
     @JoinColumn(name = "academic_year_id", nullable = false)
     private AcademicYearEntity academicYear;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 }

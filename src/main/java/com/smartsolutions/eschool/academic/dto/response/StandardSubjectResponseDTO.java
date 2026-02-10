@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StandardSubjectResponseDTO {
+    private Long id;
     private Long standardId;
     private String standardName;
     private Long subjectId;
