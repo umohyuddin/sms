@@ -13,6 +13,25 @@ import java.util.Optional;
 @Repository
 public interface TeacherSubjectAssignmentRepository extends JpaRepository<TeacherSubjectAssignmentEntity, Long> {
 
+    @Query("SELECT CASE WHEN COUNT(tsa) > 0 THEN true ELSE false END FROM TeacherSubjectAssignmentEntity tsa " +
+           "WHERE tsa.teacher.id = :employeeId AND tsa.standard.id = :standardId " +
+           "AND tsa.section.id = :sectionId AND tsa.subject.id = :subjectId " +
+           "AND tsa.academicYear.id = :academicYearId AND tsa.deleted = false")
+    boolean existsByTeacherAndAssignment(@Param("employeeId") Long employeeId,
+                                         @Param("standardId") Long standardId,
+                                         @Param("sectionId") Long sectionId,
+                                         @Param("subjectId") Long subjectId,
+                                         @Param("academicYearId") Long academicYearId);
+
+    @Query("SELECT tsa FROM TeacherSubjectAssignmentEntity tsa " +
+           "JOIN FETCH tsa.teacher " +
+           "JOIN FETCH tsa.subject " +
+           "JOIN FETCH tsa.standard " +
+           "JOIN FETCH tsa.section " +
+           "JOIN FETCH tsa.academicYear " +
+           "WHERE tsa.id = :id AND tsa.deleted = false")
+    Optional<TeacherSubjectAssignmentEntity> findByIdWithDetails(@Param("id") Long id);
+
     @Query("SELECT tsa FROM TeacherSubjectAssignmentEntity tsa JOIN FETCH tsa.teacher JOIN FETCH tsa.subject JOIN FETCH tsa.standard JOIN FETCH tsa.section " +
            "WHERE tsa.teacher.id = :employeeId AND tsa.deleted = false AND tsa.active = true")
     List<TeacherSubjectAssignmentEntity> findByTeacherId(@Param("employeeId") Long employeeId);

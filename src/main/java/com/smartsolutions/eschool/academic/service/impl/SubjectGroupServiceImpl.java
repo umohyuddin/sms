@@ -58,9 +58,18 @@ public class SubjectGroupServiceImpl implements SubjectGroupService {
     @Override
     public List<SubjectGroupResponseDTO> getAllActive() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
-        return subjectGroupRepository.findAllActiveByOrg(orgId).stream()
+
+        log.debug("Fetching active subject groups for organizationId={}", orgId);
+
+        List<SubjectGroupResponseDTO> response = subjectGroupRepository
+                .findAllByOrg(orgId)
+                .stream()
                 .map(CoreAcademicMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
+
+        log.debug("Fetched {} active subject groups for organizationId={}", response.size(), orgId);
+
+        return response;
     }
 
     @Override

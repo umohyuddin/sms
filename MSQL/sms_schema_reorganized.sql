@@ -1595,7 +1595,7 @@ CREATE TABLE subject_groups (
     organization_id BIGINT NOT NULL,
     code VARCHAR(20) UNIQUE,
     name VARCHAR(100) NOT NULL,
-
+  description VARCHAR(255),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 

@@ -19,6 +19,9 @@ public interface SubjectGroupRepository extends JpaRepository<SubjectGroupEntity
     @Query("SELECT sg FROM SubjectGroupEntity sg WHERE sg.organizationId = :orgId AND sg.deleted = false AND sg.active = true")
     List<SubjectGroupEntity> findAllActiveByOrg(@Param("orgId") Long orgId);
 
+    @Query("SELECT sg FROM SubjectGroupEntity sg WHERE sg.organizationId = :orgId AND sg.deleted = false")
+    List<SubjectGroupEntity> findAllByOrg(@Param("orgId") Long orgId);
+
     @Modifying
     @Query("UPDATE SubjectGroupEntity sg SET sg.deleted = true, sg.deletedAt = CURRENT_TIMESTAMP WHERE sg.id = :id")
     void softDeleteById(@Param("id") Long id);

@@ -29,16 +29,18 @@ public interface CampusRepository extends JpaRepository<CampusEntity, Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE CampusEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " + "WHERE s.id = :id")
-    int softDeleteById(@Param("id") Long id);
+    @Query("UPDATE CampusEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP "
+            + "WHERE s.id = :id AND s.institute.id = :instituteId")
+    int softDeleteByIdAndInstituteId(@Param("id") Long id, @Param("instituteId") Long instituteId);
 
     Long id(Long id);
 
-
     @Query("""
-            SELECT c FROM CampusEntity c WHERE (c.campusName LIKE %:keyword% OR c.campusCode LIKE %:keyword%) AND c.deleted = false""")
-    List<CampusEntity> searchByKeyword(@Param("keyword") String keyword);
+            SELECT c FROM CampusEntity c WHERE (c.campusName LIKE %:keyword% OR c.campusCode LIKE %:keyword%) AND c.institute.id = :instituteId AND c.deleted = false""")
+    List<CampusEntity> searchByKeywordAndInstituteId(@Param("keyword") String keyword,
+            @Param("instituteId") Long instituteId);
 
+    Optional<CampusEntity> findByIdAndInstituteIdAndDeletedFalse(Long id, Long instituteId);
 
     @Query("SELECT COUNT(c) FROM CampusEntity c WHERE c.institute.id = :instituteId AND c.deleted = false")
     Long countByInstituteId(@Param("instituteId") Long instituteId);

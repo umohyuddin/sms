@@ -34,6 +34,8 @@ public class EmployeeAttendanceEntity extends AuditableEntity {
     @Column(name = "remarks", length = 255)
     private String remarks;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
     public enum AttendanceStatus {
         PRESENT, ABSENT, LEAVE, HALF_DAY
     }

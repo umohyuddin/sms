@@ -28,57 +28,53 @@ import java.util.List;
 @Slf4j
 public class CampusService {
 
-
     private final CampusRepository campusRepository;
     private final InstituteDaoImp instituteDaoImp;
     private final ProvinceRepository provinceRepository;
     private final CityRepository cityRepository;
 
-    public CampusService(CampusRepository campusRepository, InstituteDaoImp instituteDaoImp, ProvinceRepository provinceRepository, CityRepository cityRepository) {
+    public CampusService(CampusRepository campusRepository, InstituteDaoImp instituteDaoImp,
+            ProvinceRepository provinceRepository, CityRepository cityRepository) {
         this.campusRepository = campusRepository;
         this.instituteDaoImp = instituteDaoImp;
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
     }
 
-    public List<CampusResponseDTO> getAll() {
+    public List<CampusResponseDTO> getAll(Long organizationId) {
         try {
-            log.info("Fetching all Campuses from database");
-            //List<CampusEntity> result = campusDao.findAll();
-            List<CampusEntity> result = campusRepository.findByDeletedFalse();
+            log.info("Fetching all Campuses from database for organization: {}", organizationId);
+            List<CampusEntity> result = campusRepository.findByInstituteIdAndDeletedFalse(organizationId);
             log.info("Successfully fetched {} Campuses", result.size());
             List<CampusResponseDTO> campusResponseDTOList = MapperUtil.mapList(result, CampusResponseDTO.class);
-            log.info("Successfully fetched {} Campuses", campusResponseDTOList);
             return campusResponseDTOList;
         } catch (DataAccessException dae) {
             log.error("Database error while fetching Campuses", dae);
-            //throw new CustomServiceException("Unable to fetch students from database", dae);
         } catch (MappingException me) {
             log.error("Error mapping StudentEntity to Campuses", me);
-            //throw new CustomServiceException("Error converting student data", me);
         } catch (Exception e) {
             log.error("Unexpected error while fetching Campuses", e);
-            //throw new ("Unexpected error occurred", e);
         }
         return Collections.emptyList();
     }
 
-    public CampusResponseDTO getById(Long id) {
-        log.info("Fetching Campus with id: {}", id);
-        CampusEntity campusEntity = campusRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
-            log.info("Fetching Campus with id: {}", id);
-            return new ResourceNotFoundException("Campus not found with id: " + id);
-        });
+    public CampusResponseDTO getById(Long id, Long organizationId) {
+        log.info("Fetching Campus with id: {} for organization: {}", id, organizationId);
+        CampusEntity campusEntity = campusRepository.findByIdAndInstituteIdAndDeletedFalse(id, organizationId)
+                .orElseThrow(() -> {
+                    log.warn("Campus not found with id: {} for organization: {}", id, organizationId);
+                    return new ResourceNotFoundException("Campus not found with id: " + id);
+                });
 
-        ProvinceEntity provinceEntity = provinceRepository.findByIdAndDeletedFalse(campusEntity.getProvinceId()).orElseThrow(() -> {
-            log.info("Fetching Province with id: {}", campusEntity.getProvinceId());
-            return new ResourceNotFoundException("Province not found with id: " + id);
-        });
+        ProvinceEntity provinceEntity = provinceRepository.findByIdAndDeletedFalse(campusEntity.getProvinceId())
+                .orElseThrow(() -> {
+                    log.info("Fetching Province with id: {}", campusEntity.getProvinceId());
+                    return new ResourceNotFoundException("Province not found with id: " + campusEntity.getProvinceId());
+                });
         CityEntity cityEntity = cityRepository.findByIdAndDeletedFalse(campusEntity.getCityId()).orElseThrow(() -> {
             log.info("Fetching City with id: {}", campusEntity.getCityId());
-            return new ResourceNotFoundException("City not found with id: " + id);
+            return new ResourceNotFoundException("City not found with id: " + campusEntity.getCityId());
         });
-
 
         CampusResponseDTO campusResponseDTO = MapperUtil.mapObject(campusEntity, CampusResponseDTO.class);
         campusResponseDTO.setProvince(MapperUtil.mapObject(provinceEntity, ProvinceResponseDTO.class));
@@ -104,40 +100,44 @@ public class CampusService {
         return campusResponseDTOList;
     }
 
-
-    public List<CampusResponseDTO> findByCampusNameContaining(String name) {
-        log.info("Fetching campuses containing name: '{}'", name);
+    public List<CampusResponseDTO> findByCampusNameContaining(String name, Long organizationId) {
+        log.info("Fetching campuses containing name: '{}' for organization: {}", name, organizationId);
         if (name == null || name.trim().isEmpty()) {
             log.error("Campus name is null or empty");
             throw new IllegalArgumentException("Campus name must not be null or empty");
         }
 
         List<CampusEntity> campusEntities = campusRepository.findByCampusNameContainingAndDeletedFalse(name);
-        if (campusEntities.isEmpty()) {
-            log.warn("No campuses found for institute name: {}", name);
-            return List.of(); // safe empty list
-        }
-        List<CampusResponseDTO> campusResponseDTOList = MapperUtil.mapList(campusEntities, CampusResponseDTO.class);
-        log.info("Found {} campuses containing name: '{}'", campusResponseDTOList.size(), name);
+        // We might want to filter by institute ID as well if the repository method
+        // doesn't support it yet
+        // For now, let's assume we want to keep it simple but filter the results
+        List<CampusResponseDTO> campusResponseDTOList = MapperUtil.mapList(
+                campusEntities.stream()
+                        .filter(c -> c.getInstitute() != null && c.getInstitute().getId().equals(organizationId))
+                        .toList(),
+                CampusResponseDTO.class);
+        log.info("Found {} campuses containing name: '{}' for organization: {}", campusResponseDTOList.size(), name,
+                organizationId);
         return campusResponseDTOList;
     }
 
-    public int softDeleteById(Long id) {
-        log.info("Soft delete request received for Campus ID: {}", id);
+    public int softDeleteById(Long id, Long organizationId) {
+        log.info("Soft delete request received for Campus ID: {} for organization: {}", id, organizationId);
         try {
-            return campusRepository.softDeleteById(id);
+            return campusRepository.softDeleteByIdAndInstituteId(id, organizationId);
         } catch (Exception e) {
-            log.error("Error while soft deleting Campus with ID {}", id, e);
+            log.error("Error while soft deleting Campus with ID {} for organization {}", id, organizationId, e);
             throw e;
         }
     }
 
-    public CampusCreateRequestDTO createCampus(CampusCreateRequestDTO requestDTO) {
-        log.info("Creating new Campus: {}", requestDTO);
+    public CampusCreateRequestDTO createCampus(CampusCreateRequestDTO requestDTO, Long organizationId) {
+        log.info("Creating new Campus: {} for organization: {}", requestDTO, organizationId);
         try {
-//            Province province = EnumValidatorUtil.getEnumByName(Province.class, requestDTO.getProvinceName());
-//            Cities city = EnumValidatorUtil.getEnumByName(Cities.class, requestDTO.getCityName());
-            InstituteEntity instituteEntity = instituteDaoImp.findById(1L);
+            InstituteEntity instituteEntity = instituteDaoImp.findById(organizationId);
+            if (instituteEntity == null) {
+                throw new ResourceNotFoundException("Institute not found with id: " + organizationId);
+            }
             CampusEntity entity = MapperUtil.mapObject(requestDTO, CampusEntity.class);
             entity.setId(null);
             entity.setInstitute(instituteEntity);
@@ -156,17 +156,16 @@ public class CampusService {
         }
     }
 
+    public CampusResponseDTO updateCampus(Long id, @Valid CampusCreateRequestDTO requestDTO, Long organizationId) {
+        log.info("Updating Campus with id {} for organization {} using DTO {}", id, organizationId, requestDTO);
 
-    public CampusResponseDTO updateCampus(Long id, @Valid CampusCreateRequestDTO requestDTO) {
-        log.info("Updating Campus with id {} using DTO {}", id, requestDTO);
-
-        CampusEntity entity = campusRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + id));
+        CampusEntity entity = campusRepository.findByIdAndInstituteIdAndDeletedFalse(id, organizationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + id));
 
         entity.setActive(requestDTO.isActive());
         if (requestDTO.getCampusName() != null && !requestDTO.getCampusName().isBlank()) {
             entity.setCampusName(requestDTO.getCampusName());
         }
-
 
         if (requestDTO.getContactNumber() != null) {
             entity.setContactNumber(requestDTO.getContactNumber());
@@ -196,9 +195,11 @@ public class CampusService {
             entity.setLogo(requestDTO.getLogo());
         }
 
-        if (requestDTO.getInstituteId() != null && (entity.getInstitute() == null || !entity.getInstitute().getId().equals(requestDTO.getInstituteId()))) {
+        if (requestDTO.getInstituteId() != null && (entity.getInstitute() == null
+                || !entity.getInstitute().getId().equals(requestDTO.getInstituteId()))) {
             InstituteEntity institute = instituteDaoImp.findById(requestDTO.getInstituteId());
-//                    .orElseThrow(() -> new ResourceNotFoundException("Institute not found with id: " + requestDTO.getInstituteId()));
+            // .orElseThrow(() -> new ResourceNotFoundException("Institute not found with
+            // id: " + requestDTO.getInstituteId()));
             entity.setInstitute(institute);
         }
 
@@ -208,21 +209,21 @@ public class CampusService {
         return response;
     }
 
-    public List<CampusResponseDTO> searchByKeyword(String keyword) {
+    public List<CampusResponseDTO> searchByKeyword(String keyword, Long organizationId) {
         try {
-            log.info("Fetching all Campuses based on search from database");
-            List<CampusEntity> result = campusRepository.searchByKeyword(keyword);
+            log.info("Fetching all Campuses based on search from database for organization: {}", organizationId);
+            List<CampusEntity> result = campusRepository.searchByKeywordAndInstituteId(keyword, organizationId);
             List<CampusResponseDTO> responseDTOS = MapperUtil.mapList(result, CampusResponseDTO.class);
             log.info("Successfully fetched Campuses based on search {} ", responseDTOS.size());
             return responseDTOS;
         } catch (DataAccessException dae) {
-            log.error("Database error while fetching Discount Types based on search", dae);
-            throw new CustomServiceException("Unable to fetch Discount Types based on search from database", dae);
+            log.error("Database error while fetching Campuses based on search", dae);
+            throw new CustomServiceException("Unable to fetch Campuses based on search from database", dae);
         } catch (MappingException me) {
-            log.error("Error mapping DiscountTpe Entity to Discount Types based on search", me);
-            throw new CustomServiceException("Error converting  Discount Types data based on search", me);
+            log.error("Error mapping Campus Entity to Campuses based on search", me);
+            throw new CustomServiceException("Error converting Campuses data based on search", me);
         } catch (Exception e) {
-            log.error("Unexpected error while fetching Discount Types based on search", e);
+            log.error("Unexpected error while fetching Campuses based on search", e);
             throw new CustomServiceException("Unexpected error occurred", e);
         }
     }
@@ -237,5 +238,3 @@ public class CampusService {
         return count;
     }
 }
-
-

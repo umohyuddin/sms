@@ -2,18 +2,18 @@ package com.smartsolutions.eschool.sclass.service;
 
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
-import com.smartsolutions.eschool.school.model.AcademicSubjectEntity;
+import com.smartsolutions.eschool.academic.entity.master.SubjectEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
-import com.smartsolutions.eschool.school.repository.SubjectRepository_;
+import com.smartsolutions.eschool.academic.repository.SubjectRepository;
 import com.smartsolutions.eschool.sclass.dtos.TeacherSubjectAssignment.request.TeacherSubjectAssignmentRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.TeacherSubjectAssignment.response.TeacherSubjectAssignmentResponseDTO;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
-import com.smartsolutions.eschool.sclass.model.TeacherSubjectAssignmentEntity;
+import com.smartsolutions.eschool.academic.entity.mapping.TeacherSubjectAssignmentEntity;
 import com.smartsolutions.eschool.sclass.repository.SectionRepository;
 import com.smartsolutions.eschool.sclass.repository.StandardRepository;
-import com.smartsolutions.eschool.sclass.repository.TeacherSubjectAssignmentRepository;
+import com.smartsolutions.eschool.academic.repository.TeacherSubjectAssignmentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class TeacherSubjectAssignmentService{
     private final EmployeeMasterRepository employeeRepository;
     private final StandardRepository standardRepository;
     private final SectionRepository sectionRepository;
-    private final SubjectRepository_ subjectRepository;
+    private final SubjectRepository subjectRepository;
     private final AcademicYearRepository academicYearRepository;
 
 
@@ -36,7 +36,7 @@ public class TeacherSubjectAssignmentService{
             TeacherSubjectAssignmentRequestDTO dto) {
 
         boolean exists = repository
-                .existsByEmployee_IdAndStandard_IdAndSection_IdAndSubject_IdAndAcademicYear_Id(
+                .existsByTeacherAndAssignment(
                         dto.getEmployeeId(),
                         dto.getStandardId(),
                         dto.getSectionId(),
@@ -57,7 +57,7 @@ public class TeacherSubjectAssignmentService{
         SectionEntity section = sectionRepository.findById(dto.getSectionId())
                 .orElseThrow(() -> new EntityNotFoundException("Section not found"));
 
-        AcademicSubjectEntity subject = subjectRepository.findById(dto.getSubjectId())
+        SubjectEntity subject = subjectRepository.findById(dto.getSubjectId())
                 .orElseThrow(() -> new EntityNotFoundException("Subject not found"));
 
         AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
@@ -65,7 +65,7 @@ public class TeacherSubjectAssignmentService{
 
         TeacherSubjectAssignmentEntity entity =
                 TeacherSubjectAssignmentEntity.builder()
-                        .employee(employee)
+                        .teacher(employee)
                         .standard(standard)
                         .section(section)
                         .subject(subject)
@@ -83,13 +83,13 @@ public class TeacherSubjectAssignmentService{
     }
 
     public TeacherSubjectAssignmentResponseDTO getById(Long id) {
-        return repository.findById(id)
+        return repository.findByIdWithDetails(id)
                 .map(this::mapToDTO)
                 .orElseThrow(() -> new EntityNotFoundException("Assignment not found"));
     }
 
     public List<TeacherSubjectAssignmentResponseDTO> getByTeacher(Long employeeId) {
-        return repository.findByEmployee_Id(employeeId)
+        return repository.findByTeacherId(employeeId)
                 .stream()
                 .map(this::mapToDTO)
                 .toList();
@@ -102,7 +102,7 @@ public class TeacherSubjectAssignmentService{
             Long academicYearId) {
 
         return repository
-                .findByStandard_IdAndSection_IdAndAcademicYear_Id(
+                .findByStandardSectionAndAcademicYear(
                         standardId, sectionId, academicYearId)
                 .stream()
                 .map(this::mapToDTO)
@@ -114,8 +114,8 @@ public class TeacherSubjectAssignmentService{
 
         return TeacherSubjectAssignmentResponseDTO.builder()
                 .id(entity.getId())
-                .employeeId(entity.getEmployee().getId())
-                .employeeName(entity.getEmployee().getFullName())
+                .employeeId(entity.getTeacher().getId())
+                .employeeName(entity.getTeacher().getFullName())
                 .standardId(entity.getStandard().getId())
                 .standardName(entity.getStandard().getStandardName())
                 .sectionId(entity.getSection().getId())

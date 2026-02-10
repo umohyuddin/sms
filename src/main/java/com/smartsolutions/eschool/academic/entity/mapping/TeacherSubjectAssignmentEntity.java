@@ -5,7 +5,7 @@ import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
-import com.smartsolutions.eschool.school.model.AcademicYearEntity;
+
 import com.smartsolutions.eschool.academic.entity.master.SubjectEntity;
 import jakarta.persistence.*;
 import lombok.*;
