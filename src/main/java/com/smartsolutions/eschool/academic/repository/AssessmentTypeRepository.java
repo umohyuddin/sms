@@ -1,0 +1,21 @@
+package com.smartsolutions.eschool.academic.repository;
+
+import com.smartsolutions.eschool.academic.entity.master.AssessmentTypeEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface AssessmentTypeRepository extends JpaRepository<AssessmentTypeEntity, Long> {
+
+    @Query("SELECT at FROM AssessmentTypeEntity at WHERE at.organizationId = :orgId AND at.deleted = false")
+    List<AssessmentTypeEntity> findAllActiveByOrg(@Param("orgId") Long orgId);
+
+    @Modifying
+    @Query("UPDATE AssessmentTypeEntity at SET at.deleted = true, at.deletedAt = CURRENT_TIMESTAMP WHERE at.id = :id")
+    void softDeleteById(@Param("id") Long id);
+}
