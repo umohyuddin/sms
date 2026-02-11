@@ -25,40 +25,47 @@ import java.util.Optional;
 @Repository
 
 public interface StandardRepository extends JpaRepository<StandardEntity, Long> {
-    Optional<StandardEntity> findByIdAndDeletedFalse(Long id);
+        @Query("SELECT s FROM StandardEntity s WHERE s.id = :id AND s.campus.institute.id = :instituteId AND s.deleted = false")
+        Optional<StandardEntity> findByIdAndInstituteIdAndDeletedFalse(@Param("id") Long id,
+                        @Param("instituteId") Long instituteId);
 
-    List<StandardEntity> findByDeletedFalse();
+        @Query("SELECT s FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.deleted = false")
+        List<StandardEntity> findByInstituteIdAndDeletedFalse(@Param("instituteId") Long instituteId);
 
-    @Query("SELECT s FROM StandardEntity s WHERE s.campus.id = :campusId AND s.deleted = false")
-    List<StandardEntity> findByCampusId(@Param("campusId") Long campusId);
+        @Query("SELECT s FROM StandardEntity s WHERE s.campus.id = :campusId AND s.campus.institute.id = :instituteId AND s.deleted = false")
+        List<StandardEntity> findByCampusIdAndInstituteId(@Param("campusId") Long campusId,
+                        @Param("instituteId") Long instituteId);
 
+        // Search by standardName or standardCode with instituteId
+        @Query("SELECT sec FROM StandardEntity sec " +
+                        "WHERE (sec.standardName LIKE %:keyword% OR sec.standardCode LIKE %:keyword%) " +
+                        "AND sec.campus.institute.id = :instituteId " +
+                        "AND sec.deleted = false")
+        List<StandardEntity> searchByKeywordAndInstituteId(@Param("keyword") String keyword,
+                        @Param("instituteId") Long instituteId);
 
-    // Search by sectionName or sectionCode
-    @Query("SELECT sec FROM StandardEntity sec " +
-            "WHERE (sec.standardName LIKE %:keyword% OR sec.standardCode LIKE %:keyword%) " +
-            "AND sec.deleted = false")
-    List<StandardEntity> searchByKeyword(@Param("keyword") String keyword);
+        @Query("SELECT s FROM StandardEntity s " +
+                        "JOIN FETCH s.campus c " +
+                        "WHERE (:campusId IS NULL OR c.id = :campusId) " +
+                        "AND c.institute.id = :instituteId " +
+                        "AND (:search IS NULL OR LOWER(s.standardName) LIKE LOWER(CONCAT('%', :search, '%')) " +
+                        "     OR LOWER(s.standardCode) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+                        "AND s.deleted = false " +
+                        "ORDER BY s.standardName ASC")
+        List<StandardEntity> searchStandardsWithOrg(@Param("campusId") Long campusId,
+                        @Param("instituteId") Long instituteId,
+                        @Param("search") String search);
 
-    @Query("SELECT s FROM StandardEntity s " +
-            "JOIN FETCH s.campus c " +
-            "WHERE (:campusId IS NULL OR c.id = :campusId) " +
-            "AND (:search IS NULL OR LOWER(s.standardName) LIKE LOWER(CONCAT('%', :search, '%')) " +
-            "     OR LOWER(s.standardCode) LIKE LOWER(CONCAT('%', :search, '%'))) " +
-            "AND s.deleted = false " +
-            "ORDER BY s.standardName ASC")
-    List<StandardEntity> searchStandards(@Param("campusId") Long campusId,
-                                         @Param("search") String search);
+        @Modifying
+        @Transactional
+        @Query("UPDATE StandardEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " +
+                        "WHERE s.id = :id AND s.campus.institute.id = :instituteId")
+        int softDeleteByIdAndInstituteId(@Param("id") Long id, @Param("instituteId") Long instituteId);
 
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE StandardEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " + "WHERE s.id = :id")
-    int softDeleteById(@Param("id") Long id);
-
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE StandardEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " +
-            "WHERE s.campus.id = :campusId AND s.deleted = false")
-    int softDeleteByCampusId(@Param("campusId") Long campusId);
+        @Modifying
+        @Transactional
+        @Query("UPDATE StandardEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " +
+                        "WHERE s.campus.id = :campusId AND s.campus.institute.id = :instituteId AND s.deleted = false")
+        int softDeleteByCampusIdAndInstituteId(@Param("campusId") Long campusId,
+                        @Param("instituteId") Long instituteId);
 }

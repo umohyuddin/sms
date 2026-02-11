@@ -2190,7 +2190,3 @@ CREATE TABLE timetable (
     FOREIGN KEY (subject_id) REFERENCES subjects(id),
     FOREIGN KEY (teacher_id) REFERENCES employee_master(id)
 );
-
-
-
-

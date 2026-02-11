@@ -595,6 +595,64 @@ VALUES
 
 
 
+INSERT INTO provinces
+(country_id, name, code, is_active, created_at, created_by, deleted)
+VALUES
+((SELECT id FROM country WHERE iso_code='PAK' LIMIT 1), 'Punjab', 'PB', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM country WHERE iso_code='PAK' LIMIT 1), 'Sindh', 'SD', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM country WHERE iso_code='PAK' LIMIT 1), 'Khyber Pakhtunkhwa', 'KP', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM country WHERE iso_code='PAK' LIMIT 1), 'Balochistan', 'BL', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM country WHERE iso_code='PAK' LIMIT 1), 'Gilgit-Baltistan', 'GB', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM country WHERE iso_code='PAK' LIMIT 1), 'Azad Jammu and Kashmir', 'AJK', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM country WHERE iso_code='PAK' LIMIT 1), 'Islamabad Capital Territory', 'ICT', TRUE, NOW(), 1, FALSE);
+
+INSERT INTO cities
+(province_id, name, code, is_active, created_at, created_by, deleted)
+VALUES
+
+-- ================= PUNJAB =================
+((SELECT id FROM provinces WHERE name='Punjab'), 'Lahore', 'LHR', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Punjab'), 'Faisalabad', 'FSD', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Punjab'), 'Rawalpindi', 'RWP', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Punjab'), 'Multan', 'MUX', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Punjab'), 'Gujranwala', 'GUJ', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Punjab'), 'Sialkot', 'SKT', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Punjab'), 'Bahawalpur', 'BWP', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Punjab'), 'Sargodha', 'SGD', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Punjab'), 'Rahim Yar Khan', 'RYK', TRUE, NOW(), 1, FALSE),
+
+-- ================= SINDH =================
+((SELECT id FROM provinces WHERE name='Sindh'), 'Karachi', 'KHI', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Sindh'), 'Hyderabad', 'HYD', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Sindh'), 'Sukkur', 'SKZ', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Sindh'), 'Larkana', 'LRK', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Sindh'), 'Nawabshah', 'NWS', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Sindh'), 'Mirpurkhas', 'MPK', TRUE, NOW(), 1, FALSE),
+
+-- ================= KP =================
+((SELECT id FROM provinces WHERE name='Khyber Pakhtunkhwa'), 'Peshawar', 'PEW', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Khyber Pakhtunkhwa'), 'Mardan', 'MRD', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Khyber Pakhtunkhwa'), 'Abbottabad', 'ABT', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Khyber Pakhtunkhwa'), 'Swat', 'SWT', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Khyber Pakhtunkhwa'), 'Kohat', 'KHT', TRUE, NOW(), 1, FALSE),
+
+-- ================= BALOCHISTAN =================
+((SELECT id FROM provinces WHERE name='Balochistan'), 'Quetta', 'QTA', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Balochistan'), 'Gwadar', 'GWD', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Balochistan'), 'Turbat', 'TBT', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Balochistan'), 'Khuzdar', 'KZD', TRUE, NOW(), 1, FALSE),
+
+-- ================= GILGIT BALTISTAN =================
+((SELECT id FROM provinces WHERE name='Gilgit-Baltistan'), 'Gilgit', 'GIL', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Gilgit-Baltistan'), 'Skardu', 'SKD', TRUE, NOW(), 1, FALSE),
+
+-- ================= AJK =================
+((SELECT id FROM provinces WHERE name='Azad Jammu and Kashmir'), 'Muzaffarabad', 'MZD', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Azad Jammu and Kashmir'), 'Mirpur', 'MPR', TRUE, NOW(), 1, FALSE),
+((SELECT id FROM provinces WHERE name='Azad Jammu and Kashmir'), 'Kotli', 'KTL', TRUE, NOW(), 1, FALSE),
+
+-- ================= ISLAMABAD =================
+((SELECT id FROM provinces WHERE name='Islamabad Capital Territory'), 'Islamabad', 'ISB', TRUE, NOW(), 1, FALSE);
 
 
 
@@ -806,3 +864,246 @@ ON DUPLICATE KEY UPDATE
     is_active = TRUE,
     is_deleted = FALSE;
 
+
+
+
+-- ============================================================
+-- Sample Data: Institutes
+-- This dataset seeds the 'institutes' table with example
+-- educational organizations. These entries are used to attach
+-- campuses, academic years, users, fee structures, and other
+-- modules within the system.
+-- ============================================================
+INSERT INTO institutes
+(id, name, address, contact_number, email, website, tagline, logo_url,
+ established_date, country_id, province_id, city_id, created_at, updated_at)
+VALUES
+(
+ 1, 'Smart Solutions School','123 Main Street, Lahore','+92-300-1234567','info@smartsolutions.edu','https://www.smartsolutions.edu','Excellence in Education',NULL, '2005-08-15',
+ (SELECT id FROM country WHERE iso_code='PAK' LIMIT 1),
+ (SELECT id FROM provinces WHERE name = 'Punjab'),
+ (SELECT id FROM cities WHERE name = 'Lahore'),
+ NOW(),
+ NOW()
+);
+
+INSERT INTO campuses (organization_id, institute_id, province_id, city_id,
+                      campus_name, contact, email, website, address,
+                      logo, deleted,
+                      created_at, created_by, updated_at, updated_by,
+                      deleted_at, deleted_by)
+VALUES
+
+-- Lahore
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Punjab'),
+ (SELECT id FROM cities WHERE name='Lahore' AND province_id = (SELECT id FROM provinces WHERE name='Punjab')),
+ 'Downtown Campus', '+92-300-1234567', 'downtown@smarteschool.com',
+ 'https://downtown.smarteschool.com', '123 Main Street', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Lahore
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Punjab'),
+ (SELECT id FROM cities WHERE name='Lahore' AND province_id = (SELECT id FROM provinces WHERE name='Punjab')),
+ 'Uptown Campus', '+92-300-7654321', 'uptown@smarteschool.com',
+ 'https://uptown.smarteschool.com', '456 Park Avenue', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Karachi
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Sindh'),
+ (SELECT id FROM cities WHERE name='Karachi' AND province_id = (SELECT id FROM provinces WHERE name='Sindh')),
+ 'Riverside Campus', '+92-301-1112223', 'riverside@smarteschool.com',
+ 'https://riverside.smarteschool.com', '789 River Road', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Peshawar
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Khyber Pakhtunkhwa'),
+ (SELECT id FROM cities WHERE name='Peshawar' AND province_id = (SELECT id FROM provinces WHERE name='Khyber Pakhtunkhwa')),
+ 'Hilltop Campus', '+92-301-3334445', 'hilltop@smarteschool.com',
+ 'https://hilltop.smarteschool.com', '101 Hill Street', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Faisalabad
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Punjab'),
+ (SELECT id FROM cities WHERE name='Faisalabad' AND province_id = (SELECT id FROM provinces WHERE name='Punjab')),
+ 'Greenfield Campus', '+92-302-5556667', 'greenfield@smarteschool.com',
+ 'https://greenfield.smarteschool.com', '202 Green Road', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Karachi
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Sindh'),
+ (SELECT id FROM cities WHERE name='Karachi' AND province_id = (SELECT id FROM provinces WHERE name='Sindh')),
+ 'Seaside Campus', '+92-302-7778889', 'seaside@smarteschool.com',
+ 'https://seaside.smarteschool.com', '303 Beach Avenue', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Multan
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Punjab'),
+ (SELECT id FROM cities WHERE name='Multan' AND province_id = (SELECT id FROM provinces WHERE name='Punjab')),
+ 'Central Campus', '+92-303-9990001', 'central@smarteschool.com',
+ 'https://central.smarteschool.com', '404 Central Street', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Hyderabad
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Sindh'),
+ (SELECT id FROM cities WHERE name='Hyderabad' AND province_id = (SELECT id FROM provinces WHERE name='Sindh')),
+ 'Lakeside Campus', '+92-303-2223334', 'lakeside@smarteschool.com',
+ 'https://lakeside.smarteschool.com', '505 Lake Road', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Rawalpindi
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Punjab'),
+ (SELECT id FROM cities WHERE name='Rawalpindi' AND province_id = (SELECT id FROM provinces WHERE name='Punjab')),
+ 'Sunrise Campus', '+92-304-4445556', 'sunrise@smarteschool.com',
+ 'https://sunrise.smarteschool.com', '606 Sunrise Blvd', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL),
+
+-- Quetta
+(1, 1,
+ (SELECT id FROM provinces WHERE name='Balochistan'),
+ (SELECT id FROM cities WHERE name='Quetta' AND province_id = (SELECT id FROM provinces WHERE name='Balochistan')),
+ 'Maple Campus', '+92-304-6667778', 'maple@smarteschool.com',
+ 'https://maple.smarteschool.com', '707 Maple Street', NULL, FALSE,
+ NOW(), 1, NOW(), 1, NULL, NULL);
+
+
+-- ============================================================
+-- Sample Data: Standards / Grades
+-- Each campus has 1st Grade → 5th Grade. These standards
+-- are used to assign students, teachers, timetables, exams,
+-- and fees. The 'deleted' column is FALSE (0) for active records.
+-- ============================================================
+
+-- Sample standards for 10 campuses
+INSERT INTO standards (organization_id, campus_id, standard_name, created_at, updated_at)
+VALUES
+-- Downtown Campus (campus_id = 1)
+(1, 1, '1st Grade', NOW(), NOW()),
+(1, 1, '2nd Grade', NOW(), NOW()),
+(1, 1, '3rd Grade', NOW(), NOW()),
+(1, 1, '4th Grade', NOW(), NOW()),
+(1, 1, '5th Grade', NOW(), NOW()),
+
+-- Uptown Campus (campus_id = 2)
+(1, 2, '1st Grade', NOW(), NOW()),
+(1, 2, '2nd Grade', NOW(), NOW()),
+(1, 2, '3rd Grade', NOW(), NOW()),
+(1, 2, '4th Grade', NOW(), NOW()),
+(1, 2, '5th Grade', NOW(), NOW()),
+
+-- Riverside Campus (campus_id = 3)
+(1, 3, '1st Grade', NOW(), NOW()),
+(1, 3, '2nd Grade', NOW(), NOW()),
+(1, 3, '3rd Grade', NOW(), NOW()),
+(1, 3, '4th Grade', NOW(), NOW()),
+(1, 3, '5th Grade', NOW(), NOW()),
+
+-- Hilltop Campus (campus_id = 4)
+(1, 4, '1st Grade', NOW(), NOW()),
+(1, 4, '2nd Grade', NOW(), NOW()),
+(1, 4, '3rd Grade', NOW(), NOW()),
+(1, 4, '4th Grade', NOW(), NOW()),
+(1, 4, '5th Grade', NOW(), NOW()),
+
+-- Greenfield Campus (campus_id = 5)
+(1, 5, '1st Grade', NOW(), NOW()),
+(1, 5, '2nd Grade', NOW(), NOW()),
+(1, 5, '3rd Grade', NOW(), NOW()),
+(1, 5, '4th Grade', NOW(), NOW()),
+(1, 5, '5th Grade', NOW(), NOW()),
+
+-- Seaside Campus (campus_id = 6)
+(1, 6, '1st Grade', NOW(), NOW()),
+(1, 6, '2nd Grade', NOW(), NOW()),
+(1, 6, '3rd Grade', NOW(), NOW()),
+(1, 6, '4th Grade', NOW(), NOW()),
+(1, 6, '5th Grade', NOW(), NOW()),
+
+-- Central Campus (campus_id = 7)
+(1, 7, '1st Grade', NOW(), NOW()),
+(1, 7, '2nd Grade', NOW(), NOW()),
+(1, 7, '3rd Grade', NOW(), NOW()),
+(1, 7, '4th Grade', NOW(), NOW()),
+(1, 7, '5th Grade', NOW(), NOW()),
+
+-- Lakeside Campus (campus_id = 8)
+(1, 8, '1st Grade', NOW(), NOW()),
+(1, 8, '2nd Grade', NOW(), NOW()),
+(1, 8, '3rd Grade', NOW(), NOW()),
+(1, 8, '4th Grade', NOW(), NOW()),
+(1, 8, '5th Grade', NOW(), NOW()),
+
+-- Sunrise Campus (campus_id = 9)
+(1, 9, '1st Grade', NOW(), NOW()),
+(1, 9, '2nd Grade', NOW(), NOW()),
+(1, 9, '3rd Grade', NOW(), NOW()),
+(1, 9, '4th Grade', NOW(), NOW()),
+(1, 9, '5th Grade', NOW(), NOW()),
+
+-- Maple Campus (campus_id = 10)
+(1, 10, '1st Grade', NOW(), NOW()),
+(1, 10, '2nd Grade', NOW(), NOW()),
+(1, 10, '3rd Grade', NOW(), NOW()),
+(1, 10, '4th Grade', NOW(), NOW()),
+(1, 10, '5th Grade', NOW(), NOW());
+
+
+-- ============================================================
+-- Sample Data: Sections
+-- Each standard (grade) is divided into sections (A/B/C).
+-- Sections are used to manage class divisions, student
+-- assignments, timetables, and teacher allocation.
+-- 'deleted' = 0 indicates active section, 1 indicates soft-deleted.
+-- ============================================================
+
+
+INSERT INTO sections (organization_id, standard_id, section_name, created_at, updated_at, deleted, deleted_at)
+VALUES
+    -- Standard 1
+    (1, 1, 'A', NOW(), NOW(), 1, NULL),
+    (1, 1, 'B', NOW(), NOW(), 0, NULL),
+    (1, 1, 'C', NOW(), NOW(), 0, NULL),
+    -- Standard 2
+    (1, 2, 'A', NOW(), NOW(), 0, NULL),
+    (1, 2, 'B', NOW(), NOW(), 0, NULL),
+    (1, 2, 'C', NOW(), NOW(), 0, NULL),
+    -- Standard 3
+    (1, 3, 'A', NOW(), NOW(), 0, NULL),
+    (1, 3, 'B', NOW(), NOW(), 0, NULL),
+    (1, 3, 'C', NOW(), NOW(), 0, NULL),
+    -- Standard 4
+    (1, 4, 'A', NOW(), NOW(), 0, NULL),
+    (1, 4, 'B', NOW(), NOW(), 0, NULL),
+    (1, 4, 'C', NOW(), NOW(), 0, NULL),
+    -- Standard 5
+    (1, 5, 'A', NOW(), NOW(), 0, NULL),
+    (1, 5, 'B', NOW(), NOW(), 0, NULL),
+    (1, 5, 'C', NOW(), NOW(), 0, NULL),
+    -- Standard 6
+    (1, 6, 'A', NOW(), NOW(), 0, NULL),
+    (1, 6, 'B', NOW(), NOW(), 0, NULL),
+    (1, 6, 'C', NOW(), NOW(), 0, NULL),
+    -- Standard 7
+    (1, 7, 'A', NOW(), NOW(), 0, NULL),
+    (1, 7, 'B', NOW(), NOW(), 0, NULL),
+    (1, 7, 'C', NOW(), NOW(), 0, NULL),
+    -- Standard 8
+    (1, 8, 'A', NOW(), NOW(), 0, NULL),
+    (1, 8, 'B', NOW(), NOW(), 0, NULL),
+    (1, 8, 'C', NOW(), NOW(), 0, NULL),
+    -- Standard 9
+    (1, 9, 'A', NOW(), NOW(), 0, NULL),
+    (1, 9, 'B', NOW(), NOW(), 0, NULL),
+    (1, 9, 'C', NOW(), NOW(), 0, NULL),
+    -- Standard 10
+    (1, 10, 'A', NOW(), NOW(), 0, NULL),
+    (1, 10, 'B', NOW(), NOW(), 0, NULL),
+    (1, 10, 'C', NOW(), NOW(), 0, NULL);

@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.sclass.controller;
 import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.facade.SectionFacade;
+import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,8 @@ public class SectionController {
     @GetMapping(value = "/sections", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() {
         log.info("GET /api/institute/campuses/standards/sections called");
-        List<SectionDTO> resources = sectionFacade.getAll();
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        List<SectionDTO> resources = sectionFacade.getAll(orgId);
         log.info("GET /api/institute/campuses/standards/sections succeeded, returned {} resources", resources.size());
         return ResponseEntity.ok().body(resources);
     }
@@ -33,7 +35,8 @@ public class SectionController {
     @GetMapping(value = "/sections/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable Long id) {
         log.info("GET /api/institute/campuses/standards/sections/{} called", id);
-        SectionDTO sectionDTO = sectionFacade.getById(id);
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        SectionDTO sectionDTO = sectionFacade.getById(id, orgId);
         log.info("GET /api/institute/campuses/standards/sections/{} succeeded", id);
         return ResponseEntity.ok().body(sectionDTO);
     }
@@ -41,25 +44,30 @@ public class SectionController {
     @GetMapping(value = "/{standardId}/sections", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByStandardId(@PathVariable Long standardId) {
         log.info("GET /api/institute/campuses/standards/{}/sections called", standardId);
-        List<SectionDTO> sectionDTO = sectionFacade.getByStandardId(standardId);
-        log.info("GET /api/institute/campuses/standards/{}/sections succeeded, returned {} resources", standardId, sectionDTO.size());
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        List<SectionDTO> sectionDTO = sectionFacade.getByStandardId(standardId, orgId);
+        log.info("GET /api/institute/campuses/standards/{}/sections succeeded, returned {} resources", standardId,
+                sectionDTO.size());
         return ResponseEntity.ok().body(sectionDTO);
     }
 
     @GetMapping(value = "/sections/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBySearch(@RequestParam(required = false) Long campusId,@RequestParam(required = false) Long standardId,@RequestParam(required = false) String keyword) {
+    public ResponseEntity<?> getBySearch(@RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId, @RequestParam(required = false) String keyword) {
         log.info("GET /api/institute/campuses/standards/sections/search called with keyword: {}", keyword);
-        List<SectionDTO> sectionDTO = sectionFacade.searchSections(campusId,standardId,keyword);
-        log.info("GET /api/institute/campuses/standards/sections/search succeeded, returned {} resources", sectionDTO.size());
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        List<SectionDTO> sectionDTO = sectionFacade.searchSections(campusId, standardId, keyword, orgId);
+        log.info("GET /api/institute/campuses/standards/sections/search succeeded, returned {} resources",
+                sectionDTO.size());
         return ResponseEntity.ok().body(sectionDTO);
     }
-
 
     @DeleteMapping("/sections/{sectionId}")
     public ResponseEntity<?> softDeleteById(@PathVariable Long sectionId) {
         log.info("DELETE /api/institute/campuses/standards/sections/{} called", sectionId);
         try {
-            int result = sectionFacade.softDeleteById(sectionId);
+            Long orgId = SecurityUtils.getCurrentOrganizationId();
+            int result = sectionFacade.softDeleteById(sectionId, orgId);
             if (result == 0) {
                 log.warn("DELETE /api/institute/campuses/standards/sections/{} failed - not found", sectionId);
                 return ResponseEntity.notFound().build();
@@ -67,7 +75,8 @@ public class SectionController {
             log.info("DELETE /api/institute/campuses/standards/sections/{} succeeded", sectionId);
             return ResponseEntity.ok("Section deleted successfully");
         } catch (Exception ex) {
-            log.error("DELETE /api/institute/campuses/standards/sections/{} failed: {}", sectionId, ex.getMessage(), ex);
+            log.error("DELETE /api/institute/campuses/standards/sections/{} failed: {}", sectionId, ex.getMessage(),
+                    ex);
             return ResponseEntity.internalServerError().body("Failed to delete section");
         }
     }
@@ -76,15 +85,18 @@ public class SectionController {
     public ResponseEntity<?> softDeleteByStandardId(@PathVariable Long standardId) {
         log.info("DELETE /api/institute/campuses/standards/{}/sections called", standardId);
         try {
-            int rows = sectionFacade.softDeleteByStandardId(standardId);
+            Long orgId = SecurityUtils.getCurrentOrganizationId();
+            int rows = sectionFacade.softDeleteByStandardId(standardId, orgId);
             if (rows == 0) {
                 log.warn("DELETE /api/institute/campuses/standards/{}/sections failed - not found", standardId);
                 return ResponseEntity.notFound().build();
             }
-            log.info("DELETE /api/institute/campuses/standards/{}/sections succeeded, deleted {} sections", standardId, rows);
+            log.info("DELETE /api/institute/campuses/standards/{}/sections succeeded, deleted {} sections", standardId,
+                    rows);
             return ResponseEntity.ok(rows + " sections soft deleted");
         } catch (Exception ex) {
-            log.error("DELETE /api/institute/campuses/standards/{}/sections failed: {}", standardId, ex.getMessage(), ex);
+            log.error("DELETE /api/institute/campuses/standards/{}/sections failed: {}", standardId, ex.getMessage(),
+                    ex);
             return ResponseEntity.internalServerError().body("Failed to delete sections by standard");
         }
     }
@@ -93,7 +105,8 @@ public class SectionController {
     public ResponseEntity<?> softDeleteAll() {
         log.info("DELETE /api/institute/campuses/standards/sections/all called");
         try {
-            int rows = sectionFacade.softDeleteAll();
+            Long orgId = SecurityUtils.getCurrentOrganizationId();
+            int rows = sectionFacade.softDeleteAll(orgId);
             log.info("DELETE /api/institute/campuses/standards/sections/all succeeded, deleted {} sections", rows);
             return ResponseEntity.ok(rows + " sections soft deleted");
         } catch (Exception ex) {
@@ -105,15 +118,19 @@ public class SectionController {
     @PostMapping(value = "/sections", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SectionCreateRequestDTO> createSection(@Valid @RequestBody SectionCreateRequestDTO dto) {
         log.info("POST /api/institute/campuses/standards/sections called for section: {}", dto.getSectionName());
-        SectionCreateRequestDTO createdSection = sectionFacade.createSection(dto);
-        log.info("POST /api/institute/campuses/standards/sections succeeded, created with id: {}", createdSection.getId());
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        SectionCreateRequestDTO createdSection = sectionFacade.createSection(dto, orgId);
+        log.info("POST /api/institute/campuses/standards/sections succeeded, created with id: {}",
+                createdSection.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSection);
     }
 
     @PutMapping(value = "sections/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SectionDTO> updateSection(@PathVariable Long id, @Valid @RequestBody SectionCreateRequestDTO dto) {
+    public ResponseEntity<SectionDTO> updateSection(@PathVariable Long id,
+            @Valid @RequestBody SectionCreateRequestDTO dto) {
         log.info("PUT /api/institute/campuses/standards/sections/{} called", id, dto);
-        SectionDTO updatedStandard = sectionFacade.updateSection(id, dto);
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        SectionDTO updatedStandard = sectionFacade.updateSection(id, dto, orgId);
         log.info("PUT /api/institute/campuses/standards/sections/{} succeeded", id);
         return ResponseEntity.ok(updatedStandard);
     }
