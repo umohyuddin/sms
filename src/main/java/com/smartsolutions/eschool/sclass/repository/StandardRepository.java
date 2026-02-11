@@ -32,10 +32,14 @@ public interface StandardRepository extends JpaRepository<StandardEntity, Long> 
         @Query("SELECT s FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.deleted = false")
         List<StandardEntity> findByInstituteIdAndDeletedFalse(@Param("instituteId") Long instituteId);
 
-        @Query("SELECT s FROM StandardEntity s WHERE s.campus.id = :campusId AND s.campus.institute.id = :instituteId AND s.deleted = false")
-        List<StandardEntity> findByCampusIdAndInstituteId(@Param("campusId") Long campusId,
-                        @Param("instituteId") Long instituteId);
-
+    @Query("SELECT s FROM StandardEntity s " +
+            "JOIN FETCH s.campus c " +
+            "JOIN FETCH c.institute i " +
+            "WHERE c.id = :campusId " +
+            "AND i.id = :instituteId " +
+            "AND s.deleted = false")
+    List<StandardEntity> findByCampusIdAndInstituteId(@Param("campusId") Long campusId,
+                                                      @Param("instituteId") Long instituteId);
         // Search by standardName or standardCode with instituteId
         @Query("SELECT sec FROM StandardEntity sec " +
                         "WHERE (sec.standardName LIKE %:keyword% OR sec.standardCode LIKE %:keyword%) " +
