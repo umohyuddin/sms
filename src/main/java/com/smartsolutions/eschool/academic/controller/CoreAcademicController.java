@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.academic.controller;
 
+import com.smartsolutions.eschool.academic.dto.request.BulkStandardSubjectRequestDTO;
 import com.smartsolutions.eschool.academic.dto.request.StandardSubjectRequestDTO;
 import com.smartsolutions.eschool.academic.dto.request.SubjectGroupRequestDTO;
 import com.smartsolutions.eschool.academic.dto.request.SubjectRequestDTO;
@@ -10,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/academic/core")
@@ -79,14 +82,28 @@ public class CoreAcademicController {
         return ResponseEntity.status(HttpStatus.CREATED).body(coreAcademicFacade.assignSubjectToStandard(dto));
     }
 
+    @PostMapping("/standard-subjects/bulk")
+    public ResponseEntity<?> bulkAssignSubject(@Valid @RequestBody BulkStandardSubjectRequestDTO dto) {
+        coreAcademicFacade.bulkAssignSubjectsToStandard(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @GetMapping("/standard-subjects")
     public ResponseEntity<?> getStandardSubjects(@RequestParam Long standardId, @RequestParam Long academicYearId) {
         return ResponseEntity.ok(coreAcademicFacade.getSubjectsByStandardAndYear(standardId, academicYearId));
     }
 
     @DeleteMapping("/standard-subjects")
-    public ResponseEntity<?> unassignSubject(@RequestParam Long standardId, @RequestParam Long subjectId, @RequestParam Long academicYearId) {
+    public ResponseEntity<?> unassignSubject(@RequestParam Long standardId, @RequestParam Long subjectId,
+            @RequestParam Long academicYearId) {
         coreAcademicFacade.unassignSubjectFromStandard(standardId, subjectId, academicYearId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/standard-subjects/bulk")
+    public ResponseEntity<?> bulkUnassignSubject(@RequestParam Long standardId, @RequestParam List<Long> subjectIds,
+            @RequestParam Long academicYearId) {
+        coreAcademicFacade.bulkUnassignSubjectsFromStandard(standardId, subjectIds, academicYearId);
         return ResponseEntity.noContent().build();
     }
 }

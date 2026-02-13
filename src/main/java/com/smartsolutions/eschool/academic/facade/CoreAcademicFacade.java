@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.academic.facade;
 
+import com.smartsolutions.eschool.academic.dto.request.BulkStandardSubjectRequestDTO;
 import com.smartsolutions.eschool.academic.dto.request.StandardSubjectRequestDTO;
 import com.smartsolutions.eschool.academic.dto.request.SubjectGroupRequestDTO;
 import com.smartsolutions.eschool.academic.dto.request.SubjectRequestDTO;
@@ -25,22 +26,69 @@ public class CoreAcademicFacade {
     private final StandardSubjectService standardSubjectService;
 
     // Subject Group
-    public SubjectGroupResponseDTO createGroup(SubjectGroupRequestDTO dto) { return subjectGroupService.create(dto); }
-    public SubjectGroupResponseDTO updateGroup(Long id, SubjectGroupRequestDTO dto) { return subjectGroupService.update(id, dto); }
-    public SubjectGroupResponseDTO getGroupById(Long id) { return subjectGroupService.getById(id); }
-    public List<SubjectGroupResponseDTO> getAllActiveGroups() { return subjectGroupService.getAllActive(); }
-    public void deleteGroup(Long id) { subjectGroupService.delete(id); }
+    public SubjectGroupResponseDTO createGroup(SubjectGroupRequestDTO dto) {
+        return subjectGroupService.create(dto);
+    }
+
+    public SubjectGroupResponseDTO updateGroup(Long id, SubjectGroupRequestDTO dto) {
+        return subjectGroupService.update(id, dto);
+    }
+
+    public SubjectGroupResponseDTO getGroupById(Long id) {
+        return subjectGroupService.getById(id);
+    }
+
+    public List<SubjectGroupResponseDTO> getAllActiveGroups() {
+        return subjectGroupService.getAllActive();
+    }
+
+    public void deleteGroup(Long id) {
+        subjectGroupService.delete(id);
+    }
 
     // Subject
-    public SubjectResponseDTO createSubject(SubjectRequestDTO dto) { return subjectService.create(dto); }
-    public SubjectResponseDTO updateSubject(Long id, SubjectRequestDTO dto) { return subjectService.update(id, dto); }
-    public SubjectResponseDTO getSubjectById(Long id) { return subjectService.getById(id); }
-    public List<SubjectResponseDTO> getAllActiveSubjects() { return subjectService.getAllActive(); }
-    public List<SubjectResponseDTO> getSubjectsByGroup(Long groupId) { return subjectService.getByGroupId(groupId); }
-    public void deleteSubject(Long id) { subjectService.delete(id); }
+    public SubjectResponseDTO createSubject(SubjectRequestDTO dto) {
+        return subjectService.create(dto);
+    }
+
+    public SubjectResponseDTO updateSubject(Long id, SubjectRequestDTO dto) {
+        return subjectService.update(id, dto);
+    }
+
+    public SubjectResponseDTO getSubjectById(Long id) {
+        return subjectService.getById(id);
+    }
+
+    public List<SubjectResponseDTO> getAllActiveSubjects() {
+        return subjectService.getAllActive();
+    }
+
+    public List<SubjectResponseDTO> getSubjectsByGroup(Long groupId) {
+        return subjectService.getByGroupId(groupId);
+    }
+
+    public void deleteSubject(Long id) {
+        subjectService.delete(id);
+    }
 
     // Standard Subject Assignment
-    public StandardSubjectResponseDTO assignSubjectToStandard(StandardSubjectRequestDTO dto) { return standardSubjectService.assign(dto); }
-    public List<StandardSubjectResponseDTO> getSubjectsByStandardAndYear(Long standardId, Long academicYearId) { return standardSubjectService.getByStandardAndYear(standardId, academicYearId); }
-    public void unassignSubjectFromStandard(Long standardId, Long subjectId, Long academicYearId) { standardSubjectService.unassign(standardId, subjectId, academicYearId); }
+    public StandardSubjectResponseDTO assignSubjectToStandard(StandardSubjectRequestDTO dto) {
+        return standardSubjectService.assign(dto);
+    }
+
+    public List<StandardSubjectResponseDTO> getSubjectsByStandardAndYear(Long standardId, Long academicYearId) {
+        return standardSubjectService.getByStandardAndYear(standardId, academicYearId);
+    }
+
+    public void unassignSubjectFromStandard(Long standardId, Long subjectId, Long academicYearId) {
+        standardSubjectService.unassign(standardId, subjectId, academicYearId);
+    }
+
+    public void bulkUnassignSubjectsFromStandard(Long standardId, List<Long> subjectIds, Long academicYearId) {
+        standardSubjectService.bulkUnassign(standardId, subjectIds, academicYearId);
+    }
+
+    public void bulkAssignSubjectsToStandard(BulkStandardSubjectRequestDTO dto) {
+        standardSubjectService.bulkAssign(dto);
+    }
 }

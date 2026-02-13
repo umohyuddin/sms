@@ -1282,3 +1282,57 @@ VALUES
     (1, 10, 'A', NOW(), NOW(), 0, NULL),
     (1, 10, 'B', NOW(), NOW(), 0, NULL),
     (1, 10, 'C', NOW(), NOW(), 0, NULL);
+
+
+
+    -- Populate standard_subjects with real-time dataset
+    INSERT INTO standard_subjects
+    (organization_id, standard_id, subject_id, academic_year_id, is_optional, weekly_hours, theory_marks, practical_marks)
+    VALUES
+    -- Primary (Std 1-5)
+    (1, 1, (SELECT id FROM subjects WHERE code='BASIC_MATH' LIMIT 1), 1, FALSE, 5, 50, 0),
+    (1, 1, (SELECT id FROM subjects WHERE code='BASIC_LANG' LIMIT 1), 1, FALSE, 5, 50, 0),
+    (1, 2, (SELECT id FROM subjects WHERE code='BASIC_MATH' LIMIT 1), 1, FALSE, 5, 50, 0),
+    (1, 2, (SELECT id FROM subjects WHERE code='BASIC_LANG' LIMIT 1), 1, FALSE, 5, 50, 0),
+    (1, 3, (SELECT id FROM subjects WHERE code='GEN_SCI' LIMIT 1), 1, FALSE, 4, 50, 10),
+    (1, 3, (SELECT id FROM subjects WHERE code='BASIC_LANG' LIMIT 1), 1, FALSE, 5, 50, 0),
+    (1, 4, (SELECT id FROM subjects WHERE code='GEN_SCI' LIMIT 1), 1, FALSE, 4, 50, 10),
+    (1, 4, (SELECT id FROM subjects WHERE code='BASIC_LANG' LIMIT 1), 1, FALSE, 5, 50, 0),
+    (1, 5, (SELECT id FROM subjects WHERE code='GEN_SCI' LIMIT 1), 1, FALSE, 4, 50, 10),
+    (1, 5, (SELECT id FROM subjects WHERE code='BASIC_LANG' LIMIT 1), 1, FALSE, 5, 50, 0),
+
+    -- Secondary (Std 6-10)
+    (1, 6, (SELECT id FROM subjects WHERE code='PHY' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 6, (SELECT id FROM subjects WHERE code='CHEM' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 6, (SELECT id FROM subjects WHERE code='BIO' LIMIT 1), 1, TRUE, 4, 70, 30),
+    (1, 6, (SELECT id FROM subjects WHERE code='ENG' LIMIT 1), 1, FALSE, 5, 100, 0),
+    (1, 7, (SELECT id FROM subjects WHERE code='PHY' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 7, (SELECT id FROM subjects WHERE code='CHEM' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 7, (SELECT id FROM subjects WHERE code='BIO' LIMIT 1), 1, TRUE, 4, 70, 30),
+    (1, 7, (SELECT id FROM subjects WHERE code='ENG' LIMIT 1), 1, FALSE, 5, 100, 0),
+    (1, 8, (SELECT id FROM subjects WHERE code='PHY' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 8, (SELECT id FROM subjects WHERE code='CHEM' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 8, (SELECT id FROM subjects WHERE code='BIO' LIMIT 1), 1, TRUE, 4, 70, 30),
+    (1, 8, (SELECT id FROM subjects WHERE code='ENG' LIMIT 1), 1, FALSE, 5, 100, 0),
+    (1, 9, (SELECT id FROM subjects WHERE code='PHY' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 9, (SELECT id FROM subjects WHERE code='CHEM' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 9, (SELECT id FROM subjects WHERE code='BIO' LIMIT 1), 1, TRUE, 4, 70, 30),
+    (1, 9, (SELECT id FROM subjects WHERE code='ENG' LIMIT 1), 1, FALSE, 5, 100, 0),
+    (1, 10, (SELECT id FROM subjects WHERE code='PHY' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 10, (SELECT id FROM subjects WHERE code='CHEM' LIMIT 1), 1, FALSE, 5, 70, 30),
+    (1, 10, (SELECT id FROM subjects WHERE code='BIO' LIMIT 1), 1, TRUE, 4, 70, 30),
+    (1, 10, (SELECT id FROM subjects WHERE code='ENG' LIMIT 1), 1, FALSE, 5, 100, 0),
+
+    -- Higher Secondary / Electives (Std 11-12)
+    (1, 11, (SELECT id FROM subjects WHERE code='PHY' LIMIT 1), 1, FALSE, 6, 100, 50),
+    (1, 11, (SELECT id FROM subjects WHERE code='CHEM' LIMIT 1), 1, FALSE, 6, 100, 50),
+    (1, 11, (SELECT id FROM subjects WHERE code='BIO' LIMIT 1), 1, TRUE, 5, 100, 50),
+    (1, 11, (SELECT id FROM subjects WHERE code='ACC' LIMIT 1), 1, TRUE, 4, 80, 20),
+    (1, 11, (SELECT id FROM subjects WHERE code='ECO' LIMIT 1), 1, TRUE, 4, 80, 20),
+    (1, 11, (SELECT id FROM subjects WHERE code='ENG' LIMIT 1), 1, FALSE, 5, 100, 0),
+    (1, 12, (SELECT id FROM subjects WHERE code='PHY' LIMIT 1), 1, FALSE, 6, 100, 50),
+    (1, 12, (SELECT id FROM subjects WHERE code='CHEM' LIMIT 1), 1, FALSE, 6, 100, 50),
+    (1, 12, (SELECT id FROM subjects WHERE code='BIO' LIMIT 1), 1, TRUE, 5, 100, 50),
+    (1, 12, (SELECT id FROM subjects WHERE code='ACC' LIMIT 1), 1, TRUE, 4, 80, 20),
+    (1, 12, (SELECT id FROM subjects WHERE code='ECO' LIMIT 1), 1, TRUE, 4, 80, 20),
+    (1, 12, (SELECT id FROM subjects WHERE code='ENG' LIMIT 1), 1, FALSE, 5, 100, 0);

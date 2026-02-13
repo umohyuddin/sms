@@ -6,6 +6,7 @@ import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.sclass.repository.StandardRepository;
 import com.smartsolutions.eschool.util.SecurityUtils;
+import com.smartsolutions.eschool.academic.dto.request.BulkStandardSubjectRequestDTO;
 import com.smartsolutions.eschool.academic.dto.request.StandardSubjectRequestDTO;
 import com.smartsolutions.eschool.academic.dto.response.StandardSubjectResponseDTO;
 import com.smartsolutions.eschool.academic.entity.mapping.StandardSubjectEntity;
@@ -27,50 +28,89 @@ import java.util.stream.Collectors;
 @Slf4j
 public class StandardSubjectServiceImpl implements StandardSubjectService {
 
-    private final StandardSubjectRepository standardSubjectRepository;
-    private final SubjectRepository subjectRepository;
-    private final StandardRepository standardRepository;
-    private final AcademicYearRepository academicYearRepository;
+        private final StandardSubjectRepository standardSubjectRepository;
+        private final SubjectRepository subjectRepository;
+        private final StandardRepository standardRepository;
+        private final AcademicYearRepository academicYearRepository;
 
-    @Override
-    @Transactional
-    public StandardSubjectResponseDTO assign(StandardSubjectRequestDTO dto) {
-        log.info("Assigning Subject {} to Standard {}", dto.getSubjectId(), dto.getStandardId());
+        @Override
+        @Transactional
+        public StandardSubjectResponseDTO assign(StandardSubjectRequestDTO dto) {
+                log.info("Assigning Subject {} to Standard {}", dto.getSubjectId(), dto.getStandardId());
 
-        SubjectEntity subject = subjectRepository.findActiveById(dto.getSubjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("Subject not found: " + dto.getSubjectId()));
-        StandardEntity standard = standardRepository.findById(dto.getStandardId())
-                .orElseThrow(() -> new ResourceNotFoundException("Standard not found: " + dto.getStandardId()));
-        AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Academic Year not found: " + dto.getAcademicYearId()));
+                SubjectEntity subject = subjectRepository.findActiveById(dto.getSubjectId())
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Subject not found: " + dto.getSubjectId()));
+                StandardEntity standard = standardRepository.findById(dto.getStandardId())
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Standard not found: " + dto.getStandardId()));
+                AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
+                                .orElseThrow(
+                                                () -> new ResourceNotFoundException(
+                                                                "Academic Year not found: " + dto.getAcademicYearId()));
 
-        StandardSubjectEntity entity = CoreAcademicMapper.toEntity(dto);
-        // MapStruct copies IDs into the embedded object, but we set relations as well
-        entity.setSubject(subject);
-        entity.setStandard(standard);
-        entity.setAcademicYear(academicYear);
+                StandardSubjectEntity entity = CoreAcademicMapper.toEntity(dto);
+                // MapStruct copies IDs into the embedded object, but we set relations as well
+                entity.setSubject(subject);
+                entity.setStandard(standard);
+                entity.setAcademicYear(academicYear);
 
-        StandardSubjectEntity saved = standardSubjectRepository.save(entity);
-        return CoreAcademicMapper.toResponse(saved);
-    }
+                StandardSubjectEntity saved = standardSubjectRepository.save(entity);
+                return CoreAcademicMapper.toResponse(saved);
+        }
 
-    @Override
-    public List<StandardSubjectResponseDTO> getByStandardAndYear(Long standardId, Long academicYearId) {
-        return standardSubjectRepository.findSubjectsByStandardAndAcademicYear(standardId, academicYearId).stream()
-                .map(CoreAcademicMapper::toResponse)
-                .collect(Collectors.toList());
-    }
+        @Override
+        public List<StandardSubjectResponseDTO> getByStandardAndYear(Long standardId, Long academicYearId) {
+                return standardSubjectRepository.findSubjectsByStandardAndAcademicYear(standardId, academicYearId)
+                                .stream()
+                                .map(CoreAcademicMapper::toResponse)
+                                .collect(Collectors.toList());
+        }
 
-    @Override
-    @Transactional
-    public void unassign(Long standardId, Long subjectId, Long academicYearId) {
-        log.info("Unassigning Subject {} from Standard {}", subjectId, standardId);
+        @Override
+        @Transactional
+        public void unassign(Long standardId, Long subjectId, Long academicYearId) {
+                log.info("Unassigning Subject {} from Standard {}", subjectId, standardId);
 
-        StandardSubjectEntity entity = standardSubjectRepository
-                .findByStandardSubjectAndYear(standardId, subjectId, academicYearId)
-                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
+                StandardSubjectEntity entity = standardSubjectRepository
+                                .findByStandardSubjectAndYear(standardId, subjectId, academicYearId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
 
-        standardSubjectRepository.softDeleteById(entity.getId());
-    }
+                standardSubjectRepository.softDeleteById(entity.getId());
+        }
+
+        @Override
+        @Transactional
+        public void bulkUnassign(Long standardId, List<Long> subjectIds, Long academicYearId) {
+                log.info("Bulk unassigning subjects {} from Standard {} for Academic Year {}", subjectIds, standardId,
+                                academicYearId);
+                standardSubjectRepository.bulkSoftDelete(standardId, subjectIds, academicYearId);
+        }
+
+        @Override
+        @Transactional
+        public void bulkAssign(BulkStandardSubjectRequestDTO dto) {
+                log.info("Bulk assigning {} subjects", dto.getAssignments().size());
+
+                for (StandardSubjectRequestDTO requestDTO : dto.getAssignments()) {
+                        SubjectEntity subject = subjectRepository.findActiveById(requestDTO.getSubjectId())
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "Subject not found: " + requestDTO.getSubjectId()));
+                        StandardEntity standard = standardRepository.findById(requestDTO.getStandardId())
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "Standard not found: " + requestDTO.getStandardId()));
+                        AcademicYearEntity academicYear = academicYearRepository
+                                        .findById(requestDTO.getAcademicYearId())
+                                        .orElseThrow(
+                                                        () -> new ResourceNotFoundException("Academic Year not found: "
+                                                                        + requestDTO.getAcademicYearId()));
+
+                        StandardSubjectEntity entity = CoreAcademicMapper.toEntity(requestDTO);
+                        entity.setSubject(subject);
+                        entity.setStandard(standard);
+                        entity.setAcademicYear(academicYear);
+
+                        standardSubjectRepository.save(entity);
+                }
+        }
 }

@@ -43,7 +43,7 @@ public class SubjectGroupServiceImpl implements SubjectGroupService {
         entity.setName(dto.getName());
         entity.setCode(dto.getCode());
         entity.setActive(dto.isActive());
-        
+        entity.setDescription(dto.getDescription());
         SubjectGroupEntity updated = subjectGroupRepository.save(entity);
         return CoreAcademicMapper.toResponse(updated);
     }
