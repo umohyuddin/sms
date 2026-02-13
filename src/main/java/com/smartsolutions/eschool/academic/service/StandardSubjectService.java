@@ -16,4 +16,6 @@ public interface StandardSubjectService {
     void bulkUnassign(Long standardId, List<Long> subjectIds, Long academicYearId);
 
     void bulkAssign(BulkStandardSubjectRequestDTO dto);
+
+    StandardSubjectResponseDTO update(Long id, StandardSubjectRequestDTO dto);
 }

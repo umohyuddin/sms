@@ -91,4 +91,8 @@ public class CoreAcademicFacade {
     public void bulkAssignSubjectsToStandard(BulkStandardSubjectRequestDTO dto) {
         standardSubjectService.bulkAssign(dto);
     }
+
+    public StandardSubjectResponseDTO updateStandardSubjectMapping(Long id, StandardSubjectRequestDTO dto) {
+        return standardSubjectService.update(id, dto);
+    }
 }

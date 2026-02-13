@@ -26,12 +26,20 @@ public interface StandardSubjectRepository extends JpaRepository<StandardSubject
                         @Param("subjectId") Long subjectId,
                         @Param("academicYearId") Long academicYearId);
 
-        @Modifying
-        @Query("UPDATE StandardSubjectEntity ss SET ss.deleted = true, ss.deletedAt = CURRENT_TIMESTAMP WHERE ss.standard.id = :standardId AND ss.academicYear.id = :academicYearId AND ss.subject.id IN :subjectIds AND ss.deleted = false")
-        void bulkSoftDelete(@Param("standardId") Long standardId, @Param("subjectIds") List<Long> subjectIds,
-                        @Param("academicYearId") Long academicYearId);
+    @Modifying
+    @Query("DELETE FROM StandardSubjectEntity ss WHERE ss.standard.id = :standardId AND ss.academicYear.id = :academicYearId AND ss.subject.id IN :subjectIds")
+    void bulkDelete(
+            @Param("standardId") Long standardId,
+            @Param("subjectIds") List<Long> subjectIds,
+            @Param("academicYearId") Long academicYearId
+    );
 
         @Modifying
         @Query("UPDATE StandardSubjectEntity ss SET ss.deleted = true, ss.deletedAt = CURRENT_TIMESTAMP WHERE ss.id = :id")
         void softDeleteById(@Param("id") Long id);
+
+    @Modifying
+    @Query("DELETE FROM StandardSubjectEntity ss WHERE ss.id = :id")
+    void deleteById(@Param("id") Long id);
+
 }

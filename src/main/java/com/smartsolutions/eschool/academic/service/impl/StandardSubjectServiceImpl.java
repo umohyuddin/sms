@@ -76,7 +76,7 @@ public class StandardSubjectServiceImpl implements StandardSubjectService {
                                 .findByStandardSubjectAndYear(standardId, subjectId, academicYearId)
                                 .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
 
-                standardSubjectRepository.softDeleteById(entity.getId());
+                standardSubjectRepository.deleteById(entity.getId());
         }
 
         @Override
@@ -84,7 +84,7 @@ public class StandardSubjectServiceImpl implements StandardSubjectService {
         public void bulkUnassign(Long standardId, List<Long> subjectIds, Long academicYearId) {
                 log.info("Bulk unassigning subjects {} from Standard {} for Academic Year {}", subjectIds, standardId,
                                 academicYearId);
-                standardSubjectRepository.bulkSoftDelete(standardId, subjectIds, academicYearId);
+                standardSubjectRepository.bulkDelete(standardId, subjectIds, academicYearId);
         }
 
         @Override
@@ -112,5 +112,30 @@ public class StandardSubjectServiceImpl implements StandardSubjectService {
 
                         standardSubjectRepository.save(entity);
                 }
+        }
+
+        @Override
+        @Transactional
+        public StandardSubjectResponseDTO update(Long id, StandardSubjectRequestDTO dto) {
+                log.info("Updating Standard Subject Mapping {}", id);
+
+                StandardSubjectEntity entity = standardSubjectRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException("Mapping not found with id: " + id));
+
+                // Update fields
+                entity.setOptional(dto.isOptional());
+                entity.setWeeklyHours(dto.getWeeklyHours());
+                entity.setTheoryMarks(dto.getTheoryMarks());
+                entity.setPracticalMarks(dto.getPracticalMarks());
+                entity.setActive(dto.isActive());
+
+                // If standardId, subjectId or academicYearId are provided, we should re-fetch
+                // them if they changed
+                // However, usually these are immutable for a mapping record.
+                // In some cases, we might want to allow changing them if we're sure.
+                // For now, I'll stick to updating attributes as per the plan.
+
+                StandardSubjectEntity saved = standardSubjectRepository.save(entity);
+                return CoreAcademicMapper.toResponse(saved);
         }
 }

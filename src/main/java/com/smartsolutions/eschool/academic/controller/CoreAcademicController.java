@@ -106,4 +106,10 @@ public class CoreAcademicController {
         coreAcademicFacade.bulkUnassignSubjectsFromStandard(standardId, subjectIds, academicYearId);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/standard-subjects/{id}")
+    public ResponseEntity<?> updateStandardSubjectMapping(@PathVariable Long id,
+            @Valid @RequestBody StandardSubjectRequestDTO dto) {
+        return ResponseEntity.ok(coreAcademicFacade.updateStandardSubjectMapping(id, dto));
+    }
 }
