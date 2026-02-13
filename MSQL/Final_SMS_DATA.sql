@@ -1,3 +1,8 @@
+INSERT INTO academic_years
+(name, code, start_date, end_date, total_months, is_current, status, organization_id)
+VALUES
+('Academic Year 2025-2026', 'AY2025', '2025-04-01', '2026-03-31', 12, TRUE, 'ACTIVE', 1);
+
 -- ============================================================
 -- Lookup Data: Languages
 -- ============================================================

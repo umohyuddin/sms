@@ -1659,7 +1659,7 @@ CREATE TABLE standard_subjects (
     deleted_at DATETIME,
     deleted_by BIGINT,
 
-UNIQUE (organization_id, standard_id, subject_id, academic_year_id, is_deleted)
+UNIQUE (organization_id, standard_id, subject_id, academic_year_id, is_deleted),
 
     FOREIGN KEY (standard_id) REFERENCES standards(id),
     FOREIGN KEY (subject_id) REFERENCES subjects(id),
