@@ -47,8 +47,23 @@ public class ExamTermServiceImpl implements ExamTermService {
     }
 
     @Override
+    public ExamTermResponseDTO getById(Long id) {
+        return examTermRepository.findByIdAndDeletedFalse(id)
+                .map(ExamAssessmentMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Exam Term not found"));
+    }
+
+    @Override
     public List<ExamTermResponseDTO> getActiveByYear(Long academicYearId) {
         return examTermRepository.findByAcademicYearId(academicYearId).stream()
+                .map(ExamAssessmentMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ExamTermResponseDTO> searchByKeyword(String keyword) {
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        return examTermRepository.searchByKeyword(keyword, orgId).stream()
                 .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }

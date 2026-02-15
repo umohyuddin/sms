@@ -65,6 +65,16 @@ public class ExamAssessmentController {
         return ResponseEntity.ok(examAssessmentFacade.getActiveTermsByYear(academicYearId));
     }
 
+    @GetMapping("/exam-terms/{id}")
+    public ResponseEntity<?> getExamTerm(@PathVariable Long id) {
+        return ResponseEntity.ok(examAssessmentFacade.getExamTermById(id));
+    }
+
+    @GetMapping("/exam-terms/search/{keyword}")
+    public ResponseEntity<?> searchExamTerms(@PathVariable String keyword) {
+        return ResponseEntity.ok(examAssessmentFacade.searchExamTerms(keyword));
+    }
+
     @DeleteMapping("/exam-terms/{id}")
     public ResponseEntity<?> deleteExamTerm(@PathVariable Long id) {
         examAssessmentFacade.deleteExamTerm(id);

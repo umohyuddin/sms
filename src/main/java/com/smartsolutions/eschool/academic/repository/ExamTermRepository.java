@@ -13,11 +13,16 @@ import java.util.Optional;
 @Repository
 public interface ExamTermRepository extends JpaRepository<ExamTermEntity, Long> {
 
-    @Query("SELECT et FROM ExamTermEntity et WHERE et.id = :id AND et.deleted = false")
+    @Query("SELECT et FROM ExamTermEntity et JOIN FETCH et.academicYear WHERE et.id = :id AND et.deleted = false")
     Optional<ExamTermEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
     @Query("SELECT et FROM ExamTermEntity et JOIN FETCH et.academicYear WHERE et.academicYear.id = :academicYearId AND et.deleted = false")
     List<ExamTermEntity> findByAcademicYearId(@Param("academicYearId") Long academicYearId);
+
+    @Query("SELECT et FROM ExamTermEntity et JOIN FETCH et.academicYear " +
+            "WHERE et.academicYear.organizationId = :orgId AND et.deleted = false " +
+            "AND LOWER(et.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<ExamTermEntity> searchByKeyword(@Param("keyword") String keyword, @Param("orgId") Long orgId);
 
     @Modifying
     @Query("UPDATE ExamTermEntity et SET et.deleted = true, et.deletedAt = CURRENT_TIMESTAMP WHERE et.id = :id")

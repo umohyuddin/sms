@@ -1384,3 +1384,12 @@ VALUES
 (1,'ENT','Entrance Exam','Admission test',TRUE,FALSE,NOW(),1),
 (1,'MOCK','Mock Exam','Practice exam',TRUE,FALSE,NOW(),1),
 (1,'SCH','Scholarship Exam','Scholarship qualification test',TRUE,FALSE,NOW(),1);
+
+
+INSERT INTO exam_terms
+(organization_id, name, sequence_no, academic_year_id, created_by) VALUES
+(1,'First Term',1,2025,1),
+(1,'Mid Term',2,2025,1),
+(1,'Second Term',3,2025,1),
+(1,'Pre Final',4,2025,1),
+(1,'Final Term',5,2025,1);

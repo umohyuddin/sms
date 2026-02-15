@@ -56,8 +56,16 @@ public class ExamAssessmentFacade {
         return examTermService.update(id, dto);
     }
 
+    public ExamTermResponseDTO getExamTermById(Long id) {
+        return examTermService.getById(id);
+    }
+
     public List<ExamTermResponseDTO> getActiveTermsByYear(Long academicYearId) {
         return examTermService.getActiveByYear(academicYearId);
+    }
+
+    public List<ExamTermResponseDTO> searchExamTerms(String keyword) {
+        return examTermService.searchByKeyword(keyword);
     }
 
     public void deleteExamTerm(Long id) {
