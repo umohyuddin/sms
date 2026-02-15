@@ -7,7 +7,14 @@ import java.util.List;
 
 public interface GradeScaleService {
     GradeScaleResponseDTO create(GradeScaleRequestDTO dto);
+
     GradeScaleResponseDTO update(Long id, GradeScaleRequestDTO dto);
+
+    GradeScaleResponseDTO getById(Long id);
+
     List<GradeScaleResponseDTO> getAllActive();
+
+    List<GradeScaleResponseDTO> searchByKeyword(String keyword);
+
     void delete(Long id);
 }

@@ -81,8 +81,16 @@ public class ExamAssessmentFacade {
         return assessmentTypeService.update(id, dto);
     }
 
+    public AssessmentTypeResponseDTO getAssessmentTypeById(Long id) {
+        return assessmentTypeService.getById(id);
+    }
+
     public List<AssessmentTypeResponseDTO> getAllActiveAssessmentTypes() {
         return assessmentTypeService.getAllActive();
+    }
+
+    public List<AssessmentTypeResponseDTO> searchAssessmentTypes(String keyword) {
+        return assessmentTypeService.searchByKeyword(keyword);
     }
 
     public void deleteAssessmentType(Long id) {

@@ -18,11 +18,16 @@ public interface GradeScaleRepository extends JpaRepository<GradeScaleEntity, Lo
     List<GradeScaleEntity> findAllByOrgId(@Param("orgId") Long orgId);
 
     @Query("SELECT gs FROM GradeScaleEntity gs WHERE gs.organizationId = :orgId " +
-           "AND :percentage BETWEEN gs.minPercentage AND gs.maxPercentage AND gs.deleted = false")
-    Optional<GradeScaleEntity> findGradeByPercentage(@Param("orgId") Long orgId, @Param("percentage") BigDecimal percentage);
+            "AND :percentage BETWEEN gs.minPercentage AND gs.maxPercentage AND gs.deleted = false")
+    Optional<GradeScaleEntity> findGradeByPercentage(@Param("orgId") Long orgId,
+            @Param("percentage") BigDecimal percentage);
 
     @Query("SELECT gs FROM GradeScaleEntity gs WHERE gs.id = :id AND gs.deleted = false")
     Optional<GradeScaleEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+
+    @Query("SELECT gs FROM GradeScaleEntity gs WHERE gs.organizationId = :orgId AND gs.deleted = false " +
+            "AND (LOWER(gs.grade) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(gs.remarks) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    List<GradeScaleEntity> searchByKeyword(@Param("keyword") String keyword, @Param("orgId") Long orgId);
 
     @Modifying
     @Query("UPDATE GradeScaleEntity gs SET gs.deleted = true, gs.deletedAt = CURRENT_TIMESTAMP WHERE gs.id = :id")

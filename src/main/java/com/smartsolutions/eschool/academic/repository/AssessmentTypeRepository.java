@@ -19,6 +19,10 @@ public interface AssessmentTypeRepository extends JpaRepository<AssessmentTypeEn
     @Query("SELECT at FROM AssessmentTypeEntity at WHERE at.organizationId = :orgId AND at.deleted = false")
     List<AssessmentTypeEntity> findAllActiveByOrg(@Param("orgId") Long orgId);
 
+    @Query("SELECT at FROM AssessmentTypeEntity at WHERE at.organizationId = :orgId AND at.deleted = false " +
+            "AND (LOWER(at.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(at.code) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    List<AssessmentTypeEntity> searchByKeyword(@Param("keyword") String keyword, @Param("orgId") Long orgId);
+
     @Modifying
     @Query("UPDATE AssessmentTypeEntity at SET at.deleted = true, at.deletedAt = CURRENT_TIMESTAMP WHERE at.id = :id")
     void softDeleteById(@Param("id") Long id);

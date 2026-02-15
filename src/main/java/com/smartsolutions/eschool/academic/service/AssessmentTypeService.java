@@ -7,7 +7,14 @@ import java.util.List;
 
 public interface AssessmentTypeService {
     AssessmentTypeResponseDTO create(AssessmentTypeRequestDTO dto);
+
     AssessmentTypeResponseDTO update(Long id, AssessmentTypeRequestDTO dto);
+
+    AssessmentTypeResponseDTO getById(Long id);
+
     List<AssessmentTypeResponseDTO> getAllActive();
+
+    List<AssessmentTypeResponseDTO> searchByKeyword(String keyword);
+
     void delete(Long id);
 }

@@ -43,9 +43,24 @@ public class AssessmentTypeServiceImpl implements AssessmentTypeService {
     }
 
     @Override
+    public AssessmentTypeResponseDTO getById(Long id) {
+        return assessmentTypeRepository.findByIdAndDeletedFalse(id)
+                .map(ExamAssessmentMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Assessment Type not found"));
+    }
+
+    @Override
     public List<AssessmentTypeResponseDTO> getAllActive() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
         return assessmentTypeRepository.findAllActiveByOrg(orgId).stream()
+                .map(ExamAssessmentMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AssessmentTypeResponseDTO> searchByKeyword(String keyword) {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        return assessmentTypeRepository.searchByKeyword(keyword, orgId).stream()
                 .map(ExamAssessmentMapper::toResponse)
                 .collect(Collectors.toList());
     }

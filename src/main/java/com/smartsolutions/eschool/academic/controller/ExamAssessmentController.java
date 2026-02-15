@@ -98,6 +98,16 @@ public class ExamAssessmentController {
         return ResponseEntity.ok(examAssessmentFacade.getAllActiveAssessmentTypes());
     }
 
+    @GetMapping("/assessment-types/{id}")
+    public ResponseEntity<?> getAssessmentType(@PathVariable Long id) {
+        return ResponseEntity.ok(examAssessmentFacade.getAssessmentTypeById(id));
+    }
+
+    @GetMapping("/assessment-types/search/{keyword}")
+    public ResponseEntity<?> searchAssessmentTypes(@PathVariable String keyword) {
+        return ResponseEntity.ok(examAssessmentFacade.searchAssessmentTypes(keyword));
+    }
+
     @DeleteMapping("/assessment-types/{id}")
     public ResponseEntity<?> deleteAssessmentType(@PathVariable Long id) {
         examAssessmentFacade.deleteAssessmentType(id);

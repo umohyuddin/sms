@@ -50,13 +50,15 @@ public class ResultsHistoryController {
 
     // Term Result
     @PostMapping("/process")
-    public ResponseEntity<?> processResults(@RequestParam Long standardId, @RequestParam Long sectionId, @RequestParam Long examTermId) {
+    public ResponseEntity<?> processResults(@RequestParam Long standardId, @RequestParam Long sectionId,
+            @RequestParam Long examTermId) {
         resultsHistoryFacade.processTermResults(standardId, sectionId, examTermId);
         return ResponseEntity.ok("Results processing initiated");
     }
 
     @GetMapping("/section")
-    public ResponseEntity<?> getSectionResults(@RequestParam Long standardId, @RequestParam Long sectionId, @RequestParam Long examTermId) {
+    public ResponseEntity<?> getSectionResults(@RequestParam Long standardId, @RequestParam Long sectionId,
+            @RequestParam Long examTermId) {
         return ResponseEntity.ok(resultsHistoryFacade.getSectionTermResults(standardId, sectionId, examTermId));
     }
 
@@ -96,6 +98,16 @@ public class ResultsHistoryController {
     @GetMapping("/grade-scales")
     public ResponseEntity<?> getAllGradeScales() {
         return ResponseEntity.ok(resultsHistoryFacade.getAllActiveGradeScales());
+    }
+
+    @GetMapping("/grade-scales/{id}")
+    public ResponseEntity<?> getGradeScale(@PathVariable Long id) {
+        return ResponseEntity.ok(resultsHistoryFacade.getGradeScaleById(id));
+    }
+
+    @GetMapping("/grade-scales/search/{keyword}")
+    public ResponseEntity<?> searchGradeScales(@PathVariable String keyword) {
+        return ResponseEntity.ok(resultsHistoryFacade.searchGradeScales(keyword));
     }
 
     @DeleteMapping("/grade-scales/{id}")

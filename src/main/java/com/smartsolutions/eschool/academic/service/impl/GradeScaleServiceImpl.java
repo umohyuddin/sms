@@ -45,9 +45,24 @@ public class GradeScaleServiceImpl implements GradeScaleService {
     }
 
     @Override
+    public GradeScaleResponseDTO getById(Long id) {
+        return gradeScaleRepository.findByIdAndDeletedFalse(id)
+                .map(ResultsMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Grade Scale not found"));
+    }
+
+    @Override
     public List<GradeScaleResponseDTO> getAllActive() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
         return gradeScaleRepository.findAllByOrgId(orgId).stream()
+                .map(ResultsMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GradeScaleResponseDTO> searchByKeyword(String keyword) {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        return gradeScaleRepository.searchByKeyword(keyword, orgId).stream()
                 .map(ResultsMapper::toResponse)
                 .collect(Collectors.toList());
     }

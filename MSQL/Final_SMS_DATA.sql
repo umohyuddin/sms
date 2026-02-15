@@ -1393,3 +1393,49 @@ INSERT INTO exam_terms
 (1,'Second Term',3,2025,1),
 (1,'Pre Final',4,2025,1),
 (1,'Final Term',5,2025,1);
+
+
+
+INSERT INTO assessment_types
+(organization_id, code, name, description, created_by)
+VALUES
+
+-- Written Evaluations
+(1,'WR','Written Exam','Traditional written paper exam',1),
+(1,'MCQ','MCQ Test','Multiple choice questions based test',1),
+(1,'SUB','Subjective','Long answer descriptive paper',1),
+(1,'OBJ','Objective','Short answer or objective type test',1),
+
+-- Continuous Assessment
+(1,'QUIZ','Quiz','Short quiz assessment',1),
+(1,'ASSIGN','Assignment','Homework or take-home task',1),
+(1,'CLASS','Class Test','In-class short test',1),
+(1,'WKTEST','Weekly Test','Weekly performance test',1),
+(1,'UNIT','Unit Test','Unit completion test',1),
+
+-- Practical Based
+(1,'PRAC','Practical','Hands-on practical exam',1),
+(1,'LAB','Lab Work','Laboratory performance assessment',1),
+(1,'DEMO','Demonstration','Practical demonstration assessment',1),
+
+-- Oral / Interactive
+(1,'VIVA','Viva Voce','Oral examination',1),
+(1,'ORAL','Oral Test','Spoken or verbal test',1),
+(1,'PRES','Presentation','Presentation based evaluation',1),
+
+-- Project / Coursework
+(1,'PROJ','Project','Project based evaluation',1),
+(1,'COURSE','Course Work','Continuous coursework assessment',1),
+(1,'PORT','Portfolio','Portfolio submission assessment',1),
+
+-- Behavior / Participation
+(1,'ATT','Attendance','Marks based on attendance',1),
+(1,'PART','Participation','Class participation marks',1),
+(1,'DISC','Discipline','Discipline evaluation marks',1),
+
+-- Special Evaluations
+(1,'MOCK','Mock Assessment','Practice exam for preparation',1),
+(1,'DIAG','Diagnostic Test','Skill assessment test',1),
+(1,'SKILL','Skill Test','Skill-based evaluation',1),
+(1,'PHYS','Physical Test','Physical activity assessment',1);
+
