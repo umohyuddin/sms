@@ -33,15 +33,22 @@ public class TeacherTimetableController {
     }
 
     @GetMapping("/assignments/section")
-    public ResponseEntity<?> getSectionAssignments(@RequestParam Long standardId, @RequestParam Long sectionId, @RequestParam Long academicYearId) {
+    public ResponseEntity<?> getSectionAssignments(@RequestParam Long standardId, @RequestParam Long sectionId,
+            @RequestParam Long academicYearId) {
         return ResponseEntity.ok(teacherTimetableFacade.getBySection(standardId, sectionId, academicYearId));
+    }
+
+    @GetMapping("/assignments/standard")
+    public ResponseEntity<?> getStandardAssignments(@RequestParam Long standardId, @RequestParam Long academicYearId) {
+        return ResponseEntity.ok(teacherTimetableFacade.getByStandard(standardId, academicYearId));
     }
 
     @DeleteMapping("/assignments")
     public ResponseEntity<?> unassignTeacher(
             @RequestParam Long employeeId, @RequestParam Long standardId, @RequestParam Long sectionId,
             @RequestParam Long subjectId, @RequestParam Long academicYearId, @RequestParam String effectiveFrom) {
-        teacherTimetableFacade.unassignTeacher(employeeId, standardId, sectionId, subjectId, academicYearId, LocalDate.parse(effectiveFrom));
+        teacherTimetableFacade.unassignTeacher(employeeId, standardId, sectionId, subjectId, academicYearId,
+                LocalDate.parse(effectiveFrom));
         return ResponseEntity.noContent().build();
     }
 

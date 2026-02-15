@@ -32,63 +32,80 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TeacherSubjectAssignmentServiceImpl implements TeacherSubjectAssignmentService {
 
-    private final TeacherSubjectAssignmentRepository teacherAssignmentRepository;
-    private final EmployeeMasterRepository employeeRepository;
-    private final StandardRepository standardRepository;
-    private final SectionRepository sectionRepository;
-    private final SubjectRepository subjectRepository;
-    private final AcademicYearRepository academicYearRepository;
+        private final TeacherSubjectAssignmentRepository teacherAssignmentRepository;
+        private final EmployeeMasterRepository employeeRepository;
+        private final StandardRepository standardRepository;
+        private final SectionRepository sectionRepository;
+        private final SubjectRepository subjectRepository;
+        private final AcademicYearRepository academicYearRepository;
 
-    @Override
-    @Transactional
-    public TeacherSubjectAssignmentResponseDTO assign(TeacherSubjectAssignmentRequestDTO dto) {
-        log.info("Assigning Teacher {} to Subject {} for Standard {} Section {}", 
-                dto.getEmployeeId(), dto.getSubjectId(), dto.getStandardId(), dto.getSectionId());
-        
-        EmployeeMasterEntity teacher = employeeRepository.findById(dto.getEmployeeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found: " + dto.getEmployeeId()));
-        SubjectEntity subject = subjectRepository.findActiveById(dto.getSubjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("Subject not found: " + dto.getSubjectId()));
-        StandardEntity standard = standardRepository.findById(dto.getStandardId())
-                .orElseThrow(() -> new ResourceNotFoundException("Standard not found: " + dto.getStandardId()));
-        SectionEntity section = sectionRepository.findById(dto.getSectionId())
-                .orElseThrow(() -> new ResourceNotFoundException("Section not found: " + dto.getSectionId()));
-        AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
-                .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found: " + dto.getAcademicYearId()));
+        @Override
+        @Transactional
+        public TeacherSubjectAssignmentResponseDTO assign(TeacherSubjectAssignmentRequestDTO dto) {
+                log.info("Assigning Teacher {} to Subject {} for Standard {} Section {}",
+                                dto.getEmployeeId(), dto.getSubjectId(), dto.getStandardId(), dto.getSectionId());
 
-        TeacherSubjectAssignmentEntity entity = TeacherAssignmentMapper.toEntity(dto);
-        entity.setTeacher(teacher);
-        entity.setSubject(subject);
-        entity.setStandard(standard);
-        entity.setSection(section);
-        entity.setAcademicYear(academicYear);
-        
-        TeacherSubjectAssignmentEntity saved = teacherAssignmentRepository.save(entity);
-        return TeacherAssignmentMapper.toResponse(saved);
-    }
+                EmployeeMasterEntity teacher = employeeRepository.findById(dto.getEmployeeId())
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Teacher not found: " + dto.getEmployeeId()));
+                SubjectEntity subject = subjectRepository.findActiveById(dto.getSubjectId())
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Subject not found: " + dto.getSubjectId()));
+                StandardEntity standard = standardRepository.findById(dto.getStandardId())
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Standard not found: " + dto.getStandardId()));
+                SectionEntity section = sectionRepository.findById(dto.getSectionId())
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Section not found: " + dto.getSectionId()));
+                AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Academic Year not found: " + dto.getAcademicYearId()));
 
-    @Override
-    public List<TeacherSubjectAssignmentResponseDTO> getByTeacher(Long employeeId) {
-        return teacherAssignmentRepository.findByTeacherId(employeeId).stream()
-                .map(TeacherAssignmentMapper::toResponse)
-                .collect(Collectors.toList());
-    }
+                TeacherSubjectAssignmentEntity entity = TeacherAssignmentMapper.toEntity(dto);
+                entity.setTeacher(teacher);
+                entity.setSubject(subject);
+                entity.setStandard(standard);
+                entity.setSection(section);
+                entity.setAcademicYear(academicYear);
 
-    @Override
-    public List<TeacherSubjectAssignmentResponseDTO> getBySection(Long standardId, Long sectionId, Long academicYearId) {
-        return teacherAssignmentRepository.findByStandardSectionAndAcademicYear(standardId, sectionId, academicYearId).stream()
-                .map(TeacherAssignmentMapper::toResponse)
-                .collect(Collectors.toList());
-    }
+                TeacherSubjectAssignmentEntity saved = teacherAssignmentRepository.save(entity);
+                return TeacherAssignmentMapper.toResponse(saved);
+        }
 
-    @Override
-    @Transactional
-    public void unassign(Long employeeId, Long standardId, Long sectionId, Long subjectId, Long academicYearId, LocalDate effectiveFrom) {
-        log.info("Unassigning Teacher assignment");
-        TeacherSubjectAssignmentEntity entity = teacherAssignmentRepository.findByTeacherStandardSectionSubjectAndYear(
-                employeeId, standardId, sectionId, subjectId, academicYearId, effectiveFrom)
-                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
-        
-        teacherAssignmentRepository.softDeleteById(entity.getId());
-    }
+        @Override
+        public List<TeacherSubjectAssignmentResponseDTO> getByTeacher(Long employeeId) {
+                return teacherAssignmentRepository.findByTeacherId(employeeId).stream()
+                                .map(TeacherAssignmentMapper::toResponse)
+                                .collect(Collectors.toList());
+        }
+
+        @Override
+        public List<TeacherSubjectAssignmentResponseDTO> getBySection(Long standardId, Long sectionId,
+                        Long academicYearId) {
+                return teacherAssignmentRepository
+                                .findByStandardSectionAndAcademicYear(standardId, sectionId, academicYearId).stream()
+                                .map(TeacherAssignmentMapper::toResponse)
+                                .collect(Collectors.toList());
+        }
+
+        @Override
+        public List<TeacherSubjectAssignmentResponseDTO> getByStandard(Long standardId, Long academicYearId) {
+                return teacherAssignmentRepository.findByStandardAndAcademicYear(standardId, academicYearId).stream()
+                                .map(TeacherAssignmentMapper::toResponse)
+                                .collect(Collectors.toList());
+        }
+
+        @Override
+        @Transactional
+        public void unassign(Long employeeId, Long standardId, Long sectionId, Long subjectId, Long academicYearId,
+                        LocalDate effectiveFrom) {
+                log.info("Unassigning Teacher assignment");
+                TeacherSubjectAssignmentEntity entity = teacherAssignmentRepository
+                                .findByTeacherStandardSectionSubjectAndYear(
+                                                employeeId, standardId, sectionId, subjectId, academicYearId,
+                                                effectiveFrom)
+                                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
+
+                teacherAssignmentRepository.softDeleteById(entity.getId());
+        }
 }

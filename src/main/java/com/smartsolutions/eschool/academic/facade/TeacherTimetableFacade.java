@@ -23,17 +23,46 @@ public class TeacherTimetableFacade {
     private final TimetableService timetableService;
 
     // Teacher Assignment
-    public TeacherSubjectAssignmentResponseDTO assignTeacher(TeacherSubjectAssignmentRequestDTO dto) { return teacherAssignmentService.assign(dto); }
-    public List<TeacherSubjectAssignmentResponseDTO> getByTeacher(Long employeeId) { return teacherAssignmentService.getByTeacher(employeeId); }
-    public List<TeacherSubjectAssignmentResponseDTO> getBySection(Long standardId, Long sectionId, Long academicYearId) { return teacherAssignmentService.getBySection(standardId, sectionId, academicYearId); }
-    public void unassignTeacher(Long employeeId, Long standardId, Long sectionId, Long subjectId, Long academicYearId, LocalDate effectiveFrom) { 
-        teacherAssignmentService.unassign(employeeId, standardId, sectionId, subjectId, academicYearId, effectiveFrom); 
+    public TeacherSubjectAssignmentResponseDTO assignTeacher(TeacherSubjectAssignmentRequestDTO dto) {
+        return teacherAssignmentService.assign(dto);
+    }
+
+    public List<TeacherSubjectAssignmentResponseDTO> getByTeacher(Long employeeId) {
+        return teacherAssignmentService.getByTeacher(employeeId);
+    }
+
+    public List<TeacherSubjectAssignmentResponseDTO> getBySection(Long standardId, Long sectionId,
+            Long academicYearId) {
+        return teacherAssignmentService.getBySection(standardId, sectionId, academicYearId);
+    }
+
+    public List<TeacherSubjectAssignmentResponseDTO> getByStandard(Long standardId, Long academicYearId) {
+        return teacherAssignmentService.getByStandard(standardId, academicYearId);
+    }
+
+    public void unassignTeacher(Long employeeId, Long standardId, Long sectionId, Long subjectId, Long academicYearId,
+            LocalDate effectiveFrom) {
+        teacherAssignmentService.unassign(employeeId, standardId, sectionId, subjectId, academicYearId, effectiveFrom);
     }
 
     // Timetable
-    public TimetableResponseDTO createTimetable(TimetableRequestDTO dto) { return timetableService.create(dto); }
-    public TimetableResponseDTO updateTimetable(Long id, TimetableRequestDTO dto) { return timetableService.update(id, dto); }
-    public List<TimetableResponseDTO> getSectionTimetable(Long standardId, Long sectionId) { return timetableService.getSectionTimetable(standardId, sectionId); }
-    public List<TimetableResponseDTO> getTeacherTimetable(Long teacherId, TimetableEntity.DayOfWeek day) { return timetableService.getTeacherTimetable(teacherId, day); }
-    public void deleteTimetable(Long id) { timetableService.delete(id); }
+    public TimetableResponseDTO createTimetable(TimetableRequestDTO dto) {
+        return timetableService.create(dto);
+    }
+
+    public TimetableResponseDTO updateTimetable(Long id, TimetableRequestDTO dto) {
+        return timetableService.update(id, dto);
+    }
+
+    public List<TimetableResponseDTO> getSectionTimetable(Long standardId, Long sectionId) {
+        return timetableService.getSectionTimetable(standardId, sectionId);
+    }
+
+    public List<TimetableResponseDTO> getTeacherTimetable(Long teacherId, TimetableEntity.DayOfWeek day) {
+        return timetableService.getTeacherTimetable(teacherId, day);
+    }
+
+    public void deleteTimetable(Long id) {
+        timetableService.delete(id);
+    }
 }

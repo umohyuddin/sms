@@ -8,7 +8,13 @@ import java.util.List;
 
 public interface TeacherSubjectAssignmentService {
     TeacherSubjectAssignmentResponseDTO assign(TeacherSubjectAssignmentRequestDTO dto);
+
     List<TeacherSubjectAssignmentResponseDTO> getByTeacher(Long employeeId);
+
     List<TeacherSubjectAssignmentResponseDTO> getBySection(Long standardId, Long sectionId, Long academicYearId);
-    void unassign(Long employeeId, Long standardId, Long sectionId, Long subjectId, Long academicYearId, LocalDate effectiveFrom);
+
+    List<TeacherSubjectAssignmentResponseDTO> getByStandard(Long standardId, Long academicYearId);
+
+    void unassign(Long employeeId, Long standardId, Long sectionId, Long subjectId, Long academicYearId,
+            LocalDate effectiveFrom);
 }
