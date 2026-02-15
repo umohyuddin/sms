@@ -58,6 +58,14 @@ public class ExamTypeServiceImpl implements ExamTypeService {
     }
 
     @Override
+    public List<ExamTypeResponseDTO> searchByKeyword(String keyword) {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        return examTypeRepository.searchByKeyword(keyword, orgId).stream()
+                .map(ExamAssessmentMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public void delete(Long id) {
         if (!examTypeRepository.existsById(id)) {

@@ -1693,16 +1693,6 @@ CREATE TABLE teacher_subject_assignment (
     deleted_at DATETIME,
     deleted_by BIGINT,
 
-    UNIQUE (
-        organization_id,
-        employee_id,
-        standard_id,
-        section_id,
-        subject_id,
-        academic_year_id,
-        effective_from
-    ),
-
     FOREIGN KEY (employee_id) REFERENCES employee_master(id),
     FOREIGN KEY (standard_id) REFERENCES standards(id),
     FOREIGN KEY (section_id) REFERENCES sections(id),
@@ -1779,20 +1769,25 @@ CREATE TABLE employee_attendance (
 DROP TABLE IF EXISTS exam_type;
 CREATE TABLE exam_type (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    organization_id BIGINT NOT NULL,
+
     code VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL,
+
+    description TEXT,
 
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    organization_id BIGINT NOT NULL,
+
+    created_at DATETIME,
     created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    updated_at DATETIME,
     updated_by BIGINT,
+
     deleted_at DATETIME,
-    deleted_by BIGINT,
-    UNIQUE (organization_id, code)
+    deleted_by BIGINT
 );
 
 

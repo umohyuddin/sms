@@ -102,8 +102,7 @@ public class TeacherSubjectAssignmentServiceImpl implements TeacherSubjectAssign
                 log.info("Unassigning Teacher assignment");
                 TeacherSubjectAssignmentEntity entity = teacherAssignmentRepository
                                 .findByTeacherStandardSectionSubjectAndYear(
-                                                employeeId, standardId, sectionId, subjectId, academicYearId,
-                                                effectiveFrom)
+                                                employeeId, standardId, sectionId, subjectId, academicYearId)
                                 .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
 
                 teacherAssignmentRepository.softDeleteById(entity.getId());

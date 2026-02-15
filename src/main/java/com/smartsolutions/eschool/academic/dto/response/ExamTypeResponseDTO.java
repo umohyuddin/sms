@@ -12,4 +12,5 @@ public class ExamTypeResponseDTO {
     private String code;
     private String name;
     private boolean active;
+    private String description;
 }

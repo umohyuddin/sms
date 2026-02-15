@@ -1341,3 +1341,46 @@ VALUES
     (1, 12, (SELECT id FROM subjects WHERE code='ACC' LIMIT 1), 1, TRUE, 4, 80, 20),
     (1, 12, (SELECT id FROM subjects WHERE code='ECO' LIMIT 1), 1, TRUE, 4, 80, 20),
     (1, 12, (SELECT id FROM subjects WHERE code='ENG' LIMIT 1), 1, FALSE, 5, 100, 0);
+
+
+INSERT INTO exam_type
+(
+    organization_id,
+    code,
+    name,
+    description,
+    is_active,
+    is_deleted,
+    created_at,
+    created_by
+)
+VALUES
+
+-- Major Exams
+(1,'MID','Mid Term Exam','Mid session evaluation',TRUE,FALSE,NOW(),1),
+(1,'FINAL','Final Exam','End term final exam',TRUE,FALSE,NOW(),1),
+(1,'ANNUAL','Annual Exam','Yearly evaluation',TRUE,FALSE,NOW(),1),
+(1,'SUPP','Supplementary Exam','Reattempt failed subjects',TRUE,FALSE,NOW(),1),
+(1,'RET','Retake Exam','Retake full exam',TRUE,FALSE,NOW(),1),
+
+-- Periodic Exams
+(1,'UT1','Unit Test 1','First unit test',TRUE,FALSE,NOW(),1),
+(1,'UT2','Unit Test 2','Second unit test',TRUE,FALSE,NOW(),1),
+(1,'UT3','Unit Test 3','Third unit test',TRUE,FALSE,NOW(),1),
+(1,'MT1','Monthly Test','Monthly performance test',TRUE,FALSE,NOW(),1),
+(1,'WKLY','Weekly Test','Weekly short test',TRUE,FALSE,NOW(),1),
+
+-- Internal Evaluation
+(1,'INT','Internal Exam','Internal assessment',TRUE,FALSE,NOW(),1),
+(1,'CLASS','Class Test','Classroom evaluation',TRUE,FALSE,NOW(),1),
+(1,'ORAL','Oral Exam','Spoken evaluation',TRUE,FALSE,NOW(),1),
+
+-- Practical Based
+(1,'PRAC','Practical Exam','Hands-on practical exam',TRUE,FALSE,NOW(),1),
+(1,'LAB','Lab Exam','Laboratory evaluation',TRUE,FALSE,NOW(),1),
+(1,'VIVA','Viva Voce','Oral viva assessment',TRUE,FALSE,NOW(),1),
+
+-- Special Cases
+(1,'ENT','Entrance Exam','Admission test',TRUE,FALSE,NOW(),1),
+(1,'MOCK','Mock Exam','Practice exam',TRUE,FALSE,NOW(),1),
+(1,'SCH','Scholarship Exam','Scholarship qualification test',TRUE,FALSE,NOW(),1);

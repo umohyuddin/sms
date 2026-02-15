@@ -30,5 +30,5 @@ public class ExamTypeEntity extends AuditableEntity {
     @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
-    private Object description;
+    private String description;
 }

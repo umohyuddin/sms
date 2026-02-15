@@ -19,6 +19,10 @@ public interface ExamTypeRepository extends JpaRepository<ExamTypeEntity, Long> 
     @Query("SELECT et FROM ExamTypeEntity et WHERE et.organizationId = :orgId AND et.deleted = false")
     List<ExamTypeEntity> findAllActiveByOrg(@Param("orgId") Long orgId);
 
+    @Query("SELECT et FROM ExamTypeEntity et WHERE et.organizationId = :orgId AND et.deleted = false " +
+            "AND (LOWER(et.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(et.code) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    List<ExamTypeEntity> searchByKeyword(@Param("keyword") String keyword, @Param("orgId") Long orgId);
+
     @Modifying
     @Query("UPDATE ExamTypeEntity et SET et.deleted = true, et.deletedAt = CURRENT_TIMESTAMP WHERE et.id = :id")
     void softDeleteById(@Param("id") Long id);

@@ -7,8 +7,14 @@ import java.util.List;
 
 public interface ExamTypeService {
     ExamTypeResponseDTO create(ExamTypeRequestDTO dto);
+
     ExamTypeResponseDTO update(Long id, ExamTypeRequestDTO dto);
+
     ExamTypeResponseDTO getById(Long id);
+
     List<ExamTypeResponseDTO> getAllActive();
+
+    List<ExamTypeResponseDTO> searchByKeyword(String keyword);
+
     void delete(Long id);
 }

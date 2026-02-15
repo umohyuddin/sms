@@ -39,7 +39,7 @@ public class ExamAssessmentMapper {
         dto.setId(entity.getId());
         dto.setCode(entity.getCode());
         dto.setName(entity.getName());
-        // description field doesn't exist in ExamTypeResponseDTO
+        dto.setDescription(entity.getDescription());
         dto.setActive(entity.isActive());
         return dto;
     }

@@ -56,14 +56,13 @@ public interface TeacherSubjectAssignmentRepository extends JpaRepository<Teache
                      +
                      "AND tsa.section.id = :sectionId AND tsa.subject.id = :subjectId AND tsa.academicYear.id = :academicYearId "
                      +
-                     "AND tsa.effectiveFrom = :effectiveFrom AND tsa.deleted = false")
+                     "AND tsa.deleted = false")
        Optional<TeacherSubjectAssignmentEntity> findByTeacherStandardSectionSubjectAndYear(
                      @Param("employeeId") Long employeeId,
                      @Param("standardId") Long standardId,
                      @Param("sectionId") Long sectionId,
                      @Param("subjectId") Long subjectId,
-                     @Param("academicYearId") Long academicYearId,
-                     @Param("effectiveFrom") java.time.LocalDate effectiveFrom);
+                     @Param("academicYearId") Long academicYearId);
 
        @Modifying
        @Query("UPDATE TeacherSubjectAssignmentEntity tsa SET tsa.deleted = true, tsa.deletedAt = CURRENT_TIMESTAMP WHERE tsa.id = :id")

@@ -28,9 +28,19 @@ public class ExamAssessmentController {
         return ResponseEntity.ok(examAssessmentFacade.updateExamType(id, dto));
     }
 
+    @GetMapping("/exam-types/{id}")
+    public ResponseEntity<?> getExamType(@PathVariable Long id) {
+        return ResponseEntity.ok(examAssessmentFacade.getExamTypeById(id));
+    }
+
     @GetMapping("/exam-types")
     public ResponseEntity<?> getAllExamTypes() {
         return ResponseEntity.ok(examAssessmentFacade.getAllActiveExamTypes());
+    }
+
+    @GetMapping("/exam-types/search/{keyword}")
+    public ResponseEntity<?> searchExamTypes(@PathVariable String keyword) {
+        return ResponseEntity.ok(examAssessmentFacade.searchExamTypes(keyword));
     }
 
     @DeleteMapping("/exam-types/{id}")
@@ -68,7 +78,8 @@ public class ExamAssessmentController {
     }
 
     @PutMapping("/assessment-types/{id}")
-    public ResponseEntity<?> updateAssessmentType(@PathVariable Long id, @Valid @RequestBody AssessmentTypeRequestDTO dto) {
+    public ResponseEntity<?> updateAssessmentType(@PathVariable Long id,
+            @Valid @RequestBody AssessmentTypeRequestDTO dto) {
         return ResponseEntity.ok(examAssessmentFacade.updateAssessmentType(id, dto));
     }
 
@@ -100,7 +111,8 @@ public class ExamAssessmentController {
     }
 
     @GetMapping("/exams/section")
-    public ResponseEntity<?> getSectionExams(@RequestParam Long standardId, @RequestParam Long sectionId, @RequestParam Long academicYearId) {
+    public ResponseEntity<?> getSectionExams(@RequestParam Long standardId, @RequestParam Long sectionId,
+            @RequestParam Long academicYearId) {
         return ResponseEntity.ok(examAssessmentFacade.getExamsBySection(standardId, sectionId, academicYearId));
     }
 
