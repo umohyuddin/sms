@@ -31,8 +31,8 @@ public class GradeScaleEntity extends AuditableEntity {
     @Column(name = "remarks", length = 50)
     private String remarks;
 
-    @Column(name = "points", precision = 3, scale = 2)
-    private BigDecimal points;
+//    @Column(name = "points", precision = 3, scale = 2)
+//    private BigDecimal points;
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;

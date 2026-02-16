@@ -1439,3 +1439,17 @@ VALUES
 (1,'SKILL','Skill Test','Skill-based evaluation',1),
 (1,'PHYS','Physical Test','Physical activity assessment',1);
 
+
+INSERT INTO grade_scales
+(organization_id, min_percentage, max_percentage, grade, remarks, created_by)
+VALUES
+(1, 90.00, 100.00, 'A+', 'Outstanding', 1),
+(1, 85.00, 89.99, 'A',  'Excellent', 1),
+(1, 80.00, 84.99, 'A-', 'Very Good', 1),
+(1, 75.00, 79.99, 'B+', 'Good', 1),
+(1, 70.00, 74.99, 'B',  'Above Average', 1),
+(1, 65.00, 69.99, 'B-', 'Satisfactory', 1),
+(1, 60.00, 64.99, 'C+', 'Acceptable', 1),
+(1, 55.00, 59.99, 'C',  'Needs Improvement', 1),
+(1, 50.00, 54.99, 'D',  'Pass', 1),
+(1, 0.00, 49.99, 'F',  'Fail', 1);

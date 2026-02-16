@@ -253,7 +253,7 @@ public class ResultsMapper {
         entity.setGrade(dto.getGrade());
         entity.setMinPercentage(dto.getMinPercentage());
         entity.setMaxPercentage(dto.getMaxPercentage());
-        entity.setPoints(dto.getPoints());
+        //entity.setPoints(dto.getPoints());
         entity.setRemarks(dto.getRemarks());
         entity.setActive(dto.isActive());
         return entity;
@@ -268,7 +268,7 @@ public class ResultsMapper {
         dto.setGrade(entity.getGrade());
         dto.setMinPercentage(entity.getMinPercentage());
         dto.setMaxPercentage(entity.getMaxPercentage());
-        dto.setPoints(entity.getPoints());
+        //dto.setPoints(entity.getPoints());
         dto.setRemarks(entity.getRemarks());
         dto.setActive(entity.isActive());
         dto.setCreatedAt(entity.getCreatedAt());

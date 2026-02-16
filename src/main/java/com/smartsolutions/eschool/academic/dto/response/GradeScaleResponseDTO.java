@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.academic.dto.response;
 
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,8 @@ public class GradeScaleResponseDTO {
     private BigDecimal maxPercentage;
     private String grade;
     private String remarks;
-    private java.math.BigDecimal points;
+//    @Transient
+//    private java.math.BigDecimal points;
     private boolean active;
     private Long organizationId;
     private java.time.LocalDateTime createdAt;

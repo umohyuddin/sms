@@ -39,7 +39,7 @@ public class GradeScaleServiceImpl implements GradeScaleService {
         entity.setMinPercentage(dto.getMinPercentage());
         entity.setMaxPercentage(dto.getMaxPercentage());
         entity.setRemarks(dto.getRemarks()); // Entity has 'remarks', not 'description'
-        entity.setPoints(dto.getPoints());
+        //entity.setPoints(dto.getPoints());
         entity.setActive(dto.isActive());
         return ResultsMapper.toResponse(gradeScaleRepository.save(entity));
     }
