@@ -136,6 +136,18 @@ public class ExamAssessmentController {
         return ResponseEntity.ok(examAssessmentFacade.getExamsBySection(standardId, sectionId, academicYearId));
     }
 
+    @GetMapping("/exams/search")
+    public ResponseEntity<?> searchExams(
+            @RequestParam(required = false) Long academicYearId,
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId,
+            @RequestParam(required = false) Long sectionId,
+            @RequestParam(required = false) Long examTermId,
+            @RequestParam(required = false) String keyword) {
+        return ResponseEntity.ok(
+                examAssessmentFacade.searchExams(academicYearId, campusId, standardId, sectionId, examTermId, keyword));
+    }
+
     @DeleteMapping("/exams/{id}")
     public ResponseEntity<?> deleteExam(@PathVariable Long id) {
         examAssessmentFacade.deleteExam(id);

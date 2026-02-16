@@ -1964,8 +1964,6 @@ CREATE TABLE exams (
     deleted_at DATETIME,
     deleted_by BIGINT,
 
-    UNIQUE (organization_id, academic_year_id, exam_term_id, standard_id, section_id),
-
     FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
     FOREIGN KEY (exam_term_id) REFERENCES exam_terms(id),
     FOREIGN KEY (campus_id) REFERENCES campuses(id),

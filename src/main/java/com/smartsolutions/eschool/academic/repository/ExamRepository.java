@@ -31,6 +31,22 @@ public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
         @Query("SELECT e FROM ExamEntity e WHERE e.organizationId = :orgId AND e.status = :status AND e.deleted = false")
         List<ExamEntity> findByStatus(@Param("orgId") Long orgId, @Param("status") ExamEntity.ExamStatus status);
 
+        @Query("SELECT e FROM ExamEntity e JOIN FETCH e.academicYear JOIN FETCH e.examTerm JOIN FETCH e.campus JOIN FETCH e.standard JOIN FETCH e.section "
+                        + "WHERE e.organizationId = :orgId AND e.deleted = false "
+                        + "AND (:academicYearId IS NULL OR e.academicYear.id = :academicYearId) "
+                        + "AND (:campusId IS NULL OR e.campus.id = :campusId) "
+                        + "AND (:standardId IS NULL OR e.standard.id = :standardId) "
+                        + "AND (:sectionId IS NULL OR e.section.id = :sectionId) "
+                        + "AND (:examTermId IS NULL OR e.examTerm.id = :examTermId) "
+                        + "AND (:keyword IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+        List<ExamEntity> searchExams(@Param("orgId") Long orgId,
+                        @Param("academicYearId") Long academicYearId,
+                        @Param("campusId") Long campusId,
+                        @Param("standardId") Long standardId,
+                        @Param("sectionId") Long sectionId,
+                        @Param("examTermId") Long examTermId,
+                        @Param("keyword") String keyword);
+
         @Modifying
         @Query("UPDATE ExamEntity e SET e.deleted = true, e.deletedAt = CURRENT_TIMESTAMP WHERE e.id = :id")
         void softDeleteById(@Param("id") Long id);

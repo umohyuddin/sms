@@ -114,6 +114,11 @@ public class ExamAssessmentFacade {
         return examService.getBySection(standardId, sectionId, academicYearId);
     }
 
+    public List<ExamResponseDTO> searchExams(Long academicYearId, Long campusId, Long standardId, Long sectionId,
+            Long examTermId, String keyword) {
+        return examService.search(academicYearId, campusId, standardId, sectionId, examTermId, keyword);
+    }
+
     public void deleteExam(Long id) {
         examService.delete(id);
     }

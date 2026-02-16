@@ -1388,11 +1388,11 @@ VALUES
 
 INSERT INTO exam_terms
 (organization_id, name, sequence_no, academic_year_id, created_by) VALUES
-(1,'First Term',1,2025,1),
-(1,'Mid Term',2,2025,1),
-(1,'Second Term',3,2025,1),
-(1,'Pre Final',4,2025,1),
-(1,'Final Term',5,2025,1);
+(1,'First Term',1,1,1),
+(1,'Mid Term',2,1,1),
+(1,'Second Term',3,1,1),
+(1,'Pre Final',4,1,1),
+(1,'Final Term',5,1,1);
 
 
 
