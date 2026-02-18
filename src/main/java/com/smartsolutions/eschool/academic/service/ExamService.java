@@ -6,7 +6,7 @@ import com.smartsolutions.eschool.academic.dto.response.ExamResponseDTO;
 import java.util.List;
 
 public interface ExamService {
-    ExamResponseDTO create(ExamRequestDTO dto);
+    List<ExamResponseDTO> create(ExamRequestDTO dto);
 
     ExamResponseDTO update(Long id, ExamRequestDTO dto);
 

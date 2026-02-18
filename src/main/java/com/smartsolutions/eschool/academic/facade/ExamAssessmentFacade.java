@@ -98,7 +98,7 @@ public class ExamAssessmentFacade {
     }
 
     // Exam
-    public ExamResponseDTO createExam(ExamRequestDTO dto) {
+    public List<ExamResponseDTO> createExam(ExamRequestDTO dto) {
         return examService.create(dto);
     }
 

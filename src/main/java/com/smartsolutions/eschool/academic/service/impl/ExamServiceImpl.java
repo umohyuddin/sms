@@ -39,7 +39,7 @@ public class ExamServiceImpl implements ExamService {
 
         @Override
         @Transactional
-        public ExamResponseDTO create(ExamRequestDTO dto) {
+        public List<ExamResponseDTO> create(ExamRequestDTO dto) {
                 AcademicYearEntity year = academicYearRepository.findById(dto.getAcademicYearId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found"));
                 ExamTermEntity term = examTermRepository.findByIdAndDeletedFalse(dto.getExamTermId())
@@ -48,17 +48,57 @@ public class ExamServiceImpl implements ExamService {
                                 .orElseThrow(() -> new ResourceNotFoundException("Campus not found"));
                 StandardEntity standard = standardRepository.findById(dto.getStandardId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Standard not found"));
-                SectionEntity section = sectionRepository.findById(dto.getSectionId())
-                                .orElseThrow(() -> new ResourceNotFoundException("Section not found"));
 
-                ExamEntity entity = ExamAssessmentMapper.toEntity(dto);
-                entity.setAcademicYear(year);
-                entity.setExamTerm(term);
-                entity.setCampus(campus);
-                entity.setStandard(standard);
-                entity.setSection(section);
+                if (dto.getSelectedSections() != null && !dto.getSelectedSections().isEmpty()) {
+                        return dto.getSelectedSections().stream()
+                                        .filter(ExamRequestDTO.SelectedSectionDTO::isSelected)
+                                        .map(sectionDto -> {
+                                                SectionEntity section = sectionRepository
+                                                                .findById(sectionDto.getSectionId())
+                                                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                                                "Section not found: " + sectionDto
+                                                                                                .getSectionId()));
 
-                return ExamAssessmentMapper.toResponse(examRepository.save(entity));
+                                                ExamEntity entity = new ExamEntity();
+                                                entity.setAcademicYear(year);
+                                                entity.setExamTerm(term);
+                                                entity.setCampus(campus);
+                                                entity.setStandard(standard);
+                                                entity.setSection(section);
+                                                entity.setName(sectionDto.getExamName() != null
+                                                                ? sectionDto.getExamName()
+                                                                : dto.getName());
+                                                entity.setStartDate(sectionDto.getStartDate() != null
+                                                                ? sectionDto.getStartDate()
+                                                                : dto.getStartDate());
+                                                entity.setEndDate(sectionDto.getEndDate() != null
+                                                                ? sectionDto.getEndDate()
+                                                                : dto.getEndDate());
+                                                entity.setStatus(sectionDto.getStatus() != null ? sectionDto.getStatus()
+                                                                : dto.getStatus());
+                                                entity.setActive(dto.isActive());
+
+                                                return ExamAssessmentMapper.toResponse(examRepository.save(entity));
+                                        })
+                                        .collect(Collectors.toList());
+                }
+
+                // Fallback for single section if still used via sectionId
+                if (dto.getSectionId() != null) {
+                        SectionEntity section = sectionRepository.findById(dto.getSectionId())
+                                        .orElseThrow(() -> new ResourceNotFoundException("Section not found"));
+
+                        ExamEntity entity = ExamAssessmentMapper.toEntity(dto);
+                        entity.setAcademicYear(year);
+                        entity.setExamTerm(term);
+                        entity.setCampus(campus);
+                        entity.setStandard(standard);
+                        entity.setSection(section);
+
+                        return List.of(ExamAssessmentMapper.toResponse(examRepository.save(entity)));
+                }
+
+                return List.of();
         }
 
         @Override
