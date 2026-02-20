@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.util.SecurityUtils;
+import com.smartsolutions.eschool.academic.dto.request.BulkExamSubjectRequestDTO;
 import com.smartsolutions.eschool.academic.dto.request.ExamSubjectRequestDTO;
 import com.smartsolutions.eschool.academic.dto.response.ExamSubjectResponseDTO;
 import com.smartsolutions.eschool.academic.entity.mapping.ExamSubjectEntity;
@@ -35,6 +36,18 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
     @Override
     @Transactional
     public ExamSubjectResponseDTO scheduleSubject(ExamSubjectRequestDTO dto) {
+        return schedule(dto);
+    }
+
+    @Override
+    @Transactional
+    public List<ExamSubjectResponseDTO> scheduleSubjects(BulkExamSubjectRequestDTO dto) {
+        return dto.getAssignments().stream()
+                .map(this::schedule)
+                .collect(Collectors.toList());
+    }
+
+    private ExamSubjectResponseDTO schedule(ExamSubjectRequestDTO dto) {
         ExamEntity exam = examRepository.findByIdAndDeletedFalse(dto.getExamId())
                 .orElseThrow(() -> new ResourceNotFoundException("Exam not found"));
         SubjectEntity subject = subjectRepository.findActiveById(dto.getSubjectId())

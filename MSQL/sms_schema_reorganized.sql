@@ -1943,16 +1943,26 @@ CREATE TABLE assessment_attachments (
 DROP TABLE IF EXISTS exams;
 CREATE TABLE exams (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
     organization_id BIGINT NOT NULL,
     academic_year_id BIGINT NOT NULL,
     exam_term_id BIGINT NOT NULL,
+    exam_type_id BIGINT NOT NULL,
+
     campus_id BIGINT NOT NULL,
     standard_id BIGINT NOT NULL,
     section_id BIGINT NOT NULL,
+
     name VARCHAR(150) NOT NULL,
+    description VARCHAR(255),
+
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    status ENUM('DRAFT','SCHEDULED','IN_PROGRESS','LOCKED','PUBLISHED') DEFAULT 'DRAFT',
+
+    result_published BOOLEAN DEFAULT FALSE,
+
+    status ENUM('DRAFT','SCHEDULED','IN_PROGRESS','LOCKED','PUBLISHED','CANCELLED')
+           DEFAULT 'DRAFT',
 
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
@@ -1964,8 +1974,12 @@ CREATE TABLE exams (
     deleted_at DATETIME,
     deleted_by BIGINT,
 
+    UNIQUE (organization_id, academic_year_id, exam_term_id, exam_type_id, campus_id, standard_id, section_id),
+
+    FOREIGN KEY (organization_id) REFERENCES organizations(id),
     FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
     FOREIGN KEY (exam_term_id) REFERENCES exam_terms(id),
+    FOREIGN KEY (exam_type_id) REFERENCES exam_type(id),
     FOREIGN KEY (campus_id) REFERENCES campuses(id),
     FOREIGN KEY (standard_id) REFERENCES standards(id),
     FOREIGN KEY (section_id) REFERENCES sections(id)

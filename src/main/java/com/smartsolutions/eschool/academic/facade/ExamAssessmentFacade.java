@@ -64,6 +64,10 @@ public class ExamAssessmentFacade {
         return examTermService.getActiveByYear(academicYearId);
     }
 
+    public List<ExamTermResponseDTO> getActiveTermsByYearAndTenant(Long academicYearId) {
+        return examTermService.getActiveByYearAndTenant(academicYearId);
+    }
+
     public List<ExamTermResponseDTO> searchExamTerms(String keyword) {
         return examTermService.searchByKeyword(keyword);
     }
@@ -126,6 +130,10 @@ public class ExamAssessmentFacade {
     // Exam Subject
     public ExamSubjectResponseDTO scheduleSubject(ExamSubjectRequestDTO dto) {
         return examSubjectService.scheduleSubject(dto);
+    }
+
+    public List<ExamSubjectResponseDTO> scheduleSubjects(BulkExamSubjectRequestDTO dto) {
+        return examSubjectService.scheduleSubjects(dto);
     }
 
     public List<ExamSubjectResponseDTO> getSubjectsByExam(Long examId) {

@@ -65,6 +65,11 @@ public class ExamAssessmentController {
         return ResponseEntity.ok(examAssessmentFacade.getActiveTermsByYear(academicYearId));
     }
 
+    @GetMapping("/exam-terms/tenant")
+    public ResponseEntity<?> getTermsByYearAndTenant(@RequestParam Long academicYearId) {
+        return ResponseEntity.ok(examAssessmentFacade.getActiveTermsByYearAndTenant(academicYearId));
+    }
+
     @GetMapping("/exam-terms/{id}")
     public ResponseEntity<?> getExamTerm(@PathVariable Long id) {
         return ResponseEntity.ok(examAssessmentFacade.getExamTermById(id));
@@ -158,6 +163,11 @@ public class ExamAssessmentController {
     @PostMapping("/exam-subjects")
     public ResponseEntity<?> scheduleSubject(@Valid @RequestBody ExamSubjectRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(examAssessmentFacade.scheduleSubject(dto));
+    }
+
+    @PostMapping("/exam-subjects/bulk")
+    public ResponseEntity<?> scheduleSubjects(@Valid @RequestBody BulkExamSubjectRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(examAssessmentFacade.scheduleSubjects(dto));
     }
 
     @GetMapping("/exam-subjects")

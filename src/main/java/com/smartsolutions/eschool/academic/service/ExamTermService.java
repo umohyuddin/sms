@@ -14,6 +14,8 @@ public interface ExamTermService {
 
     List<ExamTermResponseDTO> getActiveByYear(Long academicYearId);
 
+    List<ExamTermResponseDTO> getActiveByYearAndTenant(Long academicYearId);
+
     List<ExamTermResponseDTO> searchByKeyword(String keyword);
 
     void delete(Long id);

@@ -20,6 +20,11 @@ public interface ExamTermRepository extends JpaRepository<ExamTermEntity, Long> 
     List<ExamTermEntity> findByAcademicYearId(@Param("academicYearId") Long academicYearId);
 
     @Query("SELECT et FROM ExamTermEntity et JOIN FETCH et.academicYear " +
+            "WHERE et.academicYear.id = :academicYearId AND et.organizationId = :orgId AND et.deleted = false")
+    List<ExamTermEntity> findByAcademicYearIdAndOrganizationId(@Param("academicYearId") Long academicYearId,
+            @Param("orgId") Long orgId);
+
+    @Query("SELECT et FROM ExamTermEntity et JOIN FETCH et.academicYear " +
             "WHERE et.academicYear.organizationId = :orgId AND et.deleted = false " +
             "AND LOWER(et.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<ExamTermEntity> searchByKeyword(@Param("keyword") String keyword, @Param("orgId") Long orgId);
