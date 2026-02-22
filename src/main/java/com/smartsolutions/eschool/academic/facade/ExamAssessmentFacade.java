@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.academic.dto.request.*;
 import com.smartsolutions.eschool.academic.dto.response.*;
 import com.smartsolutions.eschool.academic.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @Component
 @Scope("prototype")
 @RequiredArgsConstructor
+@Slf4j
 public class ExamAssessmentFacade {
 
     private final ExamTypeService examTypeService;
@@ -114,6 +116,10 @@ public class ExamAssessmentFacade {
         return examService.getById(id);
     }
 
+    public ExamResponseDTO getExamById(Long id, Long orgId) {
+        return examService.getById(id, orgId);
+    }
+
     public List<ExamResponseDTO> getExamsBySection(Long standardId, Long sectionId, Long academicYearId) {
         return examService.getBySection(standardId, sectionId, academicYearId);
     }
@@ -138,6 +144,13 @@ public class ExamAssessmentFacade {
 
     public List<ExamSubjectResponseDTO> getSubjectsByExam(Long examId) {
         return examSubjectService.getByExam(examId);
+    }
+
+    public List<ExamSubjectResponseDTO> getSubjectsByExam(Long examId, Long orgId) {
+        log.info("Facade: Fetching subjects for examId: {}, orgId: {}", examId, orgId);
+        var subjects = examSubjectService.getByExam(examId, orgId);
+        log.info("Facade: Service returned {} subjects", subjects.size());
+        return subjects;
     }
 
     public void unscheduleSubject(Long examId, Long subjectId) {

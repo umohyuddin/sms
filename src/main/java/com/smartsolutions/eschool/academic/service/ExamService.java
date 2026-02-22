@@ -12,6 +12,8 @@ public interface ExamService {
 
     ExamResponseDTO getById(Long id);
 
+    ExamResponseDTO getById(Long id, Long orgId);
+
     List<ExamResponseDTO> getBySection(Long standardId, Long sectionId, Long academicYearId);
 
     List<ExamResponseDTO> search(Long academicYearId, Long campusId, Long standardId, Long sectionId, Long examTermId,

@@ -13,5 +13,7 @@ public interface ExamSubjectService {
 
     List<ExamSubjectResponseDTO> getByExam(Long examId);
 
+    List<ExamSubjectResponseDTO> getByExam(Long examId, Long orgId);
+
     void unschedule(Long examId, Long subjectId);
 }

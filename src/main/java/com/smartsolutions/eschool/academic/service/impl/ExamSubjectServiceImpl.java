@@ -75,6 +75,17 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
     }
 
     @Override
+    public List<ExamSubjectResponseDTO> getByExam(Long examId, Long orgId) {
+        log.info("Service: Executing repository query for examId: {}, orgId: {}", examId, orgId);
+        List<ExamSubjectEntity> entities = examSubjectRepository.findByExamIdAndOrganizationIdAndDeletedFalse(examId,
+                orgId);
+        log.info("Service: Found {} entities in repository", entities.size());
+        return entities.stream()
+                .map(ExamAssessmentMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public void unschedule(Long examId, Long subjectId) {
         ExamSubjectEntity entity = examSubjectRepository.findByExamAndSubject(examId, subjectId)

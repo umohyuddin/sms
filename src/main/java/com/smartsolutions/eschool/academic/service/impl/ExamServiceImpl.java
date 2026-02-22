@@ -133,6 +133,13 @@ public class ExamServiceImpl implements ExamService {
         }
 
         @Override
+        public ExamResponseDTO getById(Long id, Long orgId) {
+                return examRepository.findByIdAndOrganizationIdAndDeletedFalse(id, orgId)
+                                .map(ExamAssessmentMapper::toResponse)
+                                .orElseThrow(() -> new ResourceNotFoundException("Exam not found"));
+        }
+
+        @Override
         public List<ExamResponseDTO> getBySection(Long standardId, Long sectionId, Long academicYearId) {
                 return examRepository.findBySectionAndAcademicYear(standardId, sectionId, academicYearId).stream()
                                 .map(ExamAssessmentMapper::toResponse)

@@ -16,6 +16,9 @@ public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
         @Query("SELECT e FROM ExamEntity e WHERE e.id = :id AND e.deleted = false")
         Optional<ExamEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
+        @Query("SELECT e FROM ExamEntity e WHERE e.id = :id AND e.organizationId = :orgId AND e.deleted = false")
+        Optional<ExamEntity> findByIdAndOrganizationIdAndDeletedFalse(@Param("id") Long id, @Param("orgId") Long orgId);
+
         @Query("SELECT e FROM ExamEntity e JOIN FETCH e.academicYear JOIN FETCH e.examTerm JOIN FETCH e.examType JOIN FETCH e.campus JOIN FETCH e.standard JOIN FETCH e.section "
                         +
                         "WHERE e.standard.id = :standardId AND e.section.id = :sectionId AND e.academicYear.id = :academicYearId AND e.deleted = false")

@@ -135,6 +135,12 @@ public class ExamAssessmentController {
         return ResponseEntity.ok(examAssessmentFacade.getExamById(id));
     }
 
+    @GetMapping("/exams/get-by-id")
+    public ResponseEntity<?> getExamById(@RequestParam Long examId) {
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        return ResponseEntity.ok(examAssessmentFacade.getExamById(examId, orgId));
+    }
+
     @GetMapping("/exams/section")
     public ResponseEntity<?> getSectionExams(@RequestParam Long standardId, @RequestParam Long sectionId,
             @RequestParam Long academicYearId) {
@@ -174,7 +180,11 @@ public class ExamAssessmentController {
 
     @GetMapping("/exam-subjects")
     public ResponseEntity<?> getExamSubjects(@RequestParam Long examId) {
-        return ResponseEntity.ok(examAssessmentFacade.getSubjectsByExam(examId));
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        log.info("API: Fetching exam subjects for examId: {}, orgId: {}", examId, orgId);
+        var response = examAssessmentFacade.getSubjectsByExam(examId, orgId);
+        log.info("API: Found {} subjects for examId: {}", response.size(), examId);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/exam-subjects")
