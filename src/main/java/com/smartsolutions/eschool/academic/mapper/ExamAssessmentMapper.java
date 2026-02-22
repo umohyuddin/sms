@@ -120,6 +120,7 @@ public class ExamAssessmentMapper {
             return null;
         ExamEntity entity = new ExamEntity();
         entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
         if (dto.getAcademicYearId() != null) {
             AcademicYearEntity ay = new AcademicYearEntity();
             ay.setId(dto.getAcademicYearId());
@@ -129,6 +130,11 @@ public class ExamAssessmentMapper {
             ExamTermEntity et = new ExamTermEntity();
             et.setId(dto.getExamTermId());
             entity.setExamTerm(et);
+        }
+        if (dto.getExamTypeId() != null) {
+            ExamTypeEntity examType = new ExamTypeEntity();
+            examType.setId(dto.getExamTypeId());
+            entity.setExamType(examType);
         }
         if (dto.getCampusId() != null) {
             CampusEntity c = new CampusEntity();
@@ -157,6 +163,7 @@ public class ExamAssessmentMapper {
         ExamResponseDTO dto = new ExamResponseDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
+        dto.setDescription(entity.getDescription());
         if (entity.getAcademicYear() != null) {
             dto.setAcademicYearId(entity.getAcademicYear().getId());
             dto.setAcademicYearName(entity.getAcademicYear().getName());
@@ -164,6 +171,10 @@ public class ExamAssessmentMapper {
         if (entity.getExamTerm() != null) {
             dto.setExamTermId(entity.getExamTerm().getId());
             dto.setExamTermName(entity.getExamTerm().getName());
+        }
+        if (entity.getExamType() != null) {
+            dto.setExamTypeId(entity.getExamType().getId());
+            dto.setExamTypeName(entity.getExamType().getName());
         }
         if (entity.getCampus() != null) {
             dto.setCampusId(entity.getCampus().getId());
@@ -179,6 +190,8 @@ public class ExamAssessmentMapper {
         }
         dto.setStartDate(entity.getStartDate());
         dto.setEndDate(entity.getEndDate());
+        dto.setResultPublished(entity.getResultPublished());
+        dto.setStatus(entity.getStatus());
         dto.setActive(entity.isActive());
         return dto;
     }

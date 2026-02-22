@@ -32,6 +32,10 @@ public class ExamEntity extends AuditableEntity {
     private ExamTermEntity examTerm;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exam_type_id", nullable = false)
+    private ExamTypeEntity examType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "campus_id", nullable = false)
     private CampusEntity campus;
 
@@ -46,11 +50,18 @@ public class ExamEntity extends AuditableEntity {
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
+    @Column(name = "description", length = 255)
+    private String description;
+
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
+
+    @Builder.Default
+    @Column(name = "result_published")
+    private Boolean resultPublished = false;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
@@ -66,6 +77,6 @@ public class ExamEntity extends AuditableEntity {
     private boolean deleted = false;
 
     public enum ExamStatus {
-        DRAFT, SCHEDULED, IN_PROGRESS, LOCKED, PUBLISHED
+        DRAFT, SCHEDULED, IN_PROGRESS, LOCKED, PUBLISHED, CANCELLED
     }
 }

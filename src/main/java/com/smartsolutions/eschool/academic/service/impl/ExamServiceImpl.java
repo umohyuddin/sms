@@ -13,9 +13,11 @@ import com.smartsolutions.eschool.academic.dto.request.ExamRequestDTO;
 import com.smartsolutions.eschool.academic.dto.response.ExamResponseDTO;
 import com.smartsolutions.eschool.academic.entity.master.ExamEntity;
 import com.smartsolutions.eschool.academic.entity.master.ExamTermEntity;
+import com.smartsolutions.eschool.academic.entity.master.ExamTypeEntity;
 import com.smartsolutions.eschool.academic.mapper.ExamAssessmentMapper;
 import com.smartsolutions.eschool.academic.repository.ExamRepository;
 import com.smartsolutions.eschool.academic.repository.ExamTermRepository;
+import com.smartsolutions.eschool.academic.repository.ExamTypeRepository;
 import com.smartsolutions.eschool.academic.service.ExamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ public class ExamServiceImpl implements ExamService {
         private final ExamRepository examRepository;
         private final AcademicYearRepository academicYearRepository;
         private final ExamTermRepository examTermRepository;
+        private final ExamTypeRepository examTypeRepository;
         private final CampusRepository campusRepository;
         private final StandardRepository standardRepository;
         private final SectionRepository sectionRepository;
@@ -44,6 +47,8 @@ public class ExamServiceImpl implements ExamService {
                                 .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found"));
                 ExamTermEntity term = examTermRepository.findByIdAndDeletedFalse(dto.getExamTermId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Exam Term not found"));
+                ExamTypeEntity examType = examTypeRepository.findByIdAndDeletedFalse(dto.getExamTypeId())
+                                .orElseThrow(() -> new ResourceNotFoundException("Exam Type not found"));
                 CampusEntity campus = campusRepository.findByIdAndDeletedFalse(dto.getCampusId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Campus not found"));
                 StandardEntity standard = standardRepository.findById(dto.getStandardId())
@@ -62,6 +67,7 @@ public class ExamServiceImpl implements ExamService {
                                                 ExamEntity entity = new ExamEntity();
                                                 entity.setAcademicYear(year);
                                                 entity.setExamTerm(term);
+                                                entity.setExamType(examType);
                                                 entity.setCampus(campus);
                                                 entity.setStandard(standard);
                                                 entity.setSection(section);
@@ -91,6 +97,7 @@ public class ExamServiceImpl implements ExamService {
                         ExamEntity entity = ExamAssessmentMapper.toEntity(dto);
                         entity.setAcademicYear(year);
                         entity.setExamTerm(term);
+                        entity.setExamType(examType);
                         entity.setCampus(campus);
                         entity.setStandard(standard);
                         entity.setSection(section);
@@ -134,11 +141,11 @@ public class ExamServiceImpl implements ExamService {
 
         @Override
         public List<ExamResponseDTO> search(Long academicYearId, Long campusId, Long standardId, Long sectionId,
-                        Long examTermId, String keyword) {
+                        Long examTermId, Long examTypeId, String keyword) {
                 Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
                 return examRepository
                                 .searchExams(orgId, academicYearId, campusId, standardId, sectionId, examTermId,
-                                                keyword)
+                                                examTypeId, keyword)
                                 .stream()
                                 .map(ExamAssessmentMapper::toResponse)
                                 .collect(Collectors.toList());

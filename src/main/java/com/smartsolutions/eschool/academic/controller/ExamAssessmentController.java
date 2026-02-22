@@ -148,9 +148,11 @@ public class ExamAssessmentController {
             @RequestParam(required = false) Long standardId,
             @RequestParam(required = false) Long sectionId,
             @RequestParam(required = false) Long examTermId,
+            @RequestParam(required = false) Long examTypeId,
             @RequestParam(required = false) String keyword) {
         return ResponseEntity.ok(
-                examAssessmentFacade.searchExams(academicYearId, campusId, standardId, sectionId, examTermId, keyword));
+                examAssessmentFacade.searchExams(academicYearId, campusId, standardId, sectionId, examTermId,
+                        examTypeId, keyword));
     }
 
     @DeleteMapping("/exams/{id}")

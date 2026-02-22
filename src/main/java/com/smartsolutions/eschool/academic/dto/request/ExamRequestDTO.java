@@ -22,6 +22,9 @@ public class ExamRequestDTO {
     private Long examTermId;
 
     @NotNull
+    private Long examTypeId;
+
+    @NotNull
     private Long campusId;
 
     @NotNull
@@ -33,6 +36,8 @@ public class ExamRequestDTO {
 
     @NotBlank(message = "Name is mandatory")
     private String name;
+
+    private String description;
 
     @NotNull
     private LocalDate startDate;

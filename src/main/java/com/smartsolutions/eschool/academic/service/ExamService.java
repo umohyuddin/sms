@@ -15,7 +15,7 @@ public interface ExamService {
     List<ExamResponseDTO> getBySection(Long standardId, Long sectionId, Long academicYearId);
 
     List<ExamResponseDTO> search(Long academicYearId, Long campusId, Long standardId, Long sectionId, Long examTermId,
-            String keyword);
+            Long examTypeId, String keyword);
 
     void delete(Long id);
 }

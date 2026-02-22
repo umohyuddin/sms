@@ -16,6 +16,8 @@ public class ExamResponseDTO {
     private String academicYearName;
     private Long examTermId;
     private String examTermName;
+    private Long examTypeId;
+    private String examTypeName;
     private Long campusId;
     private String campusName;
     private Long standardId;
@@ -23,8 +25,10 @@ public class ExamResponseDTO {
     private Long sectionId;
     private String sectionName;
     private String name;
+    private String description;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Boolean resultPublished;
     private ExamEntity.ExamStatus status;
     private boolean active;
 }
