@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/academic/evaluation")
 @RequiredArgsConstructor
@@ -241,5 +243,20 @@ public class ExamAssessmentController {
     @GetMapping("/student-assessments/student/{id}")
     public ResponseEntity<?> getSubmissionsByStudent(@PathVariable Long id) {
         return ResponseEntity.ok(examAssessmentFacade.getByStudent(id));
+    }
+
+    // Student Exam Attendance
+    @PostMapping("/mark-exam-attendance")
+    public ResponseEntity<?> markExamAttendance(@Valid @RequestBody List<StudentExamAttendanceRequestDTO> requests) {
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        log.info("API: Marking exam attendance for {} students in org: {}", requests.size(), orgId);
+        return ResponseEntity.ok(examAssessmentFacade.markExamAttendance(requests, orgId));
+    }
+
+    @GetMapping("/exam-attendance")
+    public ResponseEntity<?> getAttendanceByExamSubject(@RequestParam Long examSubjectId) {
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        log.info("API: Fetching attendance for examSubjectId: {}, orgId: {}", examSubjectId, orgId);
+        return ResponseEntity.ok(examAssessmentFacade.getAttendanceByExamSubject(examSubjectId, orgId));
     }
 }

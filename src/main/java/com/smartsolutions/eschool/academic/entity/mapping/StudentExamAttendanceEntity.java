@@ -2,7 +2,6 @@ package com.smartsolutions.eschool.academic.entity.mapping;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.student.model.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

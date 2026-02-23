@@ -938,6 +938,7 @@ CREATE TABLE students (
     organization_id BIGINT NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     student_code VARCHAR(50) NOT NULL UNIQUE,
     date_of_birth DATE NOT NULL,

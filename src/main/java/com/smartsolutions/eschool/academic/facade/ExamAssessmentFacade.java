@@ -23,6 +23,7 @@ public class ExamAssessmentFacade {
     private final ExamSubjectService examSubjectService;
     private final AssessmentService assessmentService;
     private final StudentAssessmentService studentAssessmentService;
+    private final StudentExamAttendanceService studentExamAttendanceService;
 
     // Exam Type
     public ExamTypeResponseDTO createExamType(ExamTypeRequestDTO dto) {
@@ -193,5 +194,17 @@ public class ExamAssessmentFacade {
 
     public List<StudentAssessmentResponseDTO> getByStudent(Long studentId) {
         return studentAssessmentService.getByStudent(studentId);
+    }
+
+    // Student Exam Attendance
+    public List<StudentExamAttendanceResponseDTO> markExamAttendance(List<StudentExamAttendanceRequestDTO> requests,
+            Long orgId) {
+        log.info("Facade: Marking exam attendance for {} students", requests.size());
+        return studentExamAttendanceService.markAttendance(requests, orgId);
+    }
+
+    public List<StudentExamAttendanceResponseDTO> getAttendanceByExamSubject(Long examSubjectId, Long orgId) {
+        log.info("Facade: Fetching attendance for examSubjectId: {}", examSubjectId);
+        return studentExamAttendanceService.getAttendanceByExamSubject(examSubjectId, orgId);
     }
 }

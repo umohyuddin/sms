@@ -396,22 +396,6 @@ INSERT INTO institute_social_links(institute_id, platform, url, is_deleted, crea
 (1, 'Twitter',   'https://twitter.com/institute1', FALSE, 1);
 
 
-INSERT INTO admission_type (organization_id, code, name, description, is_active)
-VALUES (1, 'NEW_ADMISSION', 'New Admission / Fresh Admission', 'Student joining the school for the first time.', TRUE),
-       (1, 'TRANSFER', 'Transfer Admission', 'Student transferring from another school.', TRUE),
-       (1, 'READMISSION', 'Re-admission / Returning Student', 'Student returning after leaving the school.', TRUE),
-       (1, 'LATERAL_ENTRY', 'Lateral Entry / Direct Admission', 'Student joining a higher grade directly.', TRUE),
-       (1, 'SCHOLARSHIP', 'Scholarship / Concession Admission', 'Admission with full or partial fee waiver.', TRUE),
-       (1, 'MANAGEMENT', 'Management / Special Admission', 'Admission under management quota.', TRUE),
-       (1, 'EARLY', 'Early Admission', 'Admission before the academic session starts.', TRUE),
-       (1, 'LATE', 'Late Admission', 'Admission after the academic session has started.', TRUE),
-       (1, 'INTERNATIONAL', 'International / Expat Admission', 'Students from foreign countries.', TRUE),
-       (1, 'SPECIAL_NEEDS', 'Special Needs Admission', 'Students requiring special assistance.', TRUE),
-       (1, 'ONLINE', 'Online / Distance Learning Admission', 'Admission for online programs.', TRUE),
-       (1, 'SIBLING', 'Sibling Admission', 'Admission given when a sibling is already enrolled.', TRUE),
-       (1, 'STAFF_WARD', 'Staff / Employee Ward Admission', 'Children of school staff may get special consideration.', TRUE),
-       (1, 'MERIT', 'Merit-based Admission', 'Admission based purely on exam/test performance.', TRUE),
-       (1, 'MID_YEAR', 'Late Entry Mid-Year', 'Students joining mid-session due to relocation or other reasons.', TRUE);
 
 -- ============================================================
 -- Lookup Data: Currencies

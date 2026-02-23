@@ -1,8 +1,26 @@
 package com.smartsolutions.eschool.academic.mapper;
 
-import com.smartsolutions.eschool.academic.dto.request.*;
-import com.smartsolutions.eschool.academic.dto.response.*;
-import com.smartsolutions.eschool.academic.entity.mapping.*;
+import com.smartsolutions.eschool.academic.dto.request.AssessmentRequestDTO;
+import com.smartsolutions.eschool.academic.dto.request.AssessmentTypeRequestDTO;
+import com.smartsolutions.eschool.academic.dto.request.BulkExamSubjectRequestDTO;
+import com.smartsolutions.eschool.academic.dto.request.ExamRequestDTO;
+import com.smartsolutions.eschool.academic.dto.request.ExamSubjectRequestDTO;
+import com.smartsolutions.eschool.academic.dto.request.ExamTermRequestDTO;
+import com.smartsolutions.eschool.academic.dto.request.ExamTypeRequestDTO;
+import com.smartsolutions.eschool.academic.dto.request.StudentAssessmentRequestDTO;
+import com.smartsolutions.eschool.academic.dto.request.StudentExamAttendanceRequestDTO;
+import com.smartsolutions.eschool.academic.dto.response.AssessmentResponseDTO;
+import com.smartsolutions.eschool.academic.dto.response.AssessmentTypeResponseDTO;
+import com.smartsolutions.eschool.academic.dto.response.ExamResponseDTO;
+import com.smartsolutions.eschool.academic.dto.response.ExamSubjectResponseDTO;
+import com.smartsolutions.eschool.academic.dto.response.ExamTermResponseDTO;
+import com.smartsolutions.eschool.academic.dto.response.ExamTypeResponseDTO;
+import com.smartsolutions.eschool.academic.dto.response.StudentAssessmentResponseDTO;
+import com.smartsolutions.eschool.academic.dto.response.StudentExamAttendanceResponseDTO;
+import com.smartsolutions.eschool.academic.entity.mapping.ExamSubjectEntity;
+import com.smartsolutions.eschool.academic.entity.mapping.StudentAssessmentEntity;
+import com.smartsolutions.eschool.academic.entity.mapping.StudentExamAttendanceEntity;
+import com.smartsolutions.eschool.academic.entity.mapping.TeacherSubjectAssignmentEntity;
 import com.smartsolutions.eschool.academic.entity.master.*;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
@@ -391,6 +409,48 @@ public class ExamAssessmentMapper {
 
     public static List<StudentAssessmentResponseDTO> toStudentAssessmentResponseList(
             List<StudentAssessmentEntity> entities) {
+        return entities == null ? null
+                : entities.stream().map(ExamAssessmentMapper::toResponse).collect(Collectors.toList());
+    }
+
+    // Student Exam Attendance
+    public static StudentExamAttendanceEntity toEntity(StudentExamAttendanceRequestDTO dto) {
+        if (dto == null)
+            return null;
+        StudentExamAttendanceEntity entity = new StudentExamAttendanceEntity();
+        if (dto.getStudentId() != null) {
+            StudentEntity student = new StudentEntity();
+            student.setId(dto.getStudentId());
+            entity.setStudent(student);
+        }
+        if (dto.getExamSubjectId() != null) {
+            ExamSubjectEntity examSubject = new ExamSubjectEntity();
+            examSubject.setId(dto.getExamSubjectId());
+            entity.setExamSubject(examSubject);
+        }
+        entity.setStatus(dto.getStatus());
+        return entity;
+    }
+
+    public static StudentExamAttendanceResponseDTO toResponse(StudentExamAttendanceEntity entity) {
+        if (entity == null)
+            return null;
+        StudentExamAttendanceResponseDTO dto = StudentExamAttendanceResponseDTO.builder()
+                .id(entity.getId())
+                .status(entity.getStatus())
+                .build();
+        if (entity.getStudent() != null) {
+            dto.setStudentId(entity.getStudent().getId());
+            dto.setStudentName(entity.getStudent().getFullName());
+        }
+        if (entity.getExamSubject() != null) {
+            dto.setExamSubjectId(entity.getExamSubject().getId());
+        }
+        return dto;
+    }
+
+    public static List<StudentExamAttendanceResponseDTO> toAttendanceResponseList(
+            List<StudentExamAttendanceEntity> entities) {
         return entities == null ? null
                 : entities.stream().map(ExamAssessmentMapper::toResponse).collect(Collectors.toList());
     }
