@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.academic.facade;
 
 import com.smartsolutions.eschool.academic.dto.request.*;
 import com.smartsolutions.eschool.academic.dto.response.*;
+import com.smartsolutions.eschool.academic.dto.response.StudentMarkEntryResponseDTO;
 import com.smartsolutions.eschool.academic.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
@@ -31,6 +32,10 @@ public class ResultsHistoryFacade {
 
     public List<StudentExamMarksResponseDTO> getStudentMarks(Long studentId, Long examId) {
         return marksService.getStudentMarks(studentId, examId);
+    }
+
+    public List<StudentMarkEntryResponseDTO> getStudentsForMarkEntry(Long examSubjectId) {
+        return marksService.getStudentsForMarkEntry(examSubjectId);
     }
 
     // Exam Weightage

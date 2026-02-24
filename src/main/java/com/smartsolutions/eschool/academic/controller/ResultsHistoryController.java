@@ -36,6 +36,11 @@ public class ResultsHistoryController {
         return ResponseEntity.ok(resultsHistoryFacade.getStudentMarks(id, examId));
     }
 
+    @GetMapping("/marks/entry")
+    public ResponseEntity<?> getStudentsForMarkEntry(@RequestParam Long examSubjectId) {
+        return ResponseEntity.ok(resultsHistoryFacade.getStudentsForMarkEntry(examSubjectId));
+    }
+
     // Exam Weightage
     @PostMapping("/weightages")
     public ResponseEntity<?> saveWeightages(@Valid @RequestBody List<ExamWeightageRequestDTO> dtos) {
