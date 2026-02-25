@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.academic.dto.request.*;
 import com.smartsolutions.eschool.academic.dto.response.*;
 import com.smartsolutions.eschool.academic.entity.mapping.ExamSubjectEntity;
 import com.smartsolutions.eschool.academic.entity.mapping.ExamWeightageEntity;
+import com.smartsolutions.eschool.academic.entity.mapping.StandardSubjectEntity;
 import com.smartsolutions.eschool.academic.entity.mapping.StudentExamMarksEntity;
 import com.smartsolutions.eschool.academic.entity.mapping.StudentTermResultEntity;
 import com.smartsolutions.eschool.academic.entity.master.GradeScaleEntity;

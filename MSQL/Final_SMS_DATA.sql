@@ -5930,7 +5930,7 @@ WHERE EXISTS (SELECT 1 FROM standards WHERE standard_name = '5th Grade' AND camp
 -- standard_subjects for Maple Campus - 5th Grade
 INSERT INTO standard_subjects (organization_id, standard_id, subject_id, academic_year_id, is_optional, weekly_hours, theory_marks, practical_marks)
 SELECT
-    1, 
+    1,
     (SELECT id FROM standards WHERE standard_name = '5th Grade' AND campus_id = (SELECT id FROM campuses WHERE campus_name = 'Maple Campus' LIMIT 1) LIMIT 1),
     (SELECT id FROM subjects WHERE code = 'DRAW' LIMIT 1),
     1,
@@ -5938,3 +5938,129 @@ SELECT
 WHERE EXISTS (SELECT 1 FROM standards WHERE standard_name = '5th Grade' AND campus_id = (SELECT id FROM campuses WHERE campus_name = 'Maple Campus' LIMIT 1))
   AND EXISTS (SELECT 1 FROM subjects WHERE code = 'DRAW');
 
+
+
+-- =============================================
+-- TEST DATA FOR EXAM SUBJECTS AND ATTENDANCE
+-- Coverage: 30 Sections, 150 Students, All Subjects
+-- =============================================
+
+-- 1. Populate exam_subjects
+-- We will assign 3 subjects to each Mid Term/Final and 1 subject to Unit Tests.
+-- Targeting sections 1 to 30 as defined in Final_SMS_DATA.sql
+
+INSERT INTO exam_subjects (organization_id, exam_id, subject_id, total_marks, passing_marks, exam_date, start_time, end_time, created_by)
+-- Standard 1 (Sections 1-3)
+SELECT 1, e.id, s.id, 50, 20, '2025-05-18', '09:00:00', '10:30:00', 1
+FROM exams e
+JOIN subjects s ON s.code = 'ENG'
+WHERE e.name LIKE 'Unit Test 1 - Section %' AND e.standard_id = 1;
+
+INSERT INTO exam_subjects (organization_id, exam_id, subject_id, total_marks, passing_marks, exam_date, start_time, end_time, created_by)
+SELECT 1, e.id, s.id, 50, 20, '2025-08-18', '09:00:00', '10:30:00', 1
+FROM exams e
+JOIN subjects s ON s.code = 'URD'
+WHERE e.name LIKE 'Unit Test 2 - Section %' AND e.standard_id = 1;
+
+INSERT INTO exam_subjects (organization_id, exam_id, subject_id, total_marks, passing_marks, exam_date, start_time, end_time, created_by)
+SELECT 1, e.id, s.id, 100, 40, '2025-10-20', '09:00:00', '12:00:00', 1
+FROM exams e
+JOIN subjects s ON s.code IN ('ENG', 'URD', 'BASIC_MATH')
+WHERE e.name LIKE 'Mid Term Exam - Section %' AND e.standard_id = 1;
+
+-- Standard 2-5 (Primary)
+INSERT INTO exam_subjects (organization_id, exam_id, subject_id, total_marks, passing_marks, exam_date, start_time, end_time, created_by)
+SELECT 1, e.id, s.id, 50, 20, '2025-05-18', '09:00:00', '10:30:00', 1
+FROM exams e
+JOIN subjects s ON s.code = 'BASIC_MATH'
+WHERE e.name LIKE 'Unit Test 1 - Section %' AND e.standard_id BETWEEN 2 AND 5;
+
+-- Standard 6-10 (Secondary)
+INSERT INTO exam_subjects (organization_id, exam_id, subject_id, total_marks, passing_marks, exam_date, start_time, end_time, created_by)
+SELECT 1, e.id, s.id, 70, 30, '2025-05-20', '11:00:00', '13:00:00', 1
+FROM exams e
+JOIN subjects s ON s.code = 'PHY'
+WHERE e.name LIKE 'Unit Test 1 - Section %' AND e.standard_id BETWEEN 6 AND 10;
+
+INSERT INTO exam_subjects (organization_id, exam_id, subject_id, total_marks, passing_marks, exam_date, start_time, end_time, created_by)
+SELECT 1, e.id, s.id, 100, 40, '2025-10-25', '09:00:00', '12:00:00', 1
+FROM exams e
+JOIN subjects s ON s.code IN ('ENG', 'PHY', 'CHEM')
+WHERE e.name LIKE 'Mid Term Exam - Section %' AND e.standard_id BETWEEN 6 AND 10;
+
+-- 2. Populate student_exam_attendance
+-- We will mark attendance for all students in the corresponding sections
+-- Status randomization: mostly PRESENT, some ABSENT/UFM
+
+INSERT INTO student_exam_attendance (organization_id, exam_subject_id, student_id, status, created_by)
+SELECT 
+    1, 
+    es.id, 
+    s.id,
+    CASE 
+        WHEN RAND() > 0.1 THEN 'PRESENT' 
+        WHEN RAND() > 0.05 THEN 'ABSENT'
+        ELSE 'UFM' 
+    END,
+    1
+FROM exam_subjects es
+JOIN exams e ON es.exam_id = e.id
+JOIN students s ON s.campus_id = e.campus_id 
+    AND s.standard_id = e.standard_id 
+    AND s.section_id = e.section_id
+WHERE e.status != 'DRAFT';
+
+-- Verification counts
+SELECT 'Exam Subjects Created' as Category, COUNT(*) as Count FROM exam_subjects;
+SELECT 'Attendance Records Created' as Category, COUNT(*) as Count FROM student_exam_attendance;
+
+
+
+
+
+
+
+
+-- =============================================
+-- TEST DATA FOR EXAM WEIGHTAGE
+-- Coverage: All Standard Subjects for Academic Year 1
+-- Distribution: 10% (T1), 25% (Mid), 10% (T2), 15% (Pre), 40% (Final)
+-- =============================================
+
+-- Populate exam_weightage
+-- Linking each subject to all 5 terms with specific weightages
+
+INSERT INTO exam_weightage (
+    organization_id, 
+    academic_year_id, 
+    standard_subject_id, 
+    exam_term_id, 
+    weight_percentage, 
+    created_by
+)
+SELECT 
+    ss.organization_id, 
+    ss.academic_year_id, 
+    ss.id as standard_subject_id, 
+    et.id as exam_term_id,
+    -- Weight Distribution Logic
+    CASE 
+        WHEN et.sequence_no = 1 THEN 10.00 -- First Term
+        WHEN et.sequence_no = 2 THEN 25.00 -- Mid Term
+        WHEN et.sequence_no = 3 THEN 10.00 -- Second Term
+        WHEN et.sequence_no = 4 THEN 15.00 -- Pre Final
+        WHEN et.sequence_no = 5 THEN 40.00 -- Final Term
+        ELSE 0 
+    END as weight_percentage,
+    1
+FROM standard_subjects ss
+CROSS JOIN exam_terms et
+WHERE ss.academic_year_id = 1 
+  AND et.academic_year_id = 1
+  AND ss.is_deleted = FALSE;
+
+-- Verification counts
+SELECT 'Weightage Records Created' as Category, COUNT(*) as Count FROM exam_weightage;
+SELECT 'Total Weightage Per Subject (Check for 100%)' as Category, standard_subject_id, SUM(weight_percentage) as Total 
+FROM exam_weightage 
+GROUP BY standard_subject_id;

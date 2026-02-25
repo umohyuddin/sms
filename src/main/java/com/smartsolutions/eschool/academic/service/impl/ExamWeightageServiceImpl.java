@@ -1,7 +1,6 @@
 package com.smartsolutions.eschool.academic.service.impl;
 
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.util.SecurityUtils;
 import com.smartsolutions.eschool.academic.dto.request.BulkExamWeightageRequestDTO;
 import com.smartsolutions.eschool.academic.dto.request.ExamWeightageRequestDTO;
 import com.smartsolutions.eschool.academic.dto.response.ExamWeightageResponseDTO;
@@ -69,6 +68,7 @@ public class ExamWeightageServiceImpl implements ExamWeightageService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ExamWeightageResponseDTO> getByStandard(Long standardId, Long academicYearId) {
         return weightageRepository.findByAcademicYearIdAndStandardId(academicYearId, standardId).stream()
                 .map(ResultsMapper::toResponse)
