@@ -43,6 +43,10 @@ public class ResultsHistoryFacade {
         weightageService.saveWeightages(dtos);
     }
 
+    public void saveBulkWeightages(BulkExamWeightageRequestDTO dto) {
+        weightageService.saveBulkWeightages(dto);
+    }
+
     public List<ExamWeightageResponseDTO> getWeightagesByStandard(Long standardId, Long academicYearId) {
         return weightageService.getByStandard(standardId, academicYearId);
     }

@@ -87,16 +87,16 @@ public class ResultsMapper {
         ExamWeightageEntity entity = new ExamWeightageEntity();
         // ID is auto-generated
 
-        if (dto.getStandardId() != null) {
-            StandardEntity standard = new StandardEntity();
-            standard.setId(dto.getStandardId());
-            entity.setStandard(standard);
+        if (dto.getAcademicYearId() != null) {
+            AcademicYearEntity year = new AcademicYearEntity();
+            year.setId(dto.getAcademicYearId());
+            entity.setAcademicYear(year);
         }
 
-        if (dto.getSubjectId() != null) {
-            SubjectEntity subject = new SubjectEntity();
-            subject.setId(dto.getSubjectId());
-            entity.setSubject(subject);
+        if (dto.getStandardSubjectId() != null) {
+            StandardSubjectEntity standardSubject = new StandardSubjectEntity();
+            standardSubject.setId(dto.getStandardSubjectId());
+            entity.setStandardSubject(standardSubject);
         }
 
         if (dto.getExamTermId() != null) {
@@ -116,13 +116,18 @@ public class ResultsMapper {
         ExamWeightageResponseDTO dto = new ExamWeightageResponseDTO();
         dto.setId(entity.getId());
 
-        if (entity.getStandard() != null) {
-            dto.setStandardId(entity.getStandard().getId());
-            dto.setStandardName(entity.getStandard().getStandardName());
+        if (entity.getAcademicYear() != null) {
+            dto.setAcademicYearId(entity.getAcademicYear().getId());
+            dto.setAcademicYearName(entity.getAcademicYear().getName());
         }
-        if (entity.getSubject() != null) {
-            dto.setSubjectId(entity.getSubject().getId());
-            dto.setSubjectName(entity.getSubject().getName());
+        if (entity.getStandardSubject() != null) {
+            dto.setStandardSubjectId(entity.getStandardSubject().getId());
+            if (entity.getStandardSubject().getStandard() != null) {
+                dto.setStandardName(entity.getStandardSubject().getStandard().getStandardName());
+            }
+            if (entity.getStandardSubject().getSubject() != null) {
+                dto.setSubjectName(entity.getStandardSubject().getSubject().getName());
+            }
         }
         if (entity.getExamTerm() != null) {
             dto.setExamTermId(entity.getExamTerm().getId());
@@ -253,7 +258,7 @@ public class ResultsMapper {
         entity.setGrade(dto.getGrade());
         entity.setMinPercentage(dto.getMinPercentage());
         entity.setMaxPercentage(dto.getMaxPercentage());
-        //entity.setPoints(dto.getPoints());
+        // entity.setPoints(dto.getPoints());
         entity.setRemarks(dto.getRemarks());
         entity.setActive(dto.isActive());
         return entity;
@@ -268,7 +273,7 @@ public class ResultsMapper {
         dto.setGrade(entity.getGrade());
         dto.setMinPercentage(entity.getMinPercentage());
         dto.setMaxPercentage(entity.getMaxPercentage());
-        //dto.setPoints(entity.getPoints());
+        // dto.setPoints(entity.getPoints());
         dto.setRemarks(entity.getRemarks());
         dto.setActive(entity.isActive());
         dto.setCreatedAt(entity.getCreatedAt());

@@ -48,6 +48,12 @@ public class ResultsHistoryController {
         return ResponseEntity.ok("Weightages saved successfully");
     }
 
+    @PostMapping("/weightages/bulk")
+    public ResponseEntity<?> saveBulkWeightages(@Valid @RequestBody BulkExamWeightageRequestDTO dto) {
+        resultsHistoryFacade.saveBulkWeightages(dto);
+        return ResponseEntity.ok("Bulk weightages saved successfully");
+    }
+
     @GetMapping("/weightages/standard/{id}")
     public ResponseEntity<?> getWeightagesByStandard(@PathVariable Long id, @RequestParam Long academicYearId) {
         return ResponseEntity.ok(resultsHistoryFacade.getWeightagesByStandard(id, academicYearId));

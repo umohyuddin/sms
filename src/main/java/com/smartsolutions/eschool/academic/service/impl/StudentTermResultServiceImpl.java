@@ -119,7 +119,8 @@ public class StudentTermResultServiceImpl implements StudentTermResultService {
                 StudentExamMarksEntity subjectMarks = allMarks.stream()
                         .filter(m -> m.getExamSubject() != null &&
                                 m.getExamSubject().getSubject() != null &&
-                                m.getExamSubject().getSubject().getId().equals(weightage.getSubject().getId()))
+                                m.getExamSubject().getSubject().getId()
+                                        .equals(weightage.getStandardSubject().getSubject().getId()))
                         .findFirst()
                         .orElse(null);
 

@@ -11,9 +11,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class ExamWeightageResponseDTO {
     private Long id;
-    private Long standardId;
+    private Long academicYearId;
+    private String academicYearName;
+    private Long standardSubjectId;
     private String standardName;
-    private Long subjectId;
     private String subjectName;
     private Long examTermId;
     private String examTermName;

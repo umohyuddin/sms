@@ -1,9 +1,8 @@
 package com.smartsolutions.eschool.academic.entity.mapping;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
-import com.smartsolutions.eschool.sclass.model.StandardEntity;
+import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.academic.entity.master.ExamTermEntity;
-import com.smartsolutions.eschool.academic.entity.master.SubjectEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,12 +22,12 @@ public class ExamWeightageEntity extends AuditableEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "standard_id")
-    private StandardEntity standard;
+    @JoinColumn(name = "academic_year_id")
+    private AcademicYearEntity academicYear;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subject_id")
-    private SubjectEntity subject;
+    @JoinColumn(name = "standard_subject_id")
+    private StandardSubjectEntity standardSubject;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exam_term_id")

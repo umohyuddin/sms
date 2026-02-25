@@ -12,20 +12,34 @@ import java.util.List;
 @Repository
 public interface ExamWeightageRepository extends JpaRepository<ExamWeightageEntity, Long> {
 
-    @Query("SELECT ew FROM ExamWeightageEntity ew WHERE ew.standard.id = :standardId AND ew.deleted = false")
-    List<ExamWeightageEntity> findByStandardId(@Param("standardId") Long standardId);
+        @Query("SELECT ew FROM ExamWeightageEntity ew WHERE ew.standardSubject.standard.id = :standardId AND ew.deleted = false")
+        List<ExamWeightageEntity> findByStandardId(@Param("standardId") Long standardId);
 
-    @Query("SELECT ew FROM ExamWeightageEntity ew " +
-            "JOIN FETCH ew.subject s " +
-            "JOIN FETCH ew.examTerm et " +
-            "WHERE ew.standard.id = :standardId " +
-            "AND ew.examTerm.id = :examTermId " +
-            "AND ew.deleted = false " +
-            "AND ew.active = true")
-    List<ExamWeightageEntity> findByStandardAndExamTerm(@Param("standardId") Long standardId,
-            @Param("examTermId") Long examTermId);
+        @Query("SELECT ew FROM ExamWeightageEntity ew WHERE ew.academicYear.id = :academicYearId AND ew.standardSubject.standard.id = :standardId AND ew.deleted = false")
+        List<ExamWeightageEntity> findByAcademicYearIdAndStandardId(@Param("academicYearId") Long academicYearId,
+                        @Param("standardId") Long standardId);
 
-    @Modifying
-    @Query("UPDATE ExamWeightageEntity ew SET ew.deleted = true, ew.deletedAt = CURRENT_TIMESTAMP WHERE ew.id = :id")
-    void softDeleteById(@Param("id") Long id);
+        @Query("SELECT ew FROM ExamWeightageEntity ew " +
+                        "JOIN FETCH ew.standardSubject ss " +
+                        "JOIN FETCH ss.subject s " +
+                        "JOIN FETCH ew.examTerm et " +
+                        "WHERE ss.standard.id = :standardId " +
+                        "AND ew.examTerm.id = :examTermId " +
+                        "AND ew.deleted = false " +
+                        "AND ew.active = true")
+        List<ExamWeightageEntity> findByStandardAndExamTerm(@Param("standardId") Long standardId,
+                        @Param("examTermId") Long examTermId);
+
+        @Modifying
+        @Query("UPDATE ExamWeightageEntity ew SET ew.deleted = true, ew.deletedAt = CURRENT_TIMESTAMP " +
+                        "WHERE ew.academicYear.id = :academicYearId " +
+                        "AND ew.standardSubject.standard.id = :standardId " +
+                        "AND ew.examTerm.id = :examTermId")
+        void bulkSoftDelete(@Param("academicYearId") Long academicYearId,
+                        @Param("standardId") Long standardId,
+                        @Param("examTermId") Long examTermId);
+
+        @Modifying
+        @Query("UPDATE ExamWeightageEntity ew SET ew.deleted = true, ew.deletedAt = CURRENT_TIMESTAMP WHERE ew.id = :id")
+        void softDeleteById(@Param("id") Long id);
 }

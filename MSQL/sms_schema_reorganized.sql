@@ -938,7 +938,7 @@ CREATE TABLE students (
     organization_id BIGINT NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
-    middle_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100),
     last_name VARCHAR(50) NOT NULL,
     student_code VARCHAR(50) NOT NULL UNIQUE,
     date_of_birth DATE NOT NULL,
@@ -2064,17 +2064,27 @@ DROP TABLE IF EXISTS exam_weightage;
 CREATE TABLE exam_weightage (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id BIGINT NOT NULL,
-    standard_id BIGINT NOT NULL,
-    subject_id BIGINT NOT NULL,
-    exam_term_id BIGINT NOT NULL,
+    academic_year_id BIGINT NOT NULL,    -- Explicitly for history and performance
+    standard_subject_id BIGINT NOT NULL, -- Links to the curriculum mapping
+    exam_term_id BIGINT NOT NULL,        -- FK to Mid-Term, Final, etc.
     weight_percentage DECIMAL(5,2) NOT NULL,
 
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
-    UNIQUE (organization_id, standard_id, subject_id, exam_term_id),
-    FOREIGN KEY (standard_id) REFERENCES standards(id),
-    FOREIGN KEY (subject_id) REFERENCES subjects(id),
+    -- Audit fields
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    -- Constraint: One weight per subject/term within an academic year
+    UNIQUE (organization_id, academic_year_id, standard_subject_id, exam_term_id),
+    
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
+    FOREIGN KEY (standard_subject_id) REFERENCES standard_subjects(id),
     FOREIGN KEY (exam_term_id) REFERENCES exam_terms(id)
 );
 

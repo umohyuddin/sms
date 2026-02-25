@@ -12,10 +12,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class ExamWeightageRequestDTO {
     @NotNull
-    private Long standardId;
+    private Long academicYearId;
 
     @NotNull
-    private Long subjectId;
+    private Long standardSubjectId;
 
     @NotNull
     private Long examTermId;
