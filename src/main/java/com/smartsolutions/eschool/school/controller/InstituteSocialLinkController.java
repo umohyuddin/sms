@@ -25,47 +25,85 @@ public class InstituteSocialLinkController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteSocialLinkResponseDTO> createSocialLink(@Valid @RequestBody InstituteSocialLinkCreateRequestDTO requestDTO) {
+    public ResponseEntity<InstituteSocialLinkResponseDTO> createSocialLink(
+            @Valid @RequestBody InstituteSocialLinkCreateRequestDTO requestDTO) {
+        log.info(
+                "[Controller:InstituteSocialLinkController] createSocialLink() called - Request to create social link");
         InstituteSocialLinkResponseDTO responseDTO = instituteSocialLinkFacade.createSocialLink(requestDTO);
+        log.info(
+                "[Controller:InstituteSocialLinkController] createSocialLink() succeeded - Social link created successfully: {}",
+                responseDTO.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> getAll(@RequestParam Long instituteId) {
-        return ResponseEntity.ok(instituteSocialLinkFacade.getAll(instituteId));
+    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> getAll() {
+        log.info("[Controller:InstituteSocialLinkController] getAll() called - Request to get all social links");
+        List<InstituteSocialLinkResponseDTO> responseDTOs = instituteSocialLinkFacade.getAll();
+        log.info("[Controller:InstituteSocialLinkController] getAll() succeeded - Found {} social links",
+                responseDTOs.size());
+        return ResponseEntity.ok(responseDTOs);
     }
 
-    @GetMapping(value = "/institute/{instituteId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> getByInstituteId(@PathVariable Long instituteId) {
-        return ResponseEntity.ok(instituteSocialLinkFacade.getByInstituteId(instituteId));
+    @GetMapping(value = "/institute", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> getByInstituteId() {
+        log.info("Request to get social links by institute");
+        List<InstituteSocialLinkResponseDTO> responseDTOs = instituteSocialLinkFacade.getByInstituteId();
+        log.info("Found {} social links by instituteId", responseDTOs.size());
+        return ResponseEntity.ok(responseDTOs);
     }
 
     @GetMapping(value = "/{socialLinkId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteSocialLinkResponseDTO> getById(@PathVariable Long socialLinkId,
-                                                                  @RequestParam Long instituteId) {
-        return ResponseEntity.ok(instituteSocialLinkFacade.getById(socialLinkId, instituteId));
+    public ResponseEntity<InstituteSocialLinkResponseDTO> getById(@PathVariable Long socialLinkId) {
+        log.info("[Controller:InstituteSocialLinkController] getById() called - Request to get social link by id: {}",
+                socialLinkId);
+        InstituteSocialLinkResponseDTO responseDTO = instituteSocialLinkFacade.getById(socialLinkId);
+        log.info("[Controller:InstituteSocialLinkController] getById() succeeded - Found social link: {}",
+                socialLinkId);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PutMapping(value = "/{socialLinkId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InstituteSocialLinkResponseDTO> updateSocialLink(@PathVariable Long socialLinkId,
-                                                                           @RequestParam Long instituteId,
                                                                            @Valid @RequestBody InstituteSocialLinkUpdateRequestDTO requestDTO) {
-        return ResponseEntity.ok(instituteSocialLinkFacade.updateSocialLink(socialLinkId, instituteId, requestDTO));
+        log.info(
+                "[Controller:InstituteSocialLinkController] updateSocialLink() called - Request to update social link: {} with data: {}",
+                socialLinkId, requestDTO);
+        InstituteSocialLinkResponseDTO responseDTO = instituteSocialLinkFacade.updateSocialLink(socialLinkId,
+                requestDTO);
+        log.info(
+                "[Controller:InstituteSocialLinkController] updateSocialLink() succeeded - Social link: {} updated successfully",
+                socialLinkId);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping("/{socialLinkId}")
-    public ResponseEntity<String> deleteSocialLink(@PathVariable Long socialLinkId,
-                                                   @RequestParam Long instituteId) {
-        instituteSocialLinkFacade.deleteById(socialLinkId, instituteId);
+    public ResponseEntity<String> deleteSocialLink(@PathVariable Long socialLinkId) {
+        log.info(
+                "[Controller:InstituteSocialLinkController] deleteSocialLink() called - Request to delete social link: {}",
+                socialLinkId);
+        instituteSocialLinkFacade.deleteById(socialLinkId);
+        log.info(
+                "[Controller:InstituteSocialLinkController] deleteSocialLink() succeeded - Social link: {} deleted successfully",
+                socialLinkId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> search(@RequestParam(name = "keyword") String keyword,
-                                                                       @RequestParam Long instituteId) {
+    public ResponseEntity<List<InstituteSocialLinkResponseDTO>> search(
+            @RequestParam(name = "keyword") String keyword) {
+        log.info(
+                "[Controller:InstituteSocialLinkController] search() called - Request to search social links with keyword: {}",
+                keyword);
         if (keyword == null || keyword.trim().isEmpty()) {
+            log.warn("[Controller:InstituteSocialLinkController] search() failed - Search keyword is null or empty");
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(instituteSocialLinkFacade.searchByKeyword(keyword.trim(), instituteId));
+        List<InstituteSocialLinkResponseDTO> responseDTOs = instituteSocialLinkFacade
+                .searchByKeyword(keyword.trim());
+        log.info(
+                "[Controller:InstituteSocialLinkController] search() succeeded - Found {} social links matching keyword: {}",
+                responseDTOs.size(), keyword);
+        return ResponseEntity.ok(responseDTOs);
     }
 }

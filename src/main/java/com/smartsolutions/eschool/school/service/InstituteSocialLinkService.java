@@ -8,15 +8,15 @@ import java.util.List;
 public interface InstituteSocialLinkService {
     InstituteSocialLinkResponseDTO createSocialLink(InstituteSocialLinkCreateRequestDTO requestDTO);
 
-    List<InstituteSocialLinkResponseDTO> getAll(Long instituteId);
+    List<InstituteSocialLinkResponseDTO> getAll();
 
-    List<InstituteSocialLinkResponseDTO> getByInstituteId(Long instituteId);
+    List<InstituteSocialLinkResponseDTO> getByInstituteId();
 
-    InstituteSocialLinkResponseDTO getById(Long id, Long instituteId);
+    InstituteSocialLinkResponseDTO getById(Long id);
 
-    InstituteSocialLinkResponseDTO updateSocialLink(Long id, Long instituteId, InstituteSocialLinkUpdateRequestDTO requestDTO);
+    InstituteSocialLinkResponseDTO updateSocialLink(Long id, InstituteSocialLinkUpdateRequestDTO requestDTO);
 
-    void deleteById(Long id, Long instituteId);
+    void deleteById(Long id);
 
-    List<InstituteSocialLinkResponseDTO> searchByKeyword(String keyword, Long instituteId);
+    List<InstituteSocialLinkResponseDTO> searchByKeyword(String keyword);
 }
