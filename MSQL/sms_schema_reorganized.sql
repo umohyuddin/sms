@@ -2105,6 +2105,14 @@ CREATE TABLE student_term_result (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
+    -- Audit fields
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
     UNIQUE (organization_id, student_id, academic_year_id, exam_term_id),
     FOREIGN KEY (student_id) REFERENCES students(id),
     FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
@@ -2122,6 +2130,14 @@ CREATE TABLE report_card (
 
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    -- Audit fields
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
 
     FOREIGN KEY (student_id) REFERENCES students(id),
     FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
