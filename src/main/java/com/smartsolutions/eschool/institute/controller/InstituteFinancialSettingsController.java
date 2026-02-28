@@ -25,28 +25,37 @@ public class InstituteFinancialSettingsController {
     public ResponseEntity<FinancialSettingsResponseDTO> getByInstituteAndAcademicYear(
             @PathVariable Long instituteId,
             @PathVariable Long academicYearId) {
-        log.info("GET /api/institute/financial-settings/{}/{} called", instituteId, academicYearId);
-        return ResponseEntity.ok(facade.getByInstituteAndAcademicYear(instituteId, academicYearId));
+        log.info(
+                "[Controller:InstituteFinancialSettingsController] getByInstituteAndAcademicYear() called - institute: {}, year: {}",
+                instituteId, academicYearId);
+        FinancialSettingsResponseDTO responseDTO = facade.getByInstituteAndAcademicYear(instituteId, academicYearId);
+        log.info("[Controller:InstituteFinancialSettingsController] getByInstituteAndAcademicYear() succeeded");
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FinancialSettingsResponseDTO> create(@Valid @RequestBody FinancialSettingsRequestDTO dto) {
-        log.info("POST /api/institute/financial-settings called");
-        return ResponseEntity.status(HttpStatus.CREATED).body(facade.create(dto));
+        log.info("[Controller:InstituteFinancialSettingsController] create() called");
+        FinancialSettingsResponseDTO responseDTO = facade.create(dto);
+        log.info("[Controller:InstituteFinancialSettingsController] create() succeeded - ID: {}", responseDTO.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FinancialSettingsResponseDTO> update(
             @PathVariable Long id,
             @Valid @RequestBody FinancialSettingsRequestDTO dto) {
-        log.info("PUT /api/institute/financial-settings/{} called", id);
-        return ResponseEntity.ok(facade.update(id, dto));
+        log.info("[Controller:InstituteFinancialSettingsController] update() called - ID: {}", id);
+        FinancialSettingsResponseDTO responseDTO = facade.update(id, dto);
+        log.info("[Controller:InstituteFinancialSettingsController] update() succeeded - ID: {}", id);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        log.info("DELETE /api/institute/financial-settings/{} called", id);
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        log.info("[Controller:InstituteFinancialSettingsController] delete() called - ID: {}", id);
         facade.softDeleteById(id);
+        log.info("[Controller:InstituteFinancialSettingsController] delete() succeeded - ID: {}", id);
         return ResponseEntity.ok("Financial settings deleted successfully");
     }
 }

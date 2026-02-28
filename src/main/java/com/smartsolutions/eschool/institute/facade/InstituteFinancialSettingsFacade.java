@@ -15,22 +15,25 @@ public class InstituteFinancialSettingsFacade {
     private final InstituteFinancialSettingsService service;
 
     public FinancialSettingsResponseDTO getByInstituteAndAcademicYear(Long instituteId, Long academicYearId) {
-        log.info("Facade: Fetching financial settings for institute: {} and academic year: {}", instituteId, academicYearId);
+        log.info(
+                "[Facade:InstituteFinancialSettingsFacade] getByInstituteAndAcademicYear() called - institute: {}, year: {}",
+                instituteId, academicYearId);
         return service.getByInstituteAndAcademicYear(instituteId, academicYearId);
     }
 
     public FinancialSettingsResponseDTO create(FinancialSettingsRequestDTO requestDTO) {
-        log.info("Facade: Creating financial settings for institute: {}", requestDTO.getInstituteId());
+        log.info("[Facade:InstituteFinancialSettingsFacade] create() called - institute: {}",
+                requestDTO.getInstituteId());
         return service.create(requestDTO);
     }
 
     public FinancialSettingsResponseDTO update(Long id, FinancialSettingsRequestDTO requestDTO) {
-        log.info("Facade: Updating financial settings with ID: {}", id);
+        log.info("[Facade:InstituteFinancialSettingsFacade] update() called - ID: {}", id);
         return service.update(id, requestDTO);
     }
 
     public void softDeleteById(Long id) {
-        log.info("Facade: Soft deleting financial settings with ID: {}", id);
+        log.info("[Facade:InstituteFinancialSettingsFacade] softDeleteById() called - ID: {}", id);
         service.softDeleteById(id);
     }
 }

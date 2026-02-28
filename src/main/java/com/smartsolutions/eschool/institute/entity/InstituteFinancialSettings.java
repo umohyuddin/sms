@@ -1,9 +1,9 @@
 package com.smartsolutions.eschool.institute.entity;
 
-
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import com.smartsolutions.eschool.institute.enums.LateFeeType;
+import com.smartsolutions.eschool.institute.enums.RefundType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "institute_financial_settings", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_institute_academic_year", columnNames = {"institute_id", "academic_year_id"})
+        @UniqueConstraint(name = "uk_institute_academic_year", columnNames = { "institute_id", "academic_year_id" })
 })
 @Data
 @NoArgsConstructor
@@ -77,6 +77,10 @@ public class InstituteFinancialSettings extends ScopeAuditableEntity {
 
     @Column(name = "refund_window_days")
     private Integer refundWindowDays;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "refund_type", length = 20)
+    private RefundType refundType;
 
     @Column(name = "refund_percentage", precision = 5, scale = 2)
     private BigDecimal maxRefundPercentage;

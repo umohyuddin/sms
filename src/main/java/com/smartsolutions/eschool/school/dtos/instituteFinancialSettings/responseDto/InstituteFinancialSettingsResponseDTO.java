@@ -17,32 +17,33 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InstituteFinancialSettingsResponseDTO {
-    
+
     private Long id;
     private Long instituteId;
     private AcademicYearResponseDTO academicYear;
 
     private FeeRecurrenceRuleResponseDTO feeRecurrenceRule;
-    
+
     private CurrencyResponseDTO currency;
     private LanguageResponseDTO language;
     private String locale;
-    
+
     private String feeFrequency;
     private Boolean allowPartialPayments;
     private String lateFeeType;
     private BigDecimal lateFeeAmount;
-    
+
     private Boolean isTaxApplicable;
     private TaxTypeResponseDTO taxType;
     private Boolean isTaxInclusive;
-    
+
     private Boolean allowRefunds;
     private String refundPolicyUrl;
     private Integer refundWindowDays;
+    private String refundType;
     private BigDecimal refundPercentage;
     private BigDecimal refundFixedAmount;
-    
+
     private Boolean invoiceMandatory;
     private Boolean receiptMandatory;
     private Boolean isActive;

@@ -23,14 +23,14 @@ public class InstituteFinancialSettingsMapper {
         }
 
         InstituteFinancialSettingsEntity entity = new InstituteFinancialSettingsEntity();
-        
+
         // Basic fields
         entity.setLocale(dto.getLocale());
         entity.setFeeFrequency(dto.getFeeFrequency());
         entity.setAllowPartialPayments(dto.getAllowPartialPayments());
         entity.setLateFeeType(dto.getLateFeeType());
         entity.setLateFeeAmount(dto.getLateFeeAmount());
-        
+
         // Tax fields
         entity.setIsTaxApplicable(dto.getIsTaxApplicable());
         entity.setIsTaxInclusive(dto.getIsTaxInclusive());
@@ -41,19 +41,20 @@ public class InstituteFinancialSettingsMapper {
             feeRecurrenceRule.setId(dto.getFeeRecurrenceRuleId());
             entity.setFeeRecurrenceRule(feeRecurrenceRule);
         }
-        
+
         // Refund fields
         entity.setAllowRefunds(dto.getAllowRefunds());
         entity.setRefundPolicyUrl(dto.getRefundPolicyUrl());
         entity.setRefundWindowDays(dto.getRefundWindowDays());
+        entity.setRefundType(dto.getRefundType());
         entity.setRefundPercentage(dto.getRefundPercentage());
         entity.setRefundFixedAmount(dto.getRefundFixedAmount());
-        
+
         // Compliance fields
         entity.setInvoiceMandatory(dto.getInvoiceMandatory());
         entity.setReceiptMandatory(dto.getReceiptMandatory());
         entity.setIsActive(dto.getIsActive());
-        
+
         // Institute, AcademicYear, Currency, Language, and TaxType are set in service
         return entity;
     }
@@ -64,14 +65,14 @@ public class InstituteFinancialSettingsMapper {
         }
 
         InstituteFinancialSettingsResponseDTO dto = new InstituteFinancialSettingsResponseDTO();
-        
+
         dto.setId(entity.getId());
-        
+
         // Institute ID
         if (entity.getInstitute() != null) {
             dto.setInstituteId(entity.getInstitute().getId());
         }
-        
+
         // Academic Year mapping
         if (entity.getAcademicYear() != null) {
             AcademicYearResponseDTO academicYearDTO = new AcademicYearResponseDTO();
@@ -81,10 +82,11 @@ public class InstituteFinancialSettingsMapper {
             academicYearDTO.setStartDate(entity.getAcademicYear().getStartDate());
             academicYearDTO.setEndDate(entity.getAcademicYear().getEndDate());
             academicYearDTO.setIsCurrent(entity.getAcademicYear().getIsCurrent());
-            academicYearDTO.setStatus(entity.getAcademicYear().getStatus() != null ? entity.getAcademicYear().getStatus().name() : null);
+            academicYearDTO.setStatus(
+                    entity.getAcademicYear().getStatus() != null ? entity.getAcademicYear().getStatus().name() : null);
             dto.setAcademicYear(academicYearDTO);
         }
-        
+
         // Currency mapping
         if (entity.getCurrency() != null) {
             CurrencyResponseDTO currencyDTO = new CurrencyResponseDTO();
@@ -106,7 +108,7 @@ public class InstituteFinancialSettingsMapper {
             feeRecurrenceRuleDTO.setIsActive(entity.getFeeRecurrenceRule().getIsActive());
             dto.setFeeRecurrenceRule(feeRecurrenceRuleDTO);
         }
-        
+
         // Language mapping
         if (entity.getLanguage() != null) {
             LanguageResponseDTO languageDTO = new LanguageResponseDTO();
@@ -116,7 +118,7 @@ public class InstituteFinancialSettingsMapper {
             languageDTO.setIsActive(entity.getLanguage().getIsActive());
             dto.setLanguage(languageDTO);
         }
-        
+
         // Tax Type mapping
         if (entity.getTaxType() != null) {
             TaxTypeResponseDTO taxTypeDTO = new TaxTypeResponseDTO();
@@ -130,48 +132,57 @@ public class InstituteFinancialSettingsMapper {
             taxTypeDTO.setIsActive(entity.getTaxType().getIsActive());
             dto.setTaxType(taxTypeDTO);
         }
-        
+
         // Basic fields
         dto.setLocale(entity.getLocale());
         dto.setFeeFrequency(entity.getFeeFrequency());
         dto.setAllowPartialPayments(entity.getAllowPartialPayments());
         dto.setLateFeeType(entity.getLateFeeType());
         dto.setLateFeeAmount(entity.getLateFeeAmount());
-        
+
         // Tax fields
         dto.setIsTaxApplicable(entity.getIsTaxApplicable());
         dto.setIsTaxInclusive(entity.getIsTaxInclusive());
-        
+
         // Refund fields
         dto.setAllowRefunds(entity.getAllowRefunds());
         dto.setRefundPolicyUrl(entity.getRefundPolicyUrl());
         dto.setRefundWindowDays(entity.getRefundWindowDays());
+        dto.setRefundType(entity.getRefundType() != null ? entity.getRefundType().name() : null);
         dto.setRefundPercentage(entity.getRefundPercentage());
         dto.setRefundFixedAmount(entity.getRefundFixedAmount());
-        
+
         // Compliance fields
         dto.setInvoiceMandatory(entity.getInvoiceMandatory());
         dto.setReceiptMandatory(entity.getReceiptMandatory());
         dto.setIsActive(entity.getIsActive());
-        
+
         return dto;
     }
 
-    public static void updateEntityFromDTO(InstituteFinancialSettingsEntity entity, InstituteFinancialSettingsUpdateRequestDTO dto) {
+    public static void updateEntityFromDTO(InstituteFinancialSettingsEntity entity,
+            InstituteFinancialSettingsUpdateRequestDTO dto) {
         if (entity == null || dto == null) {
             return;
         }
 
         // Update basic fields only if provided
-        if (dto.getLocale() != null) entity.setLocale(dto.getLocale());
-        if (dto.getFeeFrequency() != null) entity.setFeeFrequency(dto.getFeeFrequency());
-        if (dto.getAllowPartialPayments() != null) entity.setAllowPartialPayments(dto.getAllowPartialPayments());
-        if (dto.getLateFeeType() != null) entity.setLateFeeType(dto.getLateFeeType());
-        if (dto.getLateFeeAmount() != null) entity.setLateFeeAmount(dto.getLateFeeAmount());
-        
+        if (dto.getLocale() != null)
+            entity.setLocale(dto.getLocale());
+        if (dto.getFeeFrequency() != null)
+            entity.setFeeFrequency(dto.getFeeFrequency());
+        if (dto.getAllowPartialPayments() != null)
+            entity.setAllowPartialPayments(dto.getAllowPartialPayments());
+        if (dto.getLateFeeType() != null)
+            entity.setLateFeeType(dto.getLateFeeType());
+        if (dto.getLateFeeAmount() != null)
+            entity.setLateFeeAmount(dto.getLateFeeAmount());
+
         // Tax fields
-        if (dto.getIsTaxApplicable() != null) entity.setIsTaxApplicable(dto.getIsTaxApplicable());
-        if (dto.getIsTaxInclusive() != null) entity.setIsTaxInclusive(dto.getIsTaxInclusive());
+        if (dto.getIsTaxApplicable() != null)
+            entity.setIsTaxApplicable(dto.getIsTaxApplicable());
+        if (dto.getIsTaxInclusive() != null)
+            entity.setIsTaxInclusive(dto.getIsTaxInclusive());
 
         // Fee recurrence rule
         if (dto.getFeeRecurrenceRuleId() != null) {
@@ -179,19 +190,30 @@ public class InstituteFinancialSettingsMapper {
             feeRecurrenceRule.setId(dto.getFeeRecurrenceRuleId());
             entity.setFeeRecurrenceRule(feeRecurrenceRule);
         }
-        
+
         // Refund fields
-        if (dto.getAllowRefunds() != null) entity.setAllowRefunds(dto.getAllowRefunds());
-        if (dto.getRefundPolicyUrl() != null) entity.setRefundPolicyUrl(dto.getRefundPolicyUrl());
-        if (dto.getRefundWindowDays() != null) entity.setRefundWindowDays(dto.getRefundWindowDays());
-        if (dto.getRefundPercentage() != null) entity.setRefundPercentage(dto.getRefundPercentage());
-        if (dto.getRefundFixedAmount() != null) entity.setRefundFixedAmount(dto.getRefundFixedAmount());
-        
+        if (dto.getAllowRefunds() != null)
+            entity.setAllowRefunds(dto.getAllowRefunds());
+        if (dto.getRefundPolicyUrl() != null)
+            entity.setRefundPolicyUrl(dto.getRefundPolicyUrl());
+        if (dto.getRefundWindowDays() != null)
+            entity.setRefundWindowDays(dto.getRefundWindowDays());
+        if (dto.getRefundType() != null)
+            entity.setRefundType(dto.getRefundType());
+        if (dto.getRefundPercentage() != null)
+            entity.setRefundPercentage(dto.getRefundPercentage());
+        if (dto.getRefundFixedAmount() != null)
+            entity.setRefundFixedAmount(dto.getRefundFixedAmount());
+
         // Compliance fields
-        if (dto.getInvoiceMandatory() != null) entity.setInvoiceMandatory(dto.getInvoiceMandatory());
-        if (dto.getReceiptMandatory() != null) entity.setReceiptMandatory(dto.getReceiptMandatory());
-        if (dto.getIsActive() != null) entity.setIsActive(dto.getIsActive());
-        
-        // Relationships (Currency, Language, TaxType, AcademicYear) are updated in service
+        if (dto.getInvoiceMandatory() != null)
+            entity.setInvoiceMandatory(dto.getInvoiceMandatory());
+        if (dto.getReceiptMandatory() != null)
+            entity.setReceiptMandatory(dto.getReceiptMandatory());
+        if (dto.getIsActive() != null)
+            entity.setIsActive(dto.getIsActive());
+
+        // Relationships (Currency, Language, TaxType, AcademicYear) are updated in
+        // service
     }
 }

@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.smartsolutions.eschool.institute.enums.RefundType;
 import java.math.BigDecimal;
 
 @Entity
@@ -82,6 +83,10 @@ public class InstituteFinancialSettingsEntity extends ScopeAuditableEntity {
 
     @Column(name = "refund_window_days")
     private Integer refundWindowDays;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "refund_type", length = 20)
+    private RefundType refundType;
 
     @Column(name = "refund_percentage", precision = 5, scale = 2)
     private BigDecimal refundPercentage;

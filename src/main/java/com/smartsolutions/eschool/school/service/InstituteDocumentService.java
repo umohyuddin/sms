@@ -19,4 +19,7 @@ public interface InstituteDocumentService {
     void deleteById(Long id);
 
     List<InstituteDocumentResponseDTO> searchByKeyword(String keyword);
+
+    InstituteDocumentResponseDTO uploadDocument(Long instituteId, String documentType, java.time.LocalDate expiryDate,
+            org.springframework.web.multipart.MultipartFile file);
 }

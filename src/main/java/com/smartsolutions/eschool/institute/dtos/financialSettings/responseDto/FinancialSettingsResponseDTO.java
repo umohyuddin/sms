@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.institute.dtos.financialSettings.responseDto;
 
 import com.smartsolutions.eschool.institute.enums.LateFeeType;
+import com.smartsolutions.eschool.institute.enums.RefundType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,6 +39,7 @@ public class FinancialSettingsResponseDTO {
     private Boolean refundsAllowed;
     private String refundPolicyUrl;
     private Integer refundWindowDays;
+    private RefundType refundType;
     private BigDecimal maxRefundPercentage;
     private BigDecimal maxRefundAmount;
 

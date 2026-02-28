@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.institute.dtos.financialSettings.requestDto;
 
 import com.smartsolutions.eschool.institute.enums.LateFeeType;
+import com.smartsolutions.eschool.institute.enums.RefundType;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,6 +52,7 @@ public class FinancialSettingsRequestDTO {
 
     @Min(value = 0, message = "Refund window days must be non-negative")
     private Integer refundWindowDays;
+    private RefundType refundType;
 
     @DecimalMin(value = "0.0", inclusive = true, message = "Max refund percentage must be non-negative")
     @DecimalMax(value = "100.0", inclusive = true, message = "Max refund percentage cannot exceed 100")

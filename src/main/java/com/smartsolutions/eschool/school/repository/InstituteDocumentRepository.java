@@ -12,29 +12,27 @@ import java.util.Optional;
 @Repository
 public interface InstituteDocumentRepository extends JpaRepository<InstituteDocumentEntity, Long> {
 
-    @Query("""
-            SELECT d FROM InstituteDocumentEntity d
-            WHERE d.id = :id
-            """)
-    Optional<InstituteDocumentEntity> findByIdJpql(@Param("id") Long id);
+        @Query("""
+                        SELECT d FROM InstituteDocumentEntity d
+                        WHERE d.id = :id AND d.institute.id = :instituteId
+                        """)
+        Optional<InstituteDocumentEntity> findByIdAndInstituteIdJpql(@Param("id") Long id,
+                        @Param("instituteId") Long instituteId);
 
-    @Query("""
-            SELECT d FROM InstituteDocumentEntity d
-            """)
-    List<InstituteDocumentEntity> findAllJpql();
+        @Query("""
+                        SELECT d FROM InstituteDocumentEntity d
+                        WHERE d.institute.id = :instituteId
+                        """)
+        List<InstituteDocumentEntity> findAllByInstituteIdJpql(@Param("instituteId") Long instituteId);
 
-    @Query("""
-            SELECT d FROM InstituteDocumentEntity d
-            WHERE d.institute.id = :instituteId
-            """)
-    List<InstituteDocumentEntity> findByInstituteId(@Param("instituteId") Long instituteId);
-
-    @Query("""
-            SELECT d FROM InstituteDocumentEntity d
-            WHERE (:keyword IS NULL OR :keyword = ''
-                OR LOWER(d.documentType) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(d.fileName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(d.fileUrl) LIKE LOWER(CONCAT('%', :keyword, '%')))
-            """)
-    List<InstituteDocumentEntity> searchByKeyword(@Param("keyword") String keyword);
+        @Query("""
+                        SELECT d FROM InstituteDocumentEntity d
+                        WHERE d.institute.id = :instituteId
+                          AND (:keyword IS NULL OR :keyword = ''
+                            OR LOWER(d.documentType) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                            OR LOWER(d.fileName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                            OR LOWER(d.fileUrl) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                        """)
+        List<InstituteDocumentEntity> searchByKeywordAndInstituteIdJpql(@Param("keyword") String keyword,
+                        @Param("instituteId") Long instituteId);
 }
