@@ -17,6 +17,9 @@ public class CampusResponseDTO {
     private Long id;
     // Use the ID of the institute for simplicity in API calls
     private Long instituteId;
+    private String instituteName;
+    private Long countryId;
+    private String countryName;
     private String campusName;
     private String campusCode;
     private String contactNumber;
@@ -31,7 +34,7 @@ public class CampusResponseDTO {
     private boolean isActive;
     private Long provinceId;
     private Long cityId;
-//    private InstituteResponseDTO institute;
+    // private InstituteResponseDTO institute;
     private ProvinceResponseDTO province;
     private CityResponseDTO city;
 }

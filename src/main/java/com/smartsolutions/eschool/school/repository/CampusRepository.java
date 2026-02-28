@@ -15,33 +15,40 @@ import java.util.Optional;
 
 @Repository
 public interface CampusRepository extends JpaRepository<CampusEntity, Long> {
-    Optional<CampusEntity> findByIdAndDeletedFalse(Long id);
 
-    List<CampusEntity> findByDeletedFalse();
+        @Query("SELECT c FROM CampusEntity c JOIN FETCH c.institute i JOIN FETCH i.country JOIN FETCH c.province JOIN FETCH c.city WHERE i.id = :instituteId")
+        List<CampusEntity> findByInstituteId(@Param("instituteId") Long instituteId);
 
-    List<CampusEntity> findByInstituteIdAndDeletedFalse(Long instituteId);
+        @Query("SELECT c FROM CampusEntity c JOIN FETCH c.institute i JOIN FETCH i.country JOIN FETCH c.province JOIN FETCH c.city WHERE c.campusName LIKE %:campusName%")
+        List<CampusEntity> findByCampusNameContaining(@Param("campusName") String campusName);
 
-    // Find all campuses by institute ID
-    List<CampusEntity> findByInstituteId(Long instituteId);
+        @Modifying
+        @Transactional
+        @Query("UPDATE CampusEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP "
+                        + "WHERE s.id = :id AND s.institute.id = :instituteId")
+        int softDeleteByIdAndInstituteId(@Param("id") Long id, @Param("instituteId") Long instituteId);
 
-    // Find a campus by its name WHERE campus_name LIKE %?%
-    List<CampusEntity> findByCampusNameContainingAndDeletedFalse(String campusName);
+        @Query("SELECT c FROM CampusEntity c JOIN FETCH c.institute i JOIN FETCH i.country JOIN FETCH c.province JOIN FETCH c.city WHERE (c.campusName LIKE %:keyword% OR c.campusCode LIKE %:keyword%) AND i.id = :instituteId")
+        List<CampusEntity> searchByKeywordAndInstituteId(@Param("keyword") String keyword,
+                        @Param("instituteId") Long instituteId);
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE CampusEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP "
-            + "WHERE s.id = :id AND s.institute.id = :instituteId")
-    int softDeleteByIdAndInstituteId(@Param("id") Long id, @Param("instituteId") Long instituteId);
+        @Query("SELECT c FROM CampusEntity c JOIN FETCH c.institute i JOIN FETCH i.country JOIN FETCH c.province JOIN FETCH c.city WHERE c.id = :id AND i.id = :instituteId")
+        Optional<CampusEntity> findByIdAndInstituteId(@Param("id") Long id, @Param("instituteId") Long instituteId);
 
-    Long id(Long id);
+        @Query("SELECT COUNT(c) FROM CampusEntity c WHERE c.institute.id = :instituteId")
+        Long countByInstituteId(@Param("instituteId") Long instituteId);
 
-    @Query("""
-            SELECT c FROM CampusEntity c WHERE (c.campusName LIKE %:keyword% OR c.campusCode LIKE %:keyword%) AND c.institute.id = :instituteId AND c.deleted = false""")
-    List<CampusEntity> searchByKeywordAndInstituteId(@Param("keyword") String keyword,
-            @Param("instituteId") Long instituteId);
+        @Query("SELECT COUNT(c) FROM CampusEntity c WHERE c.institute.id = :instituteId AND c.active = true")
+        Long countByInstituteIdAndActiveTrue(@Param("instituteId") Long instituteId);
 
-    Optional<CampusEntity> findByIdAndInstituteIdAndDeletedFalse(Long id, Long instituteId);
+        @Query("SELECT COUNT(c) FROM CampusEntity c WHERE c.institute.id = :instituteId AND c.active = false")
+        Long countByInstituteIdAndActiveFalse(@Param("instituteId") Long instituteId);
 
-    @Query("SELECT COUNT(c) FROM CampusEntity c WHERE c.institute.id = :instituteId AND c.deleted = false")
-    Long countByInstituteId(@Param("instituteId") Long instituteId);
+        @Query("SELECT (COUNT(c) > 0) FROM CampusEntity c WHERE c.institute.id = :instituteId AND c.campusCode = :campusCode")
+        boolean existsByInstituteIdAndCampusCode(@Param("instituteId") Long instituteId,
+                        @Param("campusCode") String campusCode);
+
+        @Query("SELECT (COUNT(c) > 0) FROM CampusEntity c WHERE c.institute.id = :instituteId AND c.campusCode = :campusCode AND c.id <> :id")
+        boolean existsByInstituteIdAndCampusCodeAndIdNot(@Param("instituteId") Long instituteId,
+                        @Param("campusCode") String campusCode, @Param("id") Long id);
 }

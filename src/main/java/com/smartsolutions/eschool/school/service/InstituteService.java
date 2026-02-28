@@ -1,33 +1,21 @@
 package com.smartsolutions.eschool.school.service;
 
-import com.smartsolutions.eschool.lookups.model.CityEntity;
-import com.smartsolutions.eschool.lookups.model.CountryEntity;
-import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
 import com.smartsolutions.eschool.lookups.repository.CityRepository;
 import com.smartsolutions.eschool.lookups.repository.CountryRepository;
 import com.smartsolutions.eschool.lookups.repository.ProvinceRepository;
-import com.smartsolutions.eschool.school.dtos.InstituteDTO;
 import com.smartsolutions.eschool.school.dtos.institute.request.InstituteRequestDTO;
 import com.smartsolutions.eschool.school.dtos.institute.response.InstituteResponseDTO;
+import com.smartsolutions.eschool.school.mapper.InstituteMapper;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
-import com.smartsolutions.eschool.school.repository.InstituteDao;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
-import com.smartsolutions.eschool.student.dtos.StudentDTO;
-import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.MappingException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-
 
 @Service
+@Slf4j
 public class InstituteService {
 
     private final InstituteRepository instituteRepository;
@@ -36,7 +24,8 @@ public class InstituteService {
     private final ProvinceRepository provinceRepository;
     private final CityRepository cityRepository;
 
-    public InstituteService(InstituteRepository instituteRepository, CountryRepository countryRepository, ProvinceRepository provinceRepository, CityRepository cityRepository) {
+    public InstituteService(InstituteRepository instituteRepository, CountryRepository countryRepository,
+            ProvinceRepository provinceRepository, CityRepository cityRepository) {
         this.instituteRepository = instituteRepository;
         this.countryRepository = countryRepository;
         this.provinceRepository = provinceRepository;
@@ -45,16 +34,25 @@ public class InstituteService {
 
     // Fetch the institute
     public InstituteResponseDTO getInstitute() {
+        log.info("[Service:InstituteService] getInstitute() called");
         InstituteEntity instituteEntity = instituteRepository.getSingletonInstitute().orElse(null);
         if (instituteEntity == null) {
+            log.info("[Service:InstituteService] getInstitute() - No institute found");
             return null; // no record found
         }
-        return MapperUtil.mapObject(instituteEntity, InstituteResponseDTO.class);
+        InstituteResponseDTO responseDTO = InstituteMapper.toResponseDTO(instituteEntity);
+        log.info("[Service:InstituteService] getInstitute() succeeded - Institute: {}", responseDTO.getName());
+        return responseDTO;
     }
 
     @Transactional
     public InstituteResponseDTO updateInstitute(InstituteRequestDTO dto) {
-        InstituteEntity institute = instituteRepository.getSingletonInstitute().orElseGet(InstituteEntity::new); // create new if none exists
+        log.info("[Service:InstituteService] updateInstitute() called - Update request for: {}", dto.getName());
+        InstituteEntity institute = instituteRepository.getSingletonInstitute().orElseGet(InstituteEntity::new); // create
+                                                                                                                 // new
+                                                                                                                 // if
+                                                                                                                 // none
+                                                                                                                 // exists
 
         // Set/update basic fields
 
@@ -79,17 +77,24 @@ public class InstituteService {
 
         // Optional: assign relations if IDs are provided
         if (dto.getCountryId() != null) {
-            institute.setCountry(countryRepository.findById(dto.getCountryId()).orElseThrow(() -> new IllegalArgumentException("Invalid country ID")));
+            institute.setCountry(countryRepository.findById(dto.getCountryId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid country ID")));
         }
         if (dto.getProvinceId() != null) {
-            institute.setProvince(provinceRepository.findById(dto.getProvinceId()).orElseThrow(() -> new IllegalArgumentException("Invalid province ID")));
+            institute.setProvince(provinceRepository.findById(dto.getProvinceId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid province ID")));
         }
         if (dto.getCityId() != null) {
-            institute.setCity(cityRepository.findById(dto.getCityId()).orElseThrow(() -> new IllegalArgumentException("Invalid city ID")));
+            institute.setCity(cityRepository.findById(dto.getCityId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid city ID")));
         }
 
         institute.setId(1L);
         // Save and return
-        return MapperUtil.mapObject(instituteRepository.save(institute), InstituteResponseDTO.class);
+        InstituteEntity saved = instituteRepository.save(institute);
+        InstituteResponseDTO responseDTO = InstituteMapper.toResponseDTO(saved);
+        log.info("[Service:InstituteService] updateInstitute() succeeded - Institute: {} updated",
+                responseDTO.getName());
+        return responseDTO;
     }
 }

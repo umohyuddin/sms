@@ -5,21 +5,14 @@ import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
 import com.smartsolutions.eschool.sclass.dtos.requestDto.StandardCreateRequestDTO;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.StandardDTO;
-import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.sclass.repository.StandardRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.transaction.Transactional;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.MappingException;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -97,7 +90,7 @@ public class StandardService {
             if (standardDTO.getCampusId() != null) {
                 // Verify that the campus belongs to the organization
                 CampusEntity campus = campusRepository
-                        .findByIdAndInstituteIdAndDeletedFalse(standardDTO.getCampusId(), organizationId)
+                        .findByIdAndInstituteId(standardDTO.getCampusId(), organizationId)
                         .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: "
                                 + standardDTO.getCampusId() + " for current organization"));
                 entity.setCampus(campus);
@@ -161,7 +154,7 @@ public class StandardService {
             if (dto.getCampusId() != null
                     && (entity.getCampus() == null || !entity.getCampus().getId().equals(dto.getCampusId()))) {
                 CampusEntity campus = campusRepository
-                        .findByIdAndInstituteIdAndDeletedFalse(dto.getCampusId(), organizationId)
+                        .findByIdAndInstituteId(dto.getCampusId(), organizationId)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Campus not found with id: " + dto.getCampusId() + " for current organization"));
                 entity.setCampus(campus);

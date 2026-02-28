@@ -49,7 +49,7 @@ public class ExamServiceImpl implements ExamService {
                                 .orElseThrow(() -> new ResourceNotFoundException("Exam Term not found"));
                 ExamTypeEntity examType = examTypeRepository.findByIdAndDeletedFalse(dto.getExamTypeId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Exam Type not found"));
-                CampusEntity campus = campusRepository.findByIdAndDeletedFalse(dto.getCampusId())
+                CampusEntity campus = campusRepository.findById(dto.getCampusId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Campus not found"));
                 StandardEntity standard = standardRepository.findById(dto.getStandardId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Standard not found"));
