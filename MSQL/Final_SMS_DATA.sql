@@ -3,6 +3,29 @@ INSERT INTO academic_years
 VALUES
 ('Academic Year 2025-2026', 'AY2025', '2025-04-01', '2026-03-31', 12, TRUE, 'ACTIVE', 1);
 
+
+INSERT INTO facility_types (code, name, description, is_active, is_deleted, created_at, created_by) VALUES
+('LAB', 'Laboratory', 'Science, computer, or language labs', TRUE, FALSE, NOW(), 1),
+('LIBRARY', 'Library', 'Reading, reference, digital library', TRUE, FALSE, NOW(), 1),
+('PLAYGROUND', 'Playground', 'Outdoor sports and recreation area', TRUE, FALSE, NOW(), 1),
+('AUDITORIUM', 'Auditorium', 'Multipurpose hall for events and gatherings', TRUE, FALSE, NOW(), 1),
+('CAFETERIA', 'Cafeteria', 'Dining area for students and staff', TRUE, FALSE, NOW(), 1),
+('HOSTEL', 'Hostel', 'On-campus accommodation for students', TRUE, FALSE, NOW(), 1),
+('MEDICAL_ROOM', 'Medical Room', 'First-aid and health services', TRUE, FALSE, NOW(), 1),
+('STAFF_ROOM', 'Staff Room', 'Teachers\' lounge or office area', TRUE, FALSE, NOW(), 1),
+('TRANSPORT', 'Transport Facility', 'School buses, vans, or transport services', TRUE, FALSE, NOW(), 1),
+('PRAYER_HALL', 'Prayer Hall', 'For religious activities or meditation', TRUE, FALSE, NOW(), 1),
+('SPORTS_GROUND', 'Sports Ground', 'Fields or courts for games like cricket, football, etc.', TRUE, FALSE, NOW(), 1),
+('MUSIC_ROOM', 'Music Room', 'For music classes and practice', TRUE, FALSE, NOW(), 1),
+('ART_ROOM', 'Art Room', 'For painting, crafts, and other creative activities', TRUE, FALSE, NOW(), 1),
+('COMPUTER_ROOM', 'Computer Room', 'Dedicated computer lab for students', TRUE, FALSE, NOW(), 1),
+('SCIENCE_ROOM', 'Science Lab', 'Physics, Chemistry, or Biology labs', TRUE, FALSE, NOW(), 1),
+('LANGUAGE_LAB', 'Language Lab', 'For learning foreign languages', TRUE, FALSE, NOW(), 1),
+('SWIMMING_POOL', 'Swimming Pool', 'Swimming facility', TRUE, FALSE, NOW(), 1),
+('GYM', 'Gymnasium', 'Indoor fitness and exercise facility', TRUE, FALSE, NOW(), 1),
+('PARKING', 'Parking Facility', 'Staff and visitor parking', TRUE, FALSE, NOW(), 1),
+('MULTIPURPOSE_HALL', 'Multipurpose Hall', 'For indoor activities, events, or assemblies', TRUE, FALSE, NOW(), 1);
+
 -- ============================================================
 -- Lookup Data: Languages
 -- ============================================================

@@ -13,83 +13,85 @@ import java.util.Optional;
 @Repository
 public interface InstituteFacilityRepository extends JpaRepository<InstituteFacilityEntity, Long> {
 
-    /* ===============================
-       Find by ID (with Facility Type)
-       =============================== */
+    /*
+     * ===============================
+     * Find by ID (with Facility Type)
+     * ===============================
+     */
     @Query("""
-        SELECT f
-        FROM InstituteFacilityEntity f
-        JOIN FETCH f.facilityType ft
-        WHERE f.id = :id
-    """)
-    Optional<InstituteFacilityEntity> findByIdJpql(@Param("id") Long id);
+                SELECT f
+                FROM InstituteFacilityEntity f
+                JOIN FETCH f.facilityType ft
+                WHERE f.id = :id
+                  AND f.institute.id = :instituteId
+            """)
+    Optional<InstituteFacilityEntity> findByIdAndInstituteIdJpql(@Param("id") Long id,
+            @Param("instituteId") Long instituteId);
 
-
-    /* ===============================
-       Find all (with Facility Type)
-       =============================== */
     @Query("""
-        SELECT f
-        FROM InstituteFacilityEntity f
-        JOIN FETCH f.facilityType ft
-    """)
-    List<InstituteFacilityEntity> findAllJpql();
+                SELECT f
+                FROM InstituteFacilityEntity f
+                JOIN FETCH f.facilityType ft
+                WHERE f.institute.id = :instituteId
+            """)
+    List<InstituteFacilityEntity> findAllByInstituteIdJpql(@Param("instituteId") Long instituteId);
 
-
-    /* ===============================
-       Find by Institute ID
-       =============================== */
     @Query("""
-        SELECT f
-        FROM InstituteFacilityEntity f
-        JOIN FETCH f.facilityType ft
-        WHERE f.institute.id = :instituteId
-    """)
+                SELECT f
+                FROM InstituteFacilityEntity f
+                JOIN FETCH f.facilityType ft
+                WHERE f.institute.id = :instituteId
+            """)
     List<InstituteFacilityEntity> findByInstituteId(@Param("instituteId") Long instituteId);
 
-
-    /* ===============================
-       Search by keyword (Facility Type)
-       =============================== */
     @Query("""
-        SELECT f
-        FROM InstituteFacilityEntity f
-        JOIN f.facilityType ft
-        WHERE (
-            :keyword IS NULL OR :keyword = ''
-            OR LOWER(ft.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(ft.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(f.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        )
-    """)
+                SELECT f
+                FROM InstituteFacilityEntity f
+                JOIN f.facilityType ft
+                WHERE f.institute.id = :instituteId
+                  AND (
+                    :keyword IS NULL OR :keyword = ''
+                    OR LOWER(ft.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                    OR LOWER(ft.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                    OR LOWER(f.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                )
+            """)
+    List<InstituteFacilityEntity> searchByKeywordAndInstituteId(@Param("keyword") String keyword,
+            @Param("instituteId") Long instituteId);
+
+    @Query("""
+                SELECT f
+                FROM InstituteFacilityEntity f
+                JOIN f.facilityType ft
+                WHERE (
+                    :keyword IS NULL OR :keyword = ''
+                    OR LOWER(ft.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                    OR LOWER(ft.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                    OR LOWER(f.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                )
+            """)
     List<InstituteFacilityEntity> searchByKeyword(@Param("keyword") String keyword);
 
-
-    /* ===============================
-       Institute + Keyword (Recommended)
-       =============================== */
     @Query("""
-        SELECT f
-        FROM InstituteFacilityEntity f
-        JOIN f.facilityType ft
-        WHERE f.institute.id = :instituteId
-          AND (
-              :keyword IS NULL OR :keyword = ''
-              OR LOWER(ft.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-              OR LOWER(ft.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
-              OR LOWER(f.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
-          )
-    """)
+                SELECT f
+                FROM InstituteFacilityEntity f
+                JOIN f.facilityType ft
+                WHERE f.institute.id = :instituteId
+                  AND (
+                      :keyword IS NULL OR :keyword = ''
+                      OR LOWER(ft.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                      OR LOWER(ft.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                      OR LOWER(f.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                  )
+            """)
     List<InstituteFacilityEntity> searchByInstituteAndKeyword(
             @Param("instituteId") Long instituteId,
-            @Param("keyword") String keyword
-    );
+            @Param("keyword") String keyword);
 
     @Modifying
     @Query("""
-        DELETE FROM InstituteFacilityEntity f
-        WHERE f.institute.id = :instituteId
-    """)
+                DELETE FROM InstituteFacilityEntity f
+                WHERE f.institute.id = :instituteId
+            """)
     void deleteByInstituteId(@Param("instituteId") Long instituteId);
 }
-

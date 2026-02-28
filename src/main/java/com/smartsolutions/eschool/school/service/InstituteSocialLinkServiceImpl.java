@@ -1,7 +1,6 @@
 package com.smartsolutions.eschool.school.service;
 
 import com.smartsolutions.eschool.global.error.ApiException;
-
 import com.smartsolutions.eschool.institute.error.InstituteSocialLinkErrors;
 import com.smartsolutions.eschool.school.dtos.instituteSocialLinks.requestDto.InstituteSocialLinkCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteSocialLinks.requestDto.InstituteSocialLinkUpdateRequestDTO;
@@ -10,7 +9,7 @@ import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.model.InstituteSocialLinkEntity;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
 import com.smartsolutions.eschool.school.repository.InstituteSocialLinkRepository;
-import com.smartsolutions.eschool.global.responseMappers.InstituteSocialLinkMapper;
+import com.smartsolutions.eschool.school.mapper.InstituteSocialLinkMapper;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,8 +42,12 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
                                 "[Service:InstituteSocialLinkServiceImpl] createSocialLink() called - Creating social link for institute: {}",
                                 contextInstituteId);
 
+                // check already existance of the record before creating
                 if (instituteSocialLinkRepository.existsByInstituteIdAndPlatformOrUrl(contextInstituteId,
                                 requestDTO.getPlatform(), requestDTO.getUrl())) {
+                        log.warn(
+                                        "[Service:InstituteSocialLinkServiceImpl] createSocialLink() failed - Duplicate social link for platform: {} or url: {} in institute: {}",
+                                        requestDTO.getPlatform(), requestDTO.getUrl(), contextInstituteId);
                         throw new ApiException(InstituteSocialLinkErrors.DUPLICATE_LINK,
                                         "A social link with this platform or URL already exists for your institute.",
                                         HttpStatus.CONFLICT);
@@ -104,8 +107,13 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
                                 id, contextInstituteId);
                 return instituteSocialLinkRepository.findByIdAndInstituteId(id, contextInstituteId)
                                 .map(InstituteSocialLinkMapper::toResponseDTO)
-                                .orElseThrow(() -> new ApiException(InstituteSocialLinkErrors.LINK_NOT_FOUND,
-                                                HttpStatus.NOT_FOUND));
+                                .orElseThrow(() -> {
+                                        log.warn(
+                                                        "[Service:InstituteSocialLinkServiceImpl] getById() failed - Social link: {} not found for institute: {}",
+                                                        id, contextInstituteId);
+                                        return new ApiException(InstituteSocialLinkErrors.LINK_NOT_FOUND,
+                                                        HttpStatus.NOT_FOUND);
+                                });
         }
 
         @Override
@@ -122,11 +130,16 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
 
                 InstituteSocialLinkEntity existing = instituteSocialLinkRepository
                                 .findByIdAndInstituteId(id, contextInstituteId)
-                                .orElseThrow(() -> new ApiException(InstituteSocialLinkErrors.LINK_NOT_FOUND,
-                                                "Social link not found or access denied.", HttpStatus.NOT_FOUND));
+                                .orElseThrow(() -> {
+                                        log.warn(
+                                                        "[Service:InstituteSocialLinkServiceImpl] updateSocialLink() failed - Social link: {} not found for institute: {}",
+                                                        id, contextInstituteId);
+                                        return new ApiException(InstituteSocialLinkErrors.LINK_NOT_FOUND,
+                                                        "Social link not found or access denied.",
+                                                        HttpStatus.NOT_FOUND);
+                                });
 
-                // Edge case: check if updated platform/url conflicts with another existing
-                // record
+                // check already existance of the record before update
                 if (requestDTO.getPlatform() != null || requestDTO.getUrl() != null) {
                         String newPlatform = requestDTO.getPlatform() != null ? requestDTO.getPlatform()
                                         : existing.getPlatform();
@@ -135,6 +148,9 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
                         if (instituteSocialLinkRepository.existsByInstituteIdAndPlatformOrUrlAndIdNot(
                                         contextInstituteId,
                                         newPlatform, newUrl, id)) {
+                                log.warn(
+                                                "[Service:InstituteSocialLinkServiceImpl] updateSocialLink() failed - Duplicate social link for platform: {} or url: {} in institute: {} excluding id: {}",
+                                                newPlatform, newUrl, contextInstituteId, id);
                                 throw new ApiException(InstituteSocialLinkErrors.DUPLICATE_LINK,
                                                 "Another social link with this platform or URL already exists.",
                                                 HttpStatus.CONFLICT);
@@ -162,6 +178,9 @@ public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkServic
                                 "[Service:InstituteSocialLinkServiceImpl] deleteById() called - Deleting social link by id: {} and institute id: {}",
                                 id, contextInstituteId);
                 if (!instituteSocialLinkRepository.existsByIdAndInstituteId(id, contextInstituteId)) {
+                        log.warn(
+                                        "[Service:InstituteSocialLinkServiceImpl] deleteById() failed - Social link: {} not found or access denied for institute: {}",
+                                        id, contextInstituteId);
                         throw new ApiException(InstituteSocialLinkErrors.LINK_NOT_FOUND,
                                         "Social link not found or you don't have permission to delete it.",
                                         HttpStatus.NOT_FOUND);

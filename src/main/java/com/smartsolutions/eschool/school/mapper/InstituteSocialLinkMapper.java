@@ -1,4 +1,4 @@
-package com.smartsolutions.eschool.global.responseMappers;
+package com.smartsolutions.eschool.school.mapper;
 
 import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.institute.error.InstituteSocialLinkErrors;
@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Mapper for InstituteSocialLinkEntity to DTOs and vice versa.
+ */
 public class InstituteSocialLinkMapper {
 
     private InstituteSocialLinkMapper() {

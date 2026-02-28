@@ -32,7 +32,8 @@ public class InstituteSocialLinkFacade {
     }
 
     public List<InstituteSocialLinkResponseDTO> getByInstituteId() {
-        log.info("Facade: Request to get social links by instituteId");
+        log.info(
+                "[Facade:InstituteSocialLinkFacade] getByInstituteId() called - Request to get social links by instituteId");
         return instituteSocialLinkService.getByInstituteId();
     }
 
