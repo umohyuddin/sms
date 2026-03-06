@@ -1,6 +1,7 @@
 
 
 
+
 INSERT INTO education_boards
 (code, name, country_id, description, is_active, is_deleted)
 VALUES

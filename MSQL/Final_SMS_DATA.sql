@@ -1409,6 +1409,112 @@ VALUES
  NOW()
 );
 
+
+INSERT INTO departments
+(organization_id, department_code, department_name, description, parent_id, head_employee_id, active)
+VALUES
+(1,'SCH01','School of Science','Science related departments',NULL,1,TRUE),
+(1,'SCH02','School of Arts','Arts related departments',NULL,2,TRUE),
+(1,'SCH03','School of Commerce','Commerce related departments',NULL,3,TRUE),
+(1,'SCH04','School of Engineering','Engineering related departments',NULL,1,TRUE),
+(1,'SCH05','School of Computer Science','Computer and IT departments',NULL,2,TRUE),
+(1,'SCH06','School of Medical Sciences','Medical related departments',NULL,3,TRUE),
+(1,'SCH07','School of Education','Teacher education programs',NULL,1,TRUE),
+(1,'SCH08','School of Social Sciences','Social science departments',NULL,2,TRUE),
+
+(1,'SCI01','Department of Physics','Physics studies',NULL,3,TRUE),
+(1,'SCI02','Department of Chemistry','Chemistry studies',NULL,1,TRUE),
+(1,'SCI03','Department of Biology','Biology studies',NULL,2,TRUE),
+(1,'SCI04','Department of Mathematics','Mathematics studies',NULL,3,TRUE),
+(1,'SCI05','Department of Statistics','Statistics studies',NULL,1,TRUE),
+(1,'SCI06','Department of Environmental Science','Environmental studies',NULL,2,TRUE),
+
+(1,'ART01','Department of History','History studies',NULL,3,TRUE),
+(1,'ART02','Department of Literature','Literature studies',NULL,1,TRUE),
+(1,'ART03','Department of Fine Arts','Fine arts studies',NULL,2,TRUE),
+(1,'ART04','Department of Philosophy','Philosophy studies',NULL,3,TRUE),
+(1,'ART05','Department of Linguistics','Language studies',NULL,1,TRUE),
+
+(1,'COM01','Department of Accounting','Accounting studies',NULL,2,TRUE),
+(1,'COM02','Department of Business Administration','Business administration',NULL,3,TRUE),
+(1,'COM03','Department of Economics','Economics studies',NULL,1,TRUE),
+(1,'COM04','Department of Finance','Finance studies',NULL,2,TRUE),
+(1,'COM05','Department of Marketing','Marketing studies',NULL,3,TRUE),
+(1,'COM06','Department of Human Resource Management','HR studies',NULL,1,TRUE),
+
+(1,'CSE01','Department of Computer Science','Computer science studies',NULL,2,TRUE),
+(1,'CSE02','Department of Software Engineering','Software engineering studies',NULL,3,TRUE),
+(1,'CSE03','Department of Information Technology','IT studies',NULL,1,TRUE),
+(1,'CSE04','Department of Artificial Intelligence','AI studies',NULL,2,TRUE),
+(1,'CSE05','Department of Data Science','Data science studies',NULL,3,TRUE),
+(1,'CSE06','Department of Cyber Security','Cyber security studies',NULL,1,TRUE),
+
+(1,'ENG01','Department of Mechanical Engineering','Mechanical engineering',NULL,2,TRUE),
+(1,'ENG02','Department of Electrical Engineering','Electrical engineering',NULL,3,TRUE),
+(1,'ENG03','Department of Civil Engineering','Civil engineering',NULL,1,TRUE),
+(1,'ENG04','Department of Chemical Engineering','Chemical engineering',NULL,2,TRUE),
+(1,'ENG05','Department of Industrial Engineering','Industrial engineering',NULL,3,TRUE),
+
+(1,'MED01','Department of Medicine','Medical studies',NULL,1,TRUE),
+(1,'MED02','Department of Surgery','Surgery studies',NULL,2,TRUE),
+(1,'MED03','Department of Pharmacy','Pharmacy studies',NULL,3,TRUE),
+(1,'MED04','Department of Nursing','Nursing studies',NULL,1,TRUE),
+(1,'MED05','Department of Public Health','Public health studies',NULL,2,TRUE),
+
+(1,'ADM01','Admissions Office','Student admissions',NULL,3,TRUE),
+(1,'ADM02','Finance Office','Finance management',NULL,1,TRUE),
+(1,'ADM03','Human Resources','Staff management',NULL,2,TRUE),
+(1,'ADM04','IT Support','Technical support',NULL,3,TRUE),
+(1,'ADM05','Student Affairs','Student services',NULL,1,TRUE),
+(1,'ADM06','Library','Library management',NULL,2,TRUE),
+(1,'ADM07','Examination Department','Exam management',NULL,3,TRUE),
+(1,'ADM08','Transport Department','School transport',NULL,1,TRUE);
+
+UPDATE departments d
+JOIN departments p ON p.department_code = 'SCH01'
+SET d.parent_id = p.id
+WHERE d.department_code LIKE 'SCI%';
+
+
+UPDATE departments d
+JOIN departments p ON p.department_code = 'SCH02'
+SET d.parent_id = p.id
+WHERE d.department_code LIKE 'ART%';
+
+
+UPDATE departments d
+JOIN departments p ON p.department_code = 'SCH03'
+SET d.parent_id = p.id
+WHERE d.department_code LIKE 'COM%';
+
+
+UPDATE departments d
+JOIN departments p ON p.department_code = 'SCH04'
+SET d.parent_id = p.id
+WHERE d.department_code LIKE 'ENG%';
+
+UPDATE departments d
+JOIN departments p ON p.department_code = 'SCH05'
+SET d.parent_id = p.id
+WHERE d.department_code LIKE 'CSE%';
+
+UPDATE departments d
+JOIN departments p ON p.department_code = 'SCH06'
+SET d.parent_id = p.id
+WHERE d.department_code LIKE 'MED%';
+
+
+
+UPDATE departments d
+JOIN departments p ON p.department_code = 'SCH07'
+SET d.parent_id = p.id
+WHERE d.department_code LIKE 'EDU%';
+
+UPDATE departments d
+JOIN departments p ON p.department_code = 'SCH08'
+SET d.parent_id = p.id
+WHERE d.department_code LIKE 'SOC%';
+
 INSERT INTO campuses (organization_id, institute_id, province_id, city_id,
                       campus_name, contact, email, website, address,
                       logo, deleted,
