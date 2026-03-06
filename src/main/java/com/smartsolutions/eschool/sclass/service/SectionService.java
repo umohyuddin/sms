@@ -1,22 +1,27 @@
 package com.smartsolutions.eschool.sclass.service;
 
-import com.smartsolutions.eschool.global.exception.CustomServiceException;
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
+import com.smartsolutions.eschool.sclass.error.SectionErrors;
+import com.smartsolutions.eschool.sclass.error.StandardErrors;
+import com.smartsolutions.eschool.sclass.mapper.SectionMapper;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.sclass.repository.SectionRepository;
 import com.smartsolutions.eschool.sclass.repository.StandardRepository;
-import com.smartsolutions.eschool.util.MapperUtil;
+import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class SectionService {
     private final SectionRepository sectionRepository;
     private final StandardRepository standardRepository;
@@ -26,188 +31,213 @@ public class SectionService {
         this.standardRepository = standardRepository;
     }
 
-    public List<SectionDTO> getAll(Long organizationId) {
-        log.info("Fetching all sections from database for organization: {}", organizationId);
-        try {
-            List<SectionEntity> result = sectionRepository.findByInstituteIdAndDeletedFalse(organizationId);
-            List<SectionDTO> sectionDTO = MapperUtil.mapList(result, SectionDTO.class);
-            log.info("Successfully fetched {} sections for organization: {}", sectionDTO.size(), organizationId);
-            return sectionDTO;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching all sections for organization: {}", organizationId, e);
-            throw new CustomServiceException("Failed to fetch all sections");
+    public List<SectionDTO> getAll() {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-    }
-
-    public SectionDTO getById(Long id, Long organizationId) {
-        log.info("Fetching Section with id: {} for organization: {} from database", id, organizationId);
-        try {
-            SectionEntity sectionEntity = sectionRepository.findByIdAndInstituteIdAndDeletedFalse(id, organizationId)
-                    .orElseThrow(() -> {
-                        log.warn("Section not found with id: {} for organization: {}", id, organizationId);
-                        return new ResourceNotFoundException("Section not found with id: " + id);
-                    });
-            SectionDTO sectionDTO = MapperUtil.mapObject(sectionEntity, SectionDTO.class);
-            log.info("Successfully fetched Section: id={} for organization: {}", sectionDTO.getId(), organizationId);
-            return sectionDTO;
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Section ID: {} for organization: {}", id, organizationId, e);
-            throw new CustomServiceException("Failed to fetch Section by ID");
-        }
-    }
-
-    public List<SectionDTO> getByStandardId(Long standardId, Long organizationId) {
-        log.info("Fetching all sections by standard id {} and organization {} from database", standardId,
+        log.info("[Service:SectionService] getAll() called - Fetching all sections for organization: {}",
                 organizationId);
-        try {
-            List<SectionEntity> result = sectionRepository.findByStandardIdAndInstituteIdAndDeletedFalse(standardId,
-                    organizationId);
-            List<SectionDTO> sectionDTO = MapperUtil.mapList(result, SectionDTO.class);
-            log.info("Successfully fetched {} sections for standard id {} and organization {}", sectionDTO.size(),
-                    standardId, organizationId);
-            return sectionDTO;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching sections for standard id: {} and organization: {}", standardId,
-                    organizationId, e);
-            throw new CustomServiceException("Failed to fetch sections by standardId");
-        }
+        List<SectionEntity> result = sectionRepository.findByInstituteIdAndDeletedFalse(organizationId);
+        List<SectionDTO> sectionDTO = SectionMapper.toResponseDTOList(result);
+        log.info("[Service:SectionService] getAll() succeeded - Found {} sections for organization: {}",
+                sectionDTO.size(), organizationId);
+        return sectionDTO;
     }
 
-    public int softDeleteById(Long id, Long organizationId) {
-        log.info("Soft deleting Section with ID: {} and organization: {} from database", id, organizationId);
-        try {
-            int result = sectionRepository.softDeleteByIdAndInstituteId(id, organizationId);
-            if (result == 1) {
-                log.info("Section deleted successfully with ID: {} and organization: {}", id, organizationId);
-            } else {
-                log.warn("Failed to delete Section ID: {} for organization: {}", id, organizationId);
-            }
-            return result;
-        } catch (Exception e) {
-            log.error("Error while soft deleting section with ID {} and organization: {}", id, organizationId, e);
-            throw new CustomServiceException("Failed to soft delete Section");
+    public SectionDTO getById(Long id) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        log.info("[Service:SectionService] getById() called - id: {}, organization: {}", id, organizationId);
+        SectionEntity sectionEntity = sectionRepository.findByIdAndInstituteIdAndDeletedFalse(id, organizationId)
+                .orElseThrow(() -> {
+                    log.warn("Section not found with id: {} for organization: {}", id, organizationId);
+                    return new ApiException(SectionErrors.SECTION_NOT_FOUND, HttpStatus.NOT_FOUND);
+                });
+        SectionDTO sectionDTO = SectionMapper.toResponseDTO(sectionEntity);
+        log.info("[Service:SectionService] getById() succeeded - Found Section: id={} for organization: {}",
+                sectionDTO.getId(), organizationId);
+        return sectionDTO;
     }
 
-    public int softDeleteByStandardId(Long standardId, Long organizationId) {
-        log.info("Soft deleting sections under Standard ID: {} and organization: {} from database", standardId,
+    public List<SectionDTO> getByStandardId(Long standardId) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:SectionService] getByStandardId() called - standardId: {}, organization: {}", standardId,
                 organizationId);
-        try {
-            int rows = sectionRepository.softDeleteByStandardIdAndInstituteId(standardId, organizationId);
-            if (rows == 0) {
-                log.warn("No sections found for Standard ID {} and organization: {}. Nothing was updated.", standardId,
-                        organizationId);
-            } else {
-                log.info("Soft delete succeeded. {} sections deleted for Standard ID {} and organization: {}", rows,
-                        standardId, organizationId);
-            }
-            return rows;
-        } catch (Exception e) {
-            log.error("Error while soft deleting sections for Standard ID {} and organization: {}", standardId,
-                    organizationId, e);
-            throw new CustomServiceException("Failed to soft delete sections by standard");
-        }
+        List<SectionEntity> result = sectionRepository.findByStandardIdAndInstituteIdAndDeletedFalse(standardId,
+                organizationId);
+        List<SectionDTO> sectionDTO = SectionMapper.toResponseDTOList(result);
+        log.info(
+                "[Service:SectionService] getByStandardId() succeeded - Found {} sections for standardId: {} and organization: {}",
+                sectionDTO.size(), standardId, organizationId);
+        return sectionDTO;
     }
 
-    public int softDeleteAll(Long organizationId) {
-        log.info("Soft deleting ALL sections from database for organization: {}", organizationId);
-        try {
-            int rows = sectionRepository.softDeleteByInstituteId(organizationId);
-            log.info("Successfully soft deleted ALL sections for organization: {}. Total affected: {}", organizationId,
-                    rows);
-            return rows;
-        } catch (Exception e) {
-            log.error("Error occurred while soft deleting ALL sections for organization: {}", organizationId, e);
-            throw new CustomServiceException("Failed to soft delete all sections");
+    @Transactional
+    public int softDeleteById(Long id) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        log.info("[Service:SectionService] softDeleteById() called - id: {}, organization: {}", id, organizationId);
+
+        if (sectionRepository.findByIdAndInstituteIdAndDeletedFalse(id, organizationId).isEmpty()) {
+            throw new ApiException(SectionErrors.SECTION_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        int result = sectionRepository.softDeleteByIdAndInstituteId(id, organizationId);
+        log.info("[Service:SectionService] softDeleteById() succeeded - id: {}", id);
+        return result;
     }
 
-    public List<SectionDTO> searchSections(Long campusId, Long standardId, String keyword, Long organizationId) {
-        log.info("Searching sections with campusId={}, standardId={}, keyword='{}' and organization={} from database",
-                campusId, standardId, keyword, organizationId);
-        try {
-            List<SectionEntity> result = sectionRepository.searchSectionsWithOrg(campusId, standardId, organizationId,
-                    keyword);
-            List<SectionDTO> sectionDTO = MapperUtil.mapList(result, SectionDTO.class);
-            log.info("Successfully fetched {} sections based on search for organization: {}", sectionDTO.size(),
-                    organizationId);
-            return sectionDTO;
-        } catch (Exception e) {
-            log.error("Unexpected error while searching sections for organization: {}", organizationId, e);
-            throw new CustomServiceException("Failed to search sections");
+    @Transactional
+    public int softDeleteByStandardId(Long standardId) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        log.info("[Service:SectionService] softDeleteByStandardId() called - standardId: {}, organization: {}",
+                standardId, organizationId);
+        int rows = sectionRepository.softDeleteByStandardIdAndInstituteId(standardId, organizationId);
+        log.info("[Service:SectionService] softDeleteByStandardId() succeeded - Deleted {} sections", rows);
+        return rows;
     }
 
-    public SectionCreateRequestDTO createSection(SectionCreateRequestDTO standardDTO, Long organizationId) {
-        log.info("Creating new Section for organization {} in database: {}", organizationId,
-                standardDTO.getSectionName());
-        try {
-            SectionEntity entity = MapperUtil.mapObject(standardDTO, SectionEntity.class);
-            entity.setId(null);
-
-            // Verify and set standard
-            if (standardDTO.getStandardId() != null) {
-                StandardEntity standardEntity = standardRepository
-                        .findByIdAndInstituteIdAndDeletedFalse(standardDTO.getStandardId(), organizationId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Standard not found with id: "
-                                + standardDTO.getStandardId() + " for current organization"));
-                entity.setStandard(standardEntity);
-            }
-
-            entity.setDeleted(false);
-            entity.setDeletedAt(null);
-
-            SectionEntity saved = sectionRepository.save(entity);
-            SectionCreateRequestDTO responseDTO = MapperUtil.mapObject(saved, SectionCreateRequestDTO.class);
-
-            log.info("Section created successfully with ID: {} for organization: {}", responseDTO.getId(),
-                    organizationId);
-            return responseDTO;
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception ex) {
-            log.error("Unexpected error creating Section for organization: {}", organizationId, ex);
-            throw new CustomServiceException("Failed to create Section");
+    @Transactional
+    public int softDeleteAll() {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        log.info("[Service:SectionService] softDeleteAll() called - organization: {}", organizationId);
+        int rows = sectionRepository.softDeleteByInstituteId(organizationId);
+        log.info("[Service:SectionService] softDeleteAll() succeeded - Deleted {} sections", rows);
+        return rows;
     }
 
-    public SectionDTO updateSection(Long id, @Valid SectionCreateRequestDTO dto, Long organizationId) {
-        log.info("Updating Section with id: {} for organization: {} in database", id, organizationId);
-        try {
-            SectionEntity entity = sectionRepository.findByIdAndInstituteIdAndDeletedFalse(id, organizationId)
-                    .orElseThrow(() -> {
-                        log.warn("Section not found with id: {} for organization: {}", id, organizationId);
-                        return new ResourceNotFoundException("Section not found with id: " + id);
-                    });
-
-            if (dto.getSectionName() != null && !dto.getSectionName().isBlank()) {
-                entity.setSectionName(dto.getSectionName());
-            }
-            if (dto.getSectionCode() != null) {
-                entity.setSectionCode(dto.getSectionCode());
-            }
-
-            if (dto.getStandardId() != null
-                    && (entity.getStandard() == null || !entity.getStandard().getId().equals(dto.getStandardId()))) {
-                StandardEntity standardEntity = standardRepository
-                        .findByIdAndInstituteIdAndDeletedFalse(dto.getStandardId(), organizationId)
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Standard not found with id: " + dto.getStandardId() + " for current organization"));
-                entity.setStandard(standardEntity);
-            }
-
-            SectionEntity updated = sectionRepository.save(entity);
-            SectionDTO response = MapperUtil.mapObject(updated, SectionDTO.class);
-
-            log.info("Section updated successfully: id={} for organization: {}", response.getId(), organizationId);
-            return response;
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception ex) {
-            log.error("Unexpected error while updating Section id: {} for organization: {}", id, organizationId, ex);
-            throw new CustomServiceException("Failed to update Section");
+    public List<SectionDTO> searchSections(Long campusId, Long standardId, String keyword) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        String searchKey = keyword == null ? "" : keyword.trim();
+        log.info(
+                "[Service:SectionService] searchSections() called - campusId={}, standardId={}, keyword='{}', organization={}",
+                campusId, standardId, searchKey, organizationId);
+        List<SectionEntity> result = sectionRepository.searchSectionsWithOrg(campusId, standardId, organizationId,
+                searchKey.isEmpty() ? null : searchKey);
+        List<SectionDTO> sectionDTO = SectionMapper.toResponseDTOList(result);
+        log.info(
+                "[Service:SectionService] searchSections() succeeded - Found {} sections based on search for organization: {}",
+                sectionDTO.size(), organizationId);
+        return sectionDTO;
+    }
+
+    @Transactional
+    public SectionCreateRequestDTO createSection(SectionCreateRequestDTO sectionDTO) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:SectionService] createSection() called - Creating new Section for organization: {}",
+                organizationId);
+
+        if (sectionDTO.getStandardId() == null) {
+            throw new ApiException(SectionErrors.INVALID_SECTION_DATA, "Standard ID is required",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        if (sectionDTO.getSectionCode() != null && !sectionDTO.getSectionCode().trim().isEmpty()) {
+            if (sectionRepository.existsByInstituteIdAndStandardIdAndSectionCode(organizationId,
+                    sectionDTO.getStandardId(),
+                    sectionDTO.getSectionCode().trim())) {
+                throw new ApiException(SectionErrors.DUPLICATE_SECTION_CODE, HttpStatus.CONFLICT);
+            }
+        }
+
+        if (sectionDTO.getSectionName() != null && !sectionDTO.getSectionName().trim().isEmpty()) {
+            if (sectionRepository.existsByInstituteIdAndStandardIdAndSectionName(organizationId,
+                    sectionDTO.getStandardId(),
+                    sectionDTO.getSectionName().trim())) {
+                throw new ApiException(SectionErrors.INVALID_SECTION_DATA, "Section with this name already exists",
+                        HttpStatus.CONFLICT);
+            }
+        }
+
+        SectionEntity entity = SectionMapper.toEntity(sectionDTO);
+
+        StandardEntity standardEntity = standardRepository
+                .findByIdAndInstituteIdAndDeletedFalse(sectionDTO.getStandardId(), organizationId)
+                .orElseThrow(() -> new ApiException(StandardErrors.STANDARD_NOT_FOUND, HttpStatus.NOT_FOUND));
+        entity.setStandard(standardEntity);
+
+        SectionEntity saved = sectionRepository.save(entity);
+
+        SectionCreateRequestDTO responseDTO = new SectionCreateRequestDTO();
+        responseDTO.setId(saved.getId());
+        responseDTO.setSectionName(saved.getSectionName());
+        responseDTO.setSectionCode(saved.getSectionCode());
+        responseDTO.setStandardId(saved.getStandard().getId());
+        responseDTO.setCampusId(saved.getStandard().getCampus().getId());
+
+        log.info(
+                "[Service:SectionService] createSection() succeeded - Section created successfully with ID: {} for organization: {}",
+                responseDTO.getId(), organizationId);
+        return responseDTO;
+    }
+
+    @Transactional
+    public SectionDTO updateSection(Long id, @Valid SectionCreateRequestDTO dto) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:SectionService] updateSection() called - id: {}, organization: {}", id, organizationId);
+
+        SectionEntity entity = sectionRepository.findByIdAndInstituteIdAndDeletedFalse(id, organizationId)
+                .orElseThrow(() -> {
+                    log.warn("Section not found with id: {} for organization: {}", id, organizationId);
+                    return new ApiException(SectionErrors.SECTION_NOT_FOUND, HttpStatus.NOT_FOUND);
+                });
+
+        Long targetStandardId = dto.getStandardId() != null ? dto.getStandardId() : entity.getStandard().getId();
+
+        if (dto.getSectionCode() != null && !dto.getSectionCode().trim().equals(entity.getSectionCode())) {
+            if (sectionRepository.existsByInstituteIdAndStandardIdAndSectionCodeAndIdNot(organizationId,
+                    targetStandardId,
+                    dto.getSectionCode().trim(), id)) {
+                throw new ApiException(SectionErrors.DUPLICATE_SECTION_CODE, HttpStatus.CONFLICT);
+            }
+        }
+
+        if (dto.getSectionName() != null && !dto.getSectionName().trim().equals(entity.getSectionName())) {
+            if (sectionRepository.existsByInstituteIdAndStandardIdAndSectionNameAndIdNot(organizationId,
+                    targetStandardId,
+                    dto.getSectionName().trim(), id)) {
+                throw new ApiException(SectionErrors.INVALID_SECTION_DATA, "Section with this name already exists",
+                        HttpStatus.CONFLICT);
+            }
+        }
+
+        SectionMapper.updateEntityFromDTO(entity, dto);
+
+        if (dto.getStandardId() != null
+                && (entity.getStandard() == null || !entity.getStandard().getId().equals(dto.getStandardId()))) {
+            StandardEntity standardEntity = standardRepository
+                    .findByIdAndInstituteIdAndDeletedFalse(dto.getStandardId(), organizationId)
+                    .orElseThrow(() -> new ApiException(StandardErrors.STANDARD_NOT_FOUND, HttpStatus.NOT_FOUND));
+            entity.setStandard(standardEntity);
+        }
+
+        SectionEntity updated = sectionRepository.save(entity);
+        SectionDTO response = SectionMapper.toResponseDTO(updated);
+
+        log.info("[Service:SectionService] updateSection() succeeded - id={} for organization: {}", response.getId(),
+                organizationId);
+        return response;
     }
 }
