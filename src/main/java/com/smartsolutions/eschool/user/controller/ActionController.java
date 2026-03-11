@@ -1,72 +1,93 @@
 package com.smartsolutions.eschool.user.controller;
 
-
 import com.smartsolutions.eschool.user.dtos.actions.request.ActionRequestDTO;
 import com.smartsolutions.eschool.user.dtos.actions.response.ActionResponseDTO;
 import com.smartsolutions.eschool.user.facade.ActionFacade;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/actions")
-@RequiredArgsConstructor
-@Tag(name = "Action Management", description = "Endpoints for managing global actions")
+@RequestMapping("/api/user/actions/v1")
 @Slf4j
 public class ActionController {
 
     private final ActionFacade actionFacade;
 
-    @PostMapping
-    public ResponseEntity<?> createAction(@Valid @RequestBody ActionRequestDTO dto) {
-        log.info("POST /api/v1/actions called for action: {}", dto.getName());
-        ActionResponseDTO result = actionFacade.createAction(dto);
-        log.info("POST /api/v1/actions succeeded, created action with ID: {}", result.getId());
-        return ResponseEntity.ok(result);
+    public ActionController(ActionFacade actionFacade) {
+        this.actionFacade = actionFacade;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllActions() {
-        log.info("GET /api/v1/actions called");
-        List<ActionResponseDTO> resources = actionFacade.getAllActions();
-        log.info("GET /api/v1/actions succeeded, returned {} resources", resources.size());
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ActionResponseDTO>> getAll() {
+        log.info("[Controller:ActionController] getAll() called - Request to get all actions");
+        List<ActionResponseDTO> resources = actionFacade.getAll();
+        log.info("[Controller:ActionController] getAll() succeeded - Found {} actions", resources.size());
         return ResponseEntity.ok(resources);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<?> searchActions(@RequestParam(required = false) String keyword) {
-        log.info("GET /api/v1/actions/search called with keyword: {}", keyword);
-        List<ActionResponseDTO> resources = actionFacade.searchActions(keyword);
-        log.info("GET /api/v1/actions/search succeeded, returned {} resources", resources.size());
+    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ActionResponseDTO>> getAllActive() {
+        log.info("[Controller:ActionController] getAllActive() called - Request to get all active actions");
+        List<ActionResponseDTO> resources = actionFacade.getAllActive();
+        log.info("[Controller:ActionController] getAllActive() succeeded - Found {} active actions", resources.size());
         return ResponseEntity.ok(resources);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getActionById(@PathVariable Long id) {
-        log.info("GET /api/v1/actions/{} called", id);
-        ActionResponseDTO resource = actionFacade.getActionById(id);
-        log.info("GET /api/v1/actions/{} succeeded", id);
-        return ResponseEntity.ok(resource);
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ActionResponseDTO> getById(@PathVariable Long id) {
+        log.info("[Controller:ActionController] getById() called - Request to fetch action with id: {}", id);
+        ActionResponseDTO action = actionFacade.getById(id);
+        log.info("[Controller:ActionController] getById() succeeded - Found action: {}", id);
+        return ResponseEntity.ok(action);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateAction(@PathVariable Long id, @Valid @RequestBody ActionRequestDTO dto) {
-        log.info("PUT /api/v1/actions/{} called", id);
-        ActionResponseDTO result = actionFacade.updateAction(id, dto);
-        log.info("PUT /api/v1/actions/{} succeeded", id);
-        return ResponseEntity.ok(result);
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ActionResponseDTO>> search(@RequestParam(name = "keyword") String keyword) {
+        log.info("[Controller:ActionController] search() called - Request to search actions with keyword: {}", keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<ActionResponseDTO> responseDTOs = actionFacade.searchByKeyword(keyword.trim());
+        log.info("[Controller:ActionController] search() succeeded - Found {} actions matching keyword: {}", responseDTOs.size(), keyword);
+        return ResponseEntity.ok(responseDTOs);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAction(@PathVariable Long id) {
-        log.info("DELETE /api/v1/actions/{} called", id);
-        actionFacade.deleteAction(id);
-        log.info("DELETE /api/v1/actions/{} succeeded", id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+        log.info("[Controller:ActionController] delete() called - Request to delete action: {}", id);
+        actionFacade.softDeleteById(id);
+        log.info("[Controller:ActionController] delete() succeeded - Action: {} deleted successfully", id);
+        return ResponseEntity.ok(Map.of("message", "Action deleted successfully"));
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ActionResponseDTO> create(@Valid @RequestBody ActionRequestDTO requestDTO) {
+        log.info("[Controller:ActionController] create() called - Request to create action: {}", requestDTO.getName());
+        ActionResponseDTO responseDTO = actionFacade.create(requestDTO);
+        log.info("[Controller:ActionController] create() succeeded - Action created with id: {}", responseDTO.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ActionResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ActionRequestDTO requestDTO) {
+        log.info("[Controller:ActionController] update() called - Request to update action: {}", id);
+        ActionResponseDTO responseDTO = actionFacade.update(id, requestDTO);
+        log.info("[Controller:ActionController] update() succeeded - Action: {} updated successfully", id);
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @GetMapping(value = "/statistics", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Long>> getStatistics() {
+        log.info("[Controller:ActionController] getStatistics() called");
+        Map<String, Long> statistics = actionFacade.getStatistics();
+        log.info("[Controller:ActionController] getStatistics() succeeded");
+        return ResponseEntity.ok(statistics);
     }
 }

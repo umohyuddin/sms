@@ -1,71 +1,85 @@
 package com.smartsolutions.eschool.lookups.repository;
 
 import com.smartsolutions.eschool.lookups.model.CityEntity;
-import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
 @Repository
-public interface CityRepository extends JpaRepository<CityEntity,Long>  {
-    // Fetch all non-deleted cities
-    @Query("SELECT c FROM CityEntity c WHERE c.deleted = false")
-    List<CityEntity> findAllActive();
+public interface CityRepository extends JpaRepository<CityEntity, Long> {
 
-    // Fetch all soft-deleted cities
-    @Query("SELECT c FROM CityEntity c WHERE c.deleted = true")
-    List<CityEntity> findAllDeleted();
-
-    // Fetch city by ID (non-deleted)
-    @Query("SELECT c FROM CityEntity c WHERE c.id = :id AND c.deleted = false")
+    @Query("""
+            SELECT c
+            FROM CityEntity c
+            WHERE c.id = :id
+              AND c.deleted = false
+            """)
     Optional<CityEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
-    // Fetch city by ID (including deleted)
-    @Query("SELECT c FROM CityEntity c WHERE c.id = :id")
-    Optional<CityEntity> findByIdIncludingDeleted(@Param("id") Long id);
+    @Query("""
+            SELECT c
+            FROM CityEntity c
+            WHERE c.deleted = false
+            ORDER BY c.name ASC
+            """)
+    List<CityEntity> findAllNotDeleted();
 
-    // Search by name or code (non-deleted)
-    @Query("SELECT c FROM CityEntity c WHERE (c.name LIKE %:keyword% OR c.code LIKE %:keyword%) AND c.deleted = false")
-    List<CityEntity> searchByKeyword(@Param("keyword") String keyword);
+    @Query("""
+            SELECT c
+            FROM CityEntity c
+            WHERE c.isActive = true
+              AND c.deleted = false
+            ORDER BY c.name ASC
+            """)
+    List<CityEntity> findAllActive();
 
-    // Fetch all cities of a province (non-deleted)
-    @Query("SELECT c FROM CityEntity c WHERE c.province.id = :provinceId AND c.deleted = false order by  c.name")
+    @Query("""
+            SELECT c
+            FROM CityEntity c
+            WHERE c.province.id = :provinceId
+              AND c.deleted = false
+            ORDER BY c.name ASC
+            """)
     List<CityEntity> findByProvinceId(@Param("provinceId") Long provinceId);
 
-    // Fetch all active cities of a province
-    @Query("SELECT c FROM CityEntity c WHERE c.province.id = :provinceId AND c.isActive = true AND c.deleted = false")
-    List<CityEntity> findActiveByProvinceId(@Param("provinceId") Long provinceId);
+    @Query("""
+            SELECT c
+            FROM CityEntity c
+            WHERE (LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(c.code) LIKE LOWER(CONCAT('%', :keyword, '%')))
+              AND c.deleted = false
+            ORDER BY c.name ASC
+            """)
+    List<CityEntity> searchByKeyword(@Param("keyword") String keyword);
 
-    // Soft delete city by ID
     @Modifying
-    @Query("UPDATE CityEntity c SET c.deleted = true, c.deletedAt = CURRENT_TIMESTAMP WHERE c.id = :id")
+    @Transactional
+    @Query("""
+            UPDATE CityEntity c
+            SET c.deleted = true,
+                c.deletedAt = CURRENT_TIMESTAMP
+            WHERE c.id = :id
+            """)
     int softDeleteById(@Param("id") Long id);
 
-    // Soft delete all cities of a province
-    @Modifying
-    @Query("UPDATE CityEntity c SET c.deleted = true, c.deletedAt = CURRENT_TIMESTAMP WHERE c.province.id = :provinceId")
-    int softDeleteByProvinceId(@Param("provinceId") Long provinceId);
+    @Query("SELECT COUNT(c) FROM CityEntity c WHERE c.deleted = false")
+    Long countAllNotDeleted();
 
-    // Activate / deactivate a city
-    @Modifying
-    @Query("UPDATE CityEntity c SET c.isActive = :status WHERE c.id = :id AND c.deleted = false")
-    int setActiveStatus(@Param("id") Long id, @Param("status") boolean status);
+    @Query("SELECT COUNT(c) FROM CityEntity c WHERE c.isActive = true AND c.deleted = false")
+    Long countByActiveTrue();
 
-    // Count cities in a province
-    @Query("SELECT COUNT(c) FROM CityEntity c WHERE c.province.id = :provinceId AND c.deleted = false")
-    long countByProvinceId(@Param("provinceId") Long provinceId);
+    @Query("SELECT COUNT(c) FROM CityEntity c WHERE c.isActive = false AND c.deleted = false")
+    Long countByActiveFalse();
 
-    // Check if city name exists in a province (non-deleted)
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END " +
-            "FROM CityEntity c " +
-            "WHERE c.name = :name AND c.province.id = :provinceId AND c.deleted = false")
-    boolean existsByNameInProvince(@Param("name") String name, @Param("provinceId") Long provinceId);
+    @Query("SELECT (COUNT(c) > 0) FROM CityEntity c WHERE c.province.id = :provinceId AND c.name = :name AND c.deleted = false")
+    boolean existsByProvinceIdAndName(@Param("provinceId") Long provinceId, @Param("name") String name);
+
+    @Query("SELECT (COUNT(c) > 0) FROM CityEntity c WHERE c.province.id = :provinceId AND c.name = :name AND c.id <> :id AND c.deleted = false")
+    boolean existsByProvinceIdAndNameAndIdNot(@Param("provinceId") Long provinceId, @Param("name") String name, @Param("id") Long id);
 }
-

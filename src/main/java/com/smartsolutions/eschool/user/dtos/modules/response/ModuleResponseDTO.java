@@ -1,14 +1,14 @@
 package com.smartsolutions.eschool.user.dtos.modules.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModuleResponseDTO {
@@ -22,10 +22,7 @@ public class ModuleResponseDTO {
     private Integer displayOrder;
     private Boolean systemModule;
     private Boolean active;
-    private Boolean deleted;
-
+    
     private LocalDateTime createdAt;
-    private Long createdBy;
     private LocalDateTime updatedAt;
-    private Long updatedBy;
 }

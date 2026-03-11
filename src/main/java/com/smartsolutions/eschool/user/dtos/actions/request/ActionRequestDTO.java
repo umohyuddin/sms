@@ -1,22 +1,27 @@
 package com.smartsolutions.eschool.user.dtos.actions.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActionRequestDTO {
-    @NotBlank
+    @NotBlank(message = "Action code is required")
+    @Size(max = 50, message = "Code must be at most 50 characters")
     private String code;
 
-    @NotBlank
+    @NotBlank(message = "Action name is required")
+    @Size(max = 100, message = "Name must be at most 100 characters")
     private String name;
 
+    @Size(max = 255, message = "Description must be at most 255 characters")
     private String description;
-    private Boolean active;
+
+    private Boolean active = true;
 }

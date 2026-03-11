@@ -1,114 +1,121 @@
 package com.smartsolutions.eschool.user.service;
 
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.global.responseMappers.ActionMapper;
+import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.institute.error.ActionErrors;
 import com.smartsolutions.eschool.user.dtos.actions.request.ActionRequestDTO;
 import com.smartsolutions.eschool.user.dtos.actions.response.ActionResponseDTO;
+import com.smartsolutions.eschool.user.mapper.ActionMapper;
 import com.smartsolutions.eschool.user.model.ActionEntity;
 import com.smartsolutions.eschool.user.repository.ActionRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class ActionService {
-
     private final ActionRepository actionRepository;
 
-    @Transactional
-    public ActionResponseDTO createAction(ActionRequestDTO dto) {
-        log.info("Creating new Action from database: {}", dto.getName());
-        try {
-            ActionEntity entity = ActionMapper.toEntity(dto);
-            ActionEntity saved = actionRepository.save(entity);
-            log.info("Successfully created Action with ID: {}", saved.getId());
-            return ActionMapper.toResponseDTO(saved);
-        } catch (Exception e) {
-            log.error("Unexpected error while creating Action", e);
-            throw e;
-        }
+    public ActionService(ActionRepository actionRepository) {
+        this.actionRepository = actionRepository;
     }
 
-    @Transactional(readOnly = true)
-    public List<ActionResponseDTO> getAllActions() {
-        try {
-            log.info("Fetching all active Actions from database");
-            List<ActionEntity> actions = actionRepository.findAllNotDeleted();
-            log.info("Successfully fetched {} active Actions", actions.size());
-            return ActionMapper.toResponseDTOList(actions);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Actions", e);
-            return java.util.Collections.emptyList();
-        }
+    public List<ActionResponseDTO> getAll() {
+        log.info("[Service:ActionService] getAll() called - Fetching all actions");
+        List<ActionEntity> result = actionRepository.findAllNotDeleted();
+        List<ActionResponseDTO> responseDTOs = ActionMapper.toResponseDTOList(result);
+        log.info("[Service:ActionService] getAll() succeeded - Found {} actions", responseDTOs.size());
+        return responseDTOs;
     }
 
-    @Transactional(readOnly = true)
-    public ActionResponseDTO getActionById(Long id) {
-        log.info("Fetching Action with ID: {} from database", id);
-        ActionEntity entity = actionRepository.findByIdNotDeleted(id)
-                .orElseThrow(() -> {
-                    log.warn("Action not found with ID: {}", id);
-                    return new ResourceNotFoundException("Action not found with id: " + id);
-                });
-        log.info("Successfully fetched Action: id={}", entity.getId());
-        return ActionMapper.toResponseDTO(entity);
+    public List<ActionResponseDTO> getAllActive() {
+        log.info("[Service:ActionService] getAllActive() called - Fetching active actions");
+        List<ActionEntity> result = actionRepository.findAllActive();
+        List<ActionResponseDTO> responseDTOs = ActionMapper.toResponseDTOList(result);
+        log.info("[Service:ActionService] getAllActive() succeeded - Found {} active actions", responseDTOs.size());
+        return responseDTOs;
     }
 
-    @Transactional
-    public ActionResponseDTO updateAction(Long id, ActionRequestDTO dto) {
-        log.info("Updating Action with ID: {} in database", id);
-        try {
-            ActionEntity entity = actionRepository.findByIdNotDeleted(id)
-                    .orElseThrow(() -> {
-                        log.warn("Action not found for update with ID: {}", id);
-                        return new ResourceNotFoundException("Action not found with id: " + id);
-                    });
-            ActionMapper.updateEntityFromDTO(entity, dto);
-            ActionEntity updated = actionRepository.save(entity);
-            log.info("Successfully updated Action ID: {}", id);
-            return ActionMapper.toResponseDTO(updated);
-        } catch (Exception e) {
-            log.error("Unexpected error while updating Action ID: {}", id, e);
-            throw e;
-        }
+    public ActionResponseDTO getById(Long id) {
+        log.info("[Service:ActionService] getById() called - id: {}", id);
+        ActionEntity entity = actionRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ApiException(ActionErrors.ACTION_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        ActionResponseDTO responseDTO = ActionMapper.toResponseDTO(entity);
+        log.info("[Service:ActionService] getById() succeeded - Found action: {}", id);
+        return responseDTO;
     }
 
-    @Transactional
-    public void deleteAction(Long id) {
-        log.info("Soft delete request received for Action ID: {}", id);
-        try {
-            ActionEntity entity = actionRepository.findByIdNotDeleted(id)
-                    .orElseThrow(() -> {
-                        log.warn("Action not found for deletion with ID: {}", id);
-                        return new ResourceNotFoundException("Action not found with id: " + id);
-                    });
-            entity.setDeleted(true);
-            entity.setDeletedAt(LocalDateTime.now());
-            actionRepository.save(entity);
-            log.info("Action ID: {} marked as deleted successfully", id);
-        } catch (Exception e) {
-            log.error("Error while soft deleting Action with ID: {}", id, e);
-            throw e;
-        }
-    }
-
-    @Transactional(readOnly = true)
     public List<ActionResponseDTO> searchByKeyword(String keyword) {
-        try {
-            String searchKey = keyword == null ? "" : keyword.trim();
-            log.info("Fetching Actions based on search from database with keyword: '{}'", searchKey);
-            List<ActionEntity> actions = actionRepository.searchByKeyword(searchKey);
-            log.info("Successfully fetched {} Actions based on search", actions.size());
-            return ActionMapper.toResponseDTOList(actions);
-        } catch (Exception e) {
-            log.error("Unexpected error while searching Actions", e);
-            return java.util.Collections.emptyList();
+        log.info("[Service:ActionService] searchByKeyword() called - keyword: {}", keyword);
+        List<ActionEntity> result = actionRepository.searchByKeyword(keyword);
+        List<ActionResponseDTO> responseDTOs = ActionMapper.toResponseDTOList(result);
+        log.info("[Service:ActionService] searchByKeyword() succeeded - Found {} actions", responseDTOs.size());
+        return responseDTOs;
+    }
+
+    @Transactional
+    public void softDeleteById(Long id) {
+        log.info("[Service:ActionService] softDeleteById() called - id: {}", id);
+
+        int result = actionRepository.softDeleteById(id);
+        if (result == 0) {
+            throw new ApiException(ActionErrors.ACTION_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
+        log.info("[Service:ActionService] softDeleteById() succeeded - id: {}", id);
+    }
+
+    @Transactional
+    public ActionResponseDTO create(ActionRequestDTO requestDTO) {
+        log.info("[Service:ActionService] create() called - Creating: {}", requestDTO.getName());
+
+        if (requestDTO.getCode() != null && !requestDTO.getCode().trim().isEmpty()) {
+            if (actionRepository.existsByCode(requestDTO.getCode().trim())) {
+                throw new ApiException(ActionErrors.DUPLICATE_ACTION_CODE, "Action code already exists", HttpStatus.CONFLICT);
+            }
+        }
+
+        ActionEntity entity = ActionMapper.toEntity(requestDTO);
+        ActionEntity saved = actionRepository.save(entity);
+
+        log.info("[Service:ActionService] create() succeeded - Created with id: {}", saved.getId());
+        return ActionMapper.toResponseDTO(saved);
+    }
+
+    @Transactional
+    public ActionResponseDTO update(Long id, ActionRequestDTO requestDTO) {
+        log.info("[Service:ActionService] update() called - id: {}", id);
+
+        ActionEntity existing = actionRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ApiException(ActionErrors.ACTION_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (requestDTO.getCode() != null && !requestDTO.getCode().trim().equals(existing.getCode())) {
+            if (actionRepository.existsByCodeAndIdNot(requestDTO.getCode().trim(), id)) {
+                throw new ApiException(ActionErrors.DUPLICATE_ACTION_CODE, "Action code already exists", HttpStatus.CONFLICT);
+            }
+        }
+
+        ActionMapper.updateEntityFromDTO(existing, requestDTO);
+        ActionEntity updated = actionRepository.save(existing);
+
+        log.info("[Service:ActionService] update() succeeded - id: {}", id);
+        return ActionMapper.toResponseDTO(updated);
+    }
+
+    public Map<String, Long> getStatistics() {
+        log.info("[Service:ActionService] getStatistics() called");
+
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("totalActions", actionRepository.countAllNotDeleted());
+        stats.put("activeActions", actionRepository.countByActiveTrue());
+        stats.put("inactiveActions", actionRepository.countByActiveFalse());
+
+        log.info("[Service:ActionService] getStatistics() succeeded - Stats: {}", stats);
+        return stats;
     }
 }

@@ -1,25 +1,27 @@
 package com.smartsolutions.eschool.lookups.service;
 
-import com.smartsolutions.eschool.global.exception.CustomServiceException;
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.institute.error.TaxTypeErrors;
 import com.smartsolutions.eschool.lookups.dtos.taxType.requestDto.TaxTypeRequestDTO;
 import com.smartsolutions.eschool.lookups.dtos.taxType.responseDto.TaxTypeResponseDTO;
+import com.smartsolutions.eschool.lookups.mapper.TaxTypeMapper;
 import com.smartsolutions.eschool.lookups.model.CountryEntity;
 import com.smartsolutions.eschool.lookups.model.TaxTypeEntity;
 import com.smartsolutions.eschool.lookups.repository.CountryRepository;
 import com.smartsolutions.eschool.lookups.repository.TaxTypeRepository;
-import com.smartsolutions.eschool.util.MapperUtil;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
 public class TaxTypeService {
+
     private final TaxTypeRepository taxTypeRepository;
     private final CountryRepository countryRepository;
 
@@ -28,82 +30,120 @@ public class TaxTypeService {
         this.countryRepository = countryRepository;
     }
 
-    @Transactional
-    public TaxTypeResponseDTO create(@Valid TaxTypeRequestDTO requestDTO) {
-        log.info("Creating new TaxType: {}", requestDTO.getName());
-        try {
-            TaxTypeEntity entity = MapperUtil.mapObject(requestDTO, TaxTypeEntity.class);
-            if (requestDTO.getCountryId() != null) {
-                CountryEntity country = countryRepository.findById(requestDTO.getCountryId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Country not found with id=" + requestDTO.getCountryId()));
-                entity.setCountry(country);
-            }
-            taxTypeRepository.save(entity);
-            return MapperUtil.mapObject(entity, TaxTypeResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while creating TaxType", dae);
-            throw new CustomServiceException("Failed to create TaxType due to database error");
-        } catch (Exception e) {
-            log.error("Unexpected error while creating TaxType", e);
-            throw new CustomServiceException("Failed to create TaxType");
-        }
+    public List<TaxTypeResponseDTO> getAll() {
+        log.info("[Service:TaxTypeService] getAll() called - Fetching all tax types");
+        List<TaxTypeEntity> result = taxTypeRepository.findAllNotDeleted();
+        List<TaxTypeResponseDTO> responseDTOs = TaxTypeMapper.toResponseDTOList(result);
+        log.info("[Service:TaxTypeService] getAll() succeeded - Found {} tax types", responseDTOs.size());
+        return responseDTOs;
     }
 
     public List<TaxTypeResponseDTO> getAllActive() {
-        try {
-            log.info("Fetching active TaxTypes");
-            List<TaxTypeEntity> result = taxTypeRepository.findAllActive();
-            return MapperUtil.mapList(result, TaxTypeResponseDTO.class);
-        } catch (Exception e) {
-            log.error("Error fetching active tax types", e);
-            throw new CustomServiceException("Failed to fetch active TaxTypes", e);
-        }
-    }
-
-    public List<TaxTypeResponseDTO> getByCountryId(Long countryId) {
-        try {
-            log.info("Fetching TaxTypes for country id={}", countryId);
-            List<TaxTypeEntity> result = taxTypeRepository.findByCountryId(countryId);
-            return MapperUtil.mapList(result, TaxTypeResponseDTO.class);
-        } catch (Exception e) {
-            log.error("Error fetching tax types for country id={}", countryId, e);
-            throw new CustomServiceException("Failed to fetch TaxTypes for country", e);
-        }
+        log.info("[Service:TaxTypeService] getAllActive() called - Fetching active tax types");
+        List<TaxTypeEntity> result = taxTypeRepository.findAllActive();
+        List<TaxTypeResponseDTO> responseDTOs = TaxTypeMapper.toResponseDTOList(result);
+        log.info("[Service:TaxTypeService] getAllActive() succeeded - Found {} active tax types", responseDTOs.size());
+        return responseDTOs;
     }
 
     public TaxTypeResponseDTO getById(Long id) {
-        log.info("Fetching TaxType with id={}", id);
+        log.info("[Service:TaxTypeService] getById() called - id: {}", id);
         TaxTypeEntity entity = taxTypeRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new ResourceNotFoundException("TaxType not found with id=" + id));
-        return MapperUtil.mapObject(entity, TaxTypeResponseDTO.class);
+                .orElseThrow(() -> new ApiException(TaxTypeErrors.TAX_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        TaxTypeResponseDTO responseDTO = TaxTypeMapper.toResponseDTO(entity);
+        log.info("[Service:TaxTypeService] getById() succeeded - Found tax type: {}", id);
+        return responseDTO;
+    }
+
+    public List<TaxTypeResponseDTO> getByCountryId(Long countryId) {
+        log.info("[Service:TaxTypeService] getByCountryId() called - countryId: {}", countryId);
+        List<TaxTypeEntity> result = taxTypeRepository.findByCountryId(countryId);
+        List<TaxTypeResponseDTO> responseDTOs = TaxTypeMapper.toResponseDTOList(result);
+        log.info("[Service:TaxTypeService] getByCountryId() succeeded - Found {} tax types for country: {}",
+                responseDTOs.size(), countryId);
+        return responseDTOs;
+    }
+
+    public List<TaxTypeResponseDTO> searchByKeyword(String keyword) {
+        log.info("[Service:TaxTypeService] searchByKeyword() called - keyword: {}", keyword);
+        List<TaxTypeEntity> result = taxTypeRepository.searchByKeyword(keyword);
+        List<TaxTypeResponseDTO> responseDTOs = TaxTypeMapper.toResponseDTOList(result);
+        log.info("[Service:TaxTypeService] searchByKeyword() succeeded - Found {} tax types", responseDTOs.size());
+        return responseDTOs;
     }
 
     @Transactional
-    public TaxTypeResponseDTO update(Long id, @Valid TaxTypeRequestDTO requestDTO) {
-        log.info("Updating TaxType id={}", id);
-        TaxTypeEntity entity = taxTypeRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new ResourceNotFoundException("TaxType not found with id=" + id));
-        
-        entity.setName(requestDTO.getName());
-        entity.setCode(requestDTO.getCode());
-        entity.setTaxPercentage(requestDTO.getTaxPercentage() != null ? requestDTO.getTaxPercentage() : java.math.BigDecimal.ZERO);
-        entity.setIsActive(requestDTO.getIsActive());
-        
+    public void softDeleteById(Long id) {
+        log.info("[Service:TaxTypeService] softDeleteById() called - id: {}", id);
+
+        int result = taxTypeRepository.softDeleteById(id);
+        if (result == 0) {
+            throw new ApiException(TaxTypeErrors.TAX_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        log.info("[Service:TaxTypeService] softDeleteById() succeeded - id: {}", id);
+    }
+
+    @Transactional
+    public TaxTypeResponseDTO createTaxType(TaxTypeRequestDTO requestDTO) {
+        log.info("[Service:TaxTypeService] createTaxType() called - Creating: {}", requestDTO.getCode());
+
+        if (requestDTO.getCode() != null && !requestDTO.getCode().trim().isEmpty()) {
+            if (taxTypeRepository.existsByCode(requestDTO.getCode().trim())) {
+                throw new ApiException(TaxTypeErrors.DUPLICATE_TAX_TYPE_CODE, HttpStatus.CONFLICT);
+            }
+        }
+
+        TaxTypeEntity entity = TaxTypeMapper.toEntity(requestDTO);
+
         if (requestDTO.getCountryId() != null) {
             CountryEntity country = countryRepository.findById(requestDTO.getCountryId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Country not found with id=" + requestDTO.getCountryId()));
+                    .orElseThrow(() -> new ApiException(TaxTypeErrors.COUNTRY_NOT_FOUND, HttpStatus.NOT_FOUND));
             entity.setCountry(country);
-        } else {
-            entity.setCountry(null);
         }
-        
-        taxTypeRepository.save(entity);
-        return MapperUtil.mapObject(entity, TaxTypeResponseDTO.class);
+
+        TaxTypeEntity saved = taxTypeRepository.save(entity);
+
+        log.info("[Service:TaxTypeService] createTaxType() succeeded - Created with id: {}", saved.getId());
+        return TaxTypeMapper.toResponseDTO(saved);
     }
 
     @Transactional
-    public int softDeleteById(Long id) {
-        log.info("Soft delete request for TaxType id={}", id);
-        return taxTypeRepository.softDeleteById(id);
+    public TaxTypeResponseDTO updateTaxType(Long id, TaxTypeRequestDTO requestDTO) {
+        log.info("[Service:TaxTypeService] updateTaxType() called - id: {}", id);
+
+        TaxTypeEntity existing = taxTypeRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ApiException(TaxTypeErrors.TAX_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (requestDTO.getCode() != null && !requestDTO.getCode().trim().equals(existing.getCode())) {
+            if (taxTypeRepository.existsByCodeAndIdNot(requestDTO.getCode().trim(), id)) {
+                throw new ApiException(TaxTypeErrors.DUPLICATE_TAX_TYPE_CODE, HttpStatus.CONFLICT);
+            }
+        }
+
+        TaxTypeMapper.updateEntityFromDTO(existing, requestDTO);
+
+        if (requestDTO.getCountryId() != null) {
+            CountryEntity country = countryRepository.findById(requestDTO.getCountryId())
+                    .orElseThrow(() -> new ApiException(TaxTypeErrors.COUNTRY_NOT_FOUND, HttpStatus.NOT_FOUND));
+            existing.setCountry(country);
+        }
+
+        TaxTypeEntity updated = taxTypeRepository.save(existing);
+
+        log.info("[Service:TaxTypeService] updateTaxType() succeeded - id: {}", id);
+        return TaxTypeMapper.toResponseDTO(updated);
+    }
+
+    public Map<String, Long> getStatistics() {
+        log.info("[Service:TaxTypeService] getStatistics() called");
+
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("totalTaxTypes", taxTypeRepository.countAllNotDeleted());
+        stats.put("activeTaxTypes", taxTypeRepository.countByIsActiveTrue());
+        stats.put("inactiveTaxTypes", taxTypeRepository.countByIsActiveFalse());
+
+        log.info("[Service:TaxTypeService] getStatistics() succeeded - Stats: {}", stats);
+        return stats;
     }
 }

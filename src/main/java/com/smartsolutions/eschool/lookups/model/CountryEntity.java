@@ -2,13 +2,19 @@ package com.smartsolutions.eschool.lookups.model;
 
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "country", uniqueConstraints = @UniqueConstraint(columnNames = {"country_code"}))
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CountryEntity extends ScopeAuditableEntity {
 
     @Id
@@ -26,5 +32,10 @@ public class CountryEntity extends ScopeAuditableEntity {
 
     @Column(name = "phone_code", length = 10)
     private String phoneCode;
-}
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+}

@@ -11,46 +11,88 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/lookups/fee-recurrence-rules")
 @Slf4j
 public class FeeRecurrenceRuleController {
 
-    private final FeeRecurrenceRuleFacade facade;
+    private final FeeRecurrenceRuleFacade feeRecurrenceRuleFacade;
 
-    public FeeRecurrenceRuleController(FeeRecurrenceRuleFacade facade) {
-        this.facade = facade;
-    }
-
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<FeeRecurrenceRuleResponseDTO> create(@Valid @RequestBody FeeRecurrenceRuleRequestDTO dto) {
-        log.info("POST /api/lookups/fee-recurrence-rules called");
-        return ResponseEntity.status(HttpStatus.CREATED).body(facade.create(dto));
+    public FeeRecurrenceRuleController(FeeRecurrenceRuleFacade feeRecurrenceRuleFacade) {
+        this.feeRecurrenceRuleFacade = feeRecurrenceRuleFacade;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<FeeRecurrenceRuleResponseDTO>> getAllActive() {
-        log.info("GET /api/lookups/fee-recurrence-rules called");
-        return ResponseEntity.ok(facade.getAllActive());
+    public ResponseEntity<List<FeeRecurrenceRuleResponseDTO>> getAll() {
+        log.info("[Controller:FeeRecurrenceRuleController] getAll() called - Request to get all fee recurrence rules");
+        List<FeeRecurrenceRuleResponseDTO> resources = feeRecurrenceRuleFacade.getAll();
+        log.info("[Controller:FeeRecurrenceRuleController] getAll() succeeded - Found {} fee recurrence rules",
+                resources.size());
+        return ResponseEntity.ok(resources);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FeeRecurrenceRuleResponseDTO> getById(@PathVariable Long id) {
-        log.info("GET /api/lookups/fee-recurrence-rules/{} called", id);
-        return ResponseEntity.ok(facade.getById(id));
+        log.info("[Controller:FeeRecurrenceRuleController] getById() called - Request to fetch fee recurrence rule with id: {}",
+                id);
+        FeeRecurrenceRuleResponseDTO ruleDTO = feeRecurrenceRuleFacade.getById(id);
+        log.info("[Controller:FeeRecurrenceRuleController] getById() succeeded - Found fee recurrence rule: {}", id);
+        return ResponseEntity.ok(ruleDTO);
     }
 
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<FeeRecurrenceRuleResponseDTO> update(@PathVariable Long id, @Valid @RequestBody FeeRecurrenceRuleRequestDTO dto) {
-        log.info("PUT /api/lookups/fee-recurrence-rules/{} called", id);
-        return ResponseEntity.ok(facade.update(id, dto));
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<FeeRecurrenceRuleResponseDTO>> search(
+            @RequestParam(name = "keyword") String keyword) {
+        log.info("[Controller:FeeRecurrenceRuleController] search() called - Request to search fee recurrence rules with keyword: {}",
+                keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<FeeRecurrenceRuleResponseDTO> responseDTOs = feeRecurrenceRuleFacade.searchByKeyword(keyword.trim());
+        log.info("[Controller:FeeRecurrenceRuleController] search() succeeded - Found {} fee recurrence rules matching keyword: {}",
+                responseDTOs.size(), keyword);
+        return ResponseEntity.ok(responseDTOs);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        log.info("DELETE /api/lookups/fee-recurrence-rules/{} called", id);
-        facade.softDeleteById(id);
-        return ResponseEntity.ok("Fee recurrence rule deleted successfully");
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+        log.info("[Controller:FeeRecurrenceRuleController] delete() called - Request to delete fee recurrence rule: {}",
+                id);
+        feeRecurrenceRuleFacade.softDeleteById(id);
+        log.info("[Controller:FeeRecurrenceRuleController] delete() succeeded - Fee recurrence rule: {} deleted successfully",
+                id);
+        return ResponseEntity.ok(Map.of("message", "Fee recurrence rule deleted successfully"));
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<FeeRecurrenceRuleResponseDTO> create(
+            @Valid @RequestBody FeeRecurrenceRuleRequestDTO requestDTO) {
+        log.info("[Controller:FeeRecurrenceRuleController] create() called - Request to create fee recurrence rule: {}",
+                requestDTO.getName());
+        FeeRecurrenceRuleResponseDTO responseDTO = feeRecurrenceRuleFacade.createFeeRecurrenceRule(requestDTO);
+        log.info("[Controller:FeeRecurrenceRuleController] create() succeeded - Fee recurrence rule created with id: {}",
+                responseDTO.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<FeeRecurrenceRuleResponseDTO> update(@PathVariable Long id,
+            @Valid @RequestBody FeeRecurrenceRuleRequestDTO requestDTO) {
+        log.info("[Controller:FeeRecurrenceRuleController] update() called - Request to update fee recurrence rule: {}",
+                id);
+        FeeRecurrenceRuleResponseDTO responseDTO = feeRecurrenceRuleFacade.updateFeeRecurrenceRule(id, requestDTO);
+        log.info("[Controller:FeeRecurrenceRuleController] update() succeeded - Fee recurrence rule: {} updated successfully",
+                id);
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @GetMapping(value = "/statistics", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Long>> getStatistics() {
+        log.info("[Controller:FeeRecurrenceRuleController] getStatistics() called");
+        Map<String, Long> statistics = feeRecurrenceRuleFacade.getStatistics();
+        log.info("[Controller:FeeRecurrenceRuleController] getStatistics() succeeded");
+        return ResponseEntity.ok(statistics);
     }
 }

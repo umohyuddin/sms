@@ -1,24 +1,24 @@
 package com.smartsolutions.eschool.lookups.dtos.province.responseDto;
 
-
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+import java.time.LocalDateTime;
+
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProvinceResponseDTO {
-//--
     private Long id;
-    private String code;
+    private Long countryId;
+    private String countryName;
     private String name;
-    private String description;
-
+    private String code;
     private Boolean isActive;
-    //private Integer priority;
-    //private Integer displayOrder;
-
+    
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

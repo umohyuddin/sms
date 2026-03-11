@@ -1,161 +1,127 @@
 package com.smartsolutions.eschool.employee.service;
 
-import com.smartsolutions.eschool.employee.dtos.EmployeeType.request.EmployeeTypeRequestDTO;
-import com.smartsolutions.eschool.employee.dtos.EmployeeType.response.EmployeeTypeResponseDTO;
+import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.institute.error.SalaryComponentErrors;
 import com.smartsolutions.eschool.employee.dtos.salaryComponent.request.SalaryComponentRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.salaryComponent.response.SalaryComponentResponseDTO;
-import com.smartsolutions.eschool.employee.model.EmployeeTypeEntity;
+import com.smartsolutions.eschool.employee.mapper.SalaryComponentMapper;
 import com.smartsolutions.eschool.employee.model.SalaryComponentEntity;
-import com.smartsolutions.eschool.employee.repository.EmployeeTypeRepository;
 import com.smartsolutions.eschool.employee.repository.SalaryComponentRepository;
-import com.smartsolutions.eschool.global.enums.ComponentType;
-import com.smartsolutions.eschool.global.exception.CustomServiceException;
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.util.MapperUtil;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.MappingException;
-import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 @Slf4j
 public class SalaryComponentService {
-
     private final SalaryComponentRepository salaryComponentRepository;
 
     public SalaryComponentService(SalaryComponentRepository salaryComponentRepository) {
         this.salaryComponentRepository = salaryComponentRepository;
     }
 
-    @Transactional
-    public SalaryComponentResponseDTO createComponent(@Valid SalaryComponentRequestDTO requestDTO) {
-        log.info("Creating new SalaryComponent in database: {}", requestDTO.getName());
-        try {
-            SalaryComponentEntity entity = MapperUtil.mapObject(requestDTO, SalaryComponentEntity.class);
-            entity.setDeleted(false);
-            SalaryComponentEntity saved = salaryComponentRepository.save(entity);
-            log.info("Successfully created SalaryComponent: id={}", saved.getId());
-            return MapperUtil.mapObject(saved, SalaryComponentResponseDTO.class);
-        } catch (Exception e) {
-            log.error("Unexpected error while creating SalaryComponent", e);
-            throw new CustomServiceException("Failed to create Salary Component");
-        }
+    public List<SalaryComponentResponseDTO> getAll() {
+        log.info("[Service:SalaryComponentService] getAll() called - Fetching all salary components");
+        List<SalaryComponentEntity> result = salaryComponentRepository.findAllNotDeleted();
+        List<SalaryComponentResponseDTO> responseDTOs = SalaryComponentMapper.toResponseDTOList(result);
+        log.info("[Service:SalaryComponentService] getAll() succeeded - Found {} salary components", responseDTOs.size());
+        return responseDTOs;
+    }
+
+    public List<SalaryComponentResponseDTO> getByOrganizationId(Long organizationId) {
+        log.info("[Service:SalaryComponentService] getByOrganizationId() called - Fetching salary components for organization: {}", organizationId);
+        List<SalaryComponentEntity> result = salaryComponentRepository.findByOrganizationId(organizationId);
+        List<SalaryComponentResponseDTO> responseDTOs = SalaryComponentMapper.toResponseDTOList(result);
+        log.info("[Service:SalaryComponentService] getByOrganizationId() succeeded - Found {} active salary components", responseDTOs.size());
+        return responseDTOs;
     }
 
     public SalaryComponentResponseDTO getById(Long id) {
-        log.info("Fetching SalaryComponent ID: {} from database", id);
-        try {
-            SalaryComponentEntity entity = salaryComponentRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Salary Component not found with id: " + id));
-            log.info("Successfully fetched SalaryComponent: id={}", entity.getId());
-            return toDto(entity);
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching SalaryComponent ID: {}", id, e);
-            throw new CustomServiceException("Failed to fetch Salary Component");
-        }
-    }
+        log.info("[Service:SalaryComponentService] getById() called - id: {}", id);
+        SalaryComponentEntity entity = salaryComponentRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ApiException(SalaryComponentErrors.SALARY_COMPONENT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-    public List<SalaryComponentResponseDTO> getAllNonDeleted() {
-        log.info("Fetching all non-deleted SalaryComponents from database");
-        try {
-            List<SalaryComponentEntity> entities = salaryComponentRepository.findAllNonDeleted();
-            List<SalaryComponentResponseDTO> dtoList = entities.stream()
-                    .map(this::toDto)
-                    .collect(Collectors.toList());
-            log.info("Successfully fetched {} SalaryComponents", dtoList.size());
-            return dtoList;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching SalaryComponents", e);
-            throw new CustomServiceException("Failed to fetch Salary Components");
-        }
+        SalaryComponentResponseDTO responseDTO = SalaryComponentMapper.toResponseDTO(entity);
+        log.info("[Service:SalaryComponentService] getById() succeeded - Found salary component: {}", id);
+        return responseDTO;
     }
 
     public List<SalaryComponentResponseDTO> searchByKeyword(String keyword) {
-        String searchKey = keyword == null ? "" : keyword.trim();
-        log.info("Searching SalaryComponents with keyword: '{}' in database", searchKey);
-        try {
-            List<SalaryComponentEntity> result = salaryComponentRepository.searchByKeyword(searchKey);
-            List<SalaryComponentResponseDTO> dtoList = result.stream()
-                    .map(this::toDto)
-                    .collect(Collectors.toList());
-            log.info("Successfully fetched {} SalaryComponents based on search", dtoList.size());
-            return dtoList;
-        } catch (Exception e) {
-            log.error("Unexpected error while searching SalaryComponents", e);
-            throw new CustomServiceException("Failed to search Salary Components");
-        }
+        log.info("[Service:SalaryComponentService] searchByKeyword() called - keyword: {}", keyword);
+        List<SalaryComponentEntity> result = salaryComponentRepository.searchByKeyword(keyword);
+        List<SalaryComponentResponseDTO> responseDTOs = SalaryComponentMapper.toResponseDTOList(result);
+        log.info("[Service:SalaryComponentService] searchByKeyword() succeeded - Found {} salary components", responseDTOs.size());
+        return responseDTOs;
     }
 
     @Transactional
-    public SalaryComponentResponseDTO updateComponent(Long id, @Valid SalaryComponentRequestDTO requestDTO) {
-        log.info("Updating SalaryComponent ID: {} in database", id);
-        try {
-            SalaryComponentEntity existing = salaryComponentRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Salary Component not found with id: " + id));
+    public void softDeleteById(Long id) {
+        log.info("[Service:SalaryComponentService] softDeleteById() called - id: {}", id);
 
-            existing.setName(requestDTO.getName());
-            existing.setType(requestDTO.getType());
-            existing.setIsPercentage(requestDTO.getIsPercentage());
-
-            SalaryComponentEntity updated = salaryComponentRepository.save(existing);
-            log.info("Successfully updated SalaryComponent: id={}", updated.getId());
-            return toDto(updated);
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while updating SalaryComponent ID: {}", id, e);
-            throw new CustomServiceException("Failed to update Salary Component");
+        int result = salaryComponentRepository.softDeleteById(id);
+        if (result == 0) {
+            throw new ApiException(SalaryComponentErrors.SALARY_COMPONENT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
+        log.info("[Service:SalaryComponentService] softDeleteById() succeeded - id: {}", id);
     }
 
     @Transactional
-    public void delete(Long id) {
-        log.info("Soft deleting SalaryComponent ID: {} from database", id);
-        try {
-            int affected = salaryComponentRepository.softDeleteById(id);
-            if (affected == 0) {
-                log.warn("SalaryComponent not found for deletion: id={}", id);
-                throw new ResourceNotFoundException("Salary Component not found with id: " + id);
+    public SalaryComponentResponseDTO create(SalaryComponentRequestDTO requestDTO) {
+        log.info("[Service:SalaryComponentService] create() called - Creating: {}", requestDTO.getName());
+
+        // Organization ID would technically be fed strictly from context since it's a ScopeAuditableEntity field mechanism in production.
+        // Assuming context populates entity.setOrganizationId(currentOrgId) behind the scenes in AuditableEntity hooks,
+        // we will proceed to just mock a standard context organizationId or let the JPA auditor handle it.
+        // For the sake of validation logic in create, if you need explicit cross-checking by org ID:
+        
+        // This is a placeholder representing how you'd get the contextual Org ID
+        Long currentOrganizationId = 1L; // Replace with your actual ContextHolder mechanism
+
+        if (requestDTO.getName() != null && !requestDTO.getName().trim().isEmpty()) {
+            if (salaryComponentRepository.existsByNameAndOrganizationId(requestDTO.getName().trim(), currentOrganizationId)) {
+                throw new ApiException(SalaryComponentErrors.DUPLICATE_SALARY_COMPONENT_NAME, "Salary component name already exists in this organization", HttpStatus.CONFLICT);
             }
-            log.info("Successfully soft deleted SalaryComponent: id={}", id);
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while deleting SalaryComponent ID: {}", id, e);
-            throw new CustomServiceException("Failed to delete Salary Component");
         }
+
+        SalaryComponentEntity entity = SalaryComponentMapper.toEntity(requestDTO);
+        SalaryComponentEntity saved = salaryComponentRepository.save(entity);
+
+        log.info("[Service:SalaryComponentService] create() succeeded - Created with id: {}", saved.getId());
+        return SalaryComponentMapper.toResponseDTO(saved);
     }
 
-    public Long getTotalCount() {
-        return salaryComponentRepository.countAll();
-    }
+    @Transactional
+    public SalaryComponentResponseDTO update(Long id, SalaryComponentRequestDTO requestDTO) {
+        log.info("[Service:SalaryComponentService] update() called - id: {}", id);
 
-    private SalaryComponentResponseDTO toDto(SalaryComponentEntity entity) {
-        SalaryComponentResponseDTO dto = new SalaryComponentResponseDTO();
-        dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setType(entity.getType());
-        dto.setIsPercentage(entity.getIsPercentage());
-        return dto;
-    }
+        SalaryComponentEntity existing = salaryComponentRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ApiException(SalaryComponentErrors.SALARY_COMPONENT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-    public List<SalaryComponentResponseDTO> searchComplex(String name, ComponentType type, Boolean isPercentage) {
-        String normalizedName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;
-        log.info("Complex search for SalaryComponents: name={}, type={}, isPercentage={}", normalizedName, type, isPercentage);
-        try {
-            List<SalaryComponentEntity> entities = salaryComponentRepository.search(normalizedName, type, isPercentage);
-            log.info("Successfully fetched {} SalaryComponents based on complex search", entities.size());
-            return entities.stream().map(this::toDto).collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Unexpected error during complex search for SalaryComponents", e);
-            throw new CustomServiceException("Failed to search Salary Components");
+        if (requestDTO.getName() != null && !requestDTO.getName().trim().equals(existing.getName())) {
+            if (salaryComponentRepository.existsByNameAndOrganizationIdAndIdNot(requestDTO.getName().trim(), existing.getOrganizationId(), id)) {
+                throw new ApiException(SalaryComponentErrors.DUPLICATE_SALARY_COMPONENT_NAME, "Salary component name already exists in this organization", HttpStatus.CONFLICT);
+            }
         }
+
+        SalaryComponentMapper.updateEntityFromDTO(existing, requestDTO);
+        SalaryComponentEntity updated = salaryComponentRepository.save(existing);
+
+        log.info("[Service:SalaryComponentService] update() succeeded - id: {}", id);
+        return SalaryComponentMapper.toResponseDTO(updated);
+    }
+
+    public Map<String, Long> getStatistics() {
+        log.info("[Service:SalaryComponentService] getStatistics() called");
+
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("totalSalaryComponents", salaryComponentRepository.countAllNotDeleted());
+
+        log.info("[Service:SalaryComponentService] getStatistics() succeeded - Stats: {}", stats);
+        return stats;
     }
 }

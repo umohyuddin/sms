@@ -1,12 +1,14 @@
 package com.smartsolutions.eschool.school.dtos.educationBoards.responseDto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+import java.time.LocalDateTime;
+
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class EducationBoardResponseDTO {
@@ -16,4 +18,6 @@ public class EducationBoardResponseDTO {
     private String countryCode;
     private String description;
     private Boolean isActive;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

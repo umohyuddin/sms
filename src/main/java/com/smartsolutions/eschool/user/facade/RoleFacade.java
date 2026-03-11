@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Scope("prototype")
@@ -20,49 +21,69 @@ public class RoleFacade {
         this.roleService = roleService;
     }
 
-    public RoleResponseDTO createRole(RoleRequestDTO requestDTO) {
-        log.info("Facade: Request to create Role: {}", requestDTO.getName());
-        RoleResponseDTO result = roleService.createRole(requestDTO);
-        log.info("Facade: Role created successfully with ID: {}", result.getId());
-        return result;
+    public List<RoleResponseDTO> getAll() {
+        log.info("[Facade:RoleFacade] getAll() called");
+        return roleService.getAll();
     }
 
     public List<RoleResponseDTO> getAll(Long organizationId) {
-        log.info("Facade: Request to fetch all Roles for organization: {}", organizationId);
-        List<RoleResponseDTO> result = roleService.getAll(organizationId);
-        log.info("Facade: Successfully fetched {} Roles", result.size());
-        return result;
+        log.info("[Facade:RoleFacade] getAll() called - organization: {}", organizationId);
+        return roleService.getAll(organizationId);
+    }
+
+    public RoleResponseDTO getById(Long id) {
+        log.info("[Facade:RoleFacade] getById() called - id: {}", id);
+        return roleService.getById(id);
     }
 
     public RoleResponseDTO getById(Long id, Long organizationId) {
-        log.info("Facade: Request to fetch Role ID: {} for organization: {}", id, organizationId);
-        RoleResponseDTO result = roleService.getById(id, organizationId);
-        log.info("Facade: Successfully fetched Role ID: {}", id);
-        return result;
+        log.info("[Facade:RoleFacade] getById() called - id: {}, organization: {}", id, organizationId);
+        return roleService.getById(id, organizationId);
     }
 
-    public RoleResponseDTO updateRole(Long id, Long organizationId, RoleRequestDTO requestDTO) {
-        log.info("Facade: Request to update Role ID: {} for organization: {}", id, organizationId);
-        RoleResponseDTO result = roleService.updateRole(id, organizationId, requestDTO);
-        log.info("Facade: Successfully updated Role ID: {}", id);
-        return result;
-    }
-
-    public void deleteById(Long id, Long organizationId) {
-        log.info("Facade: Request to delete Role ID: {} for organization: {}", id, organizationId);
-        roleService.deleteById(id, organizationId);
-        log.info("Facade: Successfully deleted Role ID: {}", id);
+    public List<RoleResponseDTO> searchByKeyword(String keyword) {
+        log.info("[Facade:RoleFacade] searchByKeyword() called - keyword: {}", keyword);
+        return roleService.searchByKeyword(keyword);
     }
 
     public List<RoleResponseDTO> searchByKeyword(Long organizationId, String keyword) {
-        log.info("Facade: Request to search Roles with keyword: '{}' for organization: {}", keyword, organizationId);
-        List<RoleResponseDTO> result = roleService.searchByKeyword(organizationId, keyword);
-        log.info("Facade: Search completed, found {} Roles", result.size());
-        return result;
+        log.info("[Facade:RoleFacade] searchByKeyword() called - keyword: {}, organization: {}", keyword,
+                organizationId);
+        return roleService.searchByKeyword(organizationId, keyword);
+    }
+
+    public void softDeleteById(Long id) {
+        log.info("[Facade:RoleFacade] softDeleteById() called - id: {}", id);
+        roleService.softDeleteById(id);
+    }
+
+    public void deleteById(Long id, Long organizationId) {
+        log.info("[Facade:RoleFacade] deleteById() called - id: {}, organization: {}", id, organizationId);
+        roleService.deleteById(id, organizationId);
+    }
+
+    public RoleResponseDTO createRole(RoleRequestDTO dto) {
+        log.info("[Facade:RoleFacade] createRole() called");
+        return roleService.createRole(dto);
+    }
+
+    public RoleResponseDTO updateRole(Long id, RoleRequestDTO dto) {
+        log.info("[Facade:RoleFacade] updateRole() called - id: {}", id);
+        return roleService.updateRole(id, dto);
+    }
+
+    public RoleResponseDTO updateRole(Long id, Long organizationId, RoleRequestDTO dto) {
+        log.info("[Facade:RoleFacade] updateRole() called - id: {}, organization: {}", id, organizationId);
+        return roleService.updateRole(id, organizationId, dto);
     }
 
     public List<RoleResponseDTO> getByOrganizationId(Long organizationId) {
-        log.info("Facade: Request to fetch all Roles for organization ID: {}", organizationId);
+        log.info("[Facade:RoleFacade] getByOrganizationId() called - organization: {}", organizationId);
         return roleService.getByOrganizationId(organizationId);
+    }
+
+    public Map<String, Long> getStatistics() {
+        log.info("[Facade:RoleFacade] getStatistics() called");
+        return roleService.getStatistics();
     }
 }
