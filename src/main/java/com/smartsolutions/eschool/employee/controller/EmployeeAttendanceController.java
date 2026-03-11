@@ -17,17 +17,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Transactional
+
 @RestController
 @RequestMapping("/api/employee/attendance")
 public class EmployeeAttendanceController {
 
     private EmployeeAttendanceFacade employeeAttendanceFacade;
     private ObjectMapper objectMapper;
+
     @Autowired
     public EmployeeAttendanceController(EmployeeAttendanceFacade employeeAttendanceFacade, ObjectMapper objectMapper) {
         this.employeeAttendanceFacade = employeeAttendanceFacade;
         this.objectMapper = objectMapper;
     }
+
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getAll() throws Exception {
         return new MultiResourceSuccessResponseObject(
@@ -38,8 +41,7 @@ public class EmployeeAttendanceController {
                             return new ResourceObject(
                                     String.valueOf(entity.getId()),
                                     "Employee Attendance",
-                                    resourceAttributes
-                            );
+                                    resourceAttributes);
                         })
                         .collect(Collectors.toList()));
     }
@@ -47,13 +49,13 @@ public class EmployeeAttendanceController {
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getById(@PathVariable Long id) throws Exception {
 
-        Map<String, Object> resourceAttributes = objectMapper.convertValue(employeeAttendanceFacade.getById(id), Map.class);
+        Map<String, Object> resourceAttributes = objectMapper.convertValue(employeeAttendanceFacade.getById(id),
+                Map.class);
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                    String.valueOf(id),
-                                    "Employee Salary",
-                                    resourceAttributes
-                            ));
+                String.valueOf(id),
+                "Employee Salary",
+                resourceAttributes));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
@@ -68,8 +70,7 @@ public class EmployeeAttendanceController {
                             return new ResourceObject(
                                     String.valueOf(entity.getId()),
                                     "Employee Attendance",
-                                    resourceAttributes
-                            );
+                                    resourceAttributes);
                         })
                         .collect(Collectors.toList()));
     }
@@ -82,14 +83,15 @@ public class EmployeeAttendanceController {
         }
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        EmployeeAttendanceEntity nEmployeeAttendanceEntity = objectMapper.convertValue(attributes, EmployeeAttendanceEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",employeeAttendanceFacade.create(nEmployeeAttendanceEntity));
+        EmployeeAttendanceEntity nEmployeeAttendanceEntity = objectMapper.convertValue(attributes,
+                EmployeeAttendanceEntity.class);
+        Map<String, Object> resourceAttributes = Map.of("message",
+                employeeAttendanceFacade.create(nEmployeeAttendanceEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                    String.valueOf(nEmployeeAttendanceEntity.getEmpId()),
-                                    "Employee Attendance",
-                                    resourceAttributes
-                            ));
+                String.valueOf(nEmployeeAttendanceEntity.getEmpId()),
+                "Employee Attendance",
+                resourceAttributes));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
@@ -101,28 +103,27 @@ public class EmployeeAttendanceController {
         }
         Map<String, Object> resourceMap = requestBody.get("data");
         Map<String, Object> attributes = (Map<String, Object>) resourceMap.get("attributes");
-        EmployeeAttendanceEntity nEmployeeAttendanceEntity = objectMapper.convertValue(attributes, EmployeeAttendanceEntity.class);
-        Map<String, Object> resourceAttributes = Map.of("message",employeeAttendanceFacade.update(nEmployeeAttendanceEntity));
+        EmployeeAttendanceEntity nEmployeeAttendanceEntity = objectMapper.convertValue(attributes,
+                EmployeeAttendanceEntity.class);
+        Map<String, Object> resourceAttributes = Map.of("message",
+                employeeAttendanceFacade.update(nEmployeeAttendanceEntity));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                String.valueOf(nEmployeeAttendanceEntity.getId()),
-                                "Employee Attendance",
-                                resourceAttributes
-                        ));
+                String.valueOf(nEmployeeAttendanceEntity.getId()),
+                "Employee Attendance",
+                resourceAttributes));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
     @DeleteMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject delete(
-            @PathVariable Long id
-    ) throws Exception {
-        Map<String, Object> resourceAttributes = Map.of("message",employeeAttendanceFacade.delete(id));
+            @PathVariable Long id) throws Exception {
+        Map<String, Object> resourceAttributes = Map.of("message", employeeAttendanceFacade.delete(id));
         List<ResourceObject> resourceObject = new ArrayList<>();
         resourceObject.add(new ResourceObject(
-                                String.valueOf(id),
-                                "Employee Attendance",
-                                resourceAttributes
-                        ));
+                String.valueOf(id),
+                "Employee Attendance",
+                resourceAttributes));
         return new MultiResourceSuccessResponseObject(resourceObject);
     }
 
