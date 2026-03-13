@@ -34,6 +34,22 @@ CREATE TABLE academic_years (
 CREATE INDEX idx_academic_year_status ON academic_years (status);
 CREATE INDEX idx_academic_year_is_current ON academic_years (is_current);
 
+DROP TABLE IF EXISTS charge_types;
+CREATE TABLE charge_types (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
 DROP TABLE IF EXISTS school_types;
 CREATE TABLE school_types (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -335,22 +351,33 @@ CREATE INDEX idx_education_board_name ON education_boards (name);
 CREATE INDEX idx_education_board_country ON education_boards (country_id);
 
 DROP TABLE IF EXISTS fee_catalog;
+
 CREATE TABLE fee_catalog (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     organization_id BIGINT NOT NULL,
+
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
-    charge_type VARCHAR(50) NOT NULL,
-    recurrence_rule VARCHAR(50),
+
+    charge_type_id BIGINT NOT NULL,
+    recurrence_rule_id BIGINT,
+
     active BOOLEAN NOT NULL DEFAULT TRUE,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
     created_at DATETIME,
     created_by BIGINT,
     updated_at DATETIME,
     updated_by BIGINT,
     deleted_at DATETIME,
-    deleted_by BIGINT
+    deleted_by BIGINT,
+
+    CONSTRAINT fk_fee_catalog_charge_type
+        FOREIGN KEY (charge_type_id) REFERENCES charge_types(id),
+
+    CONSTRAINT fk_fee_catalog_recurrence
+        FOREIGN KEY (recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
 );
 
 DROP TABLE IF EXISTS resources;

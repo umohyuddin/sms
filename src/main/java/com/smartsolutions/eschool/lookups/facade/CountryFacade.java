@@ -25,11 +25,6 @@ public class CountryFacade {
         return countryService.getAll();
     }
 
-    public List<CountryResponseDTO> getAllActive() {
-        log.info("[Facade:CountryFacade] getAllActive() called");
-        return countryService.getAllActive();
-    }
-
     public CountryResponseDTO getById(Long id) {
         log.info("[Facade:CountryFacade] getById() called - id: {}", id);
         return countryService.getById(id);

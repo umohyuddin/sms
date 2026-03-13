@@ -85,7 +85,8 @@ public class StudentFeeAssignmentService {
                 assignment.setFeeRate(feeRate);
 
                 // Calculate total amount based on recurrence
-                String recurrenceRule = feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule();
+                //String recurrenceRule = feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule();
+                String recurrenceRule = "recurrenceRule";
                 double baseAmount = feeRate.getAmount().doubleValue();
                 double totalAmount = baseAmount * getRecurrenceMultiplier(recurrenceRule, (int) totalMonths);
 
@@ -183,7 +184,7 @@ public class StudentFeeAssignmentService {
                 assignment.setStudent(student);
                 assignment.setFeeRate(feeRate);
 
-                String recurrenceRule = feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule();
+                String recurrenceRule = "feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule()";
                 double baseAmount = feeRate.getAmount().doubleValue();
                 double totalAmount = baseAmount * getRecurrenceMultiplier(recurrenceRule, (int) totalMonths);
 
@@ -381,8 +382,8 @@ public class StudentFeeAssignmentService {
                 .feeCatalogId(feeCatalog.getId())
                 .feeCatalogCode(feeCatalog.getCode())
                 .feeCatalogName(feeCatalog.getName())
-                .feeCatalogChargeType(feeCatalog.getChargeType())
-                .feeCatalogRecurrenceRule(feeCatalog.getRecurrenceRule())
+                .feeCatalogChargeType("feeCatalog.getChargeType()")
+                .feeCatalogRecurrenceRule("feeCatalog.getRecurrenceRule()")
                 .build();
     }
 

@@ -39,11 +39,11 @@ public class ActionMapper {
         dto.setName(entity.getName());
         dto.setDescription(entity.getDescription());
         dto.setActive(entity.getActive());
-        dto.setDeleted(entity.getDeleted());
+        //dto.setDeleted(entity.getDeleted());
         dto.setCreatedAt(entity.getCreatedAt());
-        dto.setCreatedBy(entity.getCreatedBy());
+        //dto.setCreatedBy(entity.getCreatedBy());
         dto.setUpdatedAt(entity.getUpdatedAt());
-        dto.setUpdatedBy(entity.getUpdatedBy());
+        //dto.setUpdatedBy(entity.getUpdatedBy());
         return dto;
     }
 

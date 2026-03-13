@@ -14,63 +14,47 @@ import java.util.Optional;
 @Repository
 public interface CountryRepository extends JpaRepository<CountryEntity, Long> {
 
-    @Query("""
-            SELECT c
-            FROM CountryEntity c
-            WHERE c.id = :id
-              AND c.deleted = false
-            """)
-    Optional<CountryEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+  @Query("""
+      SELECT c
+      FROM CountryEntity c
+      WHERE c.id = :id
+        AND c.deletedAt IS NULL
+      """)
+  Optional<CountryEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
-    @Query("""
-            SELECT c
-            FROM CountryEntity c
-            WHERE c.isActive = true
-              AND c.deleted = false
-            ORDER BY c.countryName ASC
-            """)
-    List<CountryEntity> findAllActive();
+  @Query("""
+      SELECT c
+      FROM CountryEntity c
+      WHERE c.deletedAt IS NULL
+      ORDER BY c.countryName ASC
+      """)
+  List<CountryEntity> findAllNotDeleted();
 
-    @Query("""
-            SELECT c
-            FROM CountryEntity c
-            WHERE c.deleted = false
-            ORDER BY c.countryName ASC
-            """)
-    List<CountryEntity> findAllNotDeleted();
+  @Query("""
+      SELECT c
+      FROM CountryEntity c
+      WHERE (LOWER(c.countryName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+         OR LOWER(c.countryCode) LIKE LOWER(CONCAT('%', :keyword, '%')))
+        AND c.deletedAt IS NULL
+      ORDER BY c.countryName ASC
+      """)
+  List<CountryEntity> searchByKeyword(@Param("keyword") String keyword);
 
-    @Query("""
-            SELECT c
-            FROM CountryEntity c
-            WHERE (LOWER(c.countryName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-               OR LOWER(c.countryCode) LIKE LOWER(CONCAT('%', :keyword, '%')))
-              AND c.deleted = false
-            ORDER BY c.countryName ASC
-            """)
-    List<CountryEntity> searchByKeyword(@Param("keyword") String keyword);
+  @Modifying
+  @Transactional
+  @Query("""
+      UPDATE CountryEntity c
+      SET c.deletedAt = CURRENT_TIMESTAMP
+      WHERE c.id = :id
+      """)
+  int softDeleteById(@Param("id") Long id);
 
-    @Modifying
-    @Transactional
-    @Query("""
-            UPDATE CountryEntity c
-            SET c.deleted = true,
-                c.deletedAt = CURRENT_TIMESTAMP
-            WHERE c.id = :id
-            """)
-    int softDeleteById(@Param("id") Long id);
+  @Query("SELECT COUNT(c) FROM CountryEntity c WHERE c.deletedAt IS NULL")
+  Long countAllNotDeleted();
 
-    @Query("SELECT COUNT(c) FROM CountryEntity c WHERE c.deleted = false")
-    Long countAllNotDeleted();
+  @Query("SELECT (COUNT(c) > 0) FROM CountryEntity c WHERE c.countryCode = :countryCode AND c.deletedAt IS NULL")
+  boolean existsByCountryCode(@Param("countryCode") String countryCode);
 
-    @Query("SELECT COUNT(c) FROM CountryEntity c WHERE c.isActive = true AND c.deleted = false")
-    Long countByIsActiveTrue();
-
-    @Query("SELECT COUNT(c) FROM CountryEntity c WHERE c.isActive = false AND c.deleted = false")
-    Long countByIsActiveFalse();
-
-    @Query("SELECT (COUNT(c) > 0) FROM CountryEntity c WHERE c.countryCode = :countryCode AND c.deleted = false")
-    boolean existsByCountryCode(@Param("countryCode") String countryCode);
-
-    @Query("SELECT (COUNT(c) > 0) FROM CountryEntity c WHERE c.countryCode = :countryCode AND c.id <> :id AND c.deleted = false")
-    boolean existsByCountryCodeAndIdNot(@Param("countryCode") String countryCode, @Param("id") Long id);
+  @Query("SELECT (COUNT(c) > 0) FROM CountryEntity c WHERE c.countryCode = :countryCode AND c.id <> :id AND c.deletedAt IS NULL")
+  boolean existsByCountryCodeAndIdNot(@Param("countryCode") String countryCode, @Param("id") Long id);
 }

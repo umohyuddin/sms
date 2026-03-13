@@ -28,7 +28,4 @@ public class CityEntity extends ScopeAuditableEntity {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
-
-    @Column(name = "deleted")
-    private Boolean deleted = false;
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "country", uniqueConstraints = @UniqueConstraint(columnNames = {"country_code"}))
+@Table(name = "country", uniqueConstraints = @UniqueConstraint(columnNames = { "country_code" }))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,9 +33,4 @@ public class CountryEntity extends ScopeAuditableEntity {
     @Column(name = "phone_code", length = 10)
     private String phoneCode;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 }

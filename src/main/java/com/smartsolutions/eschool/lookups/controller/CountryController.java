@@ -32,14 +32,6 @@ public class CountryController {
         return ResponseEntity.ok(resources);
     }
 
-    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<CountryResponseDTO>> getAllActive() {
-        log.info("[Controller:CountryController] getAllActive() called - Request to get all active countries");
-        List<CountryResponseDTO> resources = countryFacade.getAllActive();
-        log.info("[Controller:CountryController] getAllActive() succeeded - Found {} active countries", resources.size());
-        return ResponseEntity.ok(resources);
-    }
-
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CountryResponseDTO> getById(@PathVariable Long id) {
         log.info("[Controller:CountryController] getById() called - Request to fetch country with id: {}", id);
@@ -50,12 +42,14 @@ public class CountryController {
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<CountryResponseDTO>> search(@RequestParam(name = "keyword") String keyword) {
-        log.info("[Controller:CountryController] search() called - Request to search countries with keyword: {}", keyword);
+        log.info("[Controller:CountryController] search() called - Request to search countries with keyword: {}",
+                keyword);
         if (keyword == null || keyword.trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         List<CountryResponseDTO> responseDTOs = countryFacade.searchByKeyword(keyword.trim());
-        log.info("[Controller:CountryController] search() succeeded - Found {} countries matching keyword: {}", responseDTOs.size(), keyword);
+        log.info("[Controller:CountryController] search() succeeded - Found {} countries matching keyword: {}",
+                responseDTOs.size(), keyword);
         return ResponseEntity.ok(responseDTOs);
     }
 
@@ -69,14 +63,17 @@ public class CountryController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CountryResponseDTO> create(@Valid @RequestBody CountryRequestDTO requestDTO) {
-        log.info("[Controller:CountryController] create() called - Request to create country: {}", requestDTO.getCountryName());
+        log.info("[Controller:CountryController] create() called - Request to create country: {}",
+                requestDTO.getCountryName());
         CountryResponseDTO responseDTO = countryFacade.create(requestDTO);
-        log.info("[Controller:CountryController] create() succeeded - Country created with id: {}", responseDTO.getId());
+        log.info("[Controller:CountryController] create() succeeded - Country created with id: {}",
+                responseDTO.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CountryResponseDTO> update(@PathVariable Long id, @Valid @RequestBody CountryRequestDTO requestDTO) {
+    public ResponseEntity<CountryResponseDTO> update(@PathVariable Long id,
+            @Valid @RequestBody CountryRequestDTO requestDTO) {
         log.info("[Controller:CountryController] update() called - Request to update country: {}", id);
         CountryResponseDTO responseDTO = countryFacade.update(id, requestDTO);
         log.info("[Controller:CountryController] update() succeeded - Country: {} updated successfully", id);

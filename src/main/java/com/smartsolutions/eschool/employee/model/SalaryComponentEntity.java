@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import com.smartsolutions.eschool.global.enums.ComponentType;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalaryComponentEntity extends ScopeAuditableEntity {
+public class SalaryComponentEntity extends AuditableEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

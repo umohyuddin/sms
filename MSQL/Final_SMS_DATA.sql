@@ -519,6 +519,15 @@ INSERT INTO school_types (code, name, description, is_active, is_deleted) VALUES
 ('MONTESSORI', 'Montessori School', 'Focuses on child-led learning and early education.', TRUE, FALSE),
 ('VOCATIONAL', 'Vocational School', 'Specializes in skill-based education for trades and professions.', TRUE, FALSE);
 
+INSERT INTO charge_types
+(organization_id, code, name, description, is_active, deleted, created_at)
+VALUES
+(1, 'FIXED', 'Fixed Amount', 'Standard set amount (e.g., tuition, admission)', TRUE, FALSE, NOW()),
+(1, 'PERCENTAGE', 'Percentage', 'Fee calculated as a % of another fee or total (e.g., late fine, discount)', TRUE, FALSE, NOW()),
+(1, 'SLAB', 'Slab Based', 'Amount depends on slabs (e.g., transport fee depends on distance or zone)', TRUE, FALSE, NOW()),
+(1, 'PER_UNIT', 'Per Unit', 'Fee per unit/item (e.g., lab consumables, books, meals)', TRUE, FALSE, NOW()),
+(1, 'CONDITIONAL', 'Conditional', 'Fee applies only if certain condition is met (e.g., extra-curricular activity only for enrolled students)', TRUE, FALSE, NOW());
+
 
 INSERT INTO fee_recurrence_rules(code, name, description, is_active, is_deleted, created_by)
 VALUES
@@ -530,6 +539,62 @@ VALUES
 ('PER_TERM', 'Per Term', 'Fee charged per academic term or semester', TRUE, FALSE, 1),
 ('ON_DEMAND', 'On Demand', 'Fee charged when a service is used (transport, lab, activity)', TRUE, FALSE, 1);
 
+
+INSERT INTO fee_catalog
+(organization_id, code, name, description, charge_type_id, recurrence_rule_id,
+ active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+
+VALUES
+
+(1, 'ADMISSION', 'Admission Fee', 'Fee charged at the time of student admission',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ONE_TIME'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'TUITION', 'Tuition Fee', 'Core academic fee for teaching and instruction',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'ACADEMIC', 'Academic Services Fee', 'Charges related to academic support and services',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='PER_TERM'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'FACILITY', 'Facility Usage Fee', 'Charges for using school facilities and infrastructure',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ANNUAL'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'TRANSPORT', 'Transport Services Fee', 'Fee related to student transportation services',
+ (SELECT id FROM charge_types WHERE code='SLAB'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'ACTIVITY', 'Student Activities Fee', 'Fee related to extracurricular and student activities',
+ (SELECT id FROM charge_types WHERE code='CONDITIONAL'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='PER_TERM'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'RESOURCE', 'Learning Resource Fee', 'Fee related to learning materials and resources',
+ (SELECT id FROM charge_types WHERE code='PER_UNIT'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ANNUAL'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'BOARDING', 'Boarding and Accommodation Fee', 'Charges for hostel or boarding facilities',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'PENALTY', 'Penalty and Fine', 'Charges applied for late payments or violations',
+ (SELECT id FROM charge_types WHERE code='PERCENTAGE'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ON_DEMAND'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'DISCOUNT', 'Discount or Concession', 'Fee reduction applied based on eligibility',
+ (SELECT id FROM charge_types WHERE code='PERCENTAGE'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ON_DEMAND'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL);
 
 INSERT INTO roles(organization_id,code,name,description,is_system_role,active,deleted,created_by,created_at)
 VALUES

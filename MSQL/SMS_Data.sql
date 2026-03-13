@@ -542,42 +542,55 @@ VALUES (1, 'Ali', 'Ali Khan', 'Khan', 'STU001', '2008-05-15', 'MALE', 'ali.khan1
    ========================================================= */
 
 INSERT INTO fee_catalog
-(organization_id, code, name, description, charge_type, recurrence_rule,
- active, deleted,
- created_at, created_by, updated_at, updated_by,
- deleted_at, deleted_by)
-VALUES (1, 'ADMISSION', 'Admission Fee', 'One-time admission charges', 'FIXED', 'ONE_TIME',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(organization_id, code, name, description, charge_type_id, recurrence_rule_id,
+ active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
 
-       (1, 'TUITION', 'Tuition Fee', 'Regular tuition charges', 'FIXED', 'MONTHLY',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+VALUES
 
-       (1, 'EXAM', 'Examination Fee', 'Examination related charges', 'FIXED', 'TERM_WISE',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(1, 'ADMISSION', 'Admission Fee', 'Fee charged at the time of student admission',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ONE_TIME'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-       (1, 'LAB', 'Laboratory Fee', 'Laboratory usage and consumables charges', 'VARIABLE', 'TERM_WISE',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(1, 'TUITION', 'Tuition Fee', 'Core academic fee for teaching and instruction',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-       (1, 'LIBRARY', 'Library Fee', 'Library services and resources', 'FIXED', 'YEARLY',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(1, 'ACADEMIC', 'Academic Services Fee', 'Charges related to academic support and services',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='PER_TERM'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-       (1, 'TRANSPORT', 'Transport Fee', 'Student transportation charges', 'FIXED', 'MONTHLY',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(1, 'FACILITY', 'Facility Usage Fee', 'Charges for using school facilities and infrastructure',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ANNUAL'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-       (1, 'HOSTEL', 'Hostel Fee', 'Boarding and lodging charges', 'FIXED', 'MONTHLY',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(1, 'TRANSPORT', 'Transport Services Fee', 'Fee related to student transportation services',
+ (SELECT id FROM charge_types WHERE code='SLAB'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-       (1, 'ANNUAL', 'Annual Charges', 'General annual school charges', 'FIXED', 'YEARLY',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(1, 'ACTIVITY', 'Student Activities Fee', 'Fee related to extracurricular and student activities',
+ (SELECT id FROM charge_types WHERE code='CONDITIONAL'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='PER_TERM'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-       (1, 'ACTIVITY', 'Activity Fee', 'Co-curricular and extra-curricular activities', 'FIXED', 'TERM_WISE',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(1, 'RESOURCE', 'Learning Resource Fee', 'Fee related to learning materials and resources',
+ (SELECT id FROM charge_types WHERE code='PER_UNIT'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ANNUAL'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-       (1, 'DISCOUNT', 'Discount / Scholarship', 'Fee discounts and scholarships', 'DISCOUNTED', 'TERM_WISE',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(1, 'BOARDING', 'Boarding and Accommodation Fee', 'Charges for hostel or boarding facilities',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-       (1, 'FINE', 'Late Fee / Penalty', 'Late payment fines or penalties', 'PERCENTAGE', 'MONTHLY',
-        TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL);
+(1, 'PENALTY', 'Penalty and Fine', 'Charges applied for late payments or violations',
+ (SELECT id FROM charge_types WHERE code='PERCENTAGE'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ON_DEMAND'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL);
 
 
 /* =========================================================

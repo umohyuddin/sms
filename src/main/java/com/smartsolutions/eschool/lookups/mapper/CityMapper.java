@@ -68,7 +68,7 @@ public class CityMapper {
         entity.setName(dto.getName().trim());
         entity.setCode(dto.getCode() != null ? dto.getCode().trim() : null);
         entity.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
-        entity.setDeleted(false);
+        //entity.setDeleted(false);
 
         return entity;
     }

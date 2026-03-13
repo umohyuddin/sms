@@ -1,6 +1,5 @@
 package com.smartsolutions.eschool.lookups.controller;
 
-
 import com.smartsolutions.eschool.Mocking.CampusServiceMocking;
 import com.smartsolutions.eschool.employee.dtos.EmployeeType.response.EmployeeTypeResponseDTO;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
@@ -19,6 +18,8 @@ import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusRespons
 import com.smartsolutions.eschool.school.dtos.schoolTypes.responseDto.SchoolTypeResponseDTO;
 import com.smartsolutions.eschool.school.facade.DashboardFacade;
 import com.smartsolutions.eschool.school.facade.SchoolTypeFacade;
+import com.smartsolutions.eschool.school.facade.ChargeTypeFacade;
+import com.smartsolutions.eschool.school.dtos.chargetype.response.ChargeTypeResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,8 +49,15 @@ public class LookUpController {
     private final EmployeeMasterFacade employeeFacade;
     private final LookUpFacade lookUpFacade;
     private final EmployeeTypeFacade employeeTypeFacade;
+    private final ChargeTypeFacade chargeTypeFacade;
 
-    public LookUpController(SchoolTypeFacade schoolTypeFacade, CampusServiceMocking service, CountryFacade countryFacade, ReligionConfig religionConfig, FeeConfig feeConfig, BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade, NationalityConfig nationalityConfig, GenderConfig genderConfig, EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade, DashboardFacade dashboardFacade, LookUpFacade lookUpFacade, EmployeeTypeFacade employeeTypeFacade) {
+    public LookUpController(SchoolTypeFacade schoolTypeFacade, CampusServiceMocking service,
+            CountryFacade countryFacade, ReligionConfig religionConfig, FeeConfig feeConfig,
+            BloodGroupConfig bloodGroupConfig, ProvinceFacade provinceFacade, CityFacade cityFacade,
+            NationalityConfig nationalityConfig, GenderConfig genderConfig,
+            EmployeeDocumentConfig employeeDocumentConfig, EmployeeMasterFacade employeeFacade,
+            DashboardFacade dashboardFacade, LookUpFacade lookUpFacade, EmployeeTypeFacade employeeTypeFacade,
+            ChargeTypeFacade chargeTypeFacade) {
         this.schoolTypeFacade = schoolTypeFacade;
         this.service = service;
         this.countryFacade = countryFacade;
@@ -64,8 +72,8 @@ public class LookUpController {
         this.employeeFacade = employeeFacade;
         this.lookUpFacade = lookUpFacade;
         this.employeeTypeFacade = employeeTypeFacade;
+        this.chargeTypeFacade = chargeTypeFacade;
     }
-
 
     @GetMapping("/dashboard/counts")
     public ResponseEntity<?> getDashboardCounts() {
@@ -120,21 +128,22 @@ public class LookUpController {
         return ResponseEntity.ok(resource);
     }
 
-    // Get cities by province ID (for multi-level dropdown)
+    // Get provinces by country ID (for multi-level dropdown)
     @GetMapping(value = "/countries/{countryId}/provinces", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCitiesByProvince(@PathVariable Long countryId) {
-        log.info("GET /countries/{}/province called", countryId);
-        List<ProvinceResponseDTO> resources = provinceFacade.getByProvinceByCountry(countryId);
-        log.info("GET /countries/{}/province succeeded, returned {} cities", countryId, resources.size());
+    public ResponseEntity<?> getProvincesByCountry(@PathVariable Long countryId) {
+        log.info("GET /api/lookup/countries/{}/provinces called", countryId);
+        List<ProvinceResponseDTO> resources = provinceFacade.getByCountryId(countryId);
+        log.info("GET /api/lookup/countries/{}/provinces succeeded, returned {} provinces", countryId,
+                resources.size());
         return ResponseEntity.ok(resources);
     }
 
-
     @GetMapping(value = "/country/provinces/{provinceId}/cities", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getProvinceByCountry(@PathVariable Long provinceId) {
-        log.info("GET /api/lookup/provinces/{}/cities called", provinceId);
-        List<CityResponseDTO> resources = cityFacade.getByProvince(provinceId);
-        log.info("GET /api/lookup/provinces/{}/cities succeeded, returned {} cities", provinceId, resources.size());
+    public ResponseEntity<?> getCitiesByProvince(@PathVariable Long provinceId) {
+        log.info("GET /api/lookup/country/provinces/{}/cities called", provinceId);
+        List<CityResponseDTO> resources = cityFacade.getByProvinceId(provinceId);
+        log.info("GET /api/lookup/country/provinces/{}/cities succeeded, returned {} cities", provinceId,
+                resources.size());
         return ResponseEntity.ok(resources);
     }
 
@@ -149,9 +158,17 @@ public class LookUpController {
 
     @GetMapping("/fee-catalog/metadata")
     public Map<String, Map<String, String>> getFeeMeta() {
-        return Map.of("chargeTypes", feeConfig.getChargeTypes(), "recurrenceRules", feeConfig.getRecurrenceRules(), "discountChargeTypes", feeConfig.getDiscountTypes());
-    }
+        log.info("GET /api/lookup/fee-catalog/metadata called");
 
+        List<ChargeTypeResponseDTO> chargeTypesList = chargeTypeFacade.getAllActive();
+        Map<String, String> chargeTypes = chargeTypesList.stream()
+                .collect(Collectors.toMap(ChargeTypeResponseDTO::getCode, ChargeTypeResponseDTO::getName));
+
+        return Map.of(
+                "chargeTypes", chargeTypes,
+                "recurrenceRules", feeConfig.getRecurrenceRules(),
+                "discountChargeTypes", feeConfig.getDiscountTypes());
+    }
 
     @GetMapping("/docs/metadata")
     public Map<String, Object> getDocsMeta() {
@@ -159,11 +176,13 @@ public class LookUpController {
         List<EmployeeTypeResponseDTO> employeeTypeResponseDTOS = employeeTypeFacade.getAll();
         List<SchoolTypeResponseDTO> schoolTypeResponseDTOS = schoolTypeFacade.getAll();
 
-        Map<String, String> countries = countriesList.stream().collect(Collectors.toMap(item -> String.valueOf(item.getId()), CountryResponseDTO::getCountryName));
-        Map<String, String> SchoolTypes = schoolTypeResponseDTOS.stream().collect(Collectors.toMap(item -> String.valueOf(item.getId()), SchoolTypeResponseDTO::getName));
+        Map<String, String> countries = countriesList.stream()
+                .collect(Collectors.toMap(item -> String.valueOf(item.getId()), CountryResponseDTO::getCountryName));
+        Map<String, String> SchoolTypes = schoolTypeResponseDTOS.stream()
+                .collect(Collectors.toMap(item -> String.valueOf(item.getId()), SchoolTypeResponseDTO::getName));
 
-
-        Map<String, String> systemEmployeeType = employeeTypeResponseDTOS.stream().collect(Collectors.toMap(item -> String.valueOf(item.getId()), EmployeeTypeResponseDTO::getName));
+        Map<String, String> systemEmployeeType = employeeTypeResponseDTOS.stream()
+                .collect(Collectors.toMap(item -> String.valueOf(item.getId()), EmployeeTypeResponseDTO::getName));
 
         Map<String, Object> result = new HashMap<>();
         result.put("docs", employeeDocumentConfig.getDocumentTypes());
@@ -177,23 +196,24 @@ public class LookUpController {
         result.put("religions", religionConfig.getList());
         result.put("nationalities", nationalityConfig.getMap());
         result.put("countries", countries);
-        //need to change this conflicting with employee type
+        // need to change this conflicting with employee type
         result.put("employmentType", employeeDocumentConfig.getEmploymentTypes());
         result.put("systemEmployeeType", systemEmployeeType);
-        result.put("SchoolTypes",SchoolTypes);
+        result.put("SchoolTypes", SchoolTypes);
         return result;
     }
-
 
     @GetMapping("/admission/metadata")
     public Map<String, Map<String, String>> getAdmissionMeta() {
         List<ProvinceResponseDTO> provincesList = provinceFacade.getAll();
 
+        Map<String, String> provinces = provincesList.stream()
+                .collect(Collectors.toMap(province -> String.valueOf(province.getId()), // convert Long to String
+                        ProvinceResponseDTO::getName));
 
-        Map<String, String> provinces = provincesList.stream().collect(Collectors.toMap(province -> String.valueOf(province.getId()), // convert Long to String
-                ProvinceResponseDTO::getName));
-
-        return Map.of("bloodGroup", bloodGroupConfig.getGroup(), "religions", religionConfig.getList(), "nationalities", nationalityConfig.getMap(), "gender", genderConfig.getList(), "provinces", provinces, "docs", employeeDocumentConfig.getDocumentTypes());
+        return Map.of("bloodGroup", bloodGroupConfig.getGroup(), "religions", religionConfig.getList(), "nationalities",
+                nationalityConfig.getMap(), "gender", genderConfig.getList(), "provinces", provinces, "docs",
+                employeeDocumentConfig.getDocumentTypes());
     }
 
     @GetMapping("mocking/{id}")
@@ -202,4 +222,3 @@ public class LookUpController {
     }
 
 }
-

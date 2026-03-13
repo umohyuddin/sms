@@ -33,14 +33,6 @@ public class CountryService {
         return responseDTOs;
     }
 
-    public List<CountryResponseDTO> getAllActive() {
-        log.info("[Service:CountryService] getAllActive() called - Fetching active countries");
-        List<CountryEntity> result = countryRepository.findAllActive();
-        List<CountryResponseDTO> responseDTOs = CountryMapper.toResponseDTOList(result);
-        log.info("[Service:CountryService] getAllActive() succeeded - Found {} active countries", responseDTOs.size());
-        return responseDTOs;
-    }
-
     public CountryResponseDTO getById(Long id) {
         log.info("[Service:CountryService] getById() called - id: {}", id);
         CountryEntity entity = countryRepository.findByIdAndDeletedFalse(id)
@@ -76,7 +68,8 @@ public class CountryService {
 
         if (requestDTO.getCountryCode() != null && !requestDTO.getCountryCode().trim().isEmpty()) {
             if (countryRepository.existsByCountryCode(requestDTO.getCountryCode().trim())) {
-                throw new ApiException(CountryErrors.DUPLICATE_COUNTRY_CODE, "Country code already exists", HttpStatus.CONFLICT);
+                throw new ApiException(CountryErrors.DUPLICATE_COUNTRY_CODE, "Country code already exists",
+                        HttpStatus.CONFLICT);
             }
         }
 
@@ -94,9 +87,11 @@ public class CountryService {
         CountryEntity existing = countryRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ApiException(CountryErrors.COUNTRY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        if (requestDTO.getCountryCode() != null && !requestDTO.getCountryCode().trim().equals(existing.getCountryCode())) {
+        if (requestDTO.getCountryCode() != null
+                && !requestDTO.getCountryCode().trim().equals(existing.getCountryCode())) {
             if (countryRepository.existsByCountryCodeAndIdNot(requestDTO.getCountryCode().trim(), id)) {
-                throw new ApiException(CountryErrors.DUPLICATE_COUNTRY_CODE, "Country code already exists", HttpStatus.CONFLICT);
+                throw new ApiException(CountryErrors.DUPLICATE_COUNTRY_CODE, "Country code already exists",
+                        HttpStatus.CONFLICT);
             }
         }
 
@@ -112,8 +107,6 @@ public class CountryService {
 
         Map<String, Long> stats = new HashMap<>();
         stats.put("totalCountries", countryRepository.countAllNotDeleted());
-        stats.put("activeCountries", countryRepository.countByIsActiveTrue());
-        stats.put("inactiveCountries", countryRepository.countByIsActiveFalse());
 
         log.info("[Service:CountryService] getStatistics() succeeded - Stats: {}", stats);
         return stats;

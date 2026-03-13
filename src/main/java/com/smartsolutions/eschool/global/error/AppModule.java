@@ -8,6 +8,8 @@ public enum AppModule {
     PAYMENT("PAY"),
     PRODUCT("PRD"),
     SCHOOL("SCH"),
+    LOOKUP("LKP"),
+    EMPLOYEE("EMP"),
     COMMON("COM");
 
     private final String code;

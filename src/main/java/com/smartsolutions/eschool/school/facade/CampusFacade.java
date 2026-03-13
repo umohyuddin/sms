@@ -81,7 +81,7 @@ public class CampusFacade {
 
         List<ProvinceResponseDTO> provinceResponseDTOS = java.util.Collections.emptyList();
         if (instituteResponseDTO != null && instituteResponseDTO.getCountryId() != null) {
-            provinceResponseDTOS = provinceService.getByProvinceByCountry(instituteResponseDTO.getCountryId());
+            provinceResponseDTOS = provinceService.getByCountryId(instituteResponseDTO.getCountryId());
         }
 
         return CampusMetaData.builder()

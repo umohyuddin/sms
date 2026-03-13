@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeeCatalogRequestDTO {
-    private Long id;   // Optional (only for Update)
+    private Long id; // Optional (only for Update)
 
     @NotBlank(message = "Name is required")
     private String name;
@@ -22,11 +22,10 @@ public class FeeCatalogRequestDTO {
 
     private String description;
 
-    @NotBlank(message = "Charge type is required")
-    private String chargeType; // FIXED, PERCENTAGE, etc.
+    @NotNull(message = "Charge type is required")
+    private Long chargeTypeId;
 
-    @NotBlank(message = "Rule type is required")
-    private String recurrenceRule; // MONTHLY, YEARLY, etc.
+    private Long recurrenceRuleId;
 
     @NotNull(message = "Active flag is required")
     private Boolean active;
