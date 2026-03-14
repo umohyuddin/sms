@@ -36,6 +36,16 @@ public class FeeCatalogFacade {
         return feeCatalogService.searchByKeyword(keyword);
     }
 
+    public List<FeeCatalogDTO> getByChargeType(Long chargeTypeId) {
+        log.info("[Facade:FeeCatalogFacade] getByChargeType() called - chargeTypeId: {}", chargeTypeId);
+        return feeCatalogService.getByChargeType(chargeTypeId);
+    }
+
+    public List<FeeCatalogDTO> getByRecurrenceRule(Long recurrenceRuleId) {
+        log.info("[Facade:FeeCatalogFacade] getByRecurrenceRule() called - recurrenceRuleId: {}", recurrenceRuleId);
+        return feeCatalogService.getByRecurrenceRule(recurrenceRuleId);
+    }
+
     public FeeCatalogDTO createFeeCatalog(FeeCatalogRequestDTO dto) {
         log.info("[Facade:FeeCatalogFacade] createFeeCatalog() called");
         return feeCatalogService.createFeeCatalog(dto);

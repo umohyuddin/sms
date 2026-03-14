@@ -81,6 +81,33 @@ public class FeeCatalogService {
         return responseDTOs;
     }
 
+    public List<FeeCatalogDTO> getByChargeType(Long chargeTypeId) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeCatalogErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:FeeCatalogService] getByChargeType() called - chargeTypeId: {}, institute: {}", chargeTypeId,
+                organizationId);
+        List<FeeCatalogEntity> result = feeCatalogRepository.findByChargeTypeIdAndInstituteId(chargeTypeId, organizationId);
+        List<FeeCatalogDTO> responseDTOs = FeeCatalogMapper.toDtoList(result);
+        log.info("[Service:FeeCatalogService] getByChargeType() succeeded - Found {} catalogs", responseDTOs.size());
+        return responseDTOs;
+    }
+
+    public List<FeeCatalogDTO> getByRecurrenceRule(Long recurrenceRuleId) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeCatalogErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:FeeCatalogService] getByRecurrenceRule() called - recurrenceRuleId: {}, institute: {}",
+                recurrenceRuleId, organizationId);
+        List<FeeCatalogEntity> result = feeCatalogRepository.findByRecurrenceRuleIdAndInstituteId(recurrenceRuleId,
+                organizationId);
+        List<FeeCatalogDTO> responseDTOs = FeeCatalogMapper.toDtoList(result);
+        log.info("[Service:FeeCatalogService] getByRecurrenceRule() succeeded - Found {} catalogs", responseDTOs.size());
+        return responseDTOs;
+    }
+
     @Transactional
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();

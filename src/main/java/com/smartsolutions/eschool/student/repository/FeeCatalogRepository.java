@@ -48,6 +48,24 @@ public interface FeeCatalogRepository extends JpaRepository<FeeCatalogEntity, Lo
         Optional<FeeCatalogEntity> findByCodeOrNameAndInstituteId(@Param("code") String code,
                         @Param("name") String name, @Param("instituteId") Long instituteId);
 
+        @Query("SELECT fc FROM FeeCatalogEntity fc " +
+                        "JOIN FETCH fc.institute i " +
+                        "JOIN FETCH fc.chargeType ct " +
+                        "LEFT JOIN FETCH fc.recurrenceRule rr " +
+                        "WHERE ct.id = :chargeTypeId " +
+                        "AND i.id = :instituteId AND fc.deleted = false")
+        List<FeeCatalogEntity> findByChargeTypeIdAndInstituteId(@Param("chargeTypeId") Long chargeTypeId,
+                        @Param("instituteId") Long instituteId);
+
+        @Query("SELECT fc FROM FeeCatalogEntity fc " +
+                        "JOIN FETCH fc.institute i " +
+                        "JOIN FETCH fc.chargeType ct " +
+                        "LEFT JOIN FETCH fc.recurrenceRule rr " +
+                        "WHERE rr.id = :recurrenceRuleId " +
+                        "AND i.id = :instituteId AND fc.deleted = false")
+        List<FeeCatalogEntity> findByRecurrenceRuleIdAndInstituteId(@Param("recurrenceRuleId") Long recurrenceRuleId,
+                        @Param("instituteId") Long instituteId);
+
         @Modifying
         @Transactional
         @Query("UPDATE FeeCatalogEntity fc SET fc.deleted = true, fc.deletedAt = CURRENT_TIMESTAMP " +

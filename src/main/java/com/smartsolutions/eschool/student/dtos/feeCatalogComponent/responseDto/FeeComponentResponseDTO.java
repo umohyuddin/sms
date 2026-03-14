@@ -1,5 +1,8 @@
 package com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto;
 
+import com.smartsolutions.eschool.lookups.dtos.feeRecurrenceRule.responseDto.FeeRecurrenceRuleResponseDTO;
+import com.smartsolutions.eschool.school.dtos.chargetype.response.ChargeTypeResponseDTO;
+import com.smartsolutions.eschool.school.dtos.institute.response.InstituteResponseDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,4 +22,8 @@ public class FeeComponentResponseDTO {
     private boolean discountable;
     private FeeCatalogDTO feeCatalog;
 
+    // Related FeeCatalog properties
+    private ChargeTypeResponseDTO chargeType;
+    private FeeRecurrenceRuleResponseDTO recurrenceRule;
+    private InstituteResponseDTO institute;
 }
