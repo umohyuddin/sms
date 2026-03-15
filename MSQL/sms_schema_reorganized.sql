@@ -34,22 +34,7 @@ CREATE TABLE academic_years (
 CREATE INDEX idx_academic_year_status ON academic_years (status);
 CREATE INDEX idx_academic_year_is_current ON academic_years (is_current);
 
-DROP TABLE IF EXISTS charge_types;
-CREATE TABLE charge_types (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    organization_id BIGINT NOT NULL,
-    code VARCHAR(255) NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(255),
-    is_active BOOLEAN DEFAULT TRUE,
-    deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME,
-    created_by BIGINT,
-    updated_at DATETIME,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT
-);
+
 DROP TABLE IF EXISTS school_types;
 CREATE TABLE school_types (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -150,22 +135,6 @@ CREATE TABLE facility_types (
     deleted_by BIGINT
 );
 
-DROP TABLE IF EXISTS fee_recurrence_rules;
-CREATE TABLE fee_recurrence_rules (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(30) UNIQUE NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    description VARCHAR(255),
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT
-);
-CREATE INDEX idx_fee_recurrence_rule_code ON fee_recurrence_rules (code);
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
@@ -350,35 +319,7 @@ CREATE INDEX idx_education_board_code ON education_boards (code);
 CREATE INDEX idx_education_board_name ON education_boards (name);
 CREATE INDEX idx_education_board_country ON education_boards (country_id);
 
-DROP TABLE IF EXISTS fee_catalog;
 
-CREATE TABLE fee_catalog (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    organization_id BIGINT NOT NULL,
-
-    code VARCHAR(50) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL,
-    description VARCHAR(255),
-
-    charge_type_id BIGINT NOT NULL,
-    recurrence_rule_id BIGINT,
-
-    active BOOLEAN NOT NULL DEFAULT TRUE,
-    deleted BOOLEAN NOT NULL DEFAULT FALSE,
-
-    created_at DATETIME,
-    created_by BIGINT,
-    updated_at DATETIME,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT,
-
-    CONSTRAINT fk_fee_catalog_charge_type
-        FOREIGN KEY (charge_type_id) REFERENCES charge_types(id),
-
-    CONSTRAINT fk_fee_catalog_recurrence
-        FOREIGN KEY (recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
-);
 
 DROP TABLE IF EXISTS resources;
 CREATE TABLE resources (
@@ -460,28 +401,6 @@ CREATE TABLE institutes (
 CREATE INDEX idx_institutes_country_id ON institutes (country_id);
 CREATE INDEX idx_institutes_province_id ON institutes (province_id);
 CREATE INDEX idx_institutes_city_id ON institutes (city_id);
-
-DROP TABLE IF EXISTS fee_component;
-CREATE TABLE fee_component (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    organization_id BIGINT NOT NULL,
-    fee_catalog_id BIGINT NOT NULL,
-    component_code VARCHAR(50) NOT NULL,
-    component_name VARCHAR(100) NOT NULL,
-    account_code VARCHAR(50),
-    taxable BOOLEAN NOT NULL DEFAULT FALSE,
-    active BOOLEAN NOT NULL DEFAULT TRUE,
-    deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    discount_able BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME,
-    created_by BIGINT,
-    updated_at DATETIME,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT,
-    CONSTRAINT fk_fee_component_catalog FOREIGN KEY (fee_catalog_id) REFERENCES fee_catalog (id)
-);
-CREATE INDEX idx_fee_component_catalog_id ON fee_component (fee_catalog_id);
 
 DROP TABLE IF EXISTS permissions;
 CREATE TABLE permissions (
@@ -681,46 +600,6 @@ CREATE TABLE institute_accreditations (
 );
 CREATE INDEX idx_institute_accreditations_institute ON institute_accreditations (institute_id);
 
-DROP TABLE IF EXISTS institute_financial_settings;
-CREATE TABLE institute_financial_settings (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    institute_id BIGINT NOT NULL,
-    academic_year_id BIGINT NOT NULL,
-    fee_recurrence_rule_id BIGINT,
-    currency_id INT,
-    language_id BIGINT,
-    locale VARCHAR(10),
-    allow_partial_payments BOOLEAN DEFAULT FALSE,
-    late_fee_applicable BOOLEAN DEFAULT FALSE,
-    late_fee_type VARCHAR(20),
-    late_fee_amount DECIMAL(10, 2),
-    is_tax_applicable BOOLEAN DEFAULT FALSE,
-    tax_type_id BIGINT,
-    is_tax_inclusive BOOLEAN DEFAULT FALSE,
-    allow_refunds BOOLEAN DEFAULT FALSE,
-    refund_policy_url VARCHAR(255),
-    refund_window_days INT,
-     refund_type VARCHAR(20),
-    refund_percentage DECIMAL(5,2),
-    refund_fixed_amount DECIMAL(10,2),
-    invoice_mandatory BOOLEAN DEFAULT TRUE,
-    receipt_mandatory BOOLEAN DEFAULT TRUE,
-    is_active BOOLEAN DEFAULT TRUE,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-    deleted_at DATETIME,
-    deleted_by BIGINT,
-    FOREIGN KEY (institute_id) REFERENCES institutes(id),
-    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
-    FOREIGN KEY (currency_id) REFERENCES currencies(id),
-    FOREIGN KEY (tax_type_id) REFERENCES tax_types(id),
-    FOREIGN KEY (fee_recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
-);
-CREATE INDEX idx_institute_financial_settings_institute ON institute_financial_settings (institute_id);
-CREATE INDEX idx_institute_financial_settings_academic_year ON institute_financial_settings (academic_year_id);
 
 DROP TABLE IF EXISTS institute_profiles;
 CREATE TABLE institute_profiles (
@@ -882,6 +761,166 @@ CREATE TABLE sections (
 );
 CREATE INDEX idx_sections_standard_id ON sections (standard_id);
 
+
+DROP TABLE IF EXISTS fee_recurrence_rules;
+CREATE TABLE fee_recurrence_rules (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(30) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+CREATE INDEX idx_fee_recurrence_rule_code ON fee_recurrence_rules (code);
+
+
+
+DROP TABLE IF EXISTS charge_types;
+CREATE TABLE charge_types (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT
+);
+
+
+DROP TABLE IF EXISTS fee_catalog;
+CREATE TABLE fee_catalog (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+
+    code VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+
+    charge_type_id BIGINT NOT NULL,
+    recurrence_rule_id BIGINT,
+
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    CONSTRAINT fk_fee_catalog_charge_type
+        FOREIGN KEY (charge_type_id) REFERENCES charge_types(id),
+
+    CONSTRAINT fk_fee_catalog_recurrence
+        FOREIGN KEY (recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
+);
+
+
+
+DROP TABLE IF EXISTS fee_component;
+CREATE TABLE fee_component (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    fee_catalog_id BIGINT NOT NULL,
+    component_code VARCHAR(50) NOT NULL,
+    component_name VARCHAR(100) NOT NULL,
+    account_code VARCHAR(50),
+    taxable BOOLEAN NOT NULL DEFAULT FALSE,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    discount_able BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    CONSTRAINT fk_fee_component_catalog FOREIGN KEY (fee_catalog_id) REFERENCES fee_catalog (id)
+);
+CREATE INDEX idx_fee_component_catalog_id ON fee_component (fee_catalog_id);
+
+
+
+DROP TABLE IF EXISTS fee_slab_groups;
+
+CREATE TABLE fee_slab_groups (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
+    fee_component_id BIGINT NOT NULL,
+
+    code VARCHAR(50) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    CONSTRAINT fk_fee_slab_group_component
+        FOREIGN KEY (fee_component_id) REFERENCES fee_component(id)
+);
+
+DROP TABLE IF EXISTS fee_slabs;
+
+CREATE TABLE fee_slabs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
+    slab_group_id BIGINT NOT NULL,
+
+    min_value DECIMAL(10,2) NOT NULL,
+    max_value DECIMAL(10,2),
+
+    amount DECIMAL(10,2) NOT NULL,
+
+    currency VARCHAR(3),
+
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at DATETIME,
+    created_by BIGINT,
+    updated_at DATETIME,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    CONSTRAINT fk_fee_slabs_group
+        FOREIGN KEY (slab_group_id) REFERENCES fee_slab_groups(id),
+
+    CONSTRAINT chk_fee_slab_amount
+        CHECK (amount >= 0),
+
+    CONSTRAINT chk_fee_slab_range
+        CHECK (max_value IS NULL OR max_value >= min_value)
+);
+
+CREATE INDEX idx_fee_slabs_group_id
+ON fee_slabs (slab_group_id);
+CREATE INDEX idx_fee_slab_groups_component_id
+ON fee_slab_groups (fee_component_id);
+
+
 DROP TABLE IF EXISTS fee_rates;
 CREATE TABLE fee_rates (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -891,7 +930,18 @@ CREATE TABLE fee_rates (
     fee_component_id BIGINT,
     academic_year_id BIGINT NOT NULL,
     description VARCHAR(255),
-    amount DECIMAL(10, 2) NOT NULL,
+     fixed_amount DECIMAL(12,2),
+    -- Percentage
+    percentage_value DECIMAL(5,2),
+    percentage_of_component_id BIGINT,
+    -- Per unit
+    unit_price DECIMAL(12,2),
+    -- Slab group reference
+    slab_group_id BIGINT,
+
+    charge_type_id BIGINT NOT NULL,
+    priority INT DEFAULT 0,
+
     currency VARCHAR(3),
     effective_from DATE NOT NULL,
     effective_to DATE,
@@ -906,14 +956,57 @@ CREATE TABLE fee_rates (
     CONSTRAINT fk_fee_rates_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
     CONSTRAINT fk_fee_rates_standard FOREIGN KEY (standard_id) REFERENCES standards (id),
     CONSTRAINT fk_fee_rates_component FOREIGN KEY (fee_component_id) REFERENCES fee_component (id),
+    CONSTRAINT fk_fee_rates_charge_type FOREIGN KEY (charge_type_id) REFERENCES charge_types (id),
     CONSTRAINT fk_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
-    CONSTRAINT chk_fee_rates_amount CHECK (amount >= 0),
     CONSTRAINT chk_fee_rates_dates CHECK (effective_to IS NULL OR effective_to >= effective_from)
 );
 CREATE INDEX idx_fee_rates_campus_id ON fee_rates (campus_id);
 CREATE INDEX idx_fee_rates_standard_id ON fee_rates (standard_id);
 CREATE INDEX idx_fee_rates_component_id ON fee_rates (fee_component_id);
 CREATE INDEX idx_fee_rates_academic_year_id ON fee_rates (academic_year_id);
+
+
+DROP TABLE IF EXISTS institute_financial_settings;
+CREATE TABLE institute_financial_settings (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institute_id BIGINT NOT NULL,
+    academic_year_id BIGINT NOT NULL,
+    fee_recurrence_rule_id BIGINT,
+    currency_id INT,
+    language_id BIGINT,
+    locale VARCHAR(10),
+    allow_partial_payments BOOLEAN DEFAULT FALSE,
+    late_fee_applicable BOOLEAN DEFAULT FALSE,
+    late_fee_type VARCHAR(20),
+    late_fee_amount DECIMAL(10, 2),
+    is_tax_applicable BOOLEAN DEFAULT FALSE,
+    tax_type_id BIGINT,
+    is_tax_inclusive BOOLEAN DEFAULT FALSE,
+    allow_refunds BOOLEAN DEFAULT FALSE,
+    refund_policy_url VARCHAR(255),
+    refund_window_days INT,
+     refund_type VARCHAR(20),
+    refund_percentage DECIMAL(5,2),
+    refund_fixed_amount DECIMAL(10,2),
+    invoice_mandatory BOOLEAN DEFAULT TRUE,
+    receipt_mandatory BOOLEAN DEFAULT TRUE,
+    is_active BOOLEAN DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    FOREIGN KEY (institute_id) REFERENCES institutes(id),
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
+    FOREIGN KEY (currency_id) REFERENCES currencies(id),
+    FOREIGN KEY (tax_type_id) REFERENCES tax_types(id),
+    FOREIGN KEY (fee_recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
+);
+CREATE INDEX idx_institute_financial_settings_institute ON institute_financial_settings (institute_id);
+CREATE INDEX idx_institute_financial_settings_academic_year ON institute_financial_settings (academic_year_id);
 
 -- =============================
 -- LEVEL 5: Employee and Student

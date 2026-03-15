@@ -18,7 +18,17 @@ public class FeeRatesResponseDTO {
     private String code;
     private String name;
     private String description;
-    private BigDecimal amount;
+
+    private BigDecimal fixedAmount;
+    private BigDecimal percentageValue;
+    private BigDecimal unitPrice;
+
+    private FeeComponentDTO percentageOfComponent;
+    private SlabGroupDTO slabGroup;
+    private ChargeTypeDTO chargeType;
+
+    private Integer priority;
+
     private String currency;
     private LocalDate effectiveFrom;
     private LocalDate effectiveTo;
@@ -29,6 +39,32 @@ public class FeeRatesResponseDTO {
     private StandardDTO standard;
     private FeeComponentDTO feeComponent;
     private AcademicYearDTO academicYear;
+
+    // =======================
+    // CHILD DTO: SLAB GROUP
+    // =======================
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SlabGroupDTO {
+        private Long id;
+        private String name;
+        private String code;
+    }
+
+    // =======================
+    // CHILD DTO: CHARGE TYPE
+    // =======================
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChargeTypeDTO {
+        private Long id;
+        private String code;
+        private String name;
+    }
 
     // =======================
     // CHILD DTO: CAMPUS
@@ -79,6 +115,9 @@ public class FeeRatesResponseDTO {
         // Add FeeCatalog here
         private FeeCatalogDTO feeCatalog;
 
+        private ChargeTypeDTO chargeType;
+        private RecurrenceRuleDTO recurrenceRule;
+
         @Getter
         @Setter
         @NoArgsConstructor
@@ -93,6 +132,16 @@ public class FeeRatesResponseDTO {
             private String chargeTypeLabel;
             private String recurrenceRule;
             private String recurrenceRuleLabel;
+        }
+
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class RecurrenceRuleDTO {
+            private Long id;
+            private String code;
+            private String name;
         }
     }
 

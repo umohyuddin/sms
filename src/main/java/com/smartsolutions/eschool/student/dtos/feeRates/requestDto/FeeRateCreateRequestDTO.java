@@ -16,9 +16,16 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class FeeRateCreateRequestDTO {
 
-    @NotNull(message = "Amount is required")
-    @DecimalMin(value = "0.00", inclusive = false, message = "Amount must be greater than 0")
-    private BigDecimal amount;
+    private BigDecimal fixedAmount;
+    private BigDecimal percentageValue;
+    private Long percentageOfComponentId;
+    private BigDecimal unitPrice;
+    private Long slabGroupId;
+
+    @NotNull(message = "Charge Type is required")
+    private Long chargeTypeId;
+
+    private Integer priority;
 
     private String currency; // optional (USD/PKR etc.)
 

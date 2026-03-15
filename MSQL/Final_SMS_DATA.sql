@@ -680,6 +680,58 @@ VALUES
 (1, 10, 'DISC-FAM', 'Family Discount', 'ACC-DISC-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
 (1, 10, 'DISC-PROMO', 'Promotional Discount', 'ACC-DISC-03', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
 
+-- ===================================
+-- FEE RATES DATA
+-- ===================================
+
+-- 1. ADMISSION FEES (Fixed Amount)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='ADM-FORM'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='ADM-PROC'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 2500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='ADM-ORIENT'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 2. TUITION FEES (Fixed Amount)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TUI-BASIC'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 8000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TUI-LAB'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TUI-MISC'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 3. ACADEMIC SERVICES (Fixed Amount)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='EXAM-MID'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1200.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='EXAM-FINAL'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 2000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 4. FACILITY USAGE (Fixed Amount)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='LAB-COMP'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='LIB-USE'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 400.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 5. TRANSPORT (Slab Based - Requires Slab Groups, setting fixed placeholder for now)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, slab_group_id, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TRN-MON'), 1, (SELECT id FROM charge_types WHERE code='SLAB'), NULL, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 6. RESOURCE FEE (Per Unit Pricing)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, unit_price, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='RES-MATERIAL'), 1, (SELECT id FROM charge_types WHERE code='PER_UNIT'), 50.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 7. PENALTY & FINES (Percentage Based)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, percentage_value, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='FINE-LATE'), 1, (SELECT id FROM charge_types WHERE code='PERCENTAGE'), 5.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 8. DISCOUNTS & CONCESSIONS (Percentage Based)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, percentage_value, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='DISC-SCH'), 1, (SELECT id FROM charge_types WHERE code='PERCENTAGE'), 25.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='DISC-FAM'), 1, (SELECT id FROM charge_types WHERE code='PERCENTAGE'), 10.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+
 
 INSERT INTO roles(organization_id,code,name,description,is_system_role,active,deleted,created_by,created_at)
 VALUES

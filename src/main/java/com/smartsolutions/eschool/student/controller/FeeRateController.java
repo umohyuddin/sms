@@ -2,7 +2,7 @@ package com.smartsolutions.eschool.student.controller;
 
 import com.smartsolutions.eschool.student.dtos.feeRates.requestDto.FeeRateCreateRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
-import com.smartsolutions.eschool.student.dtos.responseDto.FeeRateDTO;
+
 import com.smartsolutions.eschool.student.facade.FeeRateFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,6 @@ public class FeeRateController {
         return ResponseEntity.ok(feeRateDTO);
     }
 
-
     @GetMapping(value = "/component/{componentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByFeeComponentId(@PathVariable Long componentId) {
         log.info("GET /api/fee/rates by componentId called");
@@ -59,13 +58,14 @@ public class FeeRateController {
     }
 
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> findActiveFeeRates(@RequestParam Long campusId, @RequestParam Long standardId, @RequestParam Long academicYearId) {
-        log.info("GET /api/fee/rates/active called with campus={}, standard={}, year={}", campusId, standardId, academicYearId);
+    public ResponseEntity<?> findActiveFeeRates(@RequestParam Long campusId, @RequestParam Long standardId,
+            @RequestParam Long academicYearId) {
+        log.info("GET /api/fee/rates/active called with campus={}, standard={}, year={}", campusId, standardId,
+                academicYearId);
         List<FeeRatesResponseDTO> resources = feeRateFacade.findActiveFeeRates(campusId, standardId, academicYearId);
         log.info("Active Fee Rates returned: {}", resources.size());
         return ResponseEntity.ok(resources);
     }
-
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FeeRatesResponseDTO> createFeeRate(@Valid @RequestBody FeeRateCreateRequestDTO dto) {
@@ -76,7 +76,8 @@ public class FeeRateController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<FeeRatesResponseDTO> updateFeeRate(@PathVariable Long id, @Valid @RequestBody FeeRateCreateRequestDTO dto) {
+    public ResponseEntity<FeeRatesResponseDTO> updateFeeRate(@PathVariable Long id,
+            @Valid @RequestBody FeeRateCreateRequestDTO dto) {
         log.info("PUT /api/fee/rates/{} called with payload: {}", id, dto);
         FeeRatesResponseDTO updatedFeeRate = feeRateFacade.update(id, dto);
         log.info("FeeRate updated successfully: id={}", updatedFeeRate.getId());
@@ -84,13 +85,16 @@ public class FeeRateController {
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> searchFeeRates(@RequestParam(required = false) Long feeCatalogId, @RequestParam(required = false) Long feeComponentId, @RequestParam(required = false) String keyword) {
-        log.info("GET /api/fee/rates/search called with feeCatalogId={}, feeComponentId={}, keyword={}", feeCatalogId, feeComponentId, keyword);
+    public ResponseEntity<?> searchFeeRates(@RequestParam(required = false) Long feeCatalogId,
+            @RequestParam(required = false) Long feeComponentId, @RequestParam(required = false) String keyword) {
+        log.info("GET /api/fee/rates/search called with feeCatalogId={}, feeComponentId={}, keyword={}", feeCatalogId,
+                feeComponentId, keyword);
         List<FeeRatesResponseDTO> results = feeRateFacade.searchFeeRates(feeCatalogId, feeComponentId, keyword);
         log.info("Search returned {} FeeRates", results.size());
-//        if (results.isEmpty()) {
-//            return ResponseEntity.ok().body("No Fee Rates found for the given criteria.");
-//        }
+        // if (results.isEmpty()) {
+        // return ResponseEntity.ok().body("No Fee Rates found for the given
+        // criteria.");
+        // }
         return ResponseEntity.ok(results);
     }
 

@@ -1,0 +1,105 @@
+﻿
+[ERROR] COMPILATION ERROR 
+: 
+[ERROR] /D:/SMS/sms/src/mai
+n/java/com/smartsolutions/e
+school/student/error/FeeSla
+bGroupErrors.java:[8,39] 
+cannot find symbol
+  location: class com.smart
+solutions.eschool.global.er
+ror.AppModule
+[ERROR] /D:/SMS/sms/src/mai
+n/java/com/smartsolutions/e
+school/student/error/FeeSla
+bGroupErrors.java:[9,42] 
+cannot find symbol
+  location: class com.smart
+solutions.eschool.global.er
+ror.AppModule
+[ERROR] /D:/SMS/sms/src/mai
+n/java/com/smartsolutions/e
+school/student/error/FeeSla
+bErrors.java:[8,33] cannot 
+find symbol
+  location: class com.smart
+solutions.eschool.global.er
+ror.AppModule
+[ERROR] /D:/SMS/sms/src/mai
+n/java/com/smartsolutions/e
+school/student/error/FeeSla
+bErrors.java:[9,36] cannot 
+find symbol
+  location: class com.smart
+solutions.eschool.global.er
+ror.AppModule
+[INFO] 4 errors 
+[ERROR] Failed to execute 
+goal org.apache.maven.plugi
+ns:maven-compiler-plugin:3.
+11.0:compile 
+(default-compile) on 
+project eschool: 
+Compilation failure: 
+Compilation failure: 
+[ERROR] /D:/SMS/sms/src/mai
+n/java/com/smartsolutions/e
+school/student/error/FeeSla
+bGroupErrors.java:[8,39] 
+cannot find symbol
+[ERROR]   symbol:   
+variable STUDENT
+[ERROR]   location: class c
+om.smartsolutions.eschool.g
+lobal.error.AppModule
+[ERROR] /D:/SMS/sms/src/mai
+n/java/com/smartsolutions/e
+school/student/error/FeeSla
+bGroupErrors.java:[9,42] 
+cannot find symbol
+[ERROR]   symbol:   
+variable STUDENT
+[ERROR]   location: class c
+om.smartsolutions.eschool.g
+lobal.error.AppModule
+[ERROR] /D:/SMS/sms/src/mai
+n/java/com/smartsolutions/e
+school/student/error/FeeSla
+bErrors.java:[8,33] cannot 
+find symbol
+[ERROR]   symbol:   
+variable STUDENT
+[ERROR]   location: class c
+om.smartsolutions.eschool.g
+lobal.error.AppModule
+[ERROR] /D:/SMS/sms/src/mai
+n/java/com/smartsolutions/e
+school/student/error/FeeSla
+bErrors.java:[9,36] cannot 
+find symbol
+[ERROR]   symbol:   
+variable STUDENT
+[ERROR]   location: class c
+om.smartsolutions.eschool.g
+lobal.error.AppModule
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full 
+stack trace of the errors, 
+re-run Maven with the -e 
+switch.
+[ERROR] Re-run Maven using 
+the -X switch to enable 
+full debug logging.
+[ERROR] 
+[ERROR] For more 
+information about the 
+errors and possible 
+solutions, please read the 
+following articles:
+[ERROR] [Help 1] http://cwi
+ki.apache.org/confluence/di
+splay/MAVEN/MojoFailureExce
+ption
+
+
