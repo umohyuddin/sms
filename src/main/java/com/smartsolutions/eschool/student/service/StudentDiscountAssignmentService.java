@@ -281,8 +281,6 @@ public class StudentDiscountAssignmentService {
         dto.setDiscountTypeId(type.getId());
         dto.setDiscountTypeCode(type.getCode());
         dto.setDiscountTypeName(type.getName());
-        dto.setChargeType(type.getChargeType());
-        dto.setDiscountTypePriority(type.getPriority());
         dto.setDiscountTypeDisplayOrder(type.getDisplayOrder());
 
         return dto;

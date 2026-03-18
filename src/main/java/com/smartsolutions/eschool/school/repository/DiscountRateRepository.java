@@ -1,7 +1,6 @@
 package com.smartsolutions.eschool.school.repository;
 
 import com.smartsolutions.eschool.school.model.DiscountRateEntity;
-import com.smartsolutions.eschool.school.model.DiscountSubTypeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,174 +14,151 @@ import java.util.Optional;
 @Transactional
 @Repository
 public interface DiscountRateRepository extends JpaRepository<DiscountRateEntity, Long> {
-    // ------------------------------------------------------------
-    // MARK AS ACTIVE
-    // ------------------------------------------------------------
-    @Modifying
-    @Transactional
-    @Query("""
-            UPDATE DiscountRateEntity dr
-            SET dr.isActive = true
-            WHERE dr.id = :id
-            """)
-    int markAsActive(@Param("id") Long id);
 
-    // ------------------------------------------------------------
-    // MARK AS INACTIVE
-    // ------------------------------------------------------------
-    @Modifying
-    @Transactional
-    @Query("""
-            UPDATE DiscountRateEntity dr
-            SET dr.isActive = false
-            WHERE dr.id = :id
-            """)
-    int markAsInactive(@Param("id") Long id);
+        @Modifying
+        @Transactional
+        @Query("UPDATE DiscountRateEntity dr SET dr.isActive = true WHERE dr.id = :id")
+        int markAsActive(@Param("id") Long id);
 
-    // ------------------------------------------------------------
-    // FIND BY ALL (ACTIVE/NON ACTIVE)
-    // ------------------------------------------------------------
-    @Query("""
-            SELECT dr
-            FROM DiscountRateEntity dr
-            WHERE dr.deleted = false
-            """)
-    List<DiscountRateEntity> findAllDeletedFalse();
+        @Modifying
+        @Transactional
+        @Query("UPDATE DiscountRateEntity dr SET dr.isActive = false WHERE dr.id = :id")
+        int markAsInactive(@Param("id") Long id);
 
-    // ------------------------------------------------------------
-    // FIND BY ID (ACTIVE ONLY)
-    // ------------------------------------------------------------
-    @Query("""
-            SELECT dr
-            FROM DiscountRateEntity dr
-            WHERE dr.id = :id
-              AND dr.deleted = false
-            """)
-    Optional<DiscountRateEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+        // Base fetch with all JOINs
+        @Query("""
+                        SELECT DISTINCT dr FROM DiscountRateEntity dr
+                        JOIN FETCH dr.discountSubType dst
+                        JOIN FETCH dst.discountType dt
+                        JOIN FETCH dt.chargeType ct
+                        LEFT JOIN FETCH dt.recurrenceRule rr
+                        LEFT JOIN FETCH dr.campus c
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.deleted = false
+                        ORDER BY dr.id ASC
+                        """)
+        List<DiscountRateEntity> findAllDeletedFalse();
 
-    // ------------------------------------------------------------
-    // FIND ALL ACTIVE
-    // ------------------------------------------------------------
-    @Query("""
-            SELECT dr
-            FROM DiscountRateEntity dr
-            WHERE dr.isActive = true
-              AND dr.deleted = false
-            ORDER BY dr.id ASC
-            """)
-    List<DiscountRateEntity> findAllActive();
+        @Query("""
+                        SELECT dr FROM DiscountRateEntity dr
+                        JOIN FETCH dr.discountSubType dst
+                        JOIN FETCH dst.discountType dt
+                        JOIN FETCH dt.chargeType ct
+                        LEFT JOIN FETCH dt.recurrenceRule rr
+                        LEFT JOIN FETCH dr.campus c
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.id = :id AND dr.deleted = false
+                        """)
+        Optional<DiscountRateEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
-    // ------------------------------------------------------------
-    // FIND ALL NON-ACTIVE
-    // ------------------------------------------------------------
-    @Query("""
-            SELECT dr
-            FROM DiscountRateEntity dr
-            WHERE dr.isActive = false
-              AND dr.deleted = false
-            ORDER BY dr.id ASC
-            """)
-    List<DiscountRateEntity> findAllNonActive();
+        @Query("""
+                        SELECT DISTINCT dr FROM DiscountRateEntity dr
+                        JOIN FETCH dr.discountSubType dst
+                        JOIN FETCH dst.discountType dt
+                        JOIN FETCH dt.chargeType ct
+                        LEFT JOIN FETCH dt.recurrenceRule rr
+                        LEFT JOIN FETCH dr.campus c
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.isActive = true AND dr.deleted = false
+                        ORDER BY dr.id ASC
+                        """)
+        List<DiscountRateEntity> findAllActive();
 
-    // ------------------------------------------------------------
-    // SOFT DELETE BY ID
-    // ------------------------------------------------------------
-    @Modifying
-    @Transactional
-    @Query("""
-            UPDATE DiscountRateEntity dr
-            SET dr.deleted = true,
-                dr.deletedAt = CURRENT_TIMESTAMP
-            WHERE dr.id = :id
-            """)
-    int softDeleteById(@Param("id") Long id);
+        @Query("""
+                        SELECT DISTINCT dr FROM DiscountRateEntity dr
+                        JOIN FETCH dr.discountSubType dst
+                        JOIN FETCH dst.discountType dt
+                        JOIN FETCH dt.chargeType ct
+                        LEFT JOIN FETCH dt.recurrenceRule rr
+                        LEFT JOIN FETCH dr.campus c
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.isActive = false AND dr.deleted = false
+                        ORDER BY dr.id ASC
+                        """)
+        List<DiscountRateEntity> findAllNonActive();
 
-    // ------------------------------------------------------------
-    // SOFT DELETE ALL RECORDS
-    // ------------------------------------------------------------
-    @Modifying
-    @Transactional
-    @Query("""
-            UPDATE DiscountRateEntity dr
-            SET dr.deleted = true,
-                dr.deletedAt = CURRENT_TIMESTAMP
-            """)
-    int softDeleteAll();
+        @Modifying
+        @Transactional
+        @Query("UPDATE DiscountRateEntity dr SET dr.deleted = true, dr.deletedAt = CURRENT_TIMESTAMP WHERE dr.id = :id")
+        int softDeleteById(@Param("id") Long id);
 
+        @Modifying
+        @Transactional
+        @Query("UPDATE DiscountRateEntity dr SET dr.deleted = true, dr.deletedAt = CURRENT_TIMESTAMP")
+        int softDeleteAll();
 
-    // ------------------------------------------------------------
-    // GET ALL BY SUBTYPE
-    // ------------------------------------------------------------
-    @Query("""
-            SELECT dr
-            FROM DiscountRateEntity dr
-            WHERE dr.discountSubType.id = :subTypeId
-              AND dr.deleted = false
-            ORDER BY dr.id ASC
-            """)
-    List<DiscountRateEntity> findAllByDiscountSubType(@Param("subTypeId") Long subTypeId);
+        @Query("""
+                        SELECT DISTINCT dr FROM DiscountRateEntity dr
+                        JOIN FETCH dr.discountSubType dst
+                        JOIN FETCH dst.discountType dt
+                        JOIN FETCH dt.chargeType ct
+                        LEFT JOIN FETCH dt.recurrenceRule rr
+                        LEFT JOIN FETCH dr.campus c
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.discountSubType.id = :subTypeId AND dr.deleted = false
+                        ORDER BY dr.id ASC
+                        """)
+        List<DiscountRateEntity> findAllByDiscountSubType(@Param("subTypeId") Long subTypeId);
 
-    // ------------------------------------------------------------
-// GET ALL BY CAMPUS
-// ------------------------------------------------------------
-    @Query("""
-            SELECT dr
-            FROM DiscountRateEntity dr
-            WHERE dr.campus.id = :campusId
-              AND dr.deleted = false
-            ORDER BY dr.id ASC
-            """)
-    List<DiscountRateEntity> findAllByCampus(@Param("campusId") Long campusId);
+        @Query("""
+                        SELECT DISTINCT dr FROM DiscountRateEntity dr
+                        JOIN FETCH dr.discountSubType dst
+                        JOIN FETCH dst.discountType dt
+                        JOIN FETCH dt.chargeType ct
+                        LEFT JOIN FETCH dt.recurrenceRule rr
+                        LEFT JOIN FETCH dr.campus c
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.campus.id = :campusId AND dr.deleted = false
+                        ORDER BY dr.id ASC
+                        """)
+        List<DiscountRateEntity> findAllByCampus(@Param("campusId") Long campusId);
 
-    // ------------------------------------------------------------
-// GET ALL BY ACADEMIC YEAR
-// ------------------------------------------------------------
-    @Query("""
-            SELECT dr
-            FROM DiscountRateEntity dr
-            WHERE dr.academicYear.id = :academicYearId
-              AND dr.deleted = false
-            ORDER BY dr.id ASC
-            """)
-    List<DiscountRateEntity> findAllByAcademicYear(@Param("academicYearId") Long academicYearId);
+        @Query("""
+                        SELECT DISTINCT dr FROM DiscountRateEntity dr
+                        JOIN FETCH dr.discountSubType dst
+                        JOIN FETCH dst.discountType dt
+                        JOIN FETCH dt.chargeType ct
+                        LEFT JOIN FETCH dt.recurrenceRule rr
+                        LEFT JOIN FETCH dr.campus c
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.academicYear.id = :academicYearId AND dr.deleted = false
+                        ORDER BY dr.id ASC
+                        """)
+        List<DiscountRateEntity> findAllByAcademicYear(@Param("academicYearId") Long academicYearId);
 
+        @Query("""
+                        SELECT DISTINCT dr FROM DiscountRateEntity dr
+                        JOIN FETCH dr.discountSubType dst
+                        JOIN FETCH dst.discountType dt
+                        JOIN FETCH dt.chargeType ct
+                        LEFT JOIN FETCH dt.recurrenceRule rr
+                        LEFT JOIN FETCH dr.campus c
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.deleted = false AND dst.deleted = false AND dt.deleted = false
+                        AND dr.campus.id = :campusId AND dr.academicYear.id = :academicYearId
+                        """)
+        List<DiscountRateEntity> findDiscountRatesByCampusAndAcademicYear(@Param("campusId") Long campusId,
+                        @Param("academicYearId") Long academicYearId);
 
-    @Query("""
-                SELECT dr
-                FROM DiscountRateEntity dr
-                JOIN dr.discountSubType dst
-                JOIN dst.discountType dt
-                WHERE dr.deleted = false
-                  AND dst.deleted = false
-                  AND dt.deleted = false
-                  AND dr.campus.id = :campusId
-                  AND dr.academicYear.id = :academicYearId
-            """)
-    List<DiscountRateEntity> findDiscountRatesByCampusAndAcademicYear(@Param("campusId") Long campusId, @Param("academicYearId") Long academicYearId);
-
-    @Query("""
-                SELECT dr
-                FROM DiscountRateEntity dr
-                JOIN dr.discountSubType dst
-                JOIN dst.discountType dt
-                WHERE dr.deleted = false
-                  AND dst.deleted = false
-                  AND dt.deleted = false
-            
-                  AND (:discountTypeId IS NULL OR dt.id = :discountTypeId)
-                  AND (:discountSubTypeId IS NULL OR dst.id = :discountSubTypeId)
-                  AND (:chargeType IS NULL OR dt.chargeType = :chargeType)
-                  AND (:recurrenceRule IS NULL OR dt.recurrenceRule = :recurrenceRule)
-            
-                  AND (
-                        :keyword IS NULL OR
-                        LOWER(dst.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-                        LOWER(dst.code) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                      )
-            """)
-    List<DiscountRateEntity> search(@Param("discountTypeId") Long discountTypeId, @Param("discountSubTypeId") Long discountSubTypeId, @Param("chargeType") String chargeType, @Param("recurrenceRule") String recurrenceRule, @Param("keyword") String keyword);
+        @Query("""
+                        SELECT DISTINCT dr FROM DiscountRateEntity dr
+                        JOIN FETCH dr.discountSubType dst
+                        JOIN FETCH dst.discountType dt
+                        JOIN FETCH dt.chargeType ct
+                        LEFT JOIN FETCH dt.recurrenceRule rr
+                        LEFT JOIN FETCH dr.campus c
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.deleted = false AND dst.deleted = false AND dt.deleted = false
+                        AND (:discountTypeId IS NULL OR dt.id = :discountTypeId)
+                        AND (:discountSubTypeId IS NULL OR dst.id = :discountSubTypeId)
+                        AND (:recurrenceRuleId IS NULL OR rr.id = :recurrenceRuleId)
+                        AND (:keyword IS NULL OR :keyword = ''
+                             OR LOWER(dst.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                             OR LOWER(dst.code) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                        ORDER BY dr.id ASC
+                        """)
+        List<DiscountRateEntity> search(@Param("discountTypeId") Long discountTypeId,
+                        @Param("discountSubTypeId") Long discountSubTypeId,
+                        @Param("recurrenceRuleId") Long recurrenceRuleId,
+                        @Param("keyword") String keyword);
 }
-
-
-
-

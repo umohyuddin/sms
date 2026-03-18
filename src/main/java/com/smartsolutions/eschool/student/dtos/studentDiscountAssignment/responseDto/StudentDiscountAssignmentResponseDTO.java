@@ -58,6 +58,5 @@ public class StudentDiscountAssignmentResponseDTO {
     private String discountTypeCode;
     private String discountTypeName;
     private String chargeType;
-    private Integer discountTypePriority;
     private Integer discountTypeDisplayOrder;
 }

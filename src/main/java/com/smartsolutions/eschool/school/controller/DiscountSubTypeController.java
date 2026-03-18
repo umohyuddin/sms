@@ -3,157 +3,158 @@ package com.smartsolutions.eschool.school.controller;
 import com.smartsolutions.eschool.school.dtos.discountSubType.requestDto.DiscountSubTypeRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountSubType.responseDto.DiscountSubTypeResponseDTO;
 import com.smartsolutions.eschool.school.facade.DiscountSubTypeFacade;
-import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.requestDto.FeeCatalogComponentRequestDTO;
-import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
-@Transactional
 @RestController
 @RequestMapping("/api/school/discounts/subtypes")
 @Slf4j
 public class DiscountSubTypeController {
+
     private final DiscountSubTypeFacade discountSubTypeFacade;
 
     public DiscountSubTypeController(DiscountSubTypeFacade discountSubTypeFacade) {
         this.discountSubTypeFacade = discountSubTypeFacade;
     }
 
-
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createDiscountSubType(@RequestBody @Valid DiscountSubTypeRequestDTO requestDTO) {
-        log.info("Received request to create Discount Sub Type");
-        DiscountSubTypeResponseDTO responseDTO = discountSubTypeFacade.createSubDiscountType(requestDTO);
-        log.info("Discount Sub Type created successfully with id: {}", responseDTO.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
-    }
-
+    // ====================================
+    // GET ALL
+    // ====================================
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll() throws Exception {
-        log.info("GET /api/school/discounts/types called");
+    public ResponseEntity<List<DiscountSubTypeResponseDTO>> getAll() {
+        log.info("[Controller:DiscountSubTypeController] getAll() called - Request to get all discount sub types");
         List<DiscountSubTypeResponseDTO> resources = discountSubTypeFacade.getAll();
-        log.info("GET /api/school/discounts/types succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
+        log.info("[Controller:DiscountSubTypeController] getAll() succeeded - Found {} discount sub types", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
+    // ====================================
+    // GET ALL ACTIVE
+    // ====================================
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllActive() throws Exception {
-        log.info("GET /api/school/discounts/subtypes/active called");
+    public ResponseEntity<List<DiscountSubTypeResponseDTO>> getAllActive() {
+        log.info("[Controller:DiscountSubTypeController] getAllActive() called");
         List<DiscountSubTypeResponseDTO> resources = discountSubTypeFacade.getAllActive();
-        log.info("GET /api/school/discounts/subtypes/active succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
+        log.info("[Controller:DiscountSubTypeController] getAllActive() succeeded - Found {} active discount sub types", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
+    // ====================================
+    // GET ALL INACTIVE
+    // ====================================
     @GetMapping(value = "/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllInActive() throws Exception {
-        log.info("GET /api/school/discounts/subtypes/inactive called");
+    public ResponseEntity<List<DiscountSubTypeResponseDTO>> getAllInActive() {
+        log.info("[Controller:DiscountSubTypeController] getAllInActive() called");
         List<DiscountSubTypeResponseDTO> resources = discountSubTypeFacade.getAllInActive();
-        log.info("GET /api/school/discounts/subtypes/inactive succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
+        log.info("[Controller:DiscountSubTypeController] getAllInActive() succeeded - Found {} inactive discount sub types", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
-    @GetMapping(value = "/{discountSubTypeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable Long discountSubTypeId) throws Exception {
-        log.info("GET /api/school/discounts/subtypes by id called");
-        DiscountSubTypeResponseDTO resources = discountSubTypeFacade.getById(discountSubTypeId);
-        log.info("GET /api/school/discounts/subtypes by id succeeded, returned {} resource id", resources.getId());
-        return ResponseEntity.ok().body(resources);
+    // ====================================
+    // GET BY ID
+    // ====================================
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DiscountSubTypeResponseDTO> getById(@PathVariable Long id) {
+        log.info("[Controller:DiscountSubTypeController] getById() called - id: {}", id);
+        DiscountSubTypeResponseDTO responseDTO = discountSubTypeFacade.getById(id);
+        log.info("[Controller:DiscountSubTypeController] getById() succeeded - id: {}", id);
+        return ResponseEntity.ok(responseDTO);
     }
 
-
-    @DeleteMapping("/{discountSubTypeId}")
-    public ResponseEntity<?> softDeleteById(@PathVariable Long discountSubTypeId) {
-        log.info("DELETE /api/school/discounts/subtypes by id called {}", discountSubTypeId);
-
-        int result = discountSubTypeFacade.softDeleteById(discountSubTypeId);
-        if (result == 0) {
-            log.warn("delete failed — DiscountSubType not found: {}", discountSubTypeId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("DiscountSubType not found with id: " + discountSubTypeId);
-        }
-        log.info("DiscountSubType deleted successfully: {}", discountSubTypeId);
-        return ResponseEntity.ok("DiscountSubType deleted successfully");
-
+    // ====================================
+    // CREATE
+    // ====================================
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DiscountSubTypeResponseDTO> create(@Valid @RequestBody DiscountSubTypeRequestDTO requestDTO) {
+        log.info("[Controller:DiscountSubTypeController] create() called - name: {}", requestDTO.getName());
+        DiscountSubTypeResponseDTO response = discountSubTypeFacade.create(requestDTO);
+        log.info("[Controller:DiscountSubTypeController] create() succeeded - Discount Sub Type created with id: {}", response.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
-    @DeleteMapping("/all")
-    public ResponseEntity<?> softDeleteAll() {
-        log.info("API Request: delete ALL DiscountSubTypes");
-        try {
-            int rows = discountSubTypeFacade.softDeleteAll();
-            log.info("Deleted ALL DiscountSubTypes. Count: {}", rows);
-            return ResponseEntity.ok(rows + " DiscountSubTypes deleted");
-        } catch (Exception ex) {
-            log.error("Error deleting ALL DiscountSubTypes", ex);
-            return ResponseEntity.internalServerError().body("Failed to delete all DiscountSubTypes");
-        }
-    }
-
-//    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
-//        log.info("GET /api/school/discounts/subtypes/search by keyword called");
-//        List<DiscountSubTypeResponseDTO> sectionDTO = discountSubTypeFacade.searchByKeyword(keyword);
-//        log.info("GET /api/school/discounts/subtypes/search by keyword succeeded");
-//        return ResponseEntity.ok().body(sectionDTO);
-//    }
-
-    @PatchMapping(value = "/{discountSubTypeId}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> markAsActive(@PathVariable Long discountSubTypeId) {
-        log.info("PATCH /api/school/discounts/subtypes/{}/activate called", discountSubTypeId);
-        int updatedCount = discountSubTypeFacade.markAsActive(discountSubTypeId);
-        log.info("DiscountSubType marked as active successfully: {}", discountSubTypeId);
-        return ResponseEntity.ok("DiscountSubType marked as active successfully");
-    }
-
-    @PatchMapping(value = "/{discountSubTypeId}/deactivate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> markAsInactive(@PathVariable Long discountSubTypeId) {
-        log.info("PATCH /api/school/discounts/subtypes/{}/deactivate called", discountSubTypeId);
-        int updatedCount = discountSubTypeFacade.markAsInactive(discountSubTypeId);
-        log.info("DiscountSubType marked as inactive successfully: {}", discountSubTypeId);
-        return ResponseEntity.ok("DiscountSubType marked as inactive successfully");
-    }
-
-    @GetMapping(value = "search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBySearch(@RequestParam(required = false) Long discountTypeId, @RequestParam(required = false) String keyword) {
-        log.info("GET /api/fee/component/search by keyword called");
-        List<DiscountSubTypeResponseDTO> responseDTOS = discountSubTypeFacade.searchDiscountComponents(discountTypeId, keyword);
-        log.info("GET /api/fee/component/search by keyword succeeded");
-        return ResponseEntity.ok().body(responseDTOS);
-    }
-
+    // ====================================
+    // UPDATE
+    // ====================================
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateDiscountComponent(@PathVariable Long id, @Valid @RequestBody DiscountSubTypeRequestDTO requestDTO) {
-        log.info("PUT /api/discount-components/{} - Updating discount component: {}", id, requestDTO);
-        try {
-            DiscountSubTypeResponseDTO updated = discountSubTypeFacade.update(id, requestDTO);
-            log.info("Discount component updated successfully with ID: {}", updated.getId());
-            return ResponseEntity.ok(updated);
-        } catch (EntityNotFoundException e) {
-            log.warn("Discount component not found for ID: {}", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Discount component not found");
-        } catch (Exception e) {
-            log.error("Failed to update discount component", e);
-            return ResponseEntity.internalServerError().body("Failed to update discount component");
-        }
+    public ResponseEntity<DiscountSubTypeResponseDTO> update(@PathVariable Long id, @Valid @RequestBody DiscountSubTypeRequestDTO requestDTO) {
+        log.info("[Controller:DiscountSubTypeController] update() called - id: {}", id);
+        DiscountSubTypeResponseDTO updated = discountSubTypeFacade.update(id, requestDTO);
+        log.info("[Controller:DiscountSubTypeController] update() succeeded - Discount Sub Type: {} updated successfully", updated.getId());
+        return ResponseEntity.ok(updated);
     }
 
+    // ====================================
+    // DELETE BY ID
+    // ====================================
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> softDeleteById(@PathVariable Long id) {
+        log.info("[Controller:DiscountSubTypeController] softDeleteById() called - id: {}", id);
+        discountSubTypeFacade.softDeleteById(id);
+        log.info("[Controller:DiscountSubTypeController] softDeleteById() succeeded - Discount Sub Type: {} deleted successfully", id);
+        return ResponseEntity.ok(Map.of("message", "Discount Sub Type deleted successfully"));
+    }
+
+    // ====================================
+    // DELETE ALL
+    // ====================================
+    @DeleteMapping("/all")
+    public ResponseEntity<Map<String, String>> softDeleteAll() {
+        log.info("[Controller:DiscountSubTypeController] softDeleteAll() called");
+        int rows = discountSubTypeFacade.softDeleteAll();
+        log.info("[Controller:DiscountSubTypeController] softDeleteAll() succeeded - {} discount sub types deleted", rows);
+        return ResponseEntity.ok(Map.of("message", rows + " Discount Sub Types deleted successfully"));
+    }
+
+    // ====================================
+    // ACTIVATE
+    // ====================================
+    @PatchMapping(value = "/{id}/activate")
+    public ResponseEntity<Map<String, String>> markAsActive(@PathVariable Long id) {
+        log.info("[Controller:DiscountSubTypeController] markAsActive() called - id: {}", id);
+        discountSubTypeFacade.markAsActive(id);
+        log.info("[Controller:DiscountSubTypeController] markAsActive() succeeded - id: {}", id);
+        return ResponseEntity.ok(Map.of("message", "Discount Sub Type marked as active successfully"));
+    }
+
+    // ====================================
+    // DEACTIVATE
+    // ====================================
+    @PatchMapping(value = "/{id}/deactivate")
+    public ResponseEntity<Map<String, String>> markAsInactive(@PathVariable Long id) {
+        log.info("[Controller:DiscountSubTypeController] markAsInactive() called - id: {}", id);
+        discountSubTypeFacade.markAsInactive(id);
+        log.info("[Controller:DiscountSubTypeController] markAsInactive() succeeded - id: {}", id);
+        return ResponseEntity.ok(Map.of("message", "Discount Sub Type marked as inactive successfully"));
+    }
+
+    // ====================================
+    // SEARCH
+    // ====================================
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DiscountSubTypeResponseDTO>> search(
+            @RequestParam(required = false) Long discountTypeId,
+            @RequestParam(required = false) String keyword) {
+        log.info("[Controller:DiscountSubTypeController] search() called - discountTypeId: {}, keyword: {}", discountTypeId, keyword);
+        List<DiscountSubTypeResponseDTO> result = discountSubTypeFacade.searchDiscountComponents(discountTypeId, keyword);
+        log.info("[Controller:DiscountSubTypeController] search() succeeded - Found {} discount sub types", result.size());
+        return ResponseEntity.ok(result);
+    }
+
+    // ====================================
+    // GET ACTIVE BY DISCOUNT TYPE
+    // ====================================
     @GetMapping(value = "/byDiscountType/{discountTypeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getActiveByDiscountTypeId(@PathVariable Long discountTypeId) {
-        log.info("GET /api/school/discounts/subtypes/active/by-discount-type/{} called", discountTypeId);
-        List<DiscountSubTypeResponseDTO> responseDTOS =
-                discountSubTypeFacade.getActiveByDiscountTypeId(discountTypeId);
-        log.info("Fetched {} active Discount Sub Types for discountTypeId={}",
-                responseDTOS.size(), discountTypeId);
-        return ResponseEntity.ok(responseDTOS);
+    public ResponseEntity<List<DiscountSubTypeResponseDTO>> getActiveByDiscountTypeId(@PathVariable Long discountTypeId) {
+        log.info("[Controller:DiscountSubTypeController] getActiveByDiscountTypeId() called - discountTypeId: {}", discountTypeId);
+        List<DiscountSubTypeResponseDTO> result = discountSubTypeFacade.getActiveByDiscountTypeId(discountTypeId);
+        log.info("[Controller:DiscountSubTypeController] getActiveByDiscountTypeId() succeeded - Found {} discount sub types", result.size());
+        return ResponseEntity.ok(result);
     }
-
-
 }

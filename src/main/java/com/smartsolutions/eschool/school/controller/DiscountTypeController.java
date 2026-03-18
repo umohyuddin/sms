@@ -3,105 +3,112 @@ package com.smartsolutions.eschool.school.controller;
 import com.smartsolutions.eschool.school.dtos.discountType.requestDto.DiscountTypeRequestDTO;
 import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.facade.DiscountTypeFacade;
-import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
-@Transactional
 @RestController
 @RequestMapping("/api/school/discounts/types")
 @Slf4j
 public class DiscountTypeController {
+
     private final DiscountTypeFacade discountTypeFacade;
 
     public DiscountTypeController(DiscountTypeFacade discountTypeFacade) {
         this.discountTypeFacade = discountTypeFacade;
     }
 
-
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createDiscountType(@RequestBody @Valid DiscountTypeRequestDTO requestDTO) {
-        log.info("Received request to create Discount Type");
-        DiscountTypeResponseDTO discountTypeResponseDTO = discountTypeFacade.createDiscountType(requestDTO);
-        log.info("Discount Type created successfully with id: {}", discountTypeResponseDTO.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(discountTypeResponseDTO);
-    }
-
+    // ====================================
+    // GET ALL
+    // ====================================
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll() throws Exception {
-        log.info("GET /api/school/discounts/types called");
+    public ResponseEntity<List<DiscountTypeResponseDTO>> getAll() {
+        log.info("[Controller:DiscountTypeController] getAll() called - Request to get all discount types");
         List<DiscountTypeResponseDTO> resources = discountTypeFacade.getAll();
-        log.info("GET /api/school/discounts/types succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
+        log.info("[Controller:DiscountTypeController] getAll() succeeded - Found {} discount types", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
+    // ====================================
+    // GET ALL ACTIVE
+    // ====================================
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllActive() throws Exception {
-        log.info("GET /api/school/discounts/types/active called");
+    public ResponseEntity<List<DiscountTypeResponseDTO>> getAllActive() {
+        log.info("[Controller:DiscountTypeController] getAllActive() called");
         List<DiscountTypeResponseDTO> resources = discountTypeFacade.getAllActive();
-        log.info("GET /api/school/discounts/types/active succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
+        log.info("[Controller:DiscountTypeController] getAllActive() succeeded - Found {} active discount types", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
+    // ====================================
+    // GET ALL INACTIVE
+    // ====================================
     @GetMapping(value = "/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllInActive() throws Exception {
-        log.info("GET /api/school/discounts/types/inactive called");
+    public ResponseEntity<List<DiscountTypeResponseDTO>> getAllInActive() {
+        log.info("[Controller:DiscountTypeController] getAllInActive() called");
         List<DiscountTypeResponseDTO> resources = discountTypeFacade.getAllInActive();
-        log.info("GET /api/school/discounts/types/inactive succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
+        log.info("[Controller:DiscountTypeController] getAllInActive() succeeded - Found {} inactive discount types", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
-    @GetMapping(value = "/{discountTypeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable Long discountTypeId) throws Exception {
-        log.info("GET /api/school/discounts/types by id called");
-        DiscountTypeResponseDTO resources = discountTypeFacade.getById(discountTypeId);
-        log.info("GET /api/school/discounts/types by id succeeded, returned {} resource id", resources.getId());
-        return ResponseEntity.ok().body(resources);
+    // ====================================
+    // GET BY ID
+    // ====================================
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DiscountTypeResponseDTO> getById(@PathVariable Long id) {
+        log.info("[Controller:DiscountTypeController] getById() called - id: {}", id);
+        DiscountTypeResponseDTO responseDTO = discountTypeFacade.getById(id);
+        log.info("[Controller:DiscountTypeController] getById() succeeded - id: {}", id);
+        return ResponseEntity.ok(responseDTO);
     }
 
-
-    @DeleteMapping("/{discountTypeId}")
-    public ResponseEntity<?> softDeleteById(@PathVariable Long discountTypeId) {
-        log.info("DELETE /api/school/discounts/types by id called {}", discountTypeId);
-
-        int result = discountTypeFacade.softDeleteById(discountTypeId);
-        if (result == 0) {
-            log.warn("delete failed — DiscountType not found: {}", discountTypeId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("DiscountType not found with id: " + discountTypeId);
-        }
-        log.info("DiscountType deleted successfully: {}", discountTypeId);
-        return ResponseEntity.ok("DiscountType deleted successfully");
+    // ====================================
+    // CREATE
+    // ====================================
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DiscountTypeResponseDTO> create(@Valid @RequestBody DiscountTypeRequestDTO requestDTO) {
+        log.info("[Controller:DiscountTypeController] create() called - name: {}", requestDTO.getName());
+        DiscountTypeResponseDTO response = discountTypeFacade.create(requestDTO);
+        log.info("[Controller:DiscountTypeController] create() succeeded - Discount Type created with id: {}", response.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
-    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
-        log.info("GET /api/school/discounts/types/search by keyword called");
-        List<DiscountTypeResponseDTO> sectionDTO = discountTypeFacade.searchByKeyword(keyword);
-        log.info("GET /api/school/discounts/types/search by keyword succeeded");
-        return ResponseEntity.ok().body(sectionDTO);
+    // ====================================
+    // UPDATE
+    // ====================================
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DiscountTypeResponseDTO> update(@PathVariable Long id, @Valid @RequestBody DiscountTypeRequestDTO requestDTO) {
+        log.info("[Controller:DiscountTypeController] update() called - id: {}", id);
+        DiscountTypeResponseDTO updated = discountTypeFacade.update(id, requestDTO);
+        log.info("[Controller:DiscountTypeController] update() succeeded - Discount Type: {} updated successfully", updated.getId());
+        return ResponseEntity.ok(updated);
     }
 
-    @PutMapping(value = "/{discountTypeId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateDiscountType(@PathVariable Long discountTypeId, @RequestBody @Valid DiscountTypeRequestDTO requestDTO) {
-
-        log.info("Received request to update Discount Type with id: {}", discountTypeId);
-
-        DiscountTypeResponseDTO updatedDiscountType = discountTypeFacade.updateDiscountType(discountTypeId, requestDTO);
-
-        if (updatedDiscountType == null) {
-            log.warn("Discount Type not found for id: {}", discountTypeId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Discount Type not found with id: " + discountTypeId);
-        }
-        log.info("Discount Type updated successfully with id: {}", updatedDiscountType.getId());
-        return ResponseEntity.ok(updatedDiscountType);
+    // ====================================
+    // DELETE
+    // ====================================
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> softDeleteById(@PathVariable Long id) {
+        log.info("[Controller:DiscountTypeController] softDeleteById() called - id: {}", id);
+        discountTypeFacade.softDeleteById(id);
+        log.info("[Controller:DiscountTypeController] softDeleteById() succeeded - Discount Type: {} deleted successfully", id);
+        return ResponseEntity.ok(Map.of("message", "Discount Type deleted successfully"));
     }
 
+    // ====================================
+    // SEARCH
+    // ====================================
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DiscountTypeResponseDTO>> search(@RequestParam(required = false) String keyword) {
+        log.info("[Controller:DiscountTypeController] search() called - keyword: {}", keyword);
+        List<DiscountTypeResponseDTO> results = discountTypeFacade.searchByKeyword(keyword);
+        log.info("[Controller:DiscountTypeController] search() succeeded - Found {} discount types", results.size());
+        return ResponseEntity.ok(results);
+    }
 }

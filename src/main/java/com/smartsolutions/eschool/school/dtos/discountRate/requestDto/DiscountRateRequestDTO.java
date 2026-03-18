@@ -1,6 +1,5 @@
 package com.smartsolutions.eschool.school.dtos.discountRate.requestDto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -16,22 +15,22 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiscountRateRequestDTO {
+
     @NotNull(message = "Discount Sub Type ID is required")
     private Long discountSubTypeId;
 
-    @NotNull(message = "Campus ID is required")
-    private Long campusId; // optional if discount is global
+    private Long campusId;
 
     @NotNull(message = "Academic Year ID is required")
     private Long academicYearId;
 
     @Positive(message = "Discount value must be positive")
-    private BigDecimal value; // fixed amount
+    private BigDecimal value;
 
-    private Boolean isPercentage = false; // true if discount is percentage, false if fixed amount
+    private Boolean isPercentage = false;
 
-    private LocalDate effectiveFrom; // optional
-    private LocalDate effectiveTo;   // optional
+    private LocalDate effectiveFrom;
+    private LocalDate effectiveTo;
 
     private Boolean isActive = true;
 }

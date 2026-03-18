@@ -1,7 +1,6 @@
 package com.smartsolutions.eschool.school.controller;
 
 import com.smartsolutions.eschool.school.dtos.discountRate.requestDto.DiscountRateRequestDTO;
-import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateFullResponseDTO;
 import com.smartsolutions.eschool.school.dtos.discountRate.responseDto.DiscountRateResponseDTO;
 import com.smartsolutions.eschool.school.facade.DiscountRateFacade;
 import jakarta.validation.Valid;
@@ -9,12 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
-@Transactional
 @RestController
 @RequestMapping("/api/school/discounts/rates")
 @Slf4j
@@ -26,123 +24,142 @@ public class DiscountRateController {
         this.discountRateFacade = discountRateFacade;
     }
 
-    // -------------------------------------------------------------------------
-    // CREATE
-    // -------------------------------------------------------------------------
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createDiscountRate(@RequestBody @Valid DiscountRateRequestDTO requestDTO) {
-        log.info("Received request to create Discount Rate");
-        DiscountRateResponseDTO responseDTO = discountRateFacade.createDiscountRate(requestDTO);
-        log.info("Discount Rate created successfully with id: {}", responseDTO.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
-    }
-
-    // -------------------------------------------------------------------------
+    // ====================================
     // GET ALL
-    // -------------------------------------------------------------------------
+    // ====================================
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll() {
-        log.info("GET /api/school/discounts/rates called");
-        List<DiscountRateResponseDTO> list = discountRateFacade.getAll();
-        log.info("GET /api/school/discounts/rates succeeded, returned {} resources", list.size());
-        return ResponseEntity.ok().body(list);
+    public ResponseEntity<List<DiscountRateResponseDTO>> getAll() {
+        log.info("[Controller:DiscountRateController] getAll() called - Request to get all discount rates");
+        List<DiscountRateResponseDTO> resources = discountRateFacade.getAll();
+        log.info("[Controller:DiscountRateController] getAll() succeeded - Found {} discount rates", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
-
-    @GetMapping(value = "/byCampusYear", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getDiscountRatesByCampusAndAcademicYear(@RequestParam Long campusId, @RequestParam Long academicYearId) {
-        log.info("GET /api/school/discounts/rates/byCampusYear called with campusId={} and academicYearId={}", campusId, academicYearId);
-        List<DiscountRateFullResponseDTO> list = discountRateFacade.getDiscountRatesByCampusAndAcademicYear(campusId, academicYearId);
-        log.info("GET /api/school/discounts/rates/byCampusYear succeeded, returned {} resources", list.size());
-        return ResponseEntity.ok().body(list);
-    }
-//    // -------------------------------------------------------------------------
-//    // GET ACTIVE
-//    // -------------------------------------------------------------------------
-//    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> getAllActive() {
-//        log.info("GET /api/school/discounts/rates/active called");
-//        List<DiscountRateResponseDTO> list = discountRateFacade.getAllActive();
-//        log.info("GET /api/school/discounts/rates/active succeeded, returned {} resources", list.size());
-//        return ResponseEntity.ok().body(list);
-//    }
-//
-//    // -------------------------------------------------------------------------
-//    // GET INACTIVE
-//    // -------------------------------------------------------------------------
-//    @GetMapping(value = "/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> getAllInactive() {
-//        log.info("GET /api/school/discounts/rates/inactive called");
-//        List<DiscountRateResponseDTO> list = discountRateFacade.getAllInactive();
-//        log.info("GET /api/school/discounts/rates/inactive succeeded, returned {} resources", list.size());
-//        return ResponseEntity.ok().body(list);
-//    }
-
-    // -------------------------------------------------------------------------
+    // ====================================
     // GET BY ID
-    // -------------------------------------------------------------------------
-    @GetMapping(value = "/{discountRateId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable Long discountRateId) {
-        log.info("GET /api/school/discounts/rates/{} called", discountRateId);
-        DiscountRateResponseDTO dto = discountRateFacade.getById(discountRateId);
-        log.info("GET /api/school/discounts/rates succeeded, returned resource id {}", dto.getId());
-        return ResponseEntity.ok().body(dto);
+    // ====================================
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DiscountRateResponseDTO> getById(@PathVariable Long id) {
+        log.info("[Controller:DiscountRateController] getById() called - id: {}", id);
+        DiscountRateResponseDTO responseDTO = discountRateFacade.getById(id);
+        log.info("[Controller:DiscountRateController] getById() succeeded - id: {}", id);
+        return ResponseEntity.ok(responseDTO);
     }
 
-//    // -------------------------------------------------------------------------
-//    // DELETE BY ID (Soft Delete)
-//    // -------------------------------------------------------------------------
-//    @DeleteMapping("/{discountRateId}")
-//    public ResponseEntity<?> softDeleteById(@PathVariable Long discountRateId) {
-//        log.info("DELETE /api/school/discounts/rates/{} called", discountRateId);
-//
-//        int result = discountRateFacade.softDelete(discountRateId);
-//        if (result == 0) {
-//            log.warn("Delete failed — DiscountRate not found: {}", discountRateId);
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body("DiscountRate not found with id: " + discountRateId);
-//        }
-//
-//        log.info("DiscountRate deleted successfully: {}", discountRateId);
-//        return ResponseEntity.ok("DiscountRate deleted successfully");
-//    }
+    // ====================================
+    // GET BY CAMPUS AND ACADEMIC YEAR
+    // ====================================
+    @GetMapping(value = "/byCampusYear", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DiscountRateResponseDTO>> getByCampusAndYear(
+            @RequestParam Long campusId,
+            @RequestParam Long academicYearId) {
+        log.info("[Controller:DiscountRateController] getByCampusAndYear() called - campusId: {}, academicYearId: {}", campusId, academicYearId);
+        List<DiscountRateResponseDTO> resources = discountRateFacade.getDiscountRatesByCampusAndAcademicYear(campusId, academicYearId);
+        log.info("[Controller:DiscountRateController] getByCampusAndYear() succeeded - Found {} discount rates", resources.size());
+        return ResponseEntity.ok(resources);
+    }
 
-    // -------------------------------------------------------------------------
+    // ====================================
+    // GET BY CAMPUS
+    // ====================================
+    @GetMapping(value = "/byCampus", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DiscountRateResponseDTO>> getAllByCampus(@RequestParam Long campusId) {
+        log.info("[Controller:DiscountRateController] getAllByCampus() called - campusId: {}", campusId);
+        List<DiscountRateResponseDTO> resources = discountRateFacade.getAllByCampus(campusId);
+        log.info("[Controller:DiscountRateController] getAllByCampus() succeeded - Found {} discount rates", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
+    // ====================================
+    // GET BY ACADEMIC YEAR
+    // ====================================
+    @GetMapping(value = "/byAcademicYear", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DiscountRateResponseDTO>> getAllByAcademicYear(@RequestParam Long academicYearId) {
+        log.info("[Controller:DiscountRateController] getAllByAcademicYear() called - academicYearId: {}", academicYearId);
+        List<DiscountRateResponseDTO> resources = discountRateFacade.getAllByAcademicYear(academicYearId);
+        log.info("[Controller:DiscountRateController] getAllByAcademicYear() succeeded - Found {} discount rates", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
+    // ====================================
+    // CREATE
+    // ====================================
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DiscountRateResponseDTO> create(@Valid @RequestBody DiscountRateRequestDTO requestDTO) {
+        log.info("[Controller:DiscountRateController] create() called - discountSubTypeId: {}", requestDTO.getDiscountSubTypeId());
+        DiscountRateResponseDTO response = discountRateFacade.create(requestDTO);
+        log.info("[Controller:DiscountRateController] create() succeeded - Discount Rate created with id: {}", response.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // ====================================
+    // UPDATE
+    // ====================================
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DiscountRateResponseDTO> update(@PathVariable Long id, @Valid @RequestBody DiscountRateRequestDTO requestDTO) {
+        log.info("[Controller:DiscountRateController] update() called - id: {}", id);
+        DiscountRateResponseDTO updated = discountRateFacade.update(id, requestDTO);
+        log.info("[Controller:DiscountRateController] update() succeeded - Discount Rate: {} updated successfully", updated.getId());
+        return ResponseEntity.ok(updated);
+    }
+
+    // ====================================
+    // DELETE BY ID
+    // ====================================
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> softDeleteById(@PathVariable Long id) {
+        log.info("[Controller:DiscountRateController] softDeleteById() called - id: {}", id);
+        discountRateFacade.softDeleteById(id);
+        log.info("[Controller:DiscountRateController] softDeleteById() succeeded - Discount Rate: {} deleted successfully", id);
+        return ResponseEntity.ok(Map.of("message", "Discount Rate deleted successfully"));
+    }
+
+    // ====================================
     // DELETE ALL
-    // -------------------------------------------------------------------------
+    // ====================================
     @DeleteMapping("/all")
-    public ResponseEntity<?> softDeleteAll() {
-        log.info("DELETE ALL /api/school/discounts/rates called");
-        int count = discountRateFacade.softDeleteAll();
-        log.info("Deleted ALL DiscountRates. Count: {}", count);
-        return ResponseEntity.ok(count + " DiscountRates deleted");
+    public ResponseEntity<Map<String, String>> softDeleteAll() {
+        log.info("[Controller:DiscountRateController] softDeleteAll() called");
+        int rows = discountRateFacade.softDeleteAll();
+        log.info("[Controller:DiscountRateController] softDeleteAll() succeeded - {} discount rates deleted", rows);
+        return ResponseEntity.ok(Map.of("message", rows + " Discount Rates deleted successfully"));
     }
 
-    // -------------------------------------------------------------------------
+    // ====================================
     // ACTIVATE
-    // -------------------------------------------------------------------------
-    @PatchMapping(value = "/{discountRateId}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> activate(@PathVariable Long discountRateId) {
-        log.info("PATCH /api/school/discounts/rates/{}/activate called", discountRateId);
-        discountRateFacade.markAsActive(discountRateId);
-        return ResponseEntity.ok("DiscountRate marked as active successfully");
+    // ====================================
+    @PatchMapping(value = "/{id}/activate")
+    public ResponseEntity<Map<String, String>> markAsActive(@PathVariable Long id) {
+        log.info("[Controller:DiscountRateController] markAsActive() called - id: {}", id);
+        discountRateFacade.markAsActive(id);
+        log.info("[Controller:DiscountRateController] markAsActive() succeeded - id: {}", id);
+        return ResponseEntity.ok(Map.of("message", "Discount Rate marked as active successfully"));
     }
 
-    // -------------------------------------------------------------------------
+    // ====================================
     // DEACTIVATE
-    // -------------------------------------------------------------------------
-    @PatchMapping(value = "/{discountRateId}/deactivate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deactivate(@PathVariable Long discountRateId) {
-        log.info("PATCH /api/school/discounts/rates/{}/deactivate called", discountRateId);
-        discountRateFacade.markAsInactive(discountRateId);
-        return ResponseEntity.ok("DiscountRate marked as inactive successfully");
+    // ====================================
+    @PatchMapping(value = "/{id}/deactivate")
+    public ResponseEntity<Map<String, String>> markAsInactive(@PathVariable Long id) {
+        log.info("[Controller:DiscountRateController] markAsInactive() called - id: {}", id);
+        discountRateFacade.markAsInactive(id);
+        log.info("[Controller:DiscountRateController] markAsInactive() succeeded - id: {}", id);
+        return ResponseEntity.ok(Map.of("message", "Discount Rate marked as inactive successfully"));
     }
 
-
+    // ====================================
+    // SEARCH
+    // ====================================
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> searchDiscountRates(@RequestParam(required = false) Long discountTypeId, @RequestParam(required = false) Long discountSubTypeId, @RequestParam(required = false) String chargeTypeId, @RequestParam(required = false) String recurrenceRuleId, @RequestParam(required = false) String keyword) {
-        log.info("SEARCH DiscountRates called with discountTypeId={}, discountSubTypeId={}, chargeTypeId={}, recurrenceRuleId={}, keyword={}", discountTypeId, discountSubTypeId, chargeTypeId, recurrenceRuleId, keyword);
-        List<DiscountRateResponseDTO> list = discountRateFacade.search(discountTypeId, discountSubTypeId, chargeTypeId, recurrenceRuleId, keyword);
+    public ResponseEntity<List<DiscountRateResponseDTO>> search(
+            @RequestParam(required = false) Long discountTypeId,
+            @RequestParam(required = false) Long discountSubTypeId,
+            @RequestParam(required = false) Long recurrenceRuleId,
+            @RequestParam(required = false) String keyword) {
+        log.info("[Controller:DiscountRateController] search() called - discountTypeId: {}, discountSubTypeId: {}, recurrenceRuleId: {}, keyword: {}",
+                discountTypeId, discountSubTypeId, recurrenceRuleId, keyword);
+        List<DiscountRateResponseDTO> list = discountRateFacade.search(discountTypeId, discountSubTypeId, recurrenceRuleId, keyword);
+        log.info("[Controller:DiscountRateController] search() succeeded - Found {} discount rates", list.size());
         return ResponseEntity.ok(list);
     }
 }

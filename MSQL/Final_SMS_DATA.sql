@@ -519,217 +519,6 @@ INSERT INTO school_types (code, name, description, is_active, is_deleted) VALUES
 ('MONTESSORI', 'Montessori School', 'Focuses on child-led learning and early education.', TRUE, FALSE),
 ('VOCATIONAL', 'Vocational School', 'Specializes in skill-based education for trades and professions.', TRUE, FALSE);
 
-INSERT INTO charge_types
-(organization_id, code, name, description, is_active, deleted, created_at)
-VALUES
-(1, 'FIXED', 'Fixed Amount', 'Standard set amount (e.g., tuition, admission)', TRUE, FALSE, NOW()),
-(1, 'PERCENTAGE', 'Percentage', 'Fee calculated as a % of another fee or total (e.g., late fine, discount)', TRUE, FALSE, NOW()),
-(1, 'SLAB', 'Slab Based', 'Amount depends on slabs (e.g., transport fee depends on distance or zone)', TRUE, FALSE, NOW()),
-(1, 'PER_UNIT', 'Per Unit', 'Fee per unit/item (e.g., lab consumables, books, meals)', TRUE, FALSE, NOW()),
-(1, 'CONDITIONAL', 'Conditional', 'Fee applies only if certain condition is met (e.g., extra-curricular activity only for enrolled students)', TRUE, FALSE, NOW());
-
-
-INSERT INTO fee_recurrence_rules(code, name, description, is_active, is_deleted, created_by)
-VALUES
-('ONE_TIME', 'One Time', 'Fee charged only once (e.g., admission or registration fee)', TRUE, FALSE, 1),
-('MONTHLY', 'Monthly', 'Fee charged every month (common for tuition fees)', TRUE, FALSE, 1),
-('QUARTERLY', 'Quarterly', 'Fee charged every three months', TRUE, FALSE, 1),
-('HALF_YEARLY', 'Half Yearly', 'Fee charged twice in an academic year',TRUE, FALSE, 1),
-('ANNUAL', 'Annual', 'Fee charged once per academic year',TRUE, FALSE, 1),
-('PER_TERM', 'Per Term', 'Fee charged per academic term or semester', TRUE, FALSE, 1),
-('ON_DEMAND', 'On Demand', 'Fee charged when a service is used (transport, lab, activity)', TRUE, FALSE, 1);
-
-
-INSERT INTO fee_catalog
-(organization_id, code, name, description, charge_type_id, recurrence_rule_id,
- active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
-
-VALUES
-
-(1, 'ADMISSION', 'Admission Fee', 'Fee charged at the time of student admission',
- (SELECT id FROM charge_types WHERE code='FIXED'),
- (SELECT id FROM fee_recurrence_rules WHERE code='ONE_TIME'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-
-(1, 'TUITION', 'Tuition Fee', 'Core academic fee for teaching and instruction',
- (SELECT id FROM charge_types WHERE code='FIXED'),
- (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-
-(1, 'ACADEMIC', 'Academic Services Fee', 'Charges related to academic support and services',
- (SELECT id FROM charge_types WHERE code='FIXED'),
- (SELECT id FROM fee_recurrence_rules WHERE code='PER_TERM'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-
-(1, 'FACILITY', 'Facility Usage Fee', 'Charges for using school facilities and infrastructure',
- (SELECT id FROM charge_types WHERE code='FIXED'),
- (SELECT id FROM fee_recurrence_rules WHERE code='ANNUAL'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-
-(1, 'TRANSPORT', 'Transport Services Fee', 'Fee related to student transportation services',
- (SELECT id FROM charge_types WHERE code='SLAB'),
- (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-
-(1, 'ACTIVITY', 'Student Activities Fee', 'Fee related to extracurricular and student activities',
- (SELECT id FROM charge_types WHERE code='CONDITIONAL'),
- (SELECT id FROM fee_recurrence_rules WHERE code='PER_TERM'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-
-(1, 'RESOURCE', 'Learning Resource Fee', 'Fee related to learning materials and resources',
- (SELECT id FROM charge_types WHERE code='PER_UNIT'),
- (SELECT id FROM fee_recurrence_rules WHERE code='ANNUAL'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-
-(1, 'BOARDING', 'Boarding and Accommodation Fee', 'Charges for hostel or boarding facilities',
- (SELECT id FROM charge_types WHERE code='FIXED'),
- (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-
-(1, 'PENALTY', 'Penalty and Fine', 'Charges applied for late payments or violations',
- (SELECT id FROM charge_types WHERE code='PERCENTAGE'),
- (SELECT id FROM fee_recurrence_rules WHERE code='ON_DEMAND'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
-
-(1, 'DISCOUNT', 'Discount or Concession', 'Fee reduction applied based on eligibility',
- (SELECT id FROM charge_types WHERE code='PERCENTAGE'),
- (SELECT id FROM fee_recurrence_rules WHERE code='ON_DEMAND'),
- TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL);
-
--- ===================================
--- FEE COMPONENTS DATA
--- ===================================
--- ADMISSION FEE (Catalog ID = 1)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 1, 'ADM-FORM', 'Admission Form Fee', 'ACC-ADM-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
-(1, 1, 'ADM-PROC', 'Admission Processing Fee', 'ACC-ADM-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
-(1, 1, 'ADM-ORIENT', 'Orientation Session Fee', 'ACC-ADM-03', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
-
--- TUITION FEE (Catalog ID = 2)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 2, 'TUI-BASIC', 'Basic Tuition Fee', 'ACC-TUI-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 2, 'TUI-LAB', 'Lab Tuition Fee', 'ACC-TUI-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 2, 'TUI-MISC', 'Miscellaneous Tuition Fee', 'ACC-TUI-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
-
--- ACADEMIC SERVICES FEE (Catalog ID = 3)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 3, 'EXAM-MID', 'Mid Term Exam Fee', 'ACC-EXM-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
-(1, 3, 'EXAM-FINAL', 'Final Exam Fee', 'ACC-EXM-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
-(1, 3, 'GRADING', 'Grading & Evaluation Fee', 'ACC-EXM-03', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
-
--- FACILITY USAGE FEE (Catalog ID = 4)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 4, 'LAB-COMP', 'Computer Lab Charges', 'ACC-LAB-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 4, 'LAB-SCI', 'Science Lab Charges', 'ACC-LAB-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 4, 'LIB-USE', 'Library Usage Fee', 'ACC-LIB-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 4, 'SPORT-FAC', 'Sports Facility Charges', 'ACC-SPORT-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
-
--- TRANSPORT FEE (Catalog ID = 5)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 5, 'TRN-MON', 'Monthly Transport Charges', 'ACC-TRN-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 5, 'TRN-REG', 'Transport Registration Fee', 'ACC-TRN-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
-(1, 5, 'TRN-ROUTE', 'Route & Pickup Fee', 'ACC-TRN-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
-
--- ACTIVITY FEE (Catalog ID = 6)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 6, 'ACT-SPORT', 'Sports & Activities Fee', 'ACC-ACT-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 6, 'ACT-MUSIC', 'Music & Arts Fee', 'ACC-ACT-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 6, 'ACT-CLUB', 'Clubs & Societies Fee', 'ACC-ACT-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
-
--- RESOURCE FEE (Catalog ID = 7)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 7, 'RES-LIB', 'Library Resources Fee', 'ACC-RES-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 7, 'RES-LAB', 'Lab Consumables Fee', 'ACC-RES-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 7, 'RES-MATERIAL', 'Learning Materials Fee', 'ACC-RES-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
-
--- BOARDING FEE (Catalog ID = 8)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 8, 'HOS-MON', 'Monthly Hostel Charges', 'ACC-HOS-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 8, 'HOS-FOOD', 'Hostel Food Charges', 'ACC-HOS-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
-(1, 8, 'HOS-UTIL', 'Hostel Utility Charges', 'ACC-HOS-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
-
--- PENALTY & FINE (Catalog ID = 9)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 9, 'FINE-LATE', 'Late Payment Fine', 'ACC-FINE-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
-(1, 9, 'FINE-DISC', 'Disciplinary Fine', 'ACC-FINE-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
-(1, 9, 'FINE-MISC', 'Miscellaneous Penalty', 'ACC-FINE-03', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
-
--- DISCOUNT & CONCESSION (Catalog ID = 10)
-INSERT INTO fee_component
-(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
-VALUES
-(1, 10, 'DISC-SCH', 'Scholarship Discount', 'ACC-DISC-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
-(1, 10, 'DISC-FAM', 'Family Discount', 'ACC-DISC-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
-(1, 10, 'DISC-PROMO', 'Promotional Discount', 'ACC-DISC-03', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
-
--- ===================================
--- FEE RATES DATA
--- ===================================
-
--- 1. ADMISSION FEES (Fixed Amount)
-INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
-VALUES
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='ADM-FORM'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='ADM-PROC'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 2500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='ADM-ORIENT'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
-
--- 2. TUITION FEES (Fixed Amount)
-INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
-VALUES
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TUI-BASIC'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 8000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TUI-LAB'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TUI-MISC'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
-
--- 3. ACADEMIC SERVICES (Fixed Amount)
-INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
-VALUES
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='EXAM-MID'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1200.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='EXAM-FINAL'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 2000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
-
--- 4. FACILITY USAGE (Fixed Amount)
-INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
-VALUES
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='LAB-COMP'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='LIB-USE'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 400.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
-
--- 5. TRANSPORT (Slab Based - Requires Slab Groups, setting fixed placeholder for now)
-INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, slab_group_id, currency, effective_from, active, deleted, created_at)
-VALUES
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TRN-MON'), 1, (SELECT id FROM charge_types WHERE code='SLAB'), NULL, 'USD', '2024-01-01', TRUE, FALSE, NOW());
-
--- 6. RESOURCE FEE (Per Unit Pricing)
-INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, unit_price, currency, effective_from, active, deleted, created_at)
-VALUES
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='RES-MATERIAL'), 1, (SELECT id FROM charge_types WHERE code='PER_UNIT'), 50.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
-
--- 7. PENALTY & FINES (Percentage Based)
-INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, percentage_value, currency, effective_from, active, deleted, created_at)
-VALUES
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='FINE-LATE'), 1, (SELECT id FROM charge_types WHERE code='PERCENTAGE'), 5.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
-
--- 8. DISCOUNTS & CONCESSIONS (Percentage Based)
-INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, percentage_value, currency, effective_from, active, deleted, created_at)
-VALUES
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='DISC-SCH'), 1, (SELECT id FROM charge_types WHERE code='PERCENTAGE'), 25.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
-(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='DISC-FAM'), 1, (SELECT id FROM charge_types WHERE code='PERCENTAGE'), 10.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
 
 
 
@@ -1937,6 +1726,220 @@ VALUES
     (1, 10, 'A', NOW(), NOW(), 0, NULL),
     (1, 10, 'B', NOW(), NOW(), 0, NULL),
     (1, 10, 'C', NOW(), NOW(), 0, NULL);
+
+
+
+INSERT INTO charge_types
+(organization_id, code, name, description, is_active, deleted, created_at)
+VALUES
+(1, 'FIXED', 'Fixed Amount', 'Standard set amount (e.g., tuition, admission)', TRUE, FALSE, NOW()),
+(1, 'PERCENTAGE', 'Percentage', 'Fee calculated as a % of another fee or total (e.g., late fine, discount)', TRUE, FALSE, NOW()),
+(1, 'SLAB', 'Slab Based', 'Amount depends on slabs (e.g., transport fee depends on distance or zone)', TRUE, FALSE, NOW()),
+(1, 'PER_UNIT', 'Per Unit', 'Fee per unit/item (e.g., lab consumables, books, meals)', TRUE, FALSE, NOW()),
+(1, 'CONDITIONAL', 'Conditional', 'Fee applies only if certain condition is met (e.g., extra-curricular activity only for enrolled students)', TRUE, FALSE, NOW());
+
+
+INSERT INTO fee_recurrence_rules(code, name, description, is_active, is_deleted, created_by)
+VALUES
+('ONE_TIME', 'One Time', 'Fee charged only once (e.g., admission or registration fee)', TRUE, FALSE, 1),
+('MONTHLY', 'Monthly', 'Fee charged every month (common for tuition fees)', TRUE, FALSE, 1),
+('QUARTERLY', 'Quarterly', 'Fee charged every three months', TRUE, FALSE, 1),
+('HALF_YEARLY', 'Half Yearly', 'Fee charged twice in an academic year',TRUE, FALSE, 1),
+('ANNUAL', 'Annual', 'Fee charged once per academic year',TRUE, FALSE, 1),
+('PER_TERM', 'Per Term', 'Fee charged per academic term or semester', TRUE, FALSE, 1),
+('ON_DEMAND', 'On Demand', 'Fee charged when a service is used (transport, lab, activity)', TRUE, FALSE, 1);
+
+
+INSERT INTO fee_catalog
+(organization_id, code, name, description, charge_type_id, recurrence_rule_id,
+ active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+
+VALUES
+
+(1, 'ADMISSION', 'Admission Fee', 'Fee charged at the time of student admission',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ONE_TIME'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'TUITION', 'Tuition Fee', 'Core academic fee for teaching and instruction',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'ACADEMIC', 'Academic Services Fee', 'Charges related to academic support and services',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='PER_TERM'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'FACILITY', 'Facility Usage Fee', 'Charges for using school facilities and infrastructure',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ANNUAL'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'TRANSPORT', 'Transport Services Fee', 'Fee related to student transportation services',
+ (SELECT id FROM charge_types WHERE code='SLAB'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'ACTIVITY', 'Student Activities Fee', 'Fee related to extracurricular and student activities',
+ (SELECT id FROM charge_types WHERE code='CONDITIONAL'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='PER_TERM'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'RESOURCE', 'Learning Resource Fee', 'Fee related to learning materials and resources',
+ (SELECT id FROM charge_types WHERE code='PER_UNIT'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ANNUAL'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'BOARDING', 'Boarding and Accommodation Fee', 'Charges for hostel or boarding facilities',
+ (SELECT id FROM charge_types WHERE code='FIXED'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'PENALTY', 'Penalty and Fine', 'Charges applied for late payments or violations',
+ (SELECT id FROM charge_types WHERE code='PERCENTAGE'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ON_DEMAND'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+
+(1, 'DISCOUNT', 'Discount or Concession', 'Fee reduction applied based on eligibility',
+ (SELECT id FROM charge_types WHERE code='PERCENTAGE'),
+ (SELECT id FROM fee_recurrence_rules WHERE code='ON_DEMAND'),
+ TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL);
+
+-- ===================================
+-- FEE COMPONENTS DATA
+-- ===================================
+-- ADMISSION FEE (Catalog ID = 1)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 1, 'ADM-FORM', 'Admission Form Fee', 'ACC-ADM-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 1, 'ADM-PROC', 'Admission Processing Fee', 'ACC-ADM-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 1, 'ADM-ORIENT', 'Orientation Session Fee', 'ACC-ADM-03', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
+
+-- TUITION FEE (Catalog ID = 2)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 2, 'TUI-BASIC', 'Basic Tuition Fee', 'ACC-TUI-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 2, 'TUI-LAB', 'Lab Tuition Fee', 'ACC-TUI-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 2, 'TUI-MISC', 'Miscellaneous Tuition Fee', 'ACC-TUI-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
+
+-- ACADEMIC SERVICES FEE (Catalog ID = 3)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 3, 'EXAM-MID', 'Mid Term Exam Fee', 'ACC-EXM-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 3, 'EXAM-FINAL', 'Final Exam Fee', 'ACC-EXM-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 3, 'GRADING', 'Grading & Evaluation Fee', 'ACC-EXM-03', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
+
+-- FACILITY USAGE FEE (Catalog ID = 4)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 4, 'LAB-COMP', 'Computer Lab Charges', 'ACC-LAB-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 4, 'LAB-SCI', 'Science Lab Charges', 'ACC-LAB-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 4, 'LIB-USE', 'Library Usage Fee', 'ACC-LIB-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 4, 'SPORT-FAC', 'Sports Facility Charges', 'ACC-SPORT-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
+
+-- TRANSPORT FEE (Catalog ID = 5)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 5, 'TRN-MON', 'Monthly Transport Charges', 'ACC-TRN-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 5, 'TRN-REG', 'Transport Registration Fee', 'ACC-TRN-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 5, 'TRN-ROUTE', 'Route & Pickup Fee', 'ACC-TRN-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
+
+-- ACTIVITY FEE (Catalog ID = 6)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 6, 'ACT-SPORT', 'Sports & Activities Fee', 'ACC-ACT-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 6, 'ACT-MUSIC', 'Music & Arts Fee', 'ACC-ACT-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 6, 'ACT-CLUB', 'Clubs & Societies Fee', 'ACC-ACT-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
+
+-- RESOURCE FEE (Catalog ID = 7)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 7, 'RES-LIB', 'Library Resources Fee', 'ACC-RES-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 7, 'RES-LAB', 'Lab Consumables Fee', 'ACC-RES-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 7, 'RES-MATERIAL', 'Learning Materials Fee', 'ACC-RES-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
+
+-- BOARDING FEE (Catalog ID = 8)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 8, 'HOS-MON', 'Monthly Hostel Charges', 'ACC-HOS-01', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 8, 'HOS-FOOD', 'Hostel Food Charges', 'ACC-HOS-02', FALSE, TRUE, TRUE, FALSE, NOW(), 1),
+(1, 8, 'HOS-UTIL', 'Hostel Utility Charges', 'ACC-HOS-03', FALSE, TRUE, TRUE, FALSE, NOW(), 1);
+
+-- PENALTY & FINE (Catalog ID = 9)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 9, 'FINE-LATE', 'Late Payment Fine', 'ACC-FINE-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 9, 'FINE-DISC', 'Disciplinary Fine', 'ACC-FINE-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 9, 'FINE-MISC', 'Miscellaneous Penalty', 'ACC-FINE-03', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
+
+-- DISCOUNT & CONCESSION (Catalog ID = 10)
+INSERT INTO fee_component
+(organization_id, fee_catalog_id, component_code, component_name, account_code, taxable, discount_able, active, deleted, created_at, created_by)
+VALUES
+(1, 10, 'DISC-SCH', 'Scholarship Discount', 'ACC-DISC-01', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 10, 'DISC-FAM', 'Family Discount', 'ACC-DISC-02', FALSE, FALSE, TRUE, FALSE, NOW(), 1),
+(1, 10, 'DISC-PROMO', 'Promotional Discount', 'ACC-DISC-03', FALSE, FALSE, TRUE, FALSE, NOW(), 1);
+
+-- ===================================
+-- FEE RATES DATA
+-- ===================================
+
+-- 1. ADMISSION FEES (Fixed Amount)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='ADM-FORM'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='ADM-PROC'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 2500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='ADM-ORIENT'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 2. TUITION FEES (Fixed Amount)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TUI-BASIC'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 8000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TUI-LAB'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TUI-MISC'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 500.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 3. ACADEMIC SERVICES (Fixed Amount)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='EXAM-MID'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1200.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='EXAM-FINAL'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 2000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 4. FACILITY USAGE (Fixed Amount)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, fixed_amount, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='LAB-COMP'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 1000.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='LIB-USE'), 1, (SELECT id FROM charge_types WHERE code='FIXED'), 400.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 5. TRANSPORT (Slab Based - Requires Slab Groups, setting fixed placeholder for now)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, slab_group_id, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='TRN-MON'), 1, (SELECT id FROM charge_types WHERE code='SLAB'), NULL, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 6. RESOURCE FEE (Per Unit Pricing)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, unit_price, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='RES-MATERIAL'), 1, (SELECT id FROM charge_types WHERE code='PER_UNIT'), 50.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 7. PENALTY & FINES (Percentage Based)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, percentage_value, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='FINE-LATE'), 1, (SELECT id FROM charge_types WHERE code='PERCENTAGE'), 5.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
+
+-- 8. DISCOUNTS & CONCESSIONS (Percentage Based)
+INSERT INTO fee_rates (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, charge_type_id, percentage_value, currency, effective_from, active, deleted, created_at)
+VALUES
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='DISC-SCH'), 1, (SELECT id FROM charge_types WHERE code='PERCENTAGE'), 25.00, 'USD', '2024-01-01', TRUE, FALSE, NOW()),
+(1, 1, 1, (SELECT id FROM fee_component WHERE component_code='DISC-FAM'), 1, (SELECT id FROM charge_types WHERE code='PERCENTAGE'), 10.00, 'USD', '2024-01-01', TRUE, FALSE, NOW());
 
 
 

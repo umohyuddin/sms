@@ -20,4 +20,6 @@ public class DiscountSubTypeRequestDTO {
     @NotNull(message = "Discount Type ID is required")
     private Long discountTypeId;
     private Boolean isActive = true;
+    private Integer priority = 0;
+    private Integer displayOrder = 0;
 }

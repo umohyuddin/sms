@@ -38,6 +38,9 @@ public class DiscountSubTypeEntity extends AuditableEntity {
     @Column(nullable = false)
     private Integer displayOrder = 0;
 
+    @Column(nullable = false)
+    private Integer priority = 0;
+
     @Column(name = "deleted", nullable = false)
     private Boolean deleted = false;
 }
