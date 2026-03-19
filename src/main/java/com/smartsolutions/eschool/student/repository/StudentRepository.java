@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -17,157 +18,90 @@ import java.util.Optional;
 @Repository
 public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
 
-    @Query("SELECT s FROM StudentEntity s " +
-            "LEFT JOIN FETCH s.campus " +
-            "LEFT JOIN FETCH s.standard " +
-            "LEFT JOIN FETCH s.section " +
-            "WHERE s.id = :id AND s.deleted = false")
-    Optional<StudentEntity> findByIdAndDeletedFalse(Long id);
+    @Query("SELECT s FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.deleted = false")
+    List<StudentEntity> findAllByOrganizationId(@Param("organizationId") Long organizationId);
 
-//
-//    @Query("SELECT s FROM StudentEntity s " +
-//            "LEFT JOIN FETCH s.campus " +
-//            "LEFT JOIN FETCH s.standard " +
-//            "LEFT JOIN FETCH s.section " +
-//            "LEFT JOIN FETCH s.feeAssignments fa " +
-//            "WHERE s.deleted = false")
-//    List<StudentEntity> findByDeletedFalse();
+    @Query("SELECT s FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.isActive = true AND s.deleted = false")
+    List<StudentEntity> findAllByOrganizationIdAndIsActiveTrue(@Param("organizationId") Long organizationId);
 
-        @Query("SELECT DISTINCT s FROM StudentEntity s " +
-                "LEFT JOIN FETCH s.campus " +
-                "LEFT JOIN FETCH s.standard " +
-                "LEFT JOIN FETCH s.section " +
-                "LEFT JOIN FETCH s.feeAssignments fa " +
-                "LEFT JOIN FETCH fa.feeRate fr " +
-                "LEFT JOIN FETCH fr.feeComponent fc " +
-                "WHERE s.deleted = false AND (fr.academicYear.id = :academicYearId OR fr.academicYear.id IS NULL)")
-        List<StudentEntity> findAllWithAssignments(@Param("academicYearId") Long academicYearId);
+    @Query("SELECT s FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.isActive = false AND s.deleted = false")
+    List<StudentEntity> findAllByOrganizationIdAndIsActiveFalse(@Param("organizationId") Long organizationId);
 
     @Query("SELECT s FROM StudentEntity s " +
             "LEFT JOIN FETCH s.campus " +
             "LEFT JOIN FETCH s.standard " +
             "LEFT JOIN FETCH s.section " +
-            "WHERE s.campus.id = :campusId AND s.deleted = false")
-    List<StudentEntity> findByCampusId(@Param("campusId") Long campusId);
+            "WHERE s.id = :id AND s.organizationId = :organizationId AND s.deleted = false")
+    Optional<StudentEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
+
+    @Query("SELECT DISTINCT s FROM StudentEntity s " +
+            "LEFT JOIN FETCH s.campus " +
+            "LEFT JOIN FETCH s.standard " +
+            "LEFT JOIN FETCH s.section " +
+            "LEFT JOIN FETCH s.feeAssignments fa " +
+            "LEFT JOIN FETCH fa.feeRate fr " +
+            "LEFT JOIN FETCH fr.feeComponent fc " +
+            "WHERE s.organizationId = :organizationId AND s.deleted = false AND (fr.academicYear.id = :academicYearId OR fr.academicYear.id IS NULL)")
+    List<StudentEntity> findAllWithAssignments(@Param("academicYearId") Long academicYearId, @Param("organizationId") Long organizationId);
 
     @Query("SELECT s FROM StudentEntity s " +
             "LEFT JOIN FETCH s.campus " +
             "LEFT JOIN FETCH s.standard " +
             "LEFT JOIN FETCH s.section " +
-            "WHERE s.standard.id = :standardId AND s.deleted = false")
-    List<StudentEntity> findByStandardId(@Param("standardId") Long standardId);
+            "WHERE s.campus.id = :campusId AND s.organizationId = :organizationId AND s.deleted = false")
+    List<StudentEntity> findByCampusIdAndOrganizationId(@Param("campusId") Long campusId, @Param("organizationId") Long organizationId);
 
     @Query("SELECT s FROM StudentEntity s " +
             "LEFT JOIN FETCH s.campus " +
             "LEFT JOIN FETCH s.standard " +
             "LEFT JOIN FETCH s.section " +
-            "WHERE s.section.id = :sectionId AND s.deleted = false")
-    List<StudentEntity> findBySectionId(@Param("sectionId") Long sectionId);
-
-
-    @Query("SELECT s FROM StudentEntity s " +
-            "WHERE (s.firstName LIKE %:keyword% OR s.lastName LIKE %:keyword% OR s.fullName LIKE %:keyword%) " +
-            "AND s.deleted = false")
-    List<StudentEntity> searchStudentsByName(@Param("keyword") String keyword);
+            "WHERE s.standard.id = :standardId AND s.organizationId = :organizationId AND s.deleted = false")
+    List<StudentEntity> findByStandardIdAndOrganizationId(@Param("standardId") Long standardId, @Param("organizationId") Long organizationId);
 
     @Query("SELECT s FROM StudentEntity s " +
             "LEFT JOIN FETCH s.campus " +
             "LEFT JOIN FETCH s.standard " +
             "LEFT JOIN FETCH s.section " +
-            "WHERE s.studentCode = :studentCode AND s.deleted = false")
-    Optional<StudentEntity> findByStudentCode(@Param("studentCode") String studentCode);
+            "WHERE s.section.id = :sectionId AND s.organizationId = :organizationId AND s.deleted = false")
+    List<StudentEntity> findBySectionIdAndOrganizationId(@Param("sectionId") Long sectionId, @Param("organizationId") Long organizationId);
 
+    @Query("SELECT s FROM StudentEntity s " +
+            "WHERE (s.firstName LIKE %:keyword% OR s.lastName LIKE %:keyword% OR s.fullName LIKE %:keyword% OR s.studentCode LIKE %:keyword%) " +
+            "AND s.organizationId = :organizationId AND s.deleted = false")
+    List<StudentEntity> searchByKeywordAndOrganizationId(@Param("keyword") String keyword, @Param("organizationId") Long organizationId);
 
     @Query("SELECT s FROM StudentEntity s " +
             "LEFT JOIN FETCH s.campus " +
             "LEFT JOIN FETCH s.standard " +
             "LEFT JOIN FETCH s.section " +
-            "WHERE s.campus.id = :campusId AND s.standard.id = :standardId AND s.deleted = false")
-    List<StudentEntity> findByCampusAndStandard(@Param("campusId") Long campusId,
-                                                @Param("standardId") Long standardId);
+            "WHERE s.studentCode = :studentCode AND s.organizationId = :organizationId AND s.deleted = false")
+    Optional<StudentEntity> findByStudentCodeAndOrganizationId(@Param("studentCode") String studentCode, @Param("organizationId") Long organizationId);
 
+    @Query("SELECT s FROM StudentEntity s " +
+            "LEFT JOIN FETCH s.campus " +
+            "LEFT JOIN FETCH s.standard " +
+            "LEFT JOIN FETCH s.section " +
+            "WHERE s.campus.id = :campusId AND s.standard.id = :standardId AND s.organizationId = :organizationId AND s.deleted = false")
+    List<StudentEntity> findByCampusAndStandardAndOrganizationId(@Param("campusId") Long campusId, @Param("standardId") Long standardId, @Param("organizationId") Long organizationId);
 
-    // Total active students (not deleted)
-    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false")
-    Long countAllActiveStudents();
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.deleted = false")
+    Long countAllActiveStudents(@Param("organizationId") Long organizationId);
 
-    // Total students by campus
-    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.campus.id = :campusId")
-    Long countByCampus(@Param("campusId") Long campusId);
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.campus.id = :campusId AND s.organizationId = :organizationId AND s.deleted = false")
+    Long countByCampusAndOrganizationId(@Param("campusId") Long campusId, @Param("organizationId") Long organizationId);
 
-    // Total students by standard
-    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.standard.id = :standardId")
-    Long countByStandard(@Param("standardId") Long standardId);
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.standard.id = :standardId AND s.organizationId = :organizationId AND s.deleted = false")
+    Long countByStandardAndOrganizationId(@Param("standardId") Long standardId, @Param("organizationId") Long organizationId);
 
-    // Total students by section
-    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.section.id = :sectionId")
-    Long countBySection(@Param("sectionId") Long sectionId);
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.section.id = :sectionId AND s.organizationId = :organizationId AND s.deleted = false")
+    Long countBySectionAndOrganizationId(@Param("sectionId") Long sectionId, @Param("organizationId") Long organizationId);
 
-    // total students by gender
-    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.deleted = false AND s.gender = :gender")
-    Long countByGender(@Param("gender") String gender);
-
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.gender = :gender AND s.organizationId = :organizationId AND s.deleted = false")
+    Long countByGenderAndOrganizationId(@Param("gender") String gender, @Param("organizationId") Long organizationId);
 
     @Query("SELECT COUNT(s) FROM StudentEntity s " +
-            "WHERE s.enrollmentDate BETWEEN :startDate AND :endDate")
-    Long countStudentsRegisteredBetween(@Param("startDate") LocalDate startDate,
-                                        @Param("endDate") LocalDate endDate);
-
-//
-//    @Query("""
-//                SELECT s FROM StudentEntity s
-//                LEFT JOIN FETCH s.campus c
-//                LEFT JOIN FETCH s.standard st
-//                LEFT JOIN FETCH s.section sec
-//                LEFT JOIN FETCH s.academicYear ay
-//                WHERE s.deleted = false
-//                  AND (:campusId IS NULL OR c.id = :campusId)
-//                  AND (:standardId IS NULL OR st.id = :standardId)
-//                  AND (:studentId IS NULL OR s.id = :studentId)
-//                  AND (:academicYearId IS NULL OR ay.id = :academicYearId)
-//            """)
-//    List<StudentEntity> searchStudents(
-//            @Param("campusId") Long campusId,
-//            @Param("standardId") Long standardId,
-//            @Param("studentId") Long studentId,
-//            @Param("academicYearId") Long academicYearId
-//    );
-
-//    @Query("""
-//            SELECT s FROM StudentEntity s
-//            LEFT JOIN FETCH s.campus c
-//            LEFT JOIN FETCH s.standard st
-//            LEFT JOIN FETCH s.section sec
-//            LEFT JOIN FETCH s.academicYear ay
-//            WHERE s.deleted = false
-//              AND (:campusId IS NULL OR c.id = :campusId)
-//              AND (:standardId IS NULL OR st.id = :standardId)
-//              AND (:sectionId IS NULL OR sec.id = :sectionId)
-//              AND (:studentId IS NULL OR s.id = :studentId)
-//              AND (:academicYearId IS NULL OR ay.id = :academicYearId)
-//              AND (:keyword IS NULL OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-//                   OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-//                   OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))
-//            """)
-//@Query("""
-//    SELECT DISTINCT s FROM StudentEntity s
-//    LEFT JOIN FETCH s.campus c
-//    LEFT JOIN FETCH s.standard st
-//    LEFT JOIN FETCH s.section sec
-//    LEFT JOIN FETCH s.academicYear ay
-//    WHERE s.deleted = false
-//      AND (:campusId IS NULL OR c.id = :campusId)
-//      AND (:standardId IS NULL OR st.id = :standardId)
-//      AND (:sectionId IS NULL OR sec.id = :sectionId)
-//      AND (:studentId IS NULL OR s.id = :studentId)
-//      AND (:academicYearId IS NULL OR ay.id = :academicYearId)
-//      AND (
-//            :keyword IS NULL
-//            OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-//            OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-//            OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-//          )
-//""")
+            "WHERE s.enrollmentDate BETWEEN :startDate AND :endDate AND s.organizationId = :organizationId")
+    Long countStudentsRegisteredBetweenAndOrganizationId(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("organizationId") Long organizationId);
 
     @EntityGraph(attributePaths = {
             "campus",
@@ -177,7 +111,7 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
     })
     @Query("""
                 SELECT s FROM StudentEntity s
-                WHERE s.deleted = false
+                WHERE s.deleted = false AND s.organizationId = :organizationId
                   AND (:campusId IS NULL OR s.campus.id = :campusId)
                   AND (:standardId IS NULL OR s.standard.id = :standardId)
                   AND (:sectionId IS NULL OR s.section.id = :sectionId)
@@ -190,13 +124,61 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
                         OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                       )
             """)
-    List<StudentEntity> searchStudents(
+    List<StudentEntity> searchStudentsWithFilters(
             @Param("campusId") Long campusId,
             @Param("standardId") Long standardId,
             @Param("sectionId") Long sectionId,
             @Param("studentId") Long studentId,
             @Param("academicYearId") Long academicYearId,
-            @Param("keyword") String keyword
+            @Param("keyword") String keyword,
+            @Param("organizationId") Long organizationId
     );
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE StudentEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP "
+            + "WHERE s.id = :id AND s.organizationId = :organizationId")
+    int softDeleteByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
+
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.isActive = true AND s.deleted = false")
+    Long countByOrganizationIdAndIsActiveTrue(@Param("organizationId") Long organizationId);
+
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.isActive = false AND s.deleted = false")
+    Long countByOrganizationIdAndIsActiveFalse(@Param("organizationId") Long organizationId);
+
+    @Query("SELECT (COUNT(s) > 0) FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.studentCode = :studentCode AND s.deleted = false")
+    boolean existsByOrganizationIdAndStudentCode(@Param("organizationId") Long organizationId, @Param("studentCode") String studentCode);
+
+    @Query("SELECT (COUNT(s) > 0) FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.studentCode = :studentCode AND s.id <> :id AND s.deleted = false")
+    boolean existsByOrganizationIdAndStudentCodeAndIdNot(@Param("organizationId") Long organizationId, @Param("studentCode") String studentCode, @Param("id") Long id);
+
+    // --- Legacy Backwards Compatibility Methods for Academic/Fee/Discount Modules --- //
+    @Query("SELECT s FROM StudentEntity s LEFT JOIN FETCH s.campus LEFT JOIN FETCH s.standard LEFT JOIN FETCH s.section WHERE s.id = :id AND s.deleted = false")
+    Optional<StudentEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+
+    @Query("SELECT s FROM StudentEntity s LEFT JOIN FETCH s.campus LEFT JOIN FETCH s.standard LEFT JOIN FETCH s.section WHERE s.section.id = :sectionId AND s.deleted = false")
+    List<StudentEntity> findBySectionId(@Param("sectionId") Long sectionId);
+
+    @Query("SELECT s FROM StudentEntity s WHERE (s.firstName LIKE %:keyword% OR s.lastName LIKE %:keyword% OR s.fullName LIKE %:keyword%) AND s.deleted = false")
+    List<StudentEntity> searchStudentsByName(@Param("keyword") String keyword);
+
+    @Query("SELECT s FROM StudentEntity s LEFT JOIN FETCH s.campus LEFT JOIN FETCH s.standard LEFT JOIN FETCH s.section WHERE s.studentCode = :studentCode AND s.deleted = false")
+    Optional<StudentEntity> findByStudentCode(@Param("studentCode") String studentCode);
+
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.campus.id = :campusId AND s.deleted = false")
+    Long countByCampus(@Param("campusId") Long campusId);
+
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.standard.id = :standardId AND s.deleted = false")
+    Long countByStandard(@Param("standardId") Long standardId);
+
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.section.id = :sectionId AND s.deleted = false")
+    Long countBySection(@Param("sectionId") Long sectionId);
+
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.gender = :gender AND s.deleted = false")
+    Long countByGender(@Param("gender") String gender);
+
+    @Query("SELECT COUNT(s) FROM StudentEntity s WHERE s.enrollmentDate BETWEEN :startDate AND :endDate")
+    Long countStudentsRegisteredBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    // -------------------------------------------------------------------------- //
 }
 

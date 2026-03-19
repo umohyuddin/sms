@@ -5,6 +5,47 @@ VALUES
 
 
 
+INSERT INTO guardian_relations 
+(organization_id, name, code, description, status, is_default)
+VALUES
+
+-- 🔹 Core Parents
+(1, 'Father', 'FATHER', 'Male parent (biological or legal)', 'ACTIVE', TRUE),
+(1, 'Mother', 'MOTHER', 'Female parent (biological or legal)', 'ACTIVE', FALSE),
+
+-- 🔹 Primary Guardian
+(1, 'Guardian', 'GUARDIAN', 'Primary responsible adult (non-parent)', 'ACTIVE', FALSE),
+
+-- 🔹 Immediate Family
+(1, 'Grandparent', 'GRANDPARENT', 'Grandfather or grandmother', 'ACTIVE', FALSE),
+(1, 'Sibling', 'SIBLING', 'Brother or sister', 'ACTIVE', FALSE),
+
+-- 🔹 Extended Family
+(1, 'Uncle/Aunt', 'UNCLE_AUNT', 'Parent’s sibling', 'ACTIVE', FALSE),
+(1, 'Relative', 'RELATIVE', 'Any other family member', 'ACTIVE', FALSE),
+
+-- 🔹 Legal / Care Types
+(1, 'Foster Parent', 'FOSTER_PARENT', 'Temporary guardian assigned legally', 'ACTIVE', FALSE),
+(1, 'Adoptive Parent', 'ADOPTIVE_PARENT', 'Legally adopted parent', 'ACTIVE', FALSE),
+(1, 'Legal Guardian', 'LEGAL_GUARDIAN', 'Court-appointed guardian', 'ACTIVE', FALSE),
+
+-- 🔹 Care Providers
+(1, 'Caretaker', 'CARETAKER', 'Responsible for daily care', 'ACTIVE', FALSE),
+(1, 'Nanny', 'NANNY', 'Childcare provider', 'ACTIVE', FALSE),
+
+-- 🔹 Institutional
+(1, 'Hostel Authority', 'HOSTEL_AUTHORITY', 'Hostel or boarding authority', 'ACTIVE', FALSE),
+(1, 'Organization', 'ORGANIZATION', 'Institution acting as guardian', 'ACTIVE', FALSE),
+
+-- 🔹 Financial / Support
+(1, 'Sponsor', 'SPONSOR', 'Financial supporter of student', 'ACTIVE', FALSE),
+
+-- 🔹 Emergency / Misc
+(1, 'Emergency Contact', 'EMERGENCY_CONTACT', 'Emergency-only contact person', 'ACTIVE', FALSE),
+
+-- 🔹 Fallback
+(1, 'Other', 'OTHER', 'Other relationship', 'ACTIVE', FALSE);
+
 
 
 INSERT INTO currencies (iso_code, name, symbol, is_active, is_deleted, created_at, created_by) VALUES
@@ -2112,25 +2153,25 @@ VALUES
 INSERT INTO admission_type
 (id, organization_id, code, name, description, is_active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
 VALUES
-(1, 101, 'REG', 'Regular Admission', 'Standard admission for new academic session', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(1, 1, 'REG', 'Regular Admission', 'Standard admission for new academic session', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-(2, 101, 'LAT', 'Lateral Entry', 'Admission granted to students transferring from another institution', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(2, 1, 'LAT', 'Lateral Entry', 'Admission granted to students transferring from another institution', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-(3, 101, 'TRF', 'Transfer Admission', 'Student migrated from another branch or campus', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(3, 1, 'TRF', 'Transfer Admission', 'Student migrated from another branch or campus', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-(4, 101, 'SCH', 'Scholarship Admission', 'Admission granted under scholarship program', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(4, 1, 'SCH', 'Scholarship Admission', 'Admission granted under scholarship program', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-(5, 101, 'SPC', 'Sports Quota', 'Admission based on sports quota eligibility', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(5, 1, 'SPC', 'Sports Quota', 'Admission based on sports quota eligibility', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-(6, 101, 'MGMT', 'Management Quota', 'Admission under management quota', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(6, 1, 'MGMT', 'Management Quota', 'Admission under management quota', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-(7, 101, 'INT', 'International Student', 'Admission for foreign or overseas students', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(7, 1, 'INT', 'International Student', 'Admission for foreign or overseas students', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-(8, 101, 'RADM', 'Re-Admission', 'Student rejoining after leaving previously', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(8, 1, 'RADM', 'Re-Admission', 'Student rejoining after leaving previously', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-(9, 101, 'COND', 'Conditional Admission', 'Admission granted with pending documents or requirements', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
+(9, 1, 'COND', 'Conditional Admission', 'Admission granted with pending documents or requirements', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL),
 
-(10, 101, 'WAIT', 'Waiting List Admission', 'Admission offered from waiting list after seat availability', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL);
+(10, 1, 'WAIT', 'Waiting List Admission', 'Admission offered from waiting list after seat availability', TRUE, FALSE, NOW(), 1, NOW(), 1, NULL, NULL);
 -- Student Data (5 per section for 30 sections = 150 students)
 -- Campus 1, Standards 1-5, Sections 1-15
 -- Campus 2, Standards 6-10, Sections 16-30

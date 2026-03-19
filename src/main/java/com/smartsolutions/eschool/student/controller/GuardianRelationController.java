@@ -1,0 +1,101 @@
+package com.smartsolutions.eschool.student.controller;
+
+import com.smartsolutions.eschool.student.dtos.guardianRelation.responseDto.GuardianRelationResponseDTO;
+import com.smartsolutions.eschool.student.dtos.guardianRelation.requestDto.GuardianRelationCreateRequestDTO;
+import com.smartsolutions.eschool.student.facade.GuardianRelationFacade;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/guardian/relation")
+@Slf4j
+public class GuardianRelationController {
+
+    private final GuardianRelationFacade guardianRelationFacade;
+
+    public GuardianRelationController(GuardianRelationFacade guardianRelationFacade) {
+        this.guardianRelationFacade = guardianRelationFacade;
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<GuardianRelationResponseDTO>> getAll() {
+        log.info("[Controller:GuardianRelationController] getAll() called - Request to get all guardian relations");
+        List<GuardianRelationResponseDTO> resources = guardianRelationFacade.getAll();
+        log.info("[Controller:GuardianRelationController] getAll() succeeded - Found {} guardian relations", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<GuardianRelationResponseDTO>> getActive() {
+        log.info("[Controller:GuardianRelationController] getActive() called - Request to get all active guardian relations");
+        List<GuardianRelationResponseDTO> resources = guardianRelationFacade.getActive();
+        log.info("[Controller:GuardianRelationController] getActive() succeeded - Found {} active guardian relations", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping(value = "/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<GuardianRelationResponseDTO>> getInactive() {
+        log.info("[Controller:GuardianRelationController] getInactive() called - Request to get all inactive guardian relations");
+        List<GuardianRelationResponseDTO> resources = guardianRelationFacade.getInactive();
+        log.info("[Controller:GuardianRelationController] getInactive() succeeded - Found {} inactive guardian relations", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GuardianRelationResponseDTO> getById(@PathVariable Long id) {
+        log.info("[Controller:GuardianRelationController] getById() called - Request to fetch guardian relation with id: {}", id);
+        GuardianRelationResponseDTO relation = guardianRelationFacade.getById(id);
+        log.info("[Controller:GuardianRelationController] getById() succeeded - Found guardian relation: {}", id);
+        return ResponseEntity.ok(relation);
+    }
+
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<GuardianRelationResponseDTO>> search(@RequestParam(name = "keyword") String keyword) {
+        log.info("[Controller:GuardianRelationController] search() called - Request to search guardian relations with keyword: {}", keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<GuardianRelationResponseDTO> responseDTOs = guardianRelationFacade.searchByKeyword(keyword.trim());
+        log.info("[Controller:GuardianRelationController] search() succeeded - Found {} guardian relations matching keyword: {}", responseDTOs.size(), keyword);
+        return ResponseEntity.ok(responseDTOs);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+        log.info("[Controller:GuardianRelationController] delete() called - Request to delete guardian relation: {}", id);
+        guardianRelationFacade.softDeleteById(id);
+        log.info("[Controller:GuardianRelationController] delete() succeeded - Guardian relation: {} deleted successfully", id);
+        return ResponseEntity.ok(Map.of("message", "Guardian relation deleted successfully"));
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GuardianRelationResponseDTO> create(@Valid @RequestBody GuardianRelationCreateRequestDTO requestDTO) {
+        log.info("[Controller:GuardianRelationController] create() called - Request to create guardian relation: {}", requestDTO.getName());
+        GuardianRelationResponseDTO responseDTO = guardianRelationFacade.createGuardianRelation(requestDTO);
+        log.info("[Controller:GuardianRelationController] create() succeeded - Guardian relation created with id: {}", responseDTO.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GuardianRelationResponseDTO> update(@PathVariable Long id, @Valid @RequestBody GuardianRelationCreateRequestDTO requestDTO) {
+        log.info("[Controller:GuardianRelationController] update() called - Request to update guardian relation: {}", id);
+        GuardianRelationResponseDTO responseDTO = guardianRelationFacade.updateGuardianRelation(id, requestDTO);
+        log.info("[Controller:GuardianRelationController] update() succeeded - Guardian relation: {} updated successfully", id);
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @GetMapping(value = "/statistics", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Long>> getStatistics() {
+        log.info("[Controller:GuardianRelationController] getStatistics() called");
+        Map<String, Long> statistics = guardianRelationFacade.getStatistics();
+        log.info("[Controller:GuardianRelationController] getStatistics() succeeded");
+        return ResponseEntity.ok(statistics);
+    }
+}

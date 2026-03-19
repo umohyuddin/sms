@@ -6,6 +6,7 @@ import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.user.model.SystemUserEntity;
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class StudentEntity {
+public class StudentEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,17 +84,6 @@ public class StudentEntity {
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 
     // --- RELATIONSHIPS --- //
 

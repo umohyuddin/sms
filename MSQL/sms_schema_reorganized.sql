@@ -1052,6 +1052,83 @@
         CONSTRAINT fk_employee_type FOREIGN KEY (employee_type_id) REFERENCES employee_type(id)
     );
 
+
+DROP TABLE IF EXISTS guardian_relations;
+
+CREATE TABLE guardian_relations (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
+
+    name VARCHAR(50) NOT NULL,
+    code VARCHAR(20) NOT NULL,
+
+    description VARCHAR(255),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_default BOOLEAN NOT NULL DEFAULT FALSE,
+
+    status VARCHAR(20) NOT NULL, -- ACTIVE, INACTIVE
+
+    -- Audit fields (same pattern as academic_years)
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    -- Constraints
+    CONSTRAINT uk_relation_code_org UNIQUE (organization_id, code),
+    CONSTRAINT uk_relation_name_org UNIQUE (organization_id, name)
+);
+
+-- Indexes (aligned with your style)
+CREATE INDEX idx_relation_org ON guardian_relations (organization_id);
+CREATE INDEX idx_relation_status ON guardian_relations (status);
+CREATE INDEX idx_relation_active ON guardian_relations (is_active);
+
+
+DROP TABLE IF EXISTS guardians;
+
+CREATE TABLE guardians (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
+    campus_id BIGINT, -- optional (if guardian tied to specific campus)
+
+    first_name VARCHAR(50) NOT NULL,
+    middle_name VARCHAR(50),
+    last_name VARCHAR(50) NOT NULL,
+    full_name VARCHAR(120) NOT NULL,
+    relation_id BIGINT NOT NULL,
+    cnic VARCHAR(20) NOT NULL,
+
+    phone VARCHAR(15) NOT NULL,
+    alternate_phone VARCHAR(15),
+
+    email VARCHAR(100),
+
+    occupation VARCHAR(100),
+    organization VARCHAR(150),
+
+    address VARCHAR(255),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    status VARCHAR(20), -- ACTIVE, INACTIVE, BLOCKED
+
+    -- Audit fields
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    -- Constraints
+    CONSTRAINT uk_guardian_cnic_org UNIQUE (organization_id, cnic),
+);
+
     DROP TABLE IF EXISTS students;
     CREATE TABLE students (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -1067,6 +1144,7 @@
         phone VARCHAR(15),
         address VARCHAR(200),
         cnic VARCHAR(20),
+        b_form_number VARCHAR(20),
         passport_number VARCHAR(20),
         religion VARCHAR(50),
         nationality VARCHAR(50),
@@ -1075,14 +1153,17 @@
         status VARCHAR(50),
         enrollment_date DATE NOT NULL,
         deleted TINYINT(1) DEFAULT 0,
-        deleted_at DATETIME,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         campus_id BIGINT,
         standard_id BIGINT,
         section_id BIGINT,
         admission_type_id BIGINT,
         academic_year_id BIGINT NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        created_by BIGINT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_by BIGINT,
+        deleted_at DATETIME,
+        deleted_by BIGINT,
         FOREIGN KEY (campus_id) REFERENCES campuses (id),
         FOREIGN KEY (standard_id) REFERENCES standards (id),
         FOREIGN KEY (section_id) REFERENCES sections (id),
@@ -1098,6 +1179,36 @@
     -- =============================
     -- LEVEL 6: User and relation tables
     -- =============================
+
+
+DROP TABLE IF EXISTS student_guardians;
+
+CREATE TABLE student_guardians (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    organization_id BIGINT NOT NULL,
+
+    campus_id BIGINT, -- multi-campus support
+
+    student_id BIGINT NOT NULL,
+    guardian_id BIGINT NOT NULL,
+    is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+    is_emergency_contact BOOLEAN NOT NULL DEFAULT FALSE,
+
+    status VARCHAR(20) NOT NULL, -- ACTIVE, INACTIVE
+
+    -- Audit fields (your standard pattern)
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+
+    -- Constraints
+    CONSTRAINT uk_student_guardian UNIQUE (organization_id, student_id, guardian_id)
+);
+
 
     DROP TABLE IF EXISTS system_users;
     CREATE TABLE system_users (

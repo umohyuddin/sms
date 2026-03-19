@@ -40,7 +40,6 @@ public class StudentRequestDTO {
     @NotBlank(message = "Full name is required")
     private String fullName;
 
-    @NotBlank(message = "Student code is required")
     private String studentCode;
 
     @NotNull(message = "Date of birth is required")

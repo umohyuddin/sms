@@ -39,7 +39,7 @@ public class SectionController {
         return ResponseEntity.ok(sectionDTO);
     }
 
-    @GetMapping(value = "/standard/{standardId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/standards/{standardId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SectionDTO>> getByStandardId(@PathVariable Long standardId) {
         log.info("[Controller:SectionController] getByStandardId() called - Request to fetch sections for standard: {}",
                 standardId);
