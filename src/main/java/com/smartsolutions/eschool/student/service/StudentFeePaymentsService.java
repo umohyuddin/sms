@@ -1,16 +1,21 @@
 package com.smartsolutions.eschool.student.service;
 
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
+import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
-
+import com.smartsolutions.eschool.school.repository.InstituteRepository;
 import com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto.StudentFeePaymentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeePayment.responseDto.StudentFeePaymentResponseDTO;
+import com.smartsolutions.eschool.student.error.StudentFeeAssignmentErrors;
 import com.smartsolutions.eschool.student.model.*;
 import com.smartsolutions.eschool.student.repository.*;
 import com.smartsolutions.eschool.util.MapperUtil;
+import com.smartsolutions.eschool.util.SecurityUtils;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,149 +27,145 @@ import java.util.List;
 @Service
 @Slf4j
 public class StudentFeePaymentsService {
-
-
     private final StudentRepository studentRepository;
-    private final FeeRateRepository feeRateRepository;
     private final StudentFeeAssignmentRepository studentFeeAssignmentRepository;
     private final StudentFeeSummaryRepository studentFeeSummaryRepository;
     private final AcademicYearRepository academicYearRepository;
     private final StudentFeePaymentsRepository studentFeePaymentsRepository;
+    private final InstituteRepository instituteRepository;
 
-
-    public StudentFeePaymentsService(StudentRepository studentRepository, FeeRateRepository feeRateRepository, StudentFeeAssignmentRepository studentFeeAssignmentRepository, StudentFeeSummaryRepository studentFeeSummaryRepository, AcademicYearRepository academicYearRepository, StudentFeePaymentsRepository studentFeePaymentsRepository) {
+    public StudentFeePaymentsService(StudentRepository studentRepository, 
+            StudentFeeAssignmentRepository studentFeeAssignmentRepository, 
+            StudentFeeSummaryRepository studentFeeSummaryRepository, 
+            AcademicYearRepository academicYearRepository, 
+            StudentFeePaymentsRepository studentFeePaymentsRepository,
+            InstituteRepository instituteRepository) {
         this.studentRepository = studentRepository;
-        this.feeRateRepository = feeRateRepository;
         this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
         this.studentFeeSummaryRepository = studentFeeSummaryRepository;
         this.academicYearRepository = academicYearRepository;
         this.studentFeePaymentsRepository = studentFeePaymentsRepository;
+        this.instituteRepository = instituteRepository;
     }
 
-
+    @Transactional
     public StudentFeePaymentRequestDTO studentFeePayment(Long studentId, @Valid StudentFeePaymentRequestDTO requestDTO) {
-        log.info("💰 Processing fee payment | studentId={},  amount={}", studentId, requestDTO.getAmountPaid());
-        try {
-            // Fetch and validate student --add academic year
-            StudentEntity student = studentRepository.findByIdAndDeletedFalse(studentId).orElseThrow(() -> {
-                log.error("Student with id {} not found", studentId);
-                return new ResourceNotFoundException("Student not found with id " + studentId);
-            });
-
-            // Fetch academic year
-            AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> {
-                log.error("Current academic year not found");
-                return new ResourceNotFoundException("Current academic year not found");
-            });
-
-            //validate fee assignment
-            //StudentFeeAssignmentEntity assignment = studentFeeAssignmentRepository.findById(requestDTO.getAssignmentId()).orElseThrow(() -> new ResourceNotFoundException("Fee Assignment not found"));
-
-            List<StudentFeeAssignmentEntity> assignments = studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, currentYear.getId());
-
-            if (assignments.isEmpty()) {
-                throw new ResourceNotFoundException("No fee assignments found for this student");
-            }
-
-
-//            if (!assignment.getStudent().getId().equals(requestDTO.getStudentId())) {
-//                throw new IllegalArgumentException("Assignment does not belong to the given student");
-//            }
-            StudentFeePaymentEntity payment = new StudentFeePaymentEntity();
-            payment.setStudent(student);
-            //payment.setAssignment(assignment);
-            payment.setPaymentDate(requestDTO.getPaymentDate());
-            payment.setAmountPaid(requestDTO.getAmountPaid());
-            payment.setPaymentMonth(requestDTO.getPaymentMonth());
-            payment.setPaymentYear(requestDTO.getPaymentYear());
-            payment.setPaymentMode(requestDTO.getPaymentMode());
-            payment.setCreatedAt(LocalDateTime.now());
-            payment.setAcademicYear(currentYear);
-
-            studentFeePaymentsRepository.save(payment);
-            log.info("Fee payment recorded successfully | paymentId={}", payment.getId());
-
-            // Total assigned fee
-            Double totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, requestDTO.getAcademicYearId());
-
-            if (totalAssigned == null) totalAssigned = 0.0;
-            BigDecimal assignedBD = BigDecimal.valueOf(totalAssigned);
-
-
-            // Optional: Add a new field in assignment entity if you want:
-            // assignment.setRemainingAmount(remaining);
-            // assignmentRepository.save(assignment);
-
-
-            StudentFeeSummaryEntity summary = studentFeeSummaryRepository.findByStudentId(student.getId()).orElse(null);
-            if (summary == null) {
-                log.info("Creating new fee summary | studentId={}, year={}", studentId, currentYear.getName());
-                summary = new StudentFeeSummaryEntity();
-                summary.setStudent(student);
-                summary.setAcademicYear(currentYear);
-
-                BigDecimal assigned = BigDecimal.valueOf(totalAssigned);
-                BigDecimal paid = BigDecimal.valueOf(payment.getAmountPaid());
-                BigDecimal balance = assigned.subtract(paid);
-
-                summary.setTotalAssignedFee(assigned);
-                summary.setTotalPaid(paid);
-                summary.setBalance(balance);
-
-            } else {
-                log.info("Updating existing summary | summaryId={}", summary.getId());
-                BigDecimal updatedPaid = summary.getTotalPaid().add(BigDecimal.valueOf(requestDTO.getAmountPaid()));
-
-                BigDecimal balance = summary.getTotalAssignedFee().subtract(updatedPaid);
-
-                summary.setTotalPaid(updatedPaid);
-                summary.setBalance(balance);
-            }
-
-            studentFeeSummaryRepository.save(summary);
-            log.info("Fee summary updated | studentId={}, balance={}", studentId, summary.getBalance());
-            return MapperUtil.mapObject(payment, StudentFeePaymentRequestDTO.class);
-
-        } catch (ResourceNotFoundException e) {
-            // Already logged, rethrow to propagate
-            throw e;
-        } catch (Exception e) {
-            log.error("Failed to assign fees for studentId={}", studentId, e);
-            throw new RuntimeException("Failed to assign fees. Transaction rolled back.", e);
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        log.info("[Service:StudentFeePaymentsService] studentFeePayment() called - studentId={}, amount={}, institute={}", 
+                studentId, requestDTO.getAmountPaid(), organizationId);
+
+        // Fetch student
+        StudentEntity student = studentRepository.findById(studentId).orElseThrow(() -> {
+            log.error("[Service:StudentFeePaymentsService] Student with id {} not found", studentId);
+            return new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Student not found", HttpStatus.NOT_FOUND);
+        });
+
+        // Fetch academic year
+        AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> {
+            log.error("[Service:StudentFeePaymentsService] Current academic year not found");
+            return new ApiException(StudentFeeAssignmentErrors.CURRENT_ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND);
+        });
+
+        // Validate fee assignment
+        List<StudentFeeAssignmentEntity> assignments = studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, currentYear.getId(), organizationId);
+
+        if (assignments.isEmpty()) {
+            throw new ApiException(StudentFeeAssignmentErrors.ASSIGNMENT_NOT_FOUND, "No fee assignments found for this student", HttpStatus.NOT_FOUND);
+        }
+
+        InstituteEntity institute = instituteRepository.findById(organizationId)
+                .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN));
+
+        StudentFeePaymentEntity payment = new StudentFeePaymentEntity();
+        payment.setStudent(student);
+        payment.setInstitute(institute);
+        payment.setPaymentDate(requestDTO.getPaymentDate());
+        payment.setAmountPaid(requestDTO.getAmountPaid());
+        payment.setPaymentMonth(requestDTO.getPaymentMonth());
+        payment.setPaymentYear(requestDTO.getPaymentYear());
+        payment.setPaymentMode(requestDTO.getPaymentMode());
+        payment.setCreatedAt(LocalDateTime.now());
+        payment.setAcademicYear(currentYear);
+
+        studentFeePaymentsRepository.save(payment);
+        log.info("[Service:StudentFeePaymentsService] Fee payment recorded successfully | paymentId={}", payment.getId());
+
+        // Total assigned fee
+        Double totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, requestDTO.getAcademicYearId(), organizationId);
+        if (totalAssigned == null) totalAssigned = 0.0;
+
+        StudentFeeSummaryEntity summary = studentFeeSummaryRepository.findByStudentId(student.getId()).orElse(null);
+        if (summary == null) {
+            log.info("[Service:StudentFeePaymentsService] Creating new fee summary | studentId={}", studentId);
+            summary = new StudentFeeSummaryEntity();
+            summary.setStudent(student);
+            summary.setAcademicYear(currentYear);
+            summary.setInstitute(institute);
+
+            BigDecimal assigned = BigDecimal.valueOf(totalAssigned);
+            BigDecimal paid = BigDecimal.valueOf(payment.getAmountPaid());
+            BigDecimal balance = assigned.subtract(paid);
+
+            summary.setTotalAssignedFee(assigned);
+            summary.setTotalPaid(paid);
+            summary.setBalance(balance);
+        } else {
+            log.info("[Service:StudentFeePaymentsService] Updating existing summary | summaryId={}", summary.getId());
+            BigDecimal updatedPaid = summary.getTotalPaid().add(BigDecimal.valueOf(requestDTO.getAmountPaid()));
+            BigDecimal balance = summary.getTotalAssignedFee().subtract(updatedPaid);
+
+            summary.setTotalPaid(updatedPaid);
+            summary.setBalance(balance);
+        }
+
+        studentFeeSummaryRepository.save(summary);
+        log.info("[Service:StudentFeePaymentsService] Fee summary updated | studentId={}, balance={}", studentId, summary.getBalance());
+        return MapperUtil.mapObject(payment, StudentFeePaymentRequestDTO.class);
     }
 
     public List<StudentFeePaymentResponseDTO> getStudentPaymentsByAcademicYear(Long studentId, Long academicYearId) {
-
-        log.info("Fetching payments for studentId={}, academicYearId={}", studentId, academicYearId);
-        StudentEntity student = studentRepository.findByIdAndDeletedFalse(studentId).orElseThrow(() -> new ResourceNotFoundException("Student not found with id " + studentId));
-        AcademicYearEntity academicYear = academicYearRepository.findById(academicYearId).orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id " + academicYearId));
-        List<StudentFeePaymentEntity> payments = studentFeePaymentsRepository.findPaymentsByStudentAndAcademicYear(studentId, academicYearId);
-        if (payments.isEmpty()) {
-            log.warn("No payments found for studentId={} and academicYearId={}", studentId, academicYearId);
-        } else {
-            log.info("Found {} payments for studentId={} and year={}", payments.size(), studentId, academicYear.getName());
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        List<StudentFeePaymentResponseDTO> responseDTOS = MapperUtil.mapList(payments, StudentFeePaymentResponseDTO.class);
+        log.info("[Service:StudentFeePaymentsService] getStudentPaymentsByAcademicYear() called - studentId={}, academicYearId={}, institute={}", 
+                studentId, academicYearId, organizationId);
 
-
-        return responseDTOS;
+        List<StudentFeePaymentEntity> payments = studentFeePaymentsRepository.findPaymentsByStudentAndAcademicYear(studentId, academicYearId, organizationId);
+        log.info("[Service:StudentFeePaymentsService] Found {} payments", payments.size());
+        
+        return MapperUtil.mapList(payments, StudentFeePaymentResponseDTO.class);
     }
 
-
     public Double getTotalFeeCollected(Long academicYearId) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:StudentFeePaymentsService] getTotalFeeCollected() called - academicYearId={}, institute={}", academicYearId, organizationId);
 
         if (academicYearId == null) {
-            AcademicYearEntity academicYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id "));
-            academicYearId = academicYear.getId();
+            AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() ->
+                    new ApiException(StudentFeeAssignmentErrors.CURRENT_ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND));
+            academicYearId = currentYear.getId();
         }
-        Double totalCollected = studentFeePaymentsRepository.getTotalFeeCollected(academicYearId);
-        return totalCollected != null ? totalCollected : 0.0;
+        return studentFeePaymentsRepository.getTotalFeeCollected(academicYearId, organizationId);
     }
 
     public Double getCollectedUpToCurrentMonth() {
-        AcademicYearEntity academicYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id "));
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:StudentFeePaymentsService] getCollectedUpToCurrentMonth() called - institute={}", organizationId);
+
+        AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() ->
+                new ApiException(StudentFeeAssignmentErrors.CURRENT_ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND));
+        
         LocalDate endOfCurrentMonth = YearMonth.now().atEndOfMonth();
-        return studentFeePaymentsRepository.getTotalCollectedUpToMonth(academicYear.getId(), endOfCurrentMonth);
+        return studentFeePaymentsRepository.getTotalCollectedUpToMonth(currentYear.getId(), endOfCurrentMonth, organizationId);
     }
 }

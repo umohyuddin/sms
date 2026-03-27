@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.student.controller;
 
 import com.smartsolutions.eschool.global.utils.UploadUtil;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentBasicInfoUpdateDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
@@ -76,6 +77,13 @@ public class StudentController {
     public ResponseEntity<StudentResponseDTO> update(@PathVariable Long id, @Valid @RequestBody StudentRequestDTO requestDTO) {
         log.info("[Controller:StudentController] PUT /api/institute/students/{} - Updating student", id);
         StudentResponseDTO updatedStudent = studentFacade.updateStudent(id, requestDTO);
+        return ResponseEntity.ok(updatedStudent);
+    }
+
+    @PatchMapping(value = "/{id}/basic-info", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StudentResponseDTO> updateBasicInfo(@PathVariable Long id, @Valid @RequestBody StudentBasicInfoUpdateDTO basicInfoDTO) {
+        log.info("[Controller:StudentController] PATCH /api/institute/students/{}/basic-info - Updating basic info", id);
+        StudentResponseDTO updatedStudent = studentFacade.updateStudentBasicInfo(id, basicInfoDTO);
         return ResponseEntity.ok(updatedStudent);
     }
 

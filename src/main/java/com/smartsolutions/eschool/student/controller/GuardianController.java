@@ -98,4 +98,12 @@ public class GuardianController {
         log.info("[Controller:GuardianController] getStatistics() succeeded");
         return ResponseEntity.ok(statistics);
     }
+
+    @GetMapping(value = "/students/{studentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<GuardianResponseDTO>> getGuardiansByStudentId(@PathVariable Long studentId) {
+        log.info("[Controller:GuardianController] getGuardiansByStudentId() called - studentId: {}", studentId);
+        List<GuardianResponseDTO> guardians = guardianFacade.getGuardiansByStudentId(studentId);
+        log.info("[Controller:GuardianController] getGuardiansByStudentId() succeeded - Found {} guardians for student {}", guardians.size(), studentId);
+        return ResponseEntity.ok(guardians);
+    }
 }

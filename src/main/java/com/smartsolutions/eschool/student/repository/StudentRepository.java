@@ -31,6 +31,8 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
             "LEFT JOIN FETCH s.campus " +
             "LEFT JOIN FETCH s.standard " +
             "LEFT JOIN FETCH s.section " +
+            "LEFT JOIN FETCH s.admissionType " +
+            "LEFT JOIN FETCH s.academicYear " +
             "WHERE s.id = :id AND s.organizationId = :organizationId AND s.deleted = false")
     Optional<StudentEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 

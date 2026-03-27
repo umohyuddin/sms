@@ -65,4 +65,9 @@ public class GuardianFacade {
         log.info("[Facade:GuardianFacade] getStatistics() called");
         return guardianService.getStatistics();
     }
+
+    public List<GuardianResponseDTO> getGuardiansByStudentId(Long studentId) {
+        log.info("[Facade:GuardianFacade] getGuardiansByStudentId() called - studentId: {}", studentId);
+        return guardianService.getGuardiansByStudentId(studentId);
+    }
 }

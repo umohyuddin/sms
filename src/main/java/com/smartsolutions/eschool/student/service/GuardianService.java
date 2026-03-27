@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -188,5 +189,21 @@ public class GuardianService {
 
         log.info("[Service:GuardianService] getStatistics() succeeded - Stats: {}", stats);
         return stats;
+    }
+
+    public List<GuardianResponseDTO> getGuardiansByStudentId(Long studentId) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(GuardianErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:GuardianService] getGuardiansByStudentId() called - studentId: {}, organization: {}", studentId, organizationId);
+
+        List<StudentGuardianEntity> mappings = studentGuardianRepository.findActiveByStudentIdAndOrganizationId(studentId, organizationId);
+        List<Long> guardianIds = mappings.stream().map(StudentGuardianEntity::getGuardianId).collect(Collectors.toList());
+        List<GuardianEntity> guardians = guardianRepository.findAllById(guardianIds);
+
+        List<GuardianResponseDTO> responseDTOs = GuardianMapper.toResponseDTOList(guardians);
+        log.info("[Service:GuardianService] getGuardiansByStudentId() succeeded - Found {} guardians for student {}", responseDTOs.size(), studentId);
+        return responseDTOs;
     }
 }

@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.student.facade;
 
 import com.smartsolutions.eschool.global.configs.GenderConfig;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentBasicInfoUpdateDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
@@ -82,6 +83,11 @@ public class StudentFacade {
     public StudentResponseDTO updateStudent(Long studentId, StudentRequestDTO studentRequestDTO) {
         log.info("[Facade:StudentFacade] updateStudent() called for: {}", studentId);
         return studentService.updateStudent(studentId, studentRequestDTO);
+    }
+
+    public StudentResponseDTO updateStudentBasicInfo(Long studentId, StudentBasicInfoUpdateDTO basicInfoDTO) {
+        log.info("[Facade:StudentFacade] updateStudentBasicInfo() called for: {}", studentId);
+        return studentService.updateStudentBasicInfo(studentId, basicInfoDTO);
     }
 
     public void softDeleteStudent(Long studentId) {

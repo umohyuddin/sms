@@ -13,6 +13,7 @@ import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.sclass.repository.SectionRepository;
 import com.smartsolutions.eschool.sclass.repository.StandardRepository;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentBasicInfoUpdateDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
@@ -212,6 +213,34 @@ public class StudentService {
         StudentMapper.updateEntityFromDTO(entity, requestDTO);
         StudentEntity updated = studentRepository.save(entity);
         log.info("[Service:StudentService] Successfully updated Student: {}", updated.getId());
+        return StudentMapper.toResponseDTO(updated);
+    }
+
+    @Transactional
+    public StudentResponseDTO updateStudentBasicInfo(Long studentId, StudentBasicInfoUpdateDTO basicInfoDTO) {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] updateStudentBasicInfo() called for id: {} org: {}", studentId, orgId);
+
+        StudentEntity entity = studentRepository.findByIdAndOrganizationId(studentId, orgId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found with id: " + studentId, HttpStatus.NOT_FOUND));
+
+        // Update only basic info fields
+        entity.setFirstName(basicInfoDTO.getFirstName());
+        entity.setMiddleName(basicInfoDTO.getMiddleName());
+        entity.setLastName(basicInfoDTO.getLastName());
+        entity.setFullName(basicInfoDTO.getFullName());
+        entity.setDateOfBirth(basicInfoDTO.getDateOfBirth());
+        entity.setGender(basicInfoDTO.getGender());
+        entity.setCnic(basicInfoDTO.getCnic());
+        entity.setPassportNumber(basicInfoDTO.getPassportNumber());
+        entity.setPhone(basicInfoDTO.getPhone());
+        entity.setEmail(basicInfoDTO.getEmail());
+        entity.setReligion(basicInfoDTO.getReligion());
+        entity.setNationality(basicInfoDTO.getNationality());
+        entity.setBloodGroup(basicInfoDTO.getBloodGroup());
+
+        StudentEntity updated = studentRepository.save(entity);
+        log.info("[Service:StudentService] Successfully updated basic info for Student: {}", updated.getId());
         return StudentMapper.toResponseDTO(updated);
     }
 
