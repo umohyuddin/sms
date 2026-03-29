@@ -17,6 +17,7 @@ public class StudentFeeSummaryDTO {
     private Long id;
 
     private BigDecimal totalAssignedFee;
+    private BigDecimal totalDiscount;
     private BigDecimal totalPaid;
     private BigDecimal balance;
     private Long studentId;

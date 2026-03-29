@@ -15,11 +15,9 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
     @Query("""
             SELECT CASE WHEN COUNT(sfa) > 0 THEN true ELSE false END
             FROM StudentFeeAssignmentEntity sfa
-            JOIN sfa.student s
-            JOIN s.campus c
-            WHERE s.id = :studentId
-              AND sfa.feeRate.academicYear.id = :academicYearId
-              AND c.institute.id = :instituteId
+            WHERE sfa.student.id = :studentId
+              AND sfa.academicYear.id = :academicYearId
+              AND sfa.institute.id = :instituteId
             """)
     boolean isFeeAssigned(@Param("studentId") Long studentId,
                           @Param("academicYearId") Long academicYearId,
@@ -28,11 +26,9 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
     @Query("""
             SELECT COALESCE(SUM(a.totalAmount), 0)
             FROM StudentFeeAssignmentEntity a
-            JOIN a.student s
-            JOIN s.campus c
-            WHERE s.id = :studentId
-              AND a.feeRate.academicYear.id = :academicYearId
-              AND c.institute.id = :instituteId
+            WHERE a.student.id = :studentId
+              AND a.academicYear.id = :academicYearId
+              AND a.institute.id = :instituteId
             """)
     Double findTotalAssignedFee(
             @Param("studentId") Long studentId,
@@ -44,18 +40,18 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             SELECT sfa
             FROM StudentFeeAssignmentEntity sfa
             JOIN FETCH sfa.student s
-            JOIN FETCH s.campus c
-            JOIN FETCH s.standard st
-            JOIN FETCH s.section sec
-            JOIN FETCH s.academicYear ay
+            LEFT JOIN FETCH s.campus c
+            LEFT JOIN FETCH s.standard st
+            LEFT JOIN FETCH s.section sec
+            LEFT JOIN FETCH s.academicYear ay
             JOIN FETCH sfa.feeRate fr
-            JOIN FETCH fr.feeComponent fc
-            JOIN FETCH fc.feeCatalog fca
+            LEFT JOIN FETCH fr.feeComponent fc
+            LEFT JOIN FETCH fc.feeCatalog fca
             LEFT JOIN FETCH fca.chargeType ct
             LEFT JOIN FETCH fca.recurrenceRule rr
             WHERE s.id = :studentId
-              AND fr.academicYear.id = :academicYearId
-              AND c.institute.id = :instituteId
+              AND sfa.academicYear.id = :academicYearId
+              AND sfa.institute.id = :instituteId
             """)
     List<StudentFeeAssignmentEntity> findAllByStudentAndAcademicYear(
             @Param("studentId") Long studentId,
@@ -67,18 +63,18 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             SELECT a
             FROM StudentFeeAssignmentEntity a
             JOIN FETCH a.student s
-            JOIN FETCH s.campus c
-            JOIN FETCH s.standard st
-            JOIN FETCH s.section sec
-            JOIN FETCH s.academicYear ay
+            LEFT JOIN FETCH s.campus c
+            LEFT JOIN FETCH s.standard st
+            LEFT JOIN FETCH s.section sec
+            LEFT JOIN FETCH s.academicYear ay
             JOIN FETCH a.feeRate fr
-            JOIN FETCH fr.feeComponent fc
-            JOIN FETCH fc.feeCatalog fca
+            LEFT JOIN FETCH fr.feeComponent fc
+            LEFT JOIN FETCH fc.feeCatalog fca
             LEFT JOIN FETCH fca.chargeType ct
             LEFT JOIN FETCH fca.recurrenceRule rr
             WHERE s.id = :studentId
-              AND fr.academicYear.id = :academicYearId
-              AND c.institute.id = :instituteId
+              AND a.academicYear.id = :academicYearId
+              AND a.institute.id = :instituteId
             """)
     List<StudentFeeAssignmentEntity> findAssignedFeesForStudentAndYear(
             @Param("studentId") Long studentId,
@@ -89,37 +85,33 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
     @Query("""
             SELECT COALESCE(SUM(a.totalAmount), 0)
             FROM StudentFeeAssignmentEntity a
-            JOIN a.student s
-            JOIN s.campus c
-            WHERE a.feeRate.academicYear.id = :academicYearId
-              AND c.institute.id = :instituteId
+            WHERE a.academicYear.id = :academicYearId
+              AND a.institute.id = :instituteId
             """)
     Double getTotalFeeAssigned(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT COALESCE(SUM(a.totalAmount), 0)
             FROM StudentFeeAssignmentEntity a
-            JOIN a.student s
-            JOIN s.campus c
             WHERE a.dueDate < CURRENT_DATE
-              AND a.feeRate.academicYear.id = :academicYearId
-              AND c.institute.id = :instituteId
+              AND a.academicYear.id = :academicYearId
+              AND a.institute.id = :instituteId
             """)
     Double getOverdueAmount(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT sfa FROM StudentFeeAssignmentEntity sfa
             JOIN FETCH sfa.student s
-            JOIN FETCH s.campus c
-            JOIN FETCH s.standard st
-            JOIN FETCH s.section sec
-            JOIN FETCH s.academicYear ay
+            LEFT JOIN FETCH s.campus c
+            LEFT JOIN FETCH s.standard st
+            LEFT JOIN FETCH s.section sec
+            LEFT JOIN FETCH s.academicYear ay
             JOIN FETCH sfa.feeRate fr
-            JOIN FETCH fr.feeComponent fc
-            JOIN FETCH fc.feeCatalog fca
+            LEFT JOIN FETCH fr.feeComponent fc
+            LEFT JOIN FETCH fc.feeCatalog fca
             LEFT JOIN FETCH fca.chargeType ct
             LEFT JOIN FETCH fca.recurrenceRule rr
-            WHERE c.institute.id = :instituteId
+            WHERE sfa.institute.id = :instituteId
             ORDER BY sfa.createdAt DESC
             """)
     List<StudentFeeAssignmentEntity> findAllWithStudent(@Param("instituteId") Long instituteId);
@@ -127,16 +119,16 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
     @Query("""
             SELECT sfa FROM StudentFeeAssignmentEntity sfa
             JOIN FETCH sfa.student s
-            JOIN FETCH s.campus c
-            JOIN FETCH s.standard st
-            JOIN FETCH s.section sec
-            JOIN FETCH s.academicYear ay
+            LEFT JOIN FETCH s.campus c
+            LEFT JOIN FETCH s.standard st
+            LEFT JOIN FETCH s.section sec
+            LEFT JOIN FETCH s.academicYear ay
             JOIN FETCH sfa.feeRate fr
-            JOIN FETCH fr.feeComponent fc
-            JOIN FETCH fc.feeCatalog fca
+            LEFT JOIN FETCH fr.feeComponent fc
+            LEFT JOIN FETCH fc.feeCatalog fca
             LEFT JOIN FETCH fca.chargeType ct
             LEFT JOIN FETCH fca.recurrenceRule rr
-            WHERE c.institute.id = :instituteId
+            WHERE sfa.institute.id = :instituteId
               AND (LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                OR LOWER(s.studentCode) LIKE LOWER(CONCAT('%', :keyword, '%')))
             ORDER BY sfa.createdAt DESC
@@ -146,43 +138,37 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
     @Query("""
             SELECT COUNT(sfa)
             FROM StudentFeeAssignmentEntity sfa
-            JOIN sfa.student s
-            JOIN s.campus c
-            WHERE c.institute.id = :instituteId
+            WHERE sfa.institute.id = :instituteId
             """)
     Long countTotalAssignments(@Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT COUNT(sfa) FROM StudentFeeAssignmentEntity sfa
-            JOIN sfa.student s
-            JOIN s.campus c
-            WHERE sfa.feeRate.academicYear.id = :academicYearId
-              AND c.institute.id = :instituteId
+            WHERE sfa.academicYear.id = :academicYearId
+              AND sfa.institute.id = :instituteId
             """)
     Long countByAcademicYear(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT COUNT(sfa) FROM StudentFeeAssignmentEntity sfa
-            JOIN sfa.student s
-            JOIN s.campus c
             WHERE sfa.dueDate < CURRENT_DATE
-              AND c.institute.id = :instituteId
+              AND sfa.institute.id = :instituteId
             """)
     Long countOverdueAssignments(@Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT sfa FROM StudentFeeAssignmentEntity sfa
             JOIN FETCH sfa.student s
-            JOIN FETCH s.campus c
-            JOIN FETCH s.standard st
-            JOIN FETCH s.section sec
-            JOIN FETCH s.academicYear ay
+            LEFT JOIN FETCH s.campus c
+            LEFT JOIN FETCH s.standard st
+            LEFT JOIN FETCH s.section sec
+            LEFT JOIN FETCH s.academicYear ay
             JOIN FETCH sfa.feeRate fr
-            JOIN FETCH fr.feeComponent fc
-            JOIN FETCH fc.feeCatalog fca
+            LEFT JOIN FETCH fr.feeComponent fc
+            LEFT JOIN FETCH fc.feeCatalog fca
             LEFT JOIN FETCH fca.chargeType ct
             LEFT JOIN FETCH fca.recurrenceRule rr
-            WHERE sfa.id = :id AND c.institute.id = :instituteId
+            WHERE sfa.id = :id AND sfa.institute.id = :instituteId
             """)
     Optional<StudentFeeAssignmentEntity> findByIdAndInstituteId(@Param("id") Long id, @Param("instituteId") Long instituteId);
 }

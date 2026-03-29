@@ -1,27 +1,42 @@
-package com.smartsolutions.eschool.academic.dto.response;
+package com.smartsolutions.eschool.student.dtos.attendance;
 
-import com.smartsolutions.eschool.academic.entity.master.AcademicStudentAttendanceEntity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class StudentAttendanceResponseDTO {
     private Long id;
+    private Long organizationId;
+    private Long campusId;
+    private String campusName;
+    
     private Long studentId;
     private String studentName;
+    private String studentCode;
+    
     private Long standardId;
     private String standardName;
+    
     private Long sectionId;
     private String sectionName;
+    
     private LocalDate attendanceDate;
-    private AcademicStudentAttendanceEntity.AttendanceStatus status;
-    private String markedBy;
+    private String status;
+    
+    private Long markedById;
+    private String markedByName;
+    
     private String remarks;
-    private Long organizationId;
-    private Boolean isActive;
+    
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private boolean deleted;
 }

@@ -29,20 +29,20 @@ import java.util.List;
 public class StudentFeePaymentsService {
     private final StudentRepository studentRepository;
     private final StudentFeeAssignmentRepository studentFeeAssignmentRepository;
-    private final StudentFeeSummaryRepository studentFeeSummaryRepository;
+    private final StudentFeeSummaryService studentFeeSummaryService;
     private final AcademicYearRepository academicYearRepository;
     private final StudentFeePaymentsRepository studentFeePaymentsRepository;
     private final InstituteRepository instituteRepository;
 
     public StudentFeePaymentsService(StudentRepository studentRepository, 
             StudentFeeAssignmentRepository studentFeeAssignmentRepository, 
-            StudentFeeSummaryRepository studentFeeSummaryRepository, 
+            StudentFeeSummaryService studentFeeSummaryService, 
             AcademicYearRepository academicYearRepository, 
             StudentFeePaymentsRepository studentFeePaymentsRepository,
             InstituteRepository instituteRepository) {
         this.studentRepository = studentRepository;
         this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
-        this.studentFeeSummaryRepository = studentFeeSummaryRepository;
+        this.studentFeeSummaryService = studentFeeSummaryService;
         this.academicYearRepository = academicYearRepository;
         this.studentFeePaymentsRepository = studentFeePaymentsRepository;
         this.instituteRepository = instituteRepository;
@@ -93,36 +93,9 @@ public class StudentFeePaymentsService {
         studentFeePaymentsRepository.save(payment);
         log.info("[Service:StudentFeePaymentsService] Fee payment recorded successfully | paymentId={}", payment.getId());
 
-        // Total assigned fee
-        Double totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, requestDTO.getAcademicYearId(), organizationId);
-        if (totalAssigned == null) totalAssigned = 0.0;
-
-        StudentFeeSummaryEntity summary = studentFeeSummaryRepository.findByStudentId(student.getId()).orElse(null);
-        if (summary == null) {
-            log.info("[Service:StudentFeePaymentsService] Creating new fee summary | studentId={}", studentId);
-            summary = new StudentFeeSummaryEntity();
-            summary.setStudent(student);
-            summary.setAcademicYear(currentYear);
-            summary.setInstitute(institute);
-
-            BigDecimal assigned = BigDecimal.valueOf(totalAssigned);
-            BigDecimal paid = BigDecimal.valueOf(payment.getAmountPaid());
-            BigDecimal balance = assigned.subtract(paid);
-
-            summary.setTotalAssignedFee(assigned);
-            summary.setTotalPaid(paid);
-            summary.setBalance(balance);
-        } else {
-            log.info("[Service:StudentFeePaymentsService] Updating existing summary | summaryId={}", summary.getId());
-            BigDecimal updatedPaid = summary.getTotalPaid().add(BigDecimal.valueOf(requestDTO.getAmountPaid()));
-            BigDecimal balance = summary.getTotalAssignedFee().subtract(updatedPaid);
-
-            summary.setTotalPaid(updatedPaid);
-            summary.setBalance(balance);
-        }
-
-        studentFeeSummaryRepository.save(summary);
-        log.info("[Service:StudentFeePaymentsService] Fee summary updated | studentId={}, balance={}", studentId, summary.getBalance());
+        // Update Summary
+        studentFeeSummaryService.updateSummary(studentId, currentYear.getId(), organizationId);
+        
         return MapperUtil.mapObject(payment, StudentFeePaymentRequestDTO.class);
     }
 

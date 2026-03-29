@@ -30,5 +30,7 @@ public class StudentDiscountAssignmentRequestDTO {
     private BigDecimal appliedAmount;      // optional
     private BigDecimal appliedPercentage;  // optional
 
+    private BigDecimal totalAssignedFee;   // added for calculation
+
     private String reason;
 }

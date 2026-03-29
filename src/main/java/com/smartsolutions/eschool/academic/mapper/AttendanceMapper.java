@@ -5,7 +5,7 @@ import com.smartsolutions.eschool.academic.dto.request.StudentAttendanceRequestD
 import com.smartsolutions.eschool.academic.dto.response.EmployeeAttendanceResponseDTO;
 import com.smartsolutions.eschool.academic.dto.response.StudentAttendanceResponseDTO;
 import com.smartsolutions.eschool.academic.entity.master.EmployeeAttendanceEntity;
-import com.smartsolutions.eschool.academic.entity.master.StudentAttendanceEntity;
+import com.smartsolutions.eschool.academic.entity.master.AcademicStudentAttendanceEntity;
 
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
@@ -22,9 +22,9 @@ public class AttendanceMapper {
     }
 
     // Student Attendance
-    public static StudentAttendanceEntity toEntity(StudentAttendanceRequestDTO dto) {
+    public static AcademicStudentAttendanceEntity toEntity(StudentAttendanceRequestDTO dto) {
         if (dto == null) return null;
-        StudentAttendanceEntity entity = new StudentAttendanceEntity();
+        AcademicStudentAttendanceEntity entity = new AcademicStudentAttendanceEntity();
         entity.setOrganizationId(dto.getOrganizationId());
         
         if (dto.getStudentId() != null) {
@@ -58,7 +58,7 @@ public class AttendanceMapper {
         return entity;
     }
 
-    public static StudentAttendanceResponseDTO toResponse(StudentAttendanceEntity entity) {
+    public static StudentAttendanceResponseDTO toResponse(AcademicStudentAttendanceEntity entity) {
         if (entity == null) return null;
         StudentAttendanceResponseDTO dto = new StudentAttendanceResponseDTO();
         dto.setId(entity.getId());
@@ -91,7 +91,7 @@ public class AttendanceMapper {
         return dto;
     }
 
-    public static List<StudentAttendanceResponseDTO> toStudentAttendanceResponseList(List<StudentAttendanceEntity> entities) {
+    public static List<StudentAttendanceResponseDTO> toStudentAttendanceResponseList(List<AcademicStudentAttendanceEntity> entities) {
         return entities == null ? null : entities.stream().map(AttendanceMapper::toResponse).collect(Collectors.toList());
     }
 

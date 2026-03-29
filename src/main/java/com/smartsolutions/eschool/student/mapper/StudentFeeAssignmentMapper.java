@@ -110,6 +110,7 @@ public class StudentFeeAssignmentMapper {
         StudentFeeSummaryDTO dto = new StudentFeeSummaryDTO();
         dto.setId(entity.getId());
         dto.setTotalAssignedFee(entity.getTotalAssignedFee());
+        dto.setTotalDiscount(entity.getTotalDiscount());
         dto.setTotalPaid(entity.getTotalPaid());
         dto.setBalance(entity.getBalance());
         

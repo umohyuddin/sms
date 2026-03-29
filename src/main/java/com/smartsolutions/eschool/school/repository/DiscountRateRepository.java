@@ -152,6 +152,8 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRateEntity
                         AND (:discountTypeId IS NULL OR dt.id = :discountTypeId)
                         AND (:discountSubTypeId IS NULL OR dst.id = :discountSubTypeId)
                         AND (:recurrenceRuleId IS NULL OR rr.id = :recurrenceRuleId)
+                        AND (:campusId IS NULL OR c.id = :campusId)
+                        AND (:academicYearId IS NULL OR ay.id = :academicYearId)
                         AND (:keyword IS NULL OR :keyword = ''
                              OR LOWER(dst.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
                              OR LOWER(dst.code) LIKE LOWER(CONCAT('%', :keyword, '%')))
@@ -160,5 +162,19 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRateEntity
         List<DiscountRateEntity> search(@Param("discountTypeId") Long discountTypeId,
                         @Param("discountSubTypeId") Long discountSubTypeId,
                         @Param("recurrenceRuleId") Long recurrenceRuleId,
+                        @Param("campusId") Long campusId,
+                        @Param("academicYearId") Long academicYearId,
                         @Param("keyword") String keyword);
+
+        @Query("""
+                        SELECT dr FROM DiscountRateEntity dr
+                        WHERE dr.discountSubType.id = :subTypeId
+                        AND dr.campus.id = :campusId
+                        AND dr.academicYear.id = :academicYearId
+                        AND dr.deleted = false AND dr.isActive = true
+                        """)
+        Optional<DiscountRateEntity> findApplicableDiscountRate(
+                        @Param("subTypeId") Long subTypeId,
+                        @Param("campusId") Long campusId,
+                        @Param("academicYearId") Long academicYearId);
 }

@@ -1,6 +1,5 @@
-package com.smartsolutions.eschool.academic.dto.request;
+package com.smartsolutions.eschool.student.dtos.attendance;
 
-import com.smartsolutions.eschool.academic.entity.master.AcademicStudentAttendanceEntity;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,24 +12,25 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class StudentAttendanceRequestDTO {
     private Long id;
+    private Long organizationId;
+    @NotNull(message = "Campus ID is required")
+    private Long campusId;
     
-    @NotNull
+    @NotNull(message = "Student ID is required")
     private Long studentId;
     
-    @NotNull
+    @NotNull(message = "Standard ID is required")
     private Long standardId;
     
-    @NotNull
+    @NotNull(message = "Section ID is required")
     private Long sectionId;
     
-    @NotNull
+    @NotNull(message = "Attendance date is required")
     private LocalDate attendanceDate;
     
-    @NotNull
-    private AcademicStudentAttendanceEntity.AttendanceStatus status;
+    @NotNull(message = "Status is required")
+    private String status; // PRESENT, ABSENT, LEAVE
     
     private Long markedById;
     private String remarks;
-    private Long organizationId;
-    private Boolean isActive;
 }

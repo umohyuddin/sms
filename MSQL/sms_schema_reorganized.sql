@@ -1259,6 +1259,7 @@ CREATE TABLE student_guardians (
         organization_id BIGINT NOT NULL,
         student_id BIGINT NOT NULL,
         fee_rate_id BIGINT NOT NULL,
+        academic_year_id BIGINT NOT NULL,
         total_amount DOUBLE NOT NULL,
         due_date DATE,
         assigned_date DATE,
@@ -1266,10 +1267,12 @@ CREATE TABLE student_guardians (
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         CONSTRAINT fk_sfa_student FOREIGN KEY (student_id) REFERENCES students (id),
         CONSTRAINT fk_sfa_fee_rate FOREIGN KEY (fee_rate_id) REFERENCES fee_rates (id),
+        CONSTRAINT fk_sfa_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
         CONSTRAINT chk_student_fee_assign_amount CHECK (total_amount >= 0)
     );
-    ALTER TABLE student_fee_assignments ADD CONSTRAINT uq_student_fee_unique UNIQUE (student_id, fee_rate_id);
+    ALTER TABLE student_fee_assignments ADD CONSTRAINT uq_student_fee_unique UNIQUE (student_id, fee_rate_id, academic_year_id);
     CREATE INDEX idx_student_fee_assign_fee_rate_id ON student_fee_assignments (fee_rate_id);
+    CREATE INDEX idx_student_fee_assign_academic_year_id ON student_fee_assignments (academic_year_id);
 
     DROP TABLE IF EXISTS student_fee_payments;
     CREATE TABLE student_fee_payments (
@@ -1297,6 +1300,7 @@ CREATE TABLE student_guardians (
         student_id BIGINT NOT NULL,
         academic_year_id BIGINT NOT NULL,
         total_assigned_fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
+        total_discount DECIMAL(10, 2) NOT NULL DEFAULT 0,
         total_paid DECIMAL(10, 2) NOT NULL DEFAULT 0,
         balance DECIMAL(10, 2) NOT NULL DEFAULT 0,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -1933,37 +1937,38 @@ CREATE TABLE student_guardians (
     );
 
 
-
-
     DROP TABLE IF EXISTS student_attendance;
-    CREATE TABLE student_attendance (
-        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        organization_id BIGINT NOT NULL,
-        student_id BIGINT NOT NULL,
-        standard_id BIGINT NOT NULL,
-        section_id BIGINT NOT NULL,
-        attendance_date DATE NOT NULL,
-        status ENUM('PRESENT','ABSENT','LEAVE') NOT NULL,
-        marked_by BIGINT,
-        remarks VARCHAR(255),
+CREATE TABLE student_attendance (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    campus_id BIGINT NOT NULL,         -- Added
+    student_id BIGINT NOT NULL,
+    standard_id BIGINT NOT NULL,
+    section_id BIGINT NOT NULL,
+    attendance_date DATE NOT NULL,
+    status ENUM('PRESENT','ABSENT','LEAVE') NOT NULL,
+    marked_by BIGINT,
+    remarks VARCHAR(255),
 
-        is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        created_by BIGINT,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        updated_by BIGINT,
-        deleted_at DATETIME,
-        deleted_by BIGINT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
 
-        UNIQUE (organization_id, student_id, attendance_date),
+    UNIQUE (organization_id, student_id, attendance_date),
 
-        FOREIGN KEY (student_id) REFERENCES students(id),
-        FOREIGN KEY (standard_id) REFERENCES standards(id),
-        FOREIGN KEY (section_id) REFERENCES sections(id),
-        FOREIGN KEY (marked_by) REFERENCES employee_master(id) -- who marked the attendance
-    );
+    FOREIGN KEY (campus_id) REFERENCES campuses(id), -- Added
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (standard_id) REFERENCES standards(id),
+    FOREIGN KEY (section_id) REFERENCES sections(id),
+    FOREIGN KEY (marked_by) REFERENCES employee_master(id)
+);
+
 
 
 

@@ -1,19 +1,26 @@
 package com.smartsolutions.eschool.student.service;
 
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.school.model.AcademicYearEntity;
+import com.smartsolutions.eschool.school.model.InstituteEntity;
+import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
+import com.smartsolutions.eschool.school.repository.InstituteRepository;
 import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeeSummary.responseDto.StudentFeeSummaryResponseDto;
+import com.smartsolutions.eschool.student.mapper.StudentFeeAssignmentMapper;
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
+import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeSummaryEntity;
-import com.smartsolutions.eschool.student.repository.StudentFeePaymentsRepository;
-import com.smartsolutions.eschool.student.repository.StudentFeeSummaryRepository;
+import com.smartsolutions.eschool.student.repository.*;
 import com.smartsolutions.eschool.util.MapperUtil;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,11 +29,79 @@ import java.util.List;
 public class StudentFeeSummaryService {
 
     private final StudentFeeSummaryRepository studentFeeSummaryRepository;
+    private final StudentFeeAssignmentRepository studentFeeAssignmentRepository;
+    private final StudentDiscountAssignmentRepository studentDiscountAssignmentRepository;
+    private final StudentFeePaymentsRepository studentFeePaymentsRepository;
+    private final StudentRepository studentRepository;
+    private final AcademicYearRepository academicYearRepository;
+    private final InstituteRepository instituteRepository;
 
 
-    public StudentFeeSummaryService(StudentFeeSummaryRepository studentFeeSummaryRepository) {
-
+    public StudentFeeSummaryService(StudentFeeSummaryRepository studentFeeSummaryRepository,
+                                  StudentFeeAssignmentRepository studentFeeAssignmentRepository,
+                                  StudentDiscountAssignmentRepository studentDiscountAssignmentRepository,
+                                  StudentFeePaymentsRepository studentFeePaymentsRepository,
+                                  StudentRepository studentRepository,
+                                  AcademicYearRepository academicYearRepository,
+                                  InstituteRepository instituteRepository) {
         this.studentFeeSummaryRepository = studentFeeSummaryRepository;
+        this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
+        this.studentDiscountAssignmentRepository = studentDiscountAssignmentRepository;
+        this.studentFeePaymentsRepository = studentFeePaymentsRepository;
+        this.studentRepository = studentRepository;
+        this.academicYearRepository = academicYearRepository;
+        this.instituteRepository = instituteRepository;
+    }
+
+    @Transactional
+    public StudentFeeSummaryDTO updateSummary(Long studentId, Long academicYearId, Long organizationId) {
+        log.info("[Service:StudentFeeSummaryService] updateSummary() called - studentId={}, academicYearId={}, organizationId={}",
+                studentId, academicYearId, organizationId);
+
+        // 1. Calculate Totals
+        Double totalAssignedDouble = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, academicYearId, organizationId);
+        BigDecimal totalAssigned = BigDecimal.valueOf(totalAssignedDouble != null ? totalAssignedDouble : 0.0);
+
+        BigDecimal totalDiscount = studentDiscountAssignmentRepository.findTotalDiscountByStudentAndYear(studentId, academicYearId);
+        if (totalDiscount == null) totalDiscount = BigDecimal.ZERO;
+
+        BigDecimal totalPaid = studentFeePaymentsRepository.findTotalPaidByStudentAndYear(studentId, academicYearId, organizationId);
+        if (totalPaid == null) totalPaid = BigDecimal.ZERO;
+
+        // Balance = Assigned - Discount - Paid
+        BigDecimal balance = totalAssigned.subtract(totalDiscount).subtract(totalPaid);
+
+        // 2. Fetch or Create Summary Entity
+        StudentFeeSummaryEntity summary = studentFeeSummaryRepository.findByStudentIdAndAcademicYearId(studentId, academicYearId)
+                .orElseGet(() -> {
+                    log.info("[Service:StudentFeeSummaryService] Creating new summary entity");
+                    StudentFeeSummaryEntity newSummary = new StudentFeeSummaryEntity();
+                    
+                    StudentEntity student = studentRepository.findById(studentId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Student not found: " + studentId));
+                    AcademicYearEntity academicYear = academicYearRepository.findById(academicYearId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found: " + academicYearId));
+                    InstituteEntity institute = instituteRepository.findById(organizationId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Organization not found: " + organizationId));
+
+                    newSummary.setStudent(student);
+                    newSummary.setAcademicYear(academicYear);
+                    newSummary.setInstitute(institute);
+                    return newSummary;
+                });
+
+        // 3. Update fields
+        summary.setTotalAssignedFee(totalAssigned);
+        summary.setTotalDiscount(totalDiscount);
+        summary.setTotalPaid(totalPaid);
+        summary.setBalance(balance);
+
+        studentFeeSummaryRepository.save(summary);
+        log.info("[Service:StudentFeeSummaryService] Summary updated successfully - totalAssigned={}, totalDiscount={}, totalPaid={}, balance={}",
+                totalAssigned, totalDiscount, totalPaid, balance);
+
+        // 4. Return DTO (Using provide mapper if it exists, otherwise MapperUtil)
+        return StudentFeeAssignmentMapper.toSummaryDTO(summary);
     }
 
 //    public List<FeeComponentDTO> searchFeeComponent(String keyword) {

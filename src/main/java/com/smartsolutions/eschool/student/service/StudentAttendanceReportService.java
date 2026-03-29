@@ -1,7 +1,7 @@
 package com.smartsolutions.eschool.student.service;
 
-import com.smartsolutions.eschool.academic.entity.master.StudentAttendanceEntity;
-import com.smartsolutions.eschool.academic.repository.StudentAttendanceRepository;
+import com.smartsolutions.eschool.academic.entity.master.AcademicStudentAttendanceEntity;
+import com.smartsolutions.eschool.academic.repository.AcademicStudentAttendanceRepository;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class StudentAttendanceReportService {
 
-    private final StudentAttendanceRepository repository;
+    private final AcademicStudentAttendanceRepository repository;
     private final StudentRepository studentRepository;
     private final StandardRepository standardRepository;
     private final SectionRepository sectionRepository;
@@ -49,13 +49,13 @@ public class StudentAttendanceReportService {
     }
 
     public StudentAttendanceDTO markAttendance(StudentAttendanceDTO dto) {
-        StudentAttendanceEntity entity = mapToEntity(dto);
+        AcademicStudentAttendanceEntity entity = mapToEntity(dto);
         entity = repository.save(entity);
         return mapToDTO(entity);
     }
 
     public List<StudentAttendanceDTO> markBatchAttendance(List<StudentAttendanceDTO> dtos) {
-        List<StudentAttendanceEntity> entities = dtos.stream()
+        List<AcademicStudentAttendanceEntity> entities = dtos.stream()
                 .map(this::mapToEntity)
                 .collect(Collectors.toList());
         entities = repository.saveAll(entities);
@@ -66,7 +66,7 @@ public class StudentAttendanceReportService {
         if (!repository.existsById(dto.getId())) {
             throw new ResourceNotFoundException("Attendance record not found with id: " + dto.getId());
         }
-        StudentAttendanceEntity entity = mapToEntity(dto);
+        AcademicStudentAttendanceEntity entity = mapToEntity(dto);
         // Ensure ID is set for update
         entity.setId(dto.getId());
         entity = repository.save(entity);
@@ -81,17 +81,17 @@ public class StudentAttendanceReportService {
     }
 
     public List<StudentAttendanceDTO> getAttendanceByStudent(Long studentId, LocalDate startDate, LocalDate endDate) {
-        List<StudentAttendanceEntity> list = repository.findByStudentIdAndDateRange(studentId, startDate, endDate);
+        List<AcademicStudentAttendanceEntity> list = repository.findByStudentIdAndDateRange(studentId, startDate, endDate);
         return list.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     public List<StudentAttendanceDTO> getAttendanceByClass(Long standardId, Long sectionId, LocalDate date) {
-        List<StudentAttendanceEntity> list = repository.findByClassAndDate(standardId, sectionId, date);
+        List<AcademicStudentAttendanceEntity> list = repository.findByClassAndDate(standardId, sectionId, date);
         return list.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     public List<StudentAttendanceDTO> getAttendanceByStandard(Long standardId, LocalDate startDate, LocalDate endDate) {
-        List<StudentAttendanceEntity> list = repository.findByStandardAndDateRange(standardId, startDate, endDate);
+        List<AcademicStudentAttendanceEntity> list = repository.findByStandardAndDateRange(standardId, startDate, endDate);
         return list.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
@@ -101,22 +101,22 @@ public class StudentAttendanceReportService {
     }
 
     public long countPresent(Long studentId, LocalDate startDate, LocalDate endDate) {
-        return repository.countByStudentAndStatus(studentId, StudentAttendanceEntity.AttendanceStatus.PRESENT,
+        return repository.countByStudentAndStatus(studentId, AcademicStudentAttendanceEntity.AttendanceStatus.PRESENT,
                 startDate, endDate);
     }
 
     public long countAbsent(Long studentId, LocalDate startDate, LocalDate endDate) {
-        return repository.countByStudentAndStatus(studentId, StudentAttendanceEntity.AttendanceStatus.ABSENT, startDate,
+        return repository.countByStudentAndStatus(studentId, AcademicStudentAttendanceEntity.AttendanceStatus.ABSENT, startDate,
                 endDate);
     }
 
     public long countLeave(Long studentId, LocalDate startDate, LocalDate endDate) {
-        return repository.countByStudentAndStatus(studentId, StudentAttendanceEntity.AttendanceStatus.LEAVE, startDate,
+        return repository.countByStudentAndStatus(studentId, AcademicStudentAttendanceEntity.AttendanceStatus.LEAVE, startDate,
                 endDate);
     }
 
     // ----------------- Mapping Methods -----------------
-    private StudentAttendanceDTO mapToDTO(StudentAttendanceEntity entity) {
+    private StudentAttendanceDTO mapToDTO(AcademicStudentAttendanceEntity entity) {
         return new StudentAttendanceDTO(
                 entity.getId(),
                 entity.getStudent() != null ? entity.getStudent().getId() : null,
@@ -128,10 +128,10 @@ public class StudentAttendanceReportService {
                 entity.getRemarks());
     }
 
-    private StudentAttendanceEntity mapToEntity(StudentAttendanceDTO dto) {
-        StudentAttendanceEntity entity = new StudentAttendanceEntity();
+    private AcademicStudentAttendanceEntity mapToEntity(StudentAttendanceDTO dto) {
+        AcademicStudentAttendanceEntity entity = new AcademicStudentAttendanceEntity();
         if (dto.getId() != null) {
-            entity = repository.findById(dto.getId()).orElse(new StudentAttendanceEntity());
+            entity = repository.findById(dto.getId()).orElse(new AcademicStudentAttendanceEntity());
             // If ID provided but not found, treating as new or update logic?
             // Usually mapToEntity creates new instance unless fetched.
             // Simplified: create new instance and set fields.
@@ -162,7 +162,7 @@ public class StudentAttendanceReportService {
 
         entity.setAttendanceDate(dto.getAttendanceDate());
         if (dto.getStatus() != null) {
-            entity.setStatus(StudentAttendanceEntity.AttendanceStatus.valueOf(dto.getStatus()));
+            entity.setStatus(AcademicStudentAttendanceEntity.AttendanceStatus.valueOf(dto.getStatus()));
         }
 
         if (dto.getMarkedBy() != null) {

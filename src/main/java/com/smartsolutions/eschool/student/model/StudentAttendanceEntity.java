@@ -1,17 +1,23 @@
-package com.smartsolutions.eschool.academic.entity.master;
+package com.smartsolutions.eschool.student.model;
 
-import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
-import com.smartsolutions.eschool.student.model.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "student_attendance")
+@Table(name = "student_attendance", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"organization_id", "student_id", "attendance_date"})
+})
+@SQLDelete(sql = "UPDATE student_attendance SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,6 +28,14 @@ public class StudentAttendanceEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", insertable = false, updatable = false)
+    private InstituteEntity organization;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campus_id", nullable = false)
+    private CampusEntity campus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
@@ -42,14 +56,18 @@ public class StudentAttendanceEntity extends AuditableEntity {
     @Column(name = "status", nullable = false)
     private AttendanceStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "marked_by")
-    private EmployeeMasterEntity markedBy;
+    @Column(name = "marked_by")
+    private Long markedBy;
 
     @Column(name = "remarks", length = 255)
     private String remarks;
-    @Column(name = "deleted", nullable = false)
+
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
+    @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
+
     public enum AttendanceStatus {
         PRESENT, ABSENT, LEAVE
     }

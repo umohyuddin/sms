@@ -47,6 +47,19 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             @Param("endOfMonth") LocalDate endOfMonth,
             @Param("instituteId") Long instituteId
     );
+
+    @Query("""
+            SELECT COALESCE(SUM(p.amountPaid), 0)
+            FROM StudentFeePaymentEntity p
+            WHERE p.student.id = :studentId
+            AND p.academicYear.id = :academicYearId
+            AND p.student.campus.institute.id = :instituteId
+            """)
+    java.math.BigDecimal findTotalPaidByStudentAndYear(
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId,
+            @Param("instituteId") Long instituteId
+    );
 }
 
 

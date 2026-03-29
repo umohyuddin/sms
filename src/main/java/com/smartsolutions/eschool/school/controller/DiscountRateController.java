@@ -155,10 +155,12 @@ public class DiscountRateController {
             @RequestParam(required = false) Long discountTypeId,
             @RequestParam(required = false) Long discountSubTypeId,
             @RequestParam(required = false) Long recurrenceRuleId,
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long academicYearId,
             @RequestParam(required = false) String keyword) {
-        log.info("[Controller:DiscountRateController] search() called - discountTypeId: {}, discountSubTypeId: {}, recurrenceRuleId: {}, keyword: {}",
-                discountTypeId, discountSubTypeId, recurrenceRuleId, keyword);
-        List<DiscountRateResponseDTO> list = discountRateFacade.search(discountTypeId, discountSubTypeId, recurrenceRuleId, keyword);
+        log.info("[Controller:DiscountRateController] search() called - discountTypeId: {}, discountSubTypeId: {}, recurrenceRuleId: {}, campusId: {}, academicYearId: {}, keyword: {}",
+                discountTypeId, discountSubTypeId, recurrenceRuleId, campusId, academicYearId, keyword);
+        List<DiscountRateResponseDTO> list = discountRateFacade.search(discountTypeId, discountSubTypeId, recurrenceRuleId, campusId, academicYearId, keyword);
         log.info("[Controller:DiscountRateController] search() succeeded - Found {} discount rates", list.size());
         return ResponseEntity.ok(list);
     }

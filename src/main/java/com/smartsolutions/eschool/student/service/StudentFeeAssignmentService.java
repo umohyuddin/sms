@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
+import com.smartsolutions.eschool.school.repository.DiscountRateRepository;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
 import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeeAssignmentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
@@ -39,24 +40,27 @@ public class StudentFeeAssignmentService {
     private final StudentRepository studentRepository;
     private final FeeRateRepository feeRateRepository;
     private final StudentFeeAssignmentRepository studentFeeAssignmentRepository;
-    private final StudentFeeSummaryRepository studentFeeSummaryRepository;
+    private final StudentFeeSummaryService studentFeeSummaryService;
     private final AcademicYearRepository academicYearRepository;
     private final InstituteRepository instituteRepository;
+    private final DiscountRateRepository discountRateRepository;
     private final StudentDiscountAssignmentService studentDiscountAssignmentService;
 
     public StudentFeeAssignmentService(StudentRepository studentRepository, 
             FeeRateRepository feeRateRepository, 
             StudentFeeAssignmentRepository studentFeeAssignmentRepository, 
-            StudentFeeSummaryRepository studentFeeSummaryRepository, 
+            StudentFeeSummaryService studentFeeSummaryService, 
             AcademicYearRepository academicYearRepository,
             InstituteRepository instituteRepository,
+            DiscountRateRepository discountRateRepository,
             StudentDiscountAssignmentService studentDiscountAssignmentService) {
         this.studentRepository = studentRepository;
         this.feeRateRepository = feeRateRepository;
         this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
-        this.studentFeeSummaryRepository = studentFeeSummaryRepository;
+        this.studentFeeSummaryService = studentFeeSummaryService;
         this.academicYearRepository = academicYearRepository;
         this.instituteRepository = instituteRepository;
+        this.discountRateRepository = discountRateRepository;
         this.studentDiscountAssignmentService = studentDiscountAssignmentService;
     }
 
@@ -112,6 +116,7 @@ public class StudentFeeAssignmentService {
             assignment.setStudent(student);
             assignment.setFeeRate(feeRate);
             assignment.setInstitute(institute);
+            assignment.setAcademicYear(academicYear);
 
             String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
                     ? feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getName() : "ONE_TIME";
@@ -126,6 +131,7 @@ public class StudentFeeAssignmentService {
         }).collect(Collectors.toList());
 
         List<StudentFeeAssignmentEntity> savedAssignments = studentFeeAssignmentRepository.saveAll(assignments);
+        studentFeeAssignmentRepository.flush();
         log.info("[Service:StudentFeeAssignmentService] Saved {} fee assignments", savedAssignments.size());
 
         // Total assigned fee
@@ -135,34 +141,28 @@ public class StudentFeeAssignmentService {
         // Handle Discount if provided
         if (dto.getDiscountComponentId() != null) {
             log.info("[Service:StudentFeeAssignmentService] Applying discount componentId: {}", dto.getDiscountComponentId());
+            
+            com.smartsolutions.eschool.school.model.DiscountRateEntity discountRate = discountRateRepository.findApplicableDiscountRate(
+                    dto.getDiscountComponentId(), dto.getCampusId(), dto.getAcademicYearId())
+                    .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, 
+                            "No applicable discount rate found for the selected component, campus and academic year", HttpStatus.NOT_FOUND));
+
             StudentDiscountAssignmentRequestDTO discountRequest = new StudentDiscountAssignmentRequestDTO();
             discountRequest.setStudentId(studentId);
             discountRequest.setAcademicYearId(dto.getAcademicYearId());
             discountRequest.setCampusId(dto.getCampusId());
-            discountRequest.setDiscountRateId(dto.getDiscountComponentId());
+            discountRequest.setDiscountRateId(discountRate.getId());
+            discountRequest.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
             studentDiscountAssignmentService.assignDiscount(discountRequest);
         }
 
         // Summary Handling
-        StudentFeeSummaryEntity summary = studentFeeSummaryRepository.findByStudentId(studentId).orElse(null);
-        if (summary == null) {
-            log.info("[Service:StudentFeeAssignmentService] Creating new fee summary for studentId: {}", studentId);
-            summary = new StudentFeeSummaryEntity();
-            summary.setStudent(student);
-            summary.setAcademicYear(academicYear);
-            summary.setInstitute(institute);
-            summary.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
-            summary.setTotalPaid(BigDecimal.ZERO);
-            summary.setBalance(BigDecimal.valueOf(totalAssigned));
-        } else {
-            log.info("[Service:StudentFeeAssignmentService] Updating existing fee summary for studentId: {}", studentId);
-            summary.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
-            summary.setBalance(summary.getTotalAssignedFee().subtract(summary.getTotalPaid()));
-        }
+        return updateSummary(student, academicYear, institute, totalAssigned);
+    }
 
-        studentFeeSummaryRepository.save(summary);
-        log.info("[Service:StudentFeeAssignmentService] assignStudentFee() succeeded - studentId={}", studentId);
-        return StudentFeeAssignmentMapper.toSummaryDTO(summary);
+    private StudentFeeSummaryDTO updateSummary(StudentEntity student, AcademicYearEntity academicYear, 
+            InstituteEntity institute, Double totalAssigned) {
+        return studentFeeSummaryService.updateSummary(student.getId(), academicYear.getId(), institute.getId());
     }
 
     @Transactional
@@ -186,7 +186,8 @@ public class StudentFeeAssignmentService {
         List<StudentFeeAssignmentEntity> existingAssignments = studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, dto.getAcademicYearId(), organizationId);
         if (!existingAssignments.isEmpty()) {
             studentFeeAssignmentRepository.deleteAll(existingAssignments);
-            log.info("[Service:StudentFeeAssignmentService] Deleted {} existing fee assignments", existingAssignments.size());
+            studentFeeAssignmentRepository.flush();
+            log.info("[Service:StudentFeeAssignmentService] Deleted and flushed {} existing fee assignments", existingAssignments.size());
         }
 
         // Fetch new applicable fee rates
@@ -207,6 +208,7 @@ public class StudentFeeAssignmentService {
             assignment.setStudent(student);
             assignment.setFeeRate(feeRate);
             assignment.setInstitute(institute);
+            assignment.setAcademicYear(academicYear);
 
             String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
                     ? feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getName() : "ONE_TIME";
@@ -221,21 +223,36 @@ public class StudentFeeAssignmentService {
         }).collect(Collectors.toList());
 
         studentFeeAssignmentRepository.saveAll(updatedAssignments);
+        studentFeeAssignmentRepository.flush();
 
-        // Update Summary
+        // Calculate Total assigned AFTER saving so it includes newly saved records
         Double totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId(), organizationId);
         if (totalAssigned == null) totalAssigned = 0.0;
 
-        StudentFeeSummaryEntity summary = studentFeeSummaryRepository.findByStudentId(studentId).orElseThrow(() ->
-                new ApiException(StudentFeeAssignmentErrors.ASSIGNMENT_NOT_FOUND, "Fee summary not found for updates", HttpStatus.NOT_FOUND));
+        // Handle Discount update
+        if (dto.getDiscountComponentId() != null) {
+            log.info("[Service:StudentFeeAssignmentService] Updating discount componentId: {}", dto.getDiscountComponentId());
+            
+            com.smartsolutions.eschool.school.model.DiscountRateEntity discountRate = discountRateRepository.findApplicableDiscountRate(
+                    dto.getDiscountComponentId(), dto.getCampusId(), dto.getAcademicYearId())
+                    .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, 
+                            "No applicable discount rate found for the selected component, campus and academic year", HttpStatus.NOT_FOUND));
 
-        summary.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
-        summary.setBalance(summary.getTotalAssignedFee().subtract(summary.getTotalPaid()));
+            StudentDiscountAssignmentRequestDTO discountRequest = new StudentDiscountAssignmentRequestDTO();
+            discountRequest.setStudentId(studentId);
+            discountRequest.setAcademicYearId(dto.getAcademicYearId());
+            discountRequest.setCampusId(dto.getCampusId());
+            discountRequest.setDiscountRateId(discountRate.getId());
+            discountRequest.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
+            studentDiscountAssignmentService.updateDiscount(discountRequest);
+        } else {
+            log.info("[Service:StudentFeeAssignmentService] No discount provided, removing existing discount for studentId: {}", studentId);
+            studentDiscountAssignmentService.deleteDiscount(studentId, dto.getAcademicYearId(), dto.getCampusId());
+        }
 
-        studentFeeSummaryRepository.save(summary);
-        log.info("[Service:StudentFeeAssignmentService] updateStudentFee() succeeded - studentId={}", studentId);
-        return StudentFeeAssignmentMapper.toSummaryDTO(summary);
+        return updateSummary(student, academicYear, institute, totalAssigned);
     }
+
 
     public StudentFeeAssignmentsResponseDTO getFeeAssignmentByStudentId(Long studentId, Long academicYearId) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();

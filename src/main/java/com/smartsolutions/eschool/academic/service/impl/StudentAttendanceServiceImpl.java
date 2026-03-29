@@ -11,9 +11,9 @@ import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
 import com.smartsolutions.eschool.academic.dto.request.StudentAttendanceRequestDTO;
 import com.smartsolutions.eschool.academic.dto.response.StudentAttendanceResponseDTO;
-import com.smartsolutions.eschool.academic.entity.master.StudentAttendanceEntity;
+import com.smartsolutions.eschool.academic.entity.master.AcademicStudentAttendanceEntity;
 import com.smartsolutions.eschool.academic.mapper.AttendanceMapper;
-import com.smartsolutions.eschool.academic.repository.StudentAttendanceRepository;
+import com.smartsolutions.eschool.academic.repository.AcademicStudentAttendanceRepository;
 import com.smartsolutions.eschool.academic.service.StudentAttendanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class StudentAttendanceServiceImpl implements StudentAttendanceService {
 
-    private final StudentAttendanceRepository attendanceRepository;
+    private final AcademicStudentAttendanceRepository attendanceRepository;
     private final StudentRepository studentRepository;
     private final StandardRepository standardRepository;
     private final SectionRepository sectionRepository;
@@ -47,7 +47,7 @@ public class StudentAttendanceServiceImpl implements StudentAttendanceService {
             SectionEntity section = sectionRepository.findById(dto.getSectionId())
                     .orElseThrow(() -> new ResourceNotFoundException("Section not found: " + dto.getSectionId()));
             
-            StudentAttendanceEntity entity = AttendanceMapper.toEntity(dto);
+            AcademicStudentAttendanceEntity entity = AttendanceMapper.toEntity(dto);
             entity.setStudent(student);
             entity.setStandard(standard);
             entity.setSection(section);

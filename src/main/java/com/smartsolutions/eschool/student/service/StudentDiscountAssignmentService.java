@@ -13,6 +13,7 @@ import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.repository.StudentDiscountAssignmentRepository;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
+import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
@@ -21,6 +22,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,13 +36,20 @@ public class StudentDiscountAssignmentService {
     private final DiscountRateRepository discountRateRepository;
     private final CampusRepository campusRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final StudentFeeSummaryService studentFeeSummaryService;
 
-    public StudentDiscountAssignmentService(StudentDiscountAssignmentRepository assignmentRepository, StudentRepository studentRepository, DiscountRateRepository discountRateRepository, CampusRepository campusRepository, AcademicYearRepository academicYearRepository) {
+    public StudentDiscountAssignmentService(StudentDiscountAssignmentRepository assignmentRepository, 
+            StudentRepository studentRepository, 
+            DiscountRateRepository discountRateRepository, 
+            CampusRepository campusRepository, 
+            AcademicYearRepository academicYearRepository,
+            StudentFeeSummaryService studentFeeSummaryService) {
         this.assignmentRepository = assignmentRepository;
         this.studentRepository = studentRepository;
         this.discountRateRepository = discountRateRepository;
         this.campusRepository = campusRepository;
         this.academicYearRepository = academicYearRepository;
+        this.studentFeeSummaryService = studentFeeSummaryService;
     }
 
     // -------------------------------------------------------------------------
@@ -67,8 +76,25 @@ public class StudentDiscountAssignmentService {
             entity.setDiscountRate(discountRate);
             entity.setCampus(campus);
             entity.setAcademicYear(academicYear);
-            entity.setAppliedAmount(requestDTO.getAppliedAmount());
-            entity.setAppliedPercentage(requestDTO.getAppliedPercentage());
+
+            // Calculate applied amount if not provided
+            BigDecimal finalAmount = requestDTO.getAppliedAmount();
+            BigDecimal finalPercentage = requestDTO.getAppliedPercentage();
+
+            if (finalAmount == null) {
+                if (Boolean.TRUE.equals(discountRate.getIsPercentage())) {
+                    finalPercentage = discountRate.getValue();
+                    if (requestDTO.getTotalAssignedFee() != null) {
+                        finalAmount = requestDTO.getTotalAssignedFee().multiply(finalPercentage).divide(BigDecimal.valueOf(100));
+                    }
+                } else {
+                    finalAmount = discountRate.getValue();
+                    finalPercentage = null;
+                }
+            }
+
+            entity.setAppliedAmount(finalAmount);
+            entity.setAppliedPercentage(finalPercentage);
             entity.setReason(requestDTO.getReason());
             entity.setIsActive(true);
             entity.setDeleted(false);
@@ -77,6 +103,13 @@ public class StudentDiscountAssignmentService {
 
 
             log.info("Successfully assigned discount, id: {}", entity.getId());
+            
+            // Update Summary
+            Long organizationId = SecurityUtils.getCurrentOrganizationId();
+            if (organizationId != null) {
+                studentFeeSummaryService.updateSummary(student.getId(), academicYear.getId(), organizationId);
+            }
+
             return mapToResponseDto(entity);
         } catch (DataAccessException dae) {
             log.error("Database error while assigning discount", dae);
@@ -117,6 +150,7 @@ public class StudentDiscountAssignmentService {
                     .ifPresent(existing -> {
                         log.info("Deleting existing discount assignment with id: {}", existing.getId());
                         assignmentRepository.delete(existing);
+                        assignmentRepository.flush();
                     });
 
             // Create new assignment
@@ -125,15 +159,39 @@ public class StudentDiscountAssignmentService {
             entity.setDiscountRate(discountRate);
             entity.setCampus(campus);
             entity.setAcademicYear(academicYear);
-            entity.setAppliedAmount(requestDTO.getAppliedAmount());
-            entity.setAppliedPercentage(requestDTO.getAppliedPercentage());
+
+            // Calculate applied amount if not provided
+            BigDecimal finalAmount = requestDTO.getAppliedAmount();
+            BigDecimal finalPercentage = requestDTO.getAppliedPercentage();
+
+            if (finalAmount == null) {
+                if (Boolean.TRUE.equals(discountRate.getIsPercentage())) {
+                    finalPercentage = discountRate.getValue();
+                    if (requestDTO.getTotalAssignedFee() != null) {
+                        finalAmount = requestDTO.getTotalAssignedFee().multiply(finalPercentage).divide(BigDecimal.valueOf(100));
+                    }
+                } else {
+                    finalAmount = discountRate.getValue();
+                    finalPercentage = null;
+                }
+            }
+
+            entity.setAppliedAmount(finalAmount);
+            entity.setAppliedPercentage(finalPercentage);
             entity.setReason(requestDTO.getReason());
             entity.setIsActive(true);
             entity.setDeleted(false);
             entity.setId(null);
 
             assignmentRepository.save(entity);
+            assignmentRepository.flush();
             log.info("Successfully created discount assignment, id: {}", entity.getId());
+
+            // Update Summary
+            Long organizationId = SecurityUtils.getCurrentOrganizationId();
+            if (organizationId != null) {
+                studentFeeSummaryService.updateSummary(student.getId(), academicYear.getId(), organizationId);
+            }
 
             return mapToResponseDto(entity);
 
@@ -296,6 +354,12 @@ public class StudentDiscountAssignmentService {
                         log.info("Deleting existing discount assignment with id={} for studentId={}, academicYearId={}, campusId={}",
                                 existing.getId(), studentId, academicYearId, campusId);
                         assignmentRepository.delete(existing);
+                        
+                        // Update Summary
+                        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+                        if (organizationId != null) {
+                            studentFeeSummaryService.updateSummary(studentId, academicYearId, organizationId);
+                        }
                     });
         } catch (DataAccessException dae) {
             log.error("Database error while deleting discount for studentId={}, academicYearId={}, campusId={}", studentId, academicYearId, campusId, dae);
@@ -306,4 +370,8 @@ public class StudentDiscountAssignmentService {
         }
     }
 
+    public BigDecimal findTotalDiscountAmount(Long studentId, Long academicYearId) {
+        BigDecimal totalDiscount = assignmentRepository.findTotalDiscountByStudentAndYear(studentId, academicYearId);
+        return totalDiscount != null ? totalDiscount : BigDecimal.ZERO;
+    }
 }

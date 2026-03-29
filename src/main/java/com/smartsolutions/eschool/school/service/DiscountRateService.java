@@ -136,14 +136,14 @@ public class DiscountRateService {
 
     @Transactional(readOnly = true)
     public List<DiscountRateResponseDTO> search(Long discountTypeId, Long discountSubTypeId,
-            Long recurrenceRuleId, String keyword) {
+            Long recurrenceRuleId, Long campusId, Long academicYearId, String keyword) {
         log.info(
-                "SEARCH DiscountRates discountTypeId={}, discountSubTypeId={}, recurrenceRuleId={}, keyword={}",
-                discountTypeId, discountSubTypeId, recurrenceRuleId, keyword);
+                "SEARCH DiscountRates discountTypeId={}, discountSubTypeId={}, recurrenceRuleId={}, campusId={}, academicYearId={}, keyword={}",
+                discountTypeId, discountSubTypeId, recurrenceRuleId, campusId, academicYearId, keyword);
         try {
             String kw = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
             List<DiscountRateEntity> entities = discountRateRepository.search(discountTypeId, discountSubTypeId,
-                    recurrenceRuleId, kw);
+                    recurrenceRuleId, campusId, academicYearId, kw);
             return DiscountRateMapper.toDtoList(entities);
         } catch (DataAccessException dae) {
             log.error("Database error while searching Discount Rates", dae);

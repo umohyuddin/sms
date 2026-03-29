@@ -25,9 +25,8 @@ public class StudentFeeSummaryEntity {
     private com.smartsolutions.eschool.school.model.InstituteEntity institute;
 
     private BigDecimal totalAssignedFee;
-
+    private BigDecimal totalDiscount;
     private BigDecimal totalPaid;
-
     private BigDecimal balance;
 
     @ManyToOne

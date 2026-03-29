@@ -64,7 +64,7 @@ public class DiscountRateFacade {
     }
 
     public List<DiscountRateResponseDTO> search(Long discountTypeId, Long discountSubTypeId,
-            Long recurrenceRuleId, String keyword) {
-        return discountRateService.search(discountTypeId, discountSubTypeId, recurrenceRuleId, keyword);
+            Long recurrenceRuleId, Long campusId, Long academicYearId, String keyword) {
+        return discountRateService.search(discountTypeId, discountSubTypeId, recurrenceRuleId, campusId, academicYearId, keyword);
     }
 }
