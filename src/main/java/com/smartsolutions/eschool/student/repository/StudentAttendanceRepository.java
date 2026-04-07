@@ -60,24 +60,33 @@ public interface StudentAttendanceRepository extends JpaRepository<StudentAttend
     @Query("""
         SELECT sa.campus.id, sa.status, COUNT(sa)
         FROM StudentAttendanceEntity sa
-        WHERE sa.organizationId = :organizationId AND sa.attendanceDate = :date
+        WHERE sa.organizationId = :organizationId AND sa.attendanceDate BETWEEN :startDate AND :endDate
         GROUP BY sa.campus.id, sa.status
     """)
-    List<Object[]> getCampusLevelStats(@Param("organizationId") Long organizationId, @Param("date") LocalDate date);
+    List<Object[]> getCampusLevelStats(@Param("organizationId") Long organizationId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     @Query("""
         SELECT sa.standard.id, sa.status, COUNT(sa)
         FROM StudentAttendanceEntity sa
-        WHERE sa.organizationId = :organizationId AND sa.campus.id = :campusId AND sa.attendanceDate = :date
+        WHERE sa.organizationId = :organizationId AND sa.campus.id = :campusId AND sa.attendanceDate BETWEEN :startDate AND :endDate
         GROUP BY sa.standard.id, sa.status
     """)
-    List<Object[]> getStandardLevelStats(@Param("organizationId") Long organizationId, @Param("campusId") Long campusId, @Param("date") LocalDate date);
+    List<Object[]> getStandardLevelStats(@Param("organizationId") Long organizationId, @Param("campusId") Long campusId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     @Query("""
         SELECT sa.section.id, sa.status, COUNT(sa)
         FROM StudentAttendanceEntity sa
-        WHERE sa.organizationId = :organizationId AND sa.standard.id = :standardId AND sa.attendanceDate = :date
+        WHERE sa.organizationId = :organizationId AND sa.standard.id = :standardId AND sa.attendanceDate BETWEEN :startDate AND :endDate
         GROUP BY sa.section.id, sa.status
     """)
-    List<Object[]> getSectionLevelStats(@Param("organizationId") Long organizationId, @Param("standardId") Long standardId, @Param("date") LocalDate date);
+    List<Object[]> getSectionLevelStats(@Param("organizationId") Long organizationId, @Param("standardId") Long standardId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("""
+        SELECT sa.student.id, sa.status, COUNT(sa.id)
+        FROM StudentAttendanceEntity sa
+        WHERE sa.organizationId = :organizationId AND sa.section.id = :sectionId 
+        AND sa.attendanceDate BETWEEN :startDate AND :endDate
+        GROUP BY sa.student.id, sa.status
+    """)
+    List<Object[]> getStudentLevelStats(@Param("organizationId") Long organizationId, @Param("sectionId") Long sectionId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

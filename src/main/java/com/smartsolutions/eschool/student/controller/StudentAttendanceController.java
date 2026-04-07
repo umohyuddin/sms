@@ -26,6 +26,29 @@ public class StudentAttendanceController {
     private final StudentAttendanceFacade attendanceFacade;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
+    /**
+     * Search attendance records or Load Roll Call.
+     * 
+     * | Scenario                       | Repository Result | Service/API Result                           |
+     * | :---                           | :---              | :---                                         |
+     * | Attendance already marked      | List of Entities  | List of DTOs (with IDs and Status)           |
+     * | First time marking (Roll Call) | Empty List []     | **Full list of students** (id: null, status: null) |
+     * | Search by keyword (no match)   | Empty List []     | Empty List []                                |
+     * | Invalid/Missing Filters        | Empty List []     | Empty List []                                |
+     * 
+     * Detailed Behavior:
+     * - **Scenario A: Attendance already marked**
+     *   If there are already records in the database for the given filters and date:
+     *   - Result: You will get a list of all attendance records for the provided range (e.g., entire Campus or specific Section).
+     *   - Date Factor: This works for both the current date and any past date.
+     *   - Use Case: Useful for principals/admins to see overall attendance reports.
+     * 
+     * - **Scenario B: Attendance NOT marked (No records in DB)**
+     *   If the table is empty for the given filters and date:
+     *   - Result: You will get an **empty list []** UNLESS you provide all core filters (campusId, standardId, and sectionId).
+     *   - Note: The "Roll Call" (auto-populating the student list) is disabled for campus-wide searches for performance reasons.
+     *   - Roll Call: Only triggers when you narrow down to a specific **sectionId**.
+     */
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StudentAttendanceResponseDTO>> search(
             @RequestParam(required = false) Long campusId,
@@ -88,13 +111,28 @@ public class StudentAttendanceController {
         return ResponseEntity.ok(statistics);
     }
 
+    /**
+     * Get detailed attendance report with hierarchical aggregation and date range support.
+     * 
+     * | Filter Provided | Aggregation Level          |
+     * | :---            | :---                       |
+     * | None            | Campus-wide totals         |
+     * | campusId        | Standard-wide totals for Campus |
+     * | standardId      | Section-wide totals for Standard |
+     * | sectionId       | Student-level status for Section |
+     * 
+     * Full Structure: The report pre-populates all sub-levels even with zero counts.
+     */
     @GetMapping(value = "/report", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AttendanceReportDTO> getDetailedReport(
             @RequestParam(required = false) Long campusId,
             @RequestParam(required = false) Long standardId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        log.info("[Controller:StudentAttendanceController] getDetailedReport() called - campusId={}, standardId={}, date={}", campusId, standardId, date);
-        AttendanceReportDTO report = attendanceFacade.getDetailedReport(campusId, standardId, date);
+            @RequestParam(required = false) Long sectionId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        log.info("[Controller:StudentAttendanceController] getDetailedReport() called - campusId={}, standardId={}, sectionId={}, range=[{} to {}]", 
+                campusId, standardId, sectionId, startDate, endDate);
+        AttendanceReportDTO report = attendanceFacade.getDetailedReport(campusId, standardId, sectionId, startDate, endDate);
         log.info("[Controller:StudentAttendanceController] getDetailedReport() succeeded");
         return ResponseEntity.ok(report);
     }

@@ -56,8 +56,8 @@ public class StudentAttendanceFacade {
         return attendanceService.getStatistics(date);
     }
 
-    public AttendanceReportDTO getDetailedReport(Long campusId, Long standardId, LocalDate date) {
+    public AttendanceReportDTO getDetailedReport(Long campusId, Long standardId, Long sectionId, LocalDate startDate, LocalDate endDate) {
         log.info("[Facade:StudentAttendanceFacade] getDetailedReport() called");
-        return attendanceService.getDetailedReport(campusId, standardId, date);
+        return attendanceService.getDetailedReport(campusId, standardId, sectionId, startDate, endDate);
     }
 }

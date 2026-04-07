@@ -1126,7 +1126,7 @@ CREATE TABLE guardians (
     deleted_by BIGINT,
 
     -- Constraints
-    CONSTRAINT uk_guardian_cnic_org UNIQUE (organization_id, cnic),
+    CONSTRAINT uk_guardian_cnic_org UNIQUE (organization_id, cnic)
 );
 
     DROP TABLE IF EXISTS students;

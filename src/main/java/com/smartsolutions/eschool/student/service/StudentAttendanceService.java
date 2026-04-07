@@ -214,72 +214,157 @@ public class StudentAttendanceService {
         return stats;
     }
 
-    public AttendanceReportDTO getDetailedReport(Long campusId, Long standardId, LocalDate date) {
+    @Transactional(readOnly = true)
+    public AttendanceReportDTO getDetailedReport(Long campusId, Long standardId, Long sectionId, LocalDate startDate, LocalDate endDate) {
         Long organizationId = getOrgId();
-        LocalDate targetDate = (date != null) ? date : LocalDate.now();
-        log.info("[Service:StudentAttendanceService] getDetailedReport() called - org: {}, campus: {}, standard: {}, date: {}", 
-                organizationId, campusId, standardId, targetDate);
+        LocalDate start = (startDate != null) ? startDate : LocalDate.now();
+        LocalDate end = (endDate != null) ? endDate : start;
+        
+        log.info("[Service:StudentAttendanceService] getDetailedReport() called - org: {}, campus: {}, standard: {}, section: {}, range: [{} to {}]", 
+                organizationId, campusId, standardId, sectionId, start, end);
 
         AttendanceReportDTO report = new AttendanceReportDTO();
-        report.setLevel("ORGANIZATION");
-        report.setLevelId(organizationId);
-        
         List<Object[]> statsData;
         Map<Long, AttendanceSummaryDTO> summaryMap = new HashMap<>();
 
-        if (standardId != null) {
+        // 1. Initialize Full Structure (Pre-populate with all children regardless of attendance)
+        if (sectionId != null) {
+            report.setLevel("SECTION");
+            report.setLevelId(sectionId);
+            report.setLevelName(sectionRepository.findById(sectionId).map(s -> s.getSectionName()).orElse("Section Report"));
+            
+            // For Section level, target total is student count in this section
+            report.setTotalStudents(studentRepository.countBySectionAndOrganizationId(sectionId, organizationId));
+            
+            // Pre-populate with all students in this section
+            studentRepository.findBySectionIdAndOrganizationId(sectionId, organizationId).forEach(s -> {
+                summaryMap.put(s.getId(), AttendanceSummaryDTO.builder()
+                        .id(s.getId())
+                        .name(s.getFullName())
+                        .totalCount(1) // Each student is 1
+                        .attendancePercentage(0.0)
+                        .build());
+            });
+            statsData = attendanceRepository.getStudentLevelStats(organizationId, sectionId, start, end);
+        } else if (standardId != null) {
             report.setLevel("STANDARD");
             report.setLevelId(standardId);
-            statsData = attendanceRepository.getSectionLevelStats(organizationId, standardId, targetDate);
-            report.setLevelName("Standard Report"); 
+            report.setLevelName(standardRepository.findById(standardId).map(s -> s.getStandardName()).orElse("Standard Report"));
+            
+            report.setTotalStudents(studentRepository.countByStandardAndOrganizationId(standardId, organizationId));
+            
+            // Grouped master counts for sections in this standard
+            Map<Long, Long> masterCounts = new HashMap<>();
+            studentRepository.countStudentsPerSection(organizationId, standardId).forEach(row -> masterCounts.put((Long)row[0], (Long)row[1]));
+
+            // Pre-populate with all sections in this standard
+            sectionRepository.findByStandardIdAndInstituteIdAndDeletedFalse(standardId, organizationId).forEach(s -> {
+                long masterCount = masterCounts.getOrDefault(s.getId(), 0L);
+                summaryMap.put(s.getId(), AttendanceSummaryDTO.builder()
+                        .id(s.getId())
+                        .name(s.getSectionName())
+                        .totalCount(masterCount)
+                        .attendancePercentage(0.0)
+                        .build());
+            });
+            statsData = attendanceRepository.getSectionLevelStats(organizationId, standardId, start, end);
         } else if (campusId != null) {
             report.setLevel("CAMPUS");
             report.setLevelId(campusId);
-            statsData = attendanceRepository.getStandardLevelStats(organizationId, campusId, targetDate);
-            report.setLevelName("Campus Report");
+            report.setLevelName(campusRepository.findById(campusId).map(c -> c.getCampusName()).orElse("Campus Report"));
+            
+            report.setTotalStudents(studentRepository.countByCampusAndOrganizationId(campusId, organizationId));
+
+            // Grouped master counts for standards in this campus
+            Map<Long, Long> masterCounts = new HashMap<>();
+            studentRepository.countStudentsPerStandard(organizationId, campusId).forEach(row -> masterCounts.put((Long)row[0], (Long)row[1]));
+
+            // Pre-populate with all standards in this campus
+            standardRepository.findByCampusIdAndInstituteId(campusId, organizationId).forEach(s -> {
+                long masterCount = masterCounts.getOrDefault(s.getId(), 0L);
+                summaryMap.put(s.getId(), AttendanceSummaryDTO.builder()
+                        .id(s.getId())
+                        .name(s.getStandardName())
+                        .totalCount(masterCount)
+                        .attendancePercentage(0.0)
+                        .build());
+            });
+            statsData = attendanceRepository.getStandardLevelStats(organizationId, campusId, start, end);
         } else {
-            statsData = attendanceRepository.getCampusLevelStats(organizationId, targetDate);
+            report.setLevel("ORGANIZATION");
+            report.setLevelId(organizationId);
             report.setLevelName("Organization Report");
+            
+            report.setTotalStudents(studentRepository.countAllActiveStudents(organizationId));
+
+            // Grouped master counts for campuses in organization
+            Map<Long, Long> masterCounts = new HashMap<>();
+            studentRepository.countStudentsPerCampus(organizationId).forEach(row -> masterCounts.put((Long)row[0], (Long)row[1]));
+
+            // Pre-populate with all campuses in the organization
+            campusRepository.findByInstituteId(organizationId).forEach(c -> {
+                long masterCount = masterCounts.getOrDefault(c.getId(), 0L);
+                summaryMap.put(c.getId(), AttendanceSummaryDTO.builder()
+                        .id(c.getId())
+                        .name(c.getCampusName())
+                        .totalCount(masterCount)
+                        .attendancePercentage(0.0)
+                        .build());
+            });
+            statsData = attendanceRepository.getCampusLevelStats(organizationId, start, end);
         }
 
+        // 2. Merge attendance stats into the structure
         long grandPresent = 0, grandAbsent = 0, grandLeave = 0;
 
         for (Object[] row : statsData) {
             Long id = (Long) row[0];
             StudentAttendanceEntity.AttendanceStatus status = (StudentAttendanceEntity.AttendanceStatus) row[1];
             long count = (Long) row[2];
-
-            AttendanceSummaryDTO summary = summaryMap.computeIfAbsent(id, k -> AttendanceSummaryDTO.builder().id(k).name("ID: " + k).build());
+            
+            AttendanceSummaryDTO summary = summaryMap.get(id);
+            if (summary == null) continue; // Should not happen with pre-population
             
             if (status == StudentAttendanceEntity.AttendanceStatus.PRESENT) {
-                summary.setPresentCount(count);
+                summary.setPresentCount(summary.getPresentCount() + count);
                 grandPresent += count;
             } else if (status == StudentAttendanceEntity.AttendanceStatus.ABSENT) {
-                summary.setAbsentCount(count);
+                summary.setAbsentCount(summary.getAbsentCount() + count);
                 grandAbsent += count;
             } else if (status == StudentAttendanceEntity.AttendanceStatus.LEAVE) {
-                summary.setLeaveCount(count);
+                summary.setLeaveCount(summary.getLeaveCount() + count);
                 grandLeave += count;
-            }
-            
-            summary.setTotalCount(summary.getPresentCount() + summary.getAbsentCount() + summary.getLeaveCount());
-            if (summary.getTotalCount() > 0) {
-                summary.setAttendancePercentage((double) summary.getPresentCount() / summary.getTotalCount() * 100);
             }
         }
 
+        // 3. Final calculations for each summary row
+        for (AttendanceSummaryDTO summary : summaryMap.values()) {
+            // Percentages are calculated on: Present / Total Enrollment
+            // Unless Total Enrollment is 0, then we can't calculate.
+            if (summary.getTotalCount() > 0) {
+                summary.setAttendancePercentage((double) summary.getPresentCount() / (summary.getTotalCount() * Math.max(1, start.until(end).getDays() + 1)) * 100);
+            }
+        }
+
+        // 4. Final calculations for the overall report
         report.setTotalPresent(grandPresent);
         report.setTotalAbsent(grandAbsent);
         report.setTotalLeave(grandLeave);
-        report.setTotalStudents(grandPresent + grandAbsent + grandLeave);
+        // totalStudents is already set from Master table
         
-        if (report.getTotalStudents() > 0) {
-            report.setPresentPercentage((double) grandPresent / report.getTotalStudents() * 100);
-            report.setAbsentPercentage((double) grandAbsent / report.getTotalStudents() * 100);
-            report.setLeavePercentage((double) grandLeave / report.getTotalStudents() * 100);
+        long totalDays = start.until(end).getDays() + 1;
+        long adjustedTotal = report.getTotalStudents() * totalDays;
+
+        if (adjustedTotal > 0) {
+            report.setPresentPercentage((double) grandPresent / adjustedTotal * 100);
+            report.setAbsentPercentage((double) grandAbsent / adjustedTotal * 100);
+            report.setLeavePercentage((double) grandLeave / adjustedTotal * 100);
         }
 
         report.setDetails(new ArrayList<>(summaryMap.values()));
+        // Sort details by name for a cleaner report
+        report.getDetails().sort(Comparator.comparing(AttendanceSummaryDTO::getName));
+        
         return report;
     }
 

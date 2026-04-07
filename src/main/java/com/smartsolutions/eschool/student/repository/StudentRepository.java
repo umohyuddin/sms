@@ -135,6 +135,15 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
             @Param("keyword") String keyword,
             @Param("organizationId") Long organizationId
     );
+    
+    @Query("SELECT s.campus.id, COUNT(s) FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.deleted = false GROUP BY s.campus.id")
+    List<Object[]> countStudentsPerCampus(@Param("organizationId") Long organizationId);
+
+    @Query("SELECT s.standard.id, COUNT(s) FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.campus.id = :campusId AND s.deleted = false GROUP BY s.standard.id")
+    List<Object[]> countStudentsPerStandard(@Param("organizationId") Long organizationId, @Param("campusId") Long campusId);
+
+    @Query("SELECT s.section.id, COUNT(s) FROM StudentEntity s WHERE s.organizationId = :organizationId AND s.standard.id = :standardId AND s.deleted = false GROUP BY s.section.id")
+    List<Object[]> countStudentsPerSection(@Param("organizationId") Long organizationId, @Param("standardId") Long standardId);
 
     @Modifying
     @Transactional
