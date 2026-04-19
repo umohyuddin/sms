@@ -14,19 +14,19 @@ import java.util.Optional;
 @Repository
 public interface GuardianRepository extends JpaRepository<GuardianEntity, Long> {
 
-    @Query("SELECT g FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.deleted = false")
+    @Query("SELECT g FROM GuardianEntity g WHERE g.organizationId = :organizationId")
     List<GuardianEntity> findAllByOrganizationId(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT g FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.isActive = true AND g.deleted = false")
+    @Query("SELECT g FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.isActive = true")
     List<GuardianEntity> findAllByOrganizationIdAndIsActiveTrue(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT g FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.isActive = false AND g.deleted = false")
+    @Query("SELECT g FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.isActive = false")
     List<GuardianEntity> findAllByOrganizationIdAndIsActiveFalse(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT g FROM GuardianEntity g WHERE g.id = :id AND g.organizationId = :organizationId AND g.deleted = false")
+    @Query("SELECT g FROM GuardianEntity g WHERE g.id = :id AND g.organizationId = :organizationId")
     Optional<GuardianEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
-    @Query("SELECT g FROM GuardianEntity g WHERE (g.fullName LIKE %:keyword% OR g.cnic LIKE %:keyword% OR g.phone LIKE %:keyword%) AND g.organizationId = :organizationId AND g.deleted = false")
+    @Query("SELECT g FROM GuardianEntity g WHERE (g.fullName LIKE %:keyword% OR g.cnic LIKE %:keyword% OR g.phone LIKE %:keyword%) AND g.organizationId = :organizationId")
     List<GuardianEntity> searchByKeywordAndOrganizationId(@Param("keyword") String keyword, @Param("organizationId") Long organizationId);
 
     @Modifying
@@ -35,18 +35,18 @@ public interface GuardianRepository extends JpaRepository<GuardianEntity, Long> 
             + "WHERE g.id = :id AND g.organizationId = :organizationId")
     int softDeleteByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
-    @Query("SELECT COUNT(g) FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.deleted = false")
+    @Query("SELECT COUNT(g) FROM GuardianEntity g WHERE g.organizationId = :organizationId")
     Long countByOrganizationId(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT COUNT(g) FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.isActive = true AND g.deleted = false")
+    @Query("SELECT COUNT(g) FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.isActive = true")
     Long countByOrganizationIdAndIsActiveTrue(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT COUNT(g) FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.isActive = false AND g.deleted = false")
+    @Query("SELECT COUNT(g) FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.isActive = false")
     Long countByOrganizationIdAndIsActiveFalse(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT (COUNT(g) > 0) FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.cnic = :cnic AND g.deleted = false")
+    @Query("SELECT (COUNT(g) > 0) FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.cnic = :cnic")
     boolean existsByOrganizationIdAndCnic(@Param("organizationId") Long organizationId, @Param("cnic") String cnic);
 
-    @Query("SELECT (COUNT(g) > 0) FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.cnic = :cnic AND g.id <> :id AND g.deleted = false")
+    @Query("SELECT (COUNT(g) > 0) FROM GuardianEntity g WHERE g.organizationId = :organizationId AND g.cnic = :cnic AND g.id <> :id")
     boolean existsByOrganizationIdAndCnicAndIdNot(@Param("organizationId") Long organizationId, @Param("cnic") String cnic, @Param("id") Long id);
 }

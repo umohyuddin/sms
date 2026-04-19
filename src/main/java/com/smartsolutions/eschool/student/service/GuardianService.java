@@ -124,7 +124,6 @@ public class GuardianService {
         }
 
         GuardianEntity entity = GuardianMapper.toEntity(requestDTO);
-
         GuardianEntity saved = guardianRepository.save(entity);
 
         // Save student-guardian mapping if studentId is provided
@@ -137,12 +136,12 @@ public class GuardianService {
                 mapping.setCampusId(requestDTO.getCampusId());
                 mapping.setStudentId(requestDTO.getStudentId());
                 mapping.setGuardianId(saved.getId());
-                mapping.setIsPrimary(false); // Default to false, can be updated later
+                mapping.setIsPrimary(false);
                 mapping.setIsEmergencyContact(false);
                 mapping.setStatus("ACTIVE");
                 mapping.setDeleted(false);
                 studentGuardianRepository.save(mapping);
-                log.info("[Service:GuardianService] Student-guardian mapping created for student {} and guardian {}", requestDTO.getStudentId(), saved.getId());
+                log.info("[Service:GuardianService] createGuardian() - Student-guardian mapping created for student {} and guardian {}", requestDTO.getStudentId(), saved.getId());
             }
         }
 
@@ -168,7 +167,6 @@ public class GuardianService {
         }
 
         GuardianMapper.updateEntityFromDTO(existing, requestDTO);
-
         GuardianEntity updated = guardianRepository.save(existing);
 
         log.info("[Service:GuardianService] updateGuardian() succeeded - id: {}", id);

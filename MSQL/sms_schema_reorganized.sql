@@ -1075,12 +1075,14 @@ CREATE TABLE guardian_relations (
     created_by BIGINT,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     updated_by BIGINT,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
     deleted_at DATETIME,
     deleted_by BIGINT,
 
     -- Constraints
     CONSTRAINT uk_relation_code_org UNIQUE (organization_id, code),
-    CONSTRAINT uk_relation_name_org UNIQUE (organization_id, name)
+    CONSTRAINT uk_relation_name_org UNIQUE (organization_id, name),
+    CONSTRAINT chk_relation_deleted CHECK (deleted IN (0, 1))
 );
 
 -- Indexes (aligned with your style)
@@ -1122,11 +1124,13 @@ CREATE TABLE guardians (
     created_by BIGINT,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     updated_by BIGINT,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
     deleted_at DATETIME,
     deleted_by BIGINT,
 
     -- Constraints
-    CONSTRAINT uk_guardian_cnic_org UNIQUE (organization_id, cnic)
+    CONSTRAINT uk_guardian_cnic_org UNIQUE (organization_id, cnic),
+    CONSTRAINT chk_guardian_deleted CHECK (deleted IN (0, 1))
 );
 
     DROP TABLE IF EXISTS students;
@@ -1202,11 +1206,13 @@ CREATE TABLE student_guardians (
     created_by BIGINT,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     updated_by BIGINT,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
     deleted_at DATETIME,
     deleted_by BIGINT,
 
     -- Constraints
-    CONSTRAINT uk_student_guardian UNIQUE (organization_id, student_id, guardian_id)
+    CONSTRAINT uk_student_guardian UNIQUE (organization_id, student_id, guardian_id),
+    CONSTRAINT chk_student_guardian_deleted CHECK (deleted IN (0, 1))
 );
 
 
