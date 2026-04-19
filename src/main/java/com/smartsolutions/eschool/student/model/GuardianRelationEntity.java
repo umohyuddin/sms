@@ -6,9 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "guardian_relations")
+@SQLDelete(sql = "UPDATE guardian_relations SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,6 +20,7 @@ import lombok.Setter;
 public class GuardianRelationEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "code", nullable = false, length = 20)
