@@ -4,6 +4,14 @@ import com.smartsolutions.eschool.student.dtos.attendance.AttendanceReportDTO;
 import com.smartsolutions.eschool.student.dtos.attendance.StudentAttendanceRequestDTO;
 import com.smartsolutions.eschool.student.dtos.attendance.StudentAttendanceResponseDTO;
 import com.smartsolutions.eschool.student.facade.StudentAttendanceFacade;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.smartsolutions.eschool.global.error.ErrorResponse;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +31,7 @@ import java.util.Map;
 @RequestMapping({"/api/students/attendance", "/api/students/attendance/"})
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Student Attendance", description = "Endpoints for marking, searching, and generating statistics for student attendance.")
 public class StudentAttendanceController {
 
     private final StudentAttendanceFacade attendanceFacade;
@@ -49,13 +60,20 @@ public class StudentAttendanceController {
      *   - Note: The "Roll Call" (auto-populating the student list) is disabled for campus-wide searches for performance reasons.
      *   - Roll Call: Only triggers when you narrow down to a specific **sectionId**.
      */
+    @Operation(summary = "Search attendance", description = "Search for attendance records or perform a roll call for a specific section on a date.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved attendance list",
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = StudentAttendanceResponseDTO.class)))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StudentAttendanceResponseDTO>> search(
-            @RequestParam(required = false) Long campusId,
-            @RequestParam(required = false) Long standardId,
-            @RequestParam(required = false) Long sectionId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false) String keyword) {
+            @Parameter(description = "ID of the campus", example = "1") @RequestParam(required = false) Long campusId,
+            @Parameter(description = "ID of the academic standard", example = "5") @RequestParam(required = false) Long standardId,
+            @Parameter(description = "ID of the section (Required for roll call)", example = "1") @RequestParam(required = false) Long sectionId,
+            @Parameter(description = "Date for attendance", example = "2024-04-19") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @Parameter(description = "Keyword for student name search", example = "Arslan") @RequestParam(required = false) String keyword) {
         log.info("[Controller:StudentAttendanceController] search() called - campusId={}, date={}, keyword={}", campusId, date, keyword);
         List<StudentAttendanceResponseDTO> list = attendanceFacade.search(campusId, standardId, sectionId, date, keyword);
         log.info("[Controller:StudentAttendanceController] search() succeeded - Found {} records", list.size());
@@ -70,6 +88,15 @@ public class StudentAttendanceController {
         return ResponseEntity.ok(responseDTO);
     }
 
+    @Operation(summary = "Mark attendance (Single or Batch)", description = "Mark attendance for one or more students. Accepts either a single object or a JSON array.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Attendance marked successfully",
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = StudentAttendanceResponseDTO.class)))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> create(@RequestBody Object request) {
         if (request instanceof List) {
@@ -102,9 +129,16 @@ public class StudentAttendanceController {
         return ResponseEntity.ok(Map.of("message", "Attendance record deleted successfully"));
     }
 
+    @Operation(summary = "Get overall statistics", description = "Retrieve summary counts of Present, Absent, and Leave statuses for a specific date.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved statistics",
+                    content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"PRESENT\": 150, \"ABSENT\": 10, \"LEAVE\": 5}"))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping(value = "/statistics", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Long>> getStatistics(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @Parameter(description = "Target date for statistics (defaults to today)", example = "2024-04-19") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         log.info("[Controller:StudentAttendanceController] getStatistics() called");
         Map<String, Long> statistics = attendanceFacade.getStatistics(date);
         log.info("[Controller:StudentAttendanceController] getStatistics() succeeded");
@@ -123,13 +157,20 @@ public class StudentAttendanceController {
      * 
      * Full Structure: The report pre-populates all sub-levels even with zero counts.
      */
+    @Operation(summary = "Get detailed report", description = "Generate a hierarchical attendance report (Campus -> Standard -> Section -> Student).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved detailed report",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AttendanceReportDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping(value = "/report", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AttendanceReportDTO> getDetailedReport(
-            @RequestParam(required = false) Long campusId,
-            @RequestParam(required = false) Long standardId,
-            @RequestParam(required = false) Long sectionId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @Parameter(description = "ID of the campus", example = "1") @RequestParam(required = false) Long campusId,
+            @Parameter(description = "ID of the academic standard", example = "5") @RequestParam(required = false) Long standardId,
+            @Parameter(description = "ID of the section", example = "1") @RequestParam(required = false) Long sectionId,
+            @Parameter(description = "Report start date", example = "2024-04-01") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @Parameter(description = "Report end date", example = "2024-04-30") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         log.info("[Controller:StudentAttendanceController] getDetailedReport() called - campusId={}, standardId={}, sectionId={}, range=[{} to {}]", 
                 campusId, standardId, sectionId, startDate, endDate);
         AttendanceReportDTO report = attendanceFacade.getDetailedReport(campusId, standardId, sectionId, startDate, endDate);

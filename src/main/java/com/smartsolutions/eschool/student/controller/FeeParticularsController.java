@@ -5,11 +5,19 @@ import com.smartsolutions.eschool.student.facade.FeeParticularsFacade;
 import com.smartsolutions.eschool.student.model.FeeParticularsEntity;
 import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
 import com.smartsolutions.eschool.util.ResourceObject;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import com.smartsolutions.eschool.global.error.ErrorResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +27,7 @@ import java.util.stream.Collectors;
 @Transactional
 @RestController
 @RequestMapping("/api/student/feeparticulars")
+@Tag(name = "Fee Management - Particulars (Legacy)", description = "Endpoints for managing legacy fee particulars and itemized charges.")
 public class FeeParticularsController {
 
     private FeeParticularsFacade nFeeParticularsFacade;
@@ -29,7 +38,12 @@ public class FeeParticularsController {
         this.objectMapper = objectMapper;
     }
 
-    //  get all employee
+    @Operation(summary = "Get all fee particulars", description = "Retrieve all itemized fee particulars.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved particulars"),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping(value = "/getall", produces = MediaType.APPLICATION_JSON_VALUE)
     public MultiResourceSuccessResponseObject getAll() throws Exception {
         return new MultiResourceSuccessResponseObject(

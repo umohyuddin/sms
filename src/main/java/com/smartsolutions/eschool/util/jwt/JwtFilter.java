@@ -68,7 +68,7 @@ public class JwtFilter extends OncePerRequestFilter {
             log.info("Request Receive at filter \n authHeader - [{}],\n requestURL - [{}],\n requestURI - [{}],\n requestMethod - [{}],\n scheme - [{}],\n serverName - [{}],\n serverPort - [{}],\n contextPath - [{}],\n baseFQDN - [{}]", authHeader, requestURL, requestURI, requestMethod, scheme, serverName, serverPort, contextPath, baseFQDN);
             String path = request.getRequestURI();
             // skip public APIs
-            if (path.equals("/api/auth/generateToken") || path.startsWith("/swagger-ui") || path.startsWith("/api/institute/employees/profile-photos")|| path.contains("/profile-photos/")) {
+            if (path.equals("/api/auth/generateToken") || path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.startsWith("/api/institute/employees/profile-photos")|| path.contains("/profile-photos/")) {
                 chain.doFilter(request, response);
                 return;
             }

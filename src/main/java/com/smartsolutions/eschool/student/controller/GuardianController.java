@@ -5,10 +5,19 @@ import com.smartsolutions.eschool.student.dtos.guardian.requestDto.GuardianCreat
 import com.smartsolutions.eschool.student.facade.GuardianFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.smartsolutions.eschool.global.error.ErrorResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/guardians")
 @Slf4j
+@Tag(name = "Guardian Management", description = "Endpoints for managing student guardians and their personal/contact information.")
 public class GuardianController {
 
     private final GuardianFacade guardianFacade;
@@ -24,6 +34,11 @@ public class GuardianController {
         this.guardianFacade = guardianFacade;
     }
 
+    @Operation(summary = "Get all guardians", description = "Retrieve a list of all guardians registered in the system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List retrieved successfully",
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = GuardianResponseDTO.class))))
+    })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GuardianResponseDTO>> getAll() {
         log.info("[Controller:GuardianController] getAll() called - Request to get all guardians");
@@ -48,8 +63,16 @@ public class GuardianController {
         return ResponseEntity.ok(resources);
     }
 
+    @Operation(summary = "Get guardian by ID", description = "Fetch detailed information for a specific guardian.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Guardian found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GuardianResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Guardian not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GuardianResponseDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<GuardianResponseDTO> getById(
+            @Parameter(description = "ID of the guardian", example = "1") @PathVariable Long id) {
         log.info("[Controller:GuardianController] getById() called - Request to fetch guardian with id: {}", id);
         GuardianResponseDTO guardian = guardianFacade.getById(id);
         log.info("[Controller:GuardianController] getById() succeeded - Found guardian: {}", id);
@@ -75,6 +98,13 @@ public class GuardianController {
         return ResponseEntity.ok(Map.of("message", "Guardian deleted successfully"));
     }
 
+    @Operation(summary = "Create guardian", description = "Register a new guardian in the system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Guardian created successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GuardianResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid data provided",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GuardianResponseDTO> create(@Valid @RequestBody GuardianCreateRequestDTO requestDTO) {
         log.info("[Controller:GuardianController] create() called - Request to create guardian: {}", requestDTO.getFullName());

@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.auth.dtos.auth.requestDto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,22 +14,28 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Request object for student self-registration")
 public class StudentRegistrationRequestDTO {
     
     @NotNull(message = "Student ID is required")
+    @Schema(description = "Existing student ID associated with the user", example = "500")
     private Long studentId;
     
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
+    @Schema(description = "User's official email address", example = "student@smartsolutions.com")
     private String email;
     
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    @Schema(description = "Desired login username", example = "s.smith")
     private String username;
     
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
+    @Schema(description = "Secure password for the account", example = "StudentPass@123")
     private String password;
     
+    @Schema(description = "User's contact phone number", example = "+923119988776")
     private String phone;
 }

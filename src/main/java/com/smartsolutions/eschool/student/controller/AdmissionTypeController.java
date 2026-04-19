@@ -5,10 +5,19 @@ import com.smartsolutions.eschool.student.dtos.admissionType.requestDto.Admissio
 import com.smartsolutions.eschool.student.facade.AdmissionTypeFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.smartsolutions.eschool.global.error.ErrorResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admission/types")
 @Slf4j
+@Tag(name = "Admission Types", description = "Endpoints for managing student admission types (New, Transfer, etc.)")
 public class AdmissionTypeController {
 
     private final AdmissionTypeFacade admissionTypeFacade;
@@ -24,6 +34,11 @@ public class AdmissionTypeController {
         this.admissionTypeFacade = admissionTypeFacade;
     }
 
+    @Operation(summary = "Get all admission types", description = "Retrieve a list of all admission categories.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List retrieved successfully",
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = AdmissionTypeResponseDTO.class))))
+    })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<AdmissionTypeResponseDTO>> getAll() {
         log.info("[Controller:AdmissionTypeController] getAll() called - Request to get all admission types");
@@ -33,8 +48,16 @@ public class AdmissionTypeController {
         return ResponseEntity.ok(resources);
     }
 
+    @Operation(summary = "Get admission type by ID", description = "Fetch details of a specific admission category.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AdmissionTypeResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Admission type not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdmissionTypeResponseDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<AdmissionTypeResponseDTO> getById(
+            @Parameter(description = "ID of the admission type", example = "1") @PathVariable Long id) {
         log.info("[Controller:AdmissionTypeController] getById() called - Request to fetch admission type with id: {}",
                 id);
         AdmissionTypeResponseDTO admissionType = admissionTypeFacade.getById(id);

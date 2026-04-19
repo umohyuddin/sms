@@ -5,6 +5,13 @@ import com.smartsolutions.eschool.student.dtos.guardianRelation.requestDto.Guard
 import com.smartsolutions.eschool.student.facade.GuardianRelationFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/guardian/relation")
 @Slf4j
+@Tag(name = "Guardian Relationships", description = "Manage guardian relationship types (Father, Mother, Uncle, etc.)")
 public class GuardianRelationController {
 
     private final GuardianRelationFacade guardianRelationFacade;
@@ -24,6 +32,11 @@ public class GuardianRelationController {
         this.guardianRelationFacade = guardianRelationFacade;
     }
 
+    @Operation(summary = "Get all relations", description = "Retrieve a list of all guardian relationship types.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list",
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = GuardianRelationResponseDTO.class))))
+    })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GuardianRelationResponseDTO>> getAll() {
         log.info("[Controller:GuardianRelationController] getAll() called - Request to get all guardian relations");
