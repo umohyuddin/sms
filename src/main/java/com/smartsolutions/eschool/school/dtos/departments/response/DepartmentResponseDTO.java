@@ -1,7 +1,12 @@
 package com.smartsolutions.eschool.school.dtos.departments.response;
 
-import com.smartsolutions.eschool.school.model.DepartmentEntity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -28,14 +33,8 @@ public class DepartmentResponseDTO {
     private Boolean active;
     private Boolean deleted;
     private Long organizationId;
-    private java.time.LocalDateTime createdAt;
-    private java.time.LocalDateTime updatedAt;
-    public static DepartmentResponseDTO fromEntity(DepartmentEntity entity) {
-        if (entity == null) return null;
-        return DepartmentResponseDTO.builder()
-                .id(entity.getId())
-                .departmentName(entity.getDepartmentName())
-                .build();
-    }
-
+    private Long campusId;
+    private String campusName;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

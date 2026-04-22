@@ -26,4 +26,15 @@ EmployeeDesignationHistoryRepository extends JpaRepository<EmployeeDesignationHi
 
 
     List<EmployeeDesignationHistoryEntity> findByEmployee_IdOrderByStartDateDesc(Long employeeId);
+
+    @Query("""
+        SELECT h.designation.id as designationId, 
+               h.designation.designationName as designationName, 
+               COUNT(h.employee.id) as totalEmployees
+        FROM EmployeeDesignationHistoryEntity h
+        WHERE h.isCurrent = true 
+          AND h.designation.organizationId = :organizationId
+        GROUP BY h.designation.id, h.designation.designationName
+    """)
+    List<com.smartsolutions.eschool.school.dtos.designations.response.DesignationCountDTO> getStaffCountByDesignation(@Param("organizationId") Long organizationId);
 }

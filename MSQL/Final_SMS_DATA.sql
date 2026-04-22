@@ -4,6 +4,112 @@ VALUES
 ('Academic Year 2025-2026', 'AY2025', '2025-04-01', '2026-03-31', 12, TRUE, 'ACTIVE', 1);
 
 
+-- =========================
+-- 1. Leadership
+-- =========================
+INSERT INTO designations (organization_id, designation_code, designation_name, description, active, deleted, created_at)
+VALUES
+(1, 'PRINCIPAL', 'Principal', 'Leads the campus and oversees academic and administrative operations', true, false, NOW()),
+(1, 'VICE_PRINCIPAL', 'Vice Principal', 'Supports the principal in managing academic and discipline functions', true, false, NOW()),
+(1, 'HEADMASTER', 'Headmaster / Headmistress', 'Senior school authority responsible for overall school management', true, false, NOW()),
+(1, 'CAMPUS_DIRECTOR', 'Campus Director', 'Responsible for strategic and operational management of a campus', true, false, NOW()),
+(1, 'ACADEMIC_DIRECTOR', 'Academic Director', 'Oversees curriculum, teaching quality, and academic planning', true, false, NOW()),
+(1, 'OPERATIONS_MANAGER', 'Operations Manager', 'Manages day-to-day operational activities of the school', true, false, NOW()),
+(1, 'ADMINISTRATOR', 'Administrator', 'Handles overall administrative control and coordination', true, false, NOW());
+
+-- =========================
+-- 2. Teaching Staff
+-- =========================
+INSERT INTO designations VALUES
+(NULL,1,'TEACHER','Teacher','Delivers subject teaching and manages classroom activities',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'SENIOR_TEACHER','Senior Teacher','Experienced teacher with additional academic responsibilities',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'JUNIOR_TEACHER','Junior Teacher','Entry-level teacher supporting classroom instruction',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'SUBJECT_TEACHER','Subject Teacher','Specialized teacher for a specific subject area',true,false,NOW(),NULL,NULL,NULL,NULL,NULL);
+
+-- =========================
+-- 3. Specialized Teaching
+-- =========================
+INSERT INTO designations VALUES
+(NULL,1,'MONTESSORI_TEACHER','Montessori Teacher','Handles early childhood education using Montessori methods',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'KG_TEACHER','Kindergarten Teacher','Responsible for foundational early learning education',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'ART_TEACHER','Art Teacher','Teaches drawing, painting, and creative arts',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'MUSIC_TEACHER','Music Teacher','Teaches music theory and performance skills',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'PE_TEACHER','Physical Education Teacher','Conducts sports and physical fitness training',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'ISLAMIC_STUDIES_TEACHER','Islamic Studies Teacher','Teaches Quran and Islamic education',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'LAB_INSTRUCTOR','Lab Instructor','Supervises lab sessions and practical experiments',true,false,NOW(),NULL,NULL,NULL,NULL,NULL);
+
+-- =========================
+-- 4. Academic Support
+-- =========================
+INSERT INTO designations VALUES
+(NULL,1,'TEACHING_ASSISTANT','Teaching Assistant','Supports teachers in classroom activities',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'LAB_ASSISTANT','Lab Assistant','Assists in lab setup and maintenance',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'LIBRARIAN','Librarian','Manages library resources and student access',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'ASSISTANT_LIBRARIAN','Assistant Librarian','Supports library operations',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'ACADEMIC_COORDINATOR','Academic Coordinator','Coordinates academic schedules and planning',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'CURRICULUM_DEVELOPER','Curriculum Developer','Designs and improves educational curriculum',true,false,NOW(),NULL,NULL,NULL,NULL,NULL);
+
+-- =========================
+-- 5. Admin Staff
+-- =========================
+INSERT INTO designations VALUES
+(NULL,1,'OFFICE_MANAGER','Office Manager','Manages office operations and documentation',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'ADMIN_OFFICER','Admin Officer','Handles administrative tasks and coordination',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'RECEPTIONIST','Receptionist','Manages front desk and visitor interactions',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'HR_OFFICER','HR Officer','Manages recruitment and HR operations',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'HR_MANAGER','HR Manager','Leads HR policies and employee lifecycle',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'ACCOUNTS_OFFICER','Accounts Officer','Maintains financial records and transactions',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'FINANCE_MANAGER','Finance Manager','Handles budgeting and financial planning',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'DATA_ENTRY_OPERATOR','Data Entry Operator','Maintains system data and records',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'RECORD_KEEPER','Record Keeper','Maintains official documentation and archives',true,false,NOW(),NULL,NULL,NULL,NULL,NULL);
+
+-- =========================
+-- 6. Support Staff
+-- =========================
+INSERT INTO designations VALUES
+(NULL,1,'DRIVER','Driver','Provides transportation services',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'BUS_ATTENDANT','Bus Attendant','Ensures student safety during transport',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'SECURITY_GUARD','Security Guard','Ensures campus safety and security',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'WATCHMAN','Watchman','Monitors premises during off hours',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'CLEANER','Cleaner','Maintains cleanliness of facilities',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'MAINTENANCE_STAFF','Maintenance Staff','Handles general maintenance tasks',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'ELECTRICIAN','Electrician','Handles electrical systems and repairs',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'PLUMBER','Plumber','Handles plumbing maintenance',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'CANTEEN_MANAGER','Canteen Manager','Manages cafeteria operations',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'COOK','Cook','Prepares meals for students and staff',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'KITCHEN_STAFF','Kitchen Staff','Assists in kitchen operations',true,false,NOW(),NULL,NULL,NULL,NULL,NULL);
+
+-- =========================
+-- 7. Exams
+-- =========================
+INSERT INTO designations VALUES
+(NULL,1,'EXAM_CONTROLLER','Exam Controller','Manages exam planning and execution',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'EXAM_COORDINATOR','Exam Coordinator','Coordinates exam schedules',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'EVALUATOR','Evaluator','Checks and grades exam papers',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'INVIGILATOR','Invigilator','Supervises students during exams',true,false,NOW(),NULL,NULL,NULL,NULL,NULL);
+
+-- =========================
+-- 8. Coordination Roles
+-- =========================
+INSERT INTO designations VALUES
+(NULL,1,'DISCIPLINE_INCHARGE','Discipline Incharge','Ensures student discipline and behavior management',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'GRADE_COORDINATOR','Grade Coordinator','Coordinates activities of a specific grade',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'SECTION_HEAD','Section Head','Manages a section or group of classes',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'HOD','Head of Department','Leads a department academically and administratively',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'SUBJECT_COORDINATOR','Subject Coordinator','Coordinates subject curriculum and teachers',true,false,NOW(),NULL,NULL,NULL,NULL,NULL);
+
+-- =========================
+-- 9. Organization Level
+-- =========================
+INSERT INTO designations VALUES
+(NULL,1,'CEO','CEO / Founder','Top-level executive managing organization strategy',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'DIRECTOR_GENERAL','Director General','Oversees multiple campuses and operations',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'CAO','Chief Academic Officer','Leads academic strategy across organization',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'COO','Chief Operating Officer','Handles operations across campuses',true,false,NOW(),NULL,NULL,NULL,NULL,NULL),
+(NULL,1,'REGIONAL_MANAGER','Regional Manager','Manages campuses within a region',true,false,NOW(),NULL,NULL,NULL,NULL,NULL);
+
+
+
 
 INSERT INTO guardian_relations 
 (organization_id, name, code, description, status, is_default)

@@ -1548,7 +1548,8 @@ CREATE TABLE student_guardians (
     CREATE TABLE departments (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
         organization_id BIGINT NOT NULL,
-        department_code VARCHAR(50) NOT NULL UNIQUE,
+        campus_id BIGINT NOT NULL,
+        department_code VARCHAR(50) NOT NULL,
         department_name VARCHAR(150) NOT NULL,
         description VARCHAR(255),
         parent_id BIGINT NULL,
@@ -1561,9 +1562,14 @@ CREATE TABLE student_guardians (
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
+        CONSTRAINT uk_department_org_campus_code UNIQUE (organization_id, campus_id, department_code),
+        CONSTRAINT fk_department_campus FOREIGN KEY (campus_id) REFERENCES campuses(id),
         CONSTRAINT fk_department_parent FOREIGN KEY (parent_id) REFERENCES departments(id),
         CONSTRAINT fk_department_head FOREIGN KEY (head_employee_id) REFERENCES employee_master(id)
     );
+    CREATE INDEX idx_departments_campus_id ON departments (campus_id);
+    CREATE INDEX idx_departments_parent_id ON departments (parent_id);
+    CREATE INDEX idx_departments_head_employee_id ON departments (head_employee_id);
 
     DROP TABLE IF EXISTS employee_department_history;
     CREATE TABLE employee_department_history (
@@ -1591,11 +1597,9 @@ CREATE TABLE student_guardians (
     CREATE TABLE designations (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
         organization_id BIGINT NOT NULL,
-        designation_code VARCHAR(50) NOT NULL UNIQUE,
+        designation_code VARCHAR(50) NOT NULL,
         designation_name VARCHAR(150) NOT NULL,
         description VARCHAR(255),
-        employee_type_id BIGINT NOT NULL,
-        department_id BIGINT NULL,
         active BOOLEAN NOT NULL DEFAULT TRUE,
         deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME,
@@ -1604,11 +1608,8 @@ CREATE TABLE student_guardians (
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        CONSTRAINT fk_designation_employee_type FOREIGN KEY (employee_type_id) REFERENCES employee_type(id),
-        CONSTRAINT fk_designation_department FOREIGN KEY (department_id) REFERENCES departments(id)
+        CONSTRAINT uk_designation_org_code UNIQUE (organization_id, designation_code)
     );
-    CREATE INDEX idx_designations_employee_type_id ON designations (employee_type_id);
-    CREATE INDEX idx_designations_department_id ON designations (department_id);
 
     DROP TABLE IF EXISTS employee_designation_history;
     CREATE TABLE employee_designation_history (

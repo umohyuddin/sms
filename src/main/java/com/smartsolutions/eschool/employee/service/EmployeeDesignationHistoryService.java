@@ -66,31 +66,6 @@ public class EmployeeDesignationHistoryService {
         newAssignment.setIsCurrent(true);
         EmployeeDesignationHistoryEntity savedAssignment = repository.save(newAssignment);
 
-        // 6️⃣ Assign employee type automatically from designation
-        EmployeeTypeEntity employeeType = designation.getEmployeeType();
-        if (employeeType != null) {
-
-            // 6a️⃣ End previous current type
-            employeeTypeHistoryRepository.findByEmployeeIdAndIsCurrentTrue(employee.getId())
-                    .ifPresent(prevType -> {
-                        prevType.setEndDate(now);
-                        prevType.setIsCurrent(false);
-                        employeeTypeHistoryRepository.save(prevType);
-                    });
-
-            // 6b️⃣ Create new type history
-            EmployeeTypeHistoryEntity typeHistory = new EmployeeTypeHistoryEntity();
-            typeHistory.setEmployee(employee);
-            typeHistory.setEmployeeType(employeeType);
-            typeHistory.setStartDate(now);
-            typeHistory.setIsCurrent(true);
-            employeeTypeHistoryRepository.save(typeHistory);
-
-            // 6c️⃣ Update employee master
-            employee.setEmployeeType(employeeType);
-            employeeMasterRepository.save(employee);
-        }
-
         // 7️⃣ Build response DTO
         EmployeeDesignationHistoryResponseDTO response = new EmployeeDesignationHistoryResponseDTO();
         response.setId(savedAssignment.getId());

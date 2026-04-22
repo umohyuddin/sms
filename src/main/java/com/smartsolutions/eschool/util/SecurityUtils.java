@@ -17,6 +17,15 @@ public class SecurityUtils {
         return null;
     }
 
+    public static Long getCurrentCampusId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImp) {
+            UserDetailsImp userDetails = (UserDetailsImp) authentication.getPrincipal();
+            return userDetails.getCampusId();
+        }
+        return null;
+    }
+
     public static Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImp) {

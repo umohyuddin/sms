@@ -15,15 +15,6 @@ public class DesignationResponseDTO {
     private String designationCode;
     private String designationName;
     private String description;
-
-    // Optional nested department info
-    private Long departmentId;
-    private String departmentName;
-
-    // Employee Type info
-    private Long employeeTypeId;
-    private String employeeTypeName;
-
     private Boolean active;
     private Boolean deleted;
 
@@ -31,7 +22,11 @@ public class DesignationResponseDTO {
         if (entity == null) return null;
         return DesignationResponseDTO.builder()
                 .id(entity.getId())
+                .designationCode(entity.getDesignationCode())
                 .designationName(entity.getDesignationName())
+                .description(entity.getDescription())
+                .active(entity.getActive())
+                .deleted(entity.getDeleted())
                 .build();
     }
 }

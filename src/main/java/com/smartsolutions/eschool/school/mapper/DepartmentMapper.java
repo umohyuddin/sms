@@ -66,6 +66,11 @@ public class DepartmentMapper {
             dto.setHeadEmployeeName(entity.getHeadEmployee().getFullName());
         }
 
+        if (entity.getCampus() != null) {
+            dto.setCampusId(entity.getCampus().getId());
+            dto.setCampusName(entity.getCampus().getCampusName());
+        }
+
         dto.setDeleted(entity.getDeleted());
         dto.setOrganizationId(entity.getOrganizationId());
         dto.setCreatedAt(entity.getCreatedAt());

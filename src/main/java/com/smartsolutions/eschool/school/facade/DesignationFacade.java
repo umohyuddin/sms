@@ -1,11 +1,9 @@
 package com.smartsolutions.eschool.school.facade;
 
 import com.smartsolutions.eschool.school.dtos.designations.request.DesignationRequestDTO;
+import com.smartsolutions.eschool.school.dtos.designations.response.DesignationCountDTO;
 import com.smartsolutions.eschool.school.dtos.designations.response.DesignationResponseDTO;
-import com.smartsolutions.eschool.school.dtos.discountType.requestDto.DiscountTypeRequestDTO;
-import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.service.DesignationService;
-import com.smartsolutions.eschool.school.service.DiscountTypeService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
@@ -24,51 +22,55 @@ public class DesignationFacade {
     }
 
     public DesignationResponseDTO createDesignation(@Valid DesignationRequestDTO requestDTO) {
-        log.info("Facade: Request to create Designation: {}", requestDTO.getDesignationName());
+        log.info("[Facade:DesignationFacade] createDesignation() called - name: {}", requestDTO.getDesignationName());
         DesignationResponseDTO result = designationService.createDesignation(requestDTO);
-        log.info("Facade: Designation created successfully with ID: {}", result.getId());
+        log.info("[Facade:DesignationFacade] createDesignation() succeeded - created ID: {}", result.getId());
         return result;
     }
 
     public DesignationResponseDTO getById(Long designationId) {
-        log.info("Facade: Request to fetch Designation ID: {}", designationId);
+        log.info("[Facade:DesignationFacade] getById() called - id: {}", designationId);
         DesignationResponseDTO result = designationService.getById(designationId);
-        log.info("Facade: Successfully fetched Designation ID: {}", designationId);
+        log.info("[Facade:DesignationFacade] getById() succeeded - id: {}", designationId);
         return result;
     }
 
     public List<DesignationResponseDTO> getAll() {
-        log.info("Facade: Request to fetch all Designations");
+        log.info("[Facade:DesignationFacade] getAll() called");
         List<DesignationResponseDTO> result = designationService.getAll();
-        log.info("Facade: Successfully fetched {} Designations", result.size());
+        log.info("[Facade:DesignationFacade] getAll() succeeded - found {} resources", result.size());
         return result;
     }
 
     public List<DesignationResponseDTO> getAllActive() {
-        log.info("Facade: Request to fetch all active Designations");
+        log.info("[Facade:DesignationFacade] getAllActive() called");
         List<DesignationResponseDTO> result = designationService.getAllActive();
-        log.info("Facade: Successfully fetched {} active Designations", result.size());
+        log.info("[Facade:DesignationFacade] getAllActive() succeeded - found {} active resources", result.size());
         return result;
     }
 
     public List<DesignationResponseDTO> searchByKeyword(String keyword) {
-        log.info("Facade: Request to search Designations with keyword: '{}'", keyword);
+        log.info("[Facade:DesignationFacade] searchByKeyword() called - keyword: '{}'", keyword);
         List<DesignationResponseDTO> result = designationService.searchByKeyword(keyword);
-        log.info("Facade: Search completed, found {} Designations", result.size());
-        return result;
-    }
-
-    public List<DesignationResponseDTO> getByDepartmentId(Long departmentId) {
-        log.info("Facade: Request to fetch Designations for Department ID: {}", departmentId);
-        List<DesignationResponseDTO> result = designationService.getByDepartmentId(departmentId);
-        log.info("Facade: Successfully fetched {} Designations for Department ID: {}", result.size(), departmentId);
+        log.info("[Facade:DesignationFacade] searchByKeyword() succeeded - found {} resources", result.size());
         return result;
     }
 
     public DesignationResponseDTO updateDesignation(Long designationId, @Valid DesignationRequestDTO requestDTO) {
-        log.info("Facade: Request to update Designation ID: {}", designationId);
+        log.info("[Facade:DesignationFacade] updateDesignation() called - id: {}", designationId);
         DesignationResponseDTO result = designationService.updateDesignation(designationId, requestDTO);
-        log.info("Facade: Successfully updated Designation ID: {}", designationId);
+        log.info("[Facade:DesignationFacade] updateDesignation() succeeded - id: {}", designationId);
         return result;
+    }
+
+    public void softDeleteById(Long designationId) {
+        log.info("[Facade:DesignationFacade] softDeleteById() called - id: {}", designationId);
+        designationService.softDeleteById(designationId);
+        log.info("[Facade:DesignationFacade] softDeleteById() succeeded - id: {}", designationId);
+    }
+
+    public List<DesignationCountDTO> getStaffCountReport() {
+        log.info("[Facade:DesignationFacade] getStaffCountReport() called");
+        return designationService.getStaffCountReport();
     }
 }

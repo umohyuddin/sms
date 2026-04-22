@@ -20,19 +20,21 @@ public class UserDetailsImp implements UserDetails {
     private String username;
     private String email;
     private Long organizationId;
+    private Long campusId;
 
     @JsonIgnore
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImp(Long id, String username, String email, String password, Long organizationId,
+    public UserDetailsImp(Long id, String username, String email, String password, Long organizationId, Long campusId,
                         Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.organizationId = organizationId;
+        this.campusId = campusId;
         this.authorities = authorities;
     }
 
@@ -42,12 +44,22 @@ public class UserDetailsImp implements UserDetails {
                 .map(permission -> new SimpleGrantedAuthority(permission.getCode()))
                 .collect(Collectors.toList());
 
+        Long campusId = null;
+        if (user.getEmployee() != null && user.getEmployee().getDepartmentHistories() != null && !user.getEmployee().getDepartmentHistories().isEmpty()) {
+            // Get campus from the latest/current department history if available
+            // This is a simplified approach; in production, you'd find the active history record.
+            campusId = user.getEmployee().getDepartmentHistories().get(0).getDepartment().getCampus().getId();
+        } else if (user.getStudent() != null && user.getStudent().getCampus() != null) {
+            campusId = user.getStudent().getCampus().getId();
+        }
+
         return new UserDetailsImp(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPasswordHash(),
                 user.getOrganizationId(),
+                campusId,
                 authorities);
     }
 

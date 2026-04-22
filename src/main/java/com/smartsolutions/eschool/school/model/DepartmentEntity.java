@@ -21,11 +21,15 @@ public class DepartmentEntity extends AuditableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "department_code", nullable = false, unique = true, length = 50)
+    @Column(name = "department_code", nullable = false, length = 50)
     private String departmentCode;
 
     @Column(name = "department_name", nullable = false, length = 150)
     private String departmentName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campus_id", nullable = false)
+    private CampusEntity campus;
 
     @Column(length = 255)
     private String description;

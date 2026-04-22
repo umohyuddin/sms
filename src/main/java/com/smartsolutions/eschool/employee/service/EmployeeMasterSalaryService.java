@@ -7,15 +7,11 @@ import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.Em
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
 import com.smartsolutions.eschool.employee.model.*;
 import com.smartsolutions.eschool.employee.repository.*;
-import com.smartsolutions.eschool.global.enums.SalaryStatus;
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentResponseDTO;
-import com.smartsolutions.eschool.school.dtos.designations.response.DesignationResponseDTO;
-import com.smartsolutions.eschool.school.model.DepartmentEntity;
-import com.smartsolutions.eschool.school.model.DesignationEntity;
-import com.smartsolutions.eschool.school.repository.DepartmentRepository;
-import com.smartsolutions.eschool.school.repository.DesignationRepository;
+import com.smartsolutions.eschool.school.mapper.DepartmentMapper;
+import com.smartsolutions.eschool.school.mapper.DesignationMapper;
+import com.smartsolutions.eschool.util.SecurityUtils;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -300,8 +296,8 @@ public class EmployeeMasterSalaryService {
                 .updatedAt(salaryEntity.getUpdatedAt())
                 // Nested DTOs
                 .employee(EmployeeMasterResponseDto.fromEntity(employee))
-                .designation(currentDesig != null ? DesignationResponseDTO.fromEntity(currentDesig.getDesignation()) : null)
-                .department(currentDept != null ? DepartmentResponseDTO.fromEntity(currentDept.getDepartment()) : null)
+                .designation(currentDesig != null ? DesignationMapper.toResponseDTO(currentDesig.getDesignation()) : null)
+                .department(currentDept != null ? DepartmentMapper.toResponseDTO(currentDept.getDepartment()) : null)
                 .build();
     }
 

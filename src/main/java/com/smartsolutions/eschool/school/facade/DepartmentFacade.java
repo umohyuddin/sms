@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.facade;
 
 import com.smartsolutions.eschool.school.dtos.departments.request.DepartmentRequestDTO;
+import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentCountDTO;
 import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentResponseDTO;
 import com.smartsolutions.eschool.school.service.DepartmentService;
 import jakarta.validation.Valid;
@@ -14,7 +15,6 @@ import java.util.List;
 @Scope("prototype")
 @Slf4j
 public class DepartmentFacade {
-
     private final DepartmentService departmentService;
 
     public DepartmentFacade(DepartmentService departmentService) {
@@ -22,37 +22,55 @@ public class DepartmentFacade {
     }
 
     public DepartmentResponseDTO createDepartment(@Valid DepartmentRequestDTO requestDTO) {
-        log.info("[Facade:DepartmentFacade] createDepartment() called");
-        return departmentService.createDepartment(requestDTO);
+        log.info("[Facade:DepartmentFacade] createDepartment() called - name: {}", requestDTO.getDepartmentName());
+        DepartmentResponseDTO result = departmentService.createDepartment(requestDTO);
+        log.info("[Facade:DepartmentFacade] createDepartment() succeeded - ID: {}", result.getId());
+        return result;
+    }
+
+    public DepartmentResponseDTO getById(Long id) {
+        log.info("[Facade:DepartmentFacade] getById() called - id: {}", id);
+        DepartmentResponseDTO result = departmentService.getById(id);
+        log.info("[Facade:DepartmentFacade] getById() succeeded - id: {}", id);
+        return result;
     }
 
     public List<DepartmentResponseDTO> getAll() {
         log.info("[Facade:DepartmentFacade] getAll() called");
-        return departmentService.getAllDepartments();
-    }
-
-    public DepartmentResponseDTO getById(Long departmentId) {
-        log.info("[Facade:DepartmentFacade] getById() called - id: {}", departmentId);
-        return departmentService.getDepartmentById(departmentId);
+        List<DepartmentResponseDTO> result = departmentService.getAll();
+        log.info("[Facade:DepartmentFacade] getAll() succeeded - Found {} departments", result.size());
+        return result;
     }
 
     public List<DepartmentResponseDTO> getAllActive() {
         log.info("[Facade:DepartmentFacade] getAllActive() called");
-        return departmentService.getAllActiveDepartments();
+        List<DepartmentResponseDTO> result = departmentService.getAllActive();
+        log.info("[Facade:DepartmentFacade] getAllActive() succeeded - Found {} active departments", result.size());
+        return result;
     }
 
-    public DepartmentResponseDTO updateDepartment(Long departmentId, @Valid DepartmentRequestDTO requestDTO) {
-        log.info("[Facade:DepartmentFacade] updateDepartment() called - id: {}", departmentId);
-        return departmentService.updateDepartment(departmentId, requestDTO);
+    public DepartmentResponseDTO updateDepartment(Long id, @Valid DepartmentRequestDTO requestDTO) {
+        log.info("[Facade:DepartmentFacade] updateDepartment() called - id: {}", id);
+        DepartmentResponseDTO result = departmentService.updateDepartment(id, requestDTO);
+        log.info("[Facade:DepartmentFacade] updateDepartment() succeeded - id: {}", id);
+        return result;
     }
 
-    public List<DepartmentResponseDTO> searchDepartments(String keyword) {
-        log.info("[Facade:DepartmentFacade] searchDepartments() called - keyword: '{}'", keyword);
-        return departmentService.searchDepartments(keyword);
+    public List<DepartmentResponseDTO> searchByKeyword(String keyword) {
+        log.info("[Facade:DepartmentFacade] searchByKeyword() called - keyword: '{}'", keyword);
+        List<DepartmentResponseDTO> result = departmentService.searchByKeyword(keyword);
+        log.info("[Facade:DepartmentFacade] searchByKeyword() succeeded - Found {} departments", result.size());
+        return result;
     }
 
-    public void deleteById(Long departmentId) {
-        log.info("[Facade:DepartmentFacade] deleteById() called - id: {}", departmentId);
-        departmentService.deleteDepartment(departmentId);
+    public void softDeleteById(Long id) {
+        log.info("[Facade:DepartmentFacade] softDeleteById() called - id: {}", id);
+        departmentService.softDeleteById(id);
+        log.info("[Facade:DepartmentFacade] softDeleteById() succeeded - id: {}", id);
+    }
+
+    public List<DepartmentCountDTO> getStaffCountReport() {
+        log.info("[Facade:DepartmentFacade] getStaffCountReport() called");
+        return departmentService.getStaffCountReport();
     }
 }

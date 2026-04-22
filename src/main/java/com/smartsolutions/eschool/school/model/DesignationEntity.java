@@ -1,13 +1,17 @@
 package com.smartsolutions.eschool.school.model;
 
-import com.smartsolutions.eschool.employee.model.EmployeeTypeEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 @Entity
 @Table(name = "designations")
+@SQLDelete(sql = "UPDATE designations SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Getter
 @Setter
 public class DesignationEntity extends AuditableEntity {
@@ -24,20 +28,9 @@ public class DesignationEntity extends AuditableEntity {
     @Column(length = 255)
     private String description;
 
-    // Link to Employee Type (mandatory)
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "employee_type_id", nullable = false)
-    private EmployeeTypeEntity employeeType;
-
-    // Optional link to department
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    private DepartmentEntity department;
-
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 
     @Column(name = "deleted", nullable = false)
     private Boolean deleted = false;
-
 }

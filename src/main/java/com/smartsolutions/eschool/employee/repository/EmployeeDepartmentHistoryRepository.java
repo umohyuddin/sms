@@ -25,4 +25,15 @@ public interface EmployeeDepartmentHistoryRepository extends JpaRepository<Emplo
           AND e.isCurrent = true
     """)
     Optional<EmployeeDepartmentHistoryEntity> findCurrentByEmployeeId(@Param("employeeId") Long employeeId);
+
+    @Query("""
+        SELECT h.department.id as departmentId, 
+               h.department.departmentName as departmentName, 
+               COUNT(h.employee.id) as totalEmployees
+        FROM EmployeeDepartmentHistoryEntity h
+        WHERE h.isCurrent = true 
+          AND h.department.campusId = :campusId
+        GROUP BY h.department.id, h.department.departmentName
+    """)
+    List<com.smartsolutions.eschool.school.dtos.departments.response.DepartmentCountDTO> getStaffCountByDepartment(@Param("campusId") Long campusId);
 }
