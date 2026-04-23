@@ -144,6 +144,20 @@ public class EmployeeMasterController {
     }
 
 
+    @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeMasterResponseDto> createEmployee(@RequestBody EmployeeMasterRequestDto requestDto) {
+        log.info("POST /api/institute/employees called with data: {}", requestDto);
+        try {
+            EmployeeMasterResponseDto createdEmployee = employeeFacade.createEmployee(requestDto);
+            log.info("Employee created successfully with id: {}", createdEmployee.getId());
+            return ResponseEntity.ok(createdEmployee);
+        } catch (Exception e) {
+            log.error("Failed to create employee", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EmployeeMasterResponseDto> updateEmployee(@PathVariable Long id, @RequestBody EmployeeMasterRequestDto requestDto) {
         log.info("PUT /api/institute/employees/{} called to update employee: {}", id, requestDto);
