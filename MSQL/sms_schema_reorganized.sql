@@ -204,6 +204,28 @@
         deleted_by BIGINT
     );
 
+    DROP TABLE IF EXISTS department_types;
+    CREATE TABLE department_types (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        organization_id BIGINT NOT NULL,
+        code VARCHAR(50) UNIQUE NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        description VARCHAR(255),
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        created_by BIGINT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_by BIGINT,
+        deleted_at DATETIME,
+        deleted_by BIGINT,
+        CONSTRAINT chk_department_type_code_not_empty CHECK (LENGTH(code) > 0),
+        CONSTRAINT chk_department_type_name_not_empty CHECK (LENGTH(name) > 0)
+    );
+    CREATE INDEX idx_department_type_organization ON department_types (organization_id);
+    CREATE INDEX idx_department_type_code ON department_types (code);
+
+
     DROP TABLE IF EXISTS salary_component;
     CREATE TABLE salary_component (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -1549,27 +1571,40 @@ CREATE TABLE student_guardians (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
         organization_id BIGINT NOT NULL,
         campus_id BIGINT NOT NULL,
+        department_type_id BIGINT NOT NULL,
         department_code VARCHAR(50) NOT NULL,
         department_name VARCHAR(150) NOT NULL,
         description VARCHAR(255),
         parent_id BIGINT NULL,
         head_employee_id BIGINT NULL,
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
-        created_at DATETIME,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
-        updated_at DATETIME,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        CONSTRAINT uk_department_org_campus_code UNIQUE (organization_id, campus_id, department_code),
-        CONSTRAINT fk_department_campus FOREIGN KEY (campus_id) REFERENCES campuses(id),
-        CONSTRAINT fk_department_parent FOREIGN KEY (parent_id) REFERENCES departments(id),
-        CONSTRAINT fk_department_head FOREIGN KEY (head_employee_id) REFERENCES employee_master(id)
+        -- FKs
+        CONSTRAINT fk_department_campus 
+            FOREIGN KEY (campus_id) REFERENCES campuses(id),
+        CONSTRAINT fk_department_type 
+            FOREIGN KEY (department_type_id) REFERENCES department_types(id),
+        CONSTRAINT fk_department_parent 
+            FOREIGN KEY (parent_id) REFERENCES departments(id),
+        CONSTRAINT fk_department_head 
+            FOREIGN KEY (head_employee_id) REFERENCES employee_master(id),
+        -- Unique constraints
+        CONSTRAINT uk_dept_code 
+            UNIQUE (organization_id, campus_id, department_code, deleted),
+        CONSTRAINT uk_dept_name 
+            UNIQUE (organization_id, campus_id, department_name, deleted)
     );
     CREATE INDEX idx_departments_campus_id ON departments (campus_id);
     CREATE INDEX idx_departments_parent_id ON departments (parent_id);
     CREATE INDEX idx_departments_head_employee_id ON departments (head_employee_id);
+    CREATE INDEX idx_departments_type_id ON departments (department_type_id);
+
 
     DROP TABLE IF EXISTS employee_department_history;
     CREATE TABLE employee_department_history (

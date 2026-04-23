@@ -1,10 +1,9 @@
 package com.smartsolutions.eschool.school.controller;
 
-import com.smartsolutions.eschool.school.dtos.departments.request.DepartmentRequestDTO;
-import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentCountDTO;
+import com.smartsolutions.eschool.global.error.ErrorResponse;
+import com.smartsolutions.eschool.school.dtos.departments.requestDto.DepartmentCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentResponseDTO;
 import com.smartsolutions.eschool.school.facade.DepartmentFacade;
-import com.smartsolutions.eschool.global.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,7 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/institute/departments")
 @Slf4j
-@Tag(name = "Department Management", description = "Endpoints for managing campus-level departments")
+@Tag(name = "Department Management", description = "Endpoints for managing departments.")
 public class DepartmentController {
 
     private final DepartmentFacade departmentFacade;
@@ -34,84 +33,129 @@ public class DepartmentController {
         this.departmentFacade = departmentFacade;
     }
 
-    @Operation(summary = "Create a new department", description = "Creates a new campus-scoped department.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Department created successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "409", description = "Duplicate department code", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @Operation(summary = "Get all departments", description = "Retrieve a list of all departments.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DepartmentResponseDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DepartmentResponseDTO>> getAll(
+            @Parameter(description = "Optional campus ID filter", example = "1") @RequestParam(name = "campusId", required = false) Long campusId) {
+        log.info("[Controller:DepartmentController] getAll() called - campusId: {}", campusId);
+        List<DepartmentResponseDTO> resources;
+        if (campusId != null) {
+            resources = departmentFacade.getByCampusId(campusId);
+        } else {
+            resources = departmentFacade.getAll();
+        }
+        log.info("[Controller:DepartmentController] getAll() succeeded - Found {} departments", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
+    @Operation(summary = "Get department by ID", description = "Fetch detailed information about a specific department.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved department",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DepartmentResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Department not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DepartmentResponseDTO> getById(
+            @Parameter(description = "ID of the department", example = "1") @PathVariable Long id) {
+        log.info("[Controller:DepartmentController] getById() called - id: {}", id);
+        DepartmentResponseDTO department = departmentFacade.getById(id);
+        log.info("[Controller:DepartmentController] getById() succeeded - Found department: {}", id);
+        return ResponseEntity.ok(department);
+    }
+
+    @Operation(summary = "Search departments", description = "Find departments by keyword (name or code).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved matching departments",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DepartmentResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid search keyword"),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DepartmentResponseDTO>> search(
+            @Parameter(description = "Search keyword", example = "Academic") @RequestParam(name = "keyword") String keyword) {
+        log.info("[Controller:DepartmentController] search() called - keyword: {}", keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<DepartmentResponseDTO> responseDTOs = departmentFacade.searchByKeyword(keyword.trim());
+        log.info("[Controller:DepartmentController] search() succeeded - Found {} matching departments", responseDTOs.size());
+        return ResponseEntity.ok(responseDTOs);
+    }
+
+    @Operation(summary = "Create new department", description = "Register a new department.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Department created successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DepartmentResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DepartmentResponseDTO> createDepartment(@RequestBody @Valid DepartmentRequestDTO requestDTO) {
-        log.info("[Controller:DepartmentController] createDepartment() called - name: {}", requestDTO.getDepartmentName());
+    public ResponseEntity<DepartmentResponseDTO> create(@Valid @RequestBody DepartmentCreateRequestDTO requestDTO) {
+        log.info("[Controller:DepartmentController] create() called - name: {}", requestDTO.getDepartmentName());
         DepartmentResponseDTO responseDTO = departmentFacade.createDepartment(requestDTO);
-        log.info("[Controller:DepartmentController] createDepartment() succeeded - created ID: {}", responseDTO.getId());
+        log.info("[Controller:DepartmentController] create() succeeded - id: {}", responseDTO.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
-    @Operation(summary = "Get all departments", description = "Fetches all departments for the current campus.")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<DepartmentResponseDTO>> getAll() {
-        log.info("[Controller:DepartmentController] getAll() called");
-        List<DepartmentResponseDTO> resources = departmentFacade.getAll();
-        log.info("[Controller:DepartmentController] getAll() succeeded - found {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
+    @Operation(summary = "Update department", description = "Update details of an existing department.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Department updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DepartmentResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Department not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DepartmentResponseDTO> update(
+            @Parameter(description = "ID of the department to update", example = "1") @PathVariable Long id,
+            @Valid @RequestBody DepartmentCreateRequestDTO requestDTO) {
+        log.info("[Controller:DepartmentController] update() called - id: {}", id);
+        DepartmentResponseDTO responseDTO = departmentFacade.updateDepartment(id, requestDTO);
+        log.info("[Controller:DepartmentController] update() succeeded - id: {}", id);
+        return ResponseEntity.ok(responseDTO);
     }
 
-    @Operation(summary = "Get all active departments", description = "Fetches all active (enabled) departments for the current campus.")
-    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<DepartmentResponseDTO>> getAllActive() {
-        log.info("[Controller:DepartmentController] getAllActive() called");
-        List<DepartmentResponseDTO> resources = departmentFacade.getAllActive();
-        log.info("[Controller:DepartmentController] getAllActive() succeeded - found {} active resources", resources.size());
-        return ResponseEntity.ok().body(resources);
-    }
-
-    @Operation(summary = "Get department by ID")
-    @GetMapping(value = "/{departmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DepartmentResponseDTO> getById(
-            @Parameter(description = "ID of the department to fetch") @PathVariable Long departmentId) {
-        log.info("[Controller:DepartmentController] getById() called - ID: {}", departmentId);
-        DepartmentResponseDTO resource = departmentFacade.getById(departmentId);
-        log.info("[Controller:DepartmentController] getById() succeeded - Found department: {}", departmentId);
-        return ResponseEntity.ok().body(resource);
-    }
-
-    @Operation(summary = "Search departments", description = "Search for departments by name or code using a keyword.")
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<DepartmentResponseDTO>> getBySearch(
-            @Parameter(description = "Search keyword") @RequestParam(name = "keyword") String keyword) {
-        log.info("[Controller:DepartmentController] getBySearch() called - keyword: {}", keyword);
-        List<DepartmentResponseDTO> resources = departmentFacade.searchByKeyword(keyword);
-        log.info("[Controller:DepartmentController] getBySearch() succeeded - found {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
-    }
-
-    @Operation(summary = "Update an existing department")
-    @PutMapping(value = "/{departmentId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DepartmentResponseDTO> updateDepartment(
-            @Parameter(description = "ID of the department to update") @PathVariable Long departmentId,
-            @RequestBody @Valid DepartmentRequestDTO requestDTO) {
-        log.info("[Controller:DepartmentController] updateDepartment() called - ID: {}", departmentId);
-        DepartmentResponseDTO updated = departmentFacade.updateDepartment(departmentId, requestDTO);
-        log.info("[Controller:DepartmentController] updateDepartment() succeeded - updated ID: {}", departmentId);
-        return ResponseEntity.ok(updated);
-    }
-
-    @Operation(summary = "Delete (Soft) a department")
+    @Operation(summary = "Delete department", description = "Soft delete a department.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Department deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Department not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
-        log.info("[Controller:DepartmentController] delete() called - ID: {}", id);
+    public ResponseEntity<Map<String, String>> delete(
+            @Parameter(description = "ID of the department delete", example = "1") @PathVariable Long id) {
+        log.info("[Controller:DepartmentController] delete() called - id: {}", id);
         departmentFacade.softDeleteById(id);
-        log.info("[Controller:DepartmentController] delete() succeeded - marked ID: {} as deleted", id);
+        log.info("[Controller:DepartmentController] delete() succeeded - id: {}", id);
         return ResponseEntity.ok(Map.of("message", "Department deleted successfully"));
     }
 
-    @Operation(summary = "Get employee count by department", description = "Fetches a report of employee distribution across all departments in the current campus.")
-    @GetMapping(value = "/reports/staff-count", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<DepartmentCountDTO>> getStaffCountReport() {
-        log.info("[Controller:DepartmentController] getStaffCountReport() called");
-        List<DepartmentCountDTO> resources = departmentFacade.getStaffCountReport();
-        log.info("[Controller:DepartmentController] getStaffCountReport() succeeded - found {} entries", resources.size());
-        return ResponseEntity.ok().body(resources);
+    @Operation(summary = "Get department statistics", description = "Retrieve statistics for departments.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved statistics"),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/statistics", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Long>> getStatistics() {
+        log.info("[Controller:DepartmentController] getStatistics() called");
+        Map<String, Long> statistics = departmentFacade.getStatistics();
+        log.info("[Controller:DepartmentController] getStatistics() succeeded");
+        return ResponseEntity.ok(statistics);
     }
 }

@@ -3,11 +3,11 @@ package com.smartsolutions.eschool.school.model;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+
+import java.util.List;
 
 @Entity
 @Table(name = "departments")
@@ -15,11 +15,23 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted = false")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class DepartmentEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campus_id", nullable = false)
+    private CampusEntity campus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_type_id", nullable = false)
+    private DepartmentTypeEntity departmentType;
 
     @Column(name = "department_code", nullable = false, length = 50)
     private String departmentCode;
@@ -27,26 +39,25 @@ public class DepartmentEntity extends AuditableEntity {
     @Column(name = "department_name", nullable = false, length = 150)
     private String departmentName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "campus_id", nullable = false)
-    private CampusEntity campus;
-
-    @Column(length = 255)
+    @Column(name = "description", length = 255)
     private String description;
 
-    // Hierarchy - self reference
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private DepartmentEntity parentDepartment;
+    private DepartmentEntity parent;
 
-    // Head of Department
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "head_employee_id")
     private EmployeeMasterEntity headEmployee;
 
+    @Builder.Default
     @Column(name = "active", nullable = false)
-    private Boolean active = true;
+    private boolean active = true;
 
-    @Column(name = "deleted")
-    private Boolean deleted = false;
+    @Builder.Default
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    private List<DepartmentEntity> subDepartments;
 }

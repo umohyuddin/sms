@@ -2,9 +2,11 @@ package com.smartsolutions.eschool.school.repository;
 
 import com.smartsolutions.eschool.school.model.DepartmentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,29 +14,32 @@ import java.util.Optional;
 @Repository
 public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Long> {
 
-    @Query("SELECT d FROM DepartmentEntity d WHERE d.organizationId = :orgId AND d.campus.id = :campusId")
-    List<DepartmentEntity> findByOrganizationAndCampus(@Param("orgId") Long orgId, @Param("campusId") Long campusId);
+    @Query("SELECT d FROM DepartmentEntity d JOIN FETCH d.campus c JOIN FETCH d.departmentType dt LEFT JOIN FETCH d.parent p LEFT JOIN FETCH d.headEmployee h WHERE d.organizationId = :organizationId")
+    List<DepartmentEntity> findByOrganizationId(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT d FROM DepartmentEntity d WHERE d.id = :id AND d.organizationId = :orgId AND d.campus.id = :campusId")
-    Optional<DepartmentEntity> findByIdAndOrganizationAndCampus(@Param("id") Long id, @Param("orgId") Long orgId, @Param("campusId") Long campusId);
+    @Query("SELECT d FROM DepartmentEntity d JOIN FETCH d.campus c JOIN FETCH d.departmentType dt LEFT JOIN FETCH d.parent p LEFT JOIN FETCH d.headEmployee h WHERE d.campus.id = :campusId AND d.organizationId = :organizationId")
+    List<DepartmentEntity> findByCampusIdAndOrganizationId(@Param("campusId") Long campusId, @Param("organizationId") Long organizationId);
 
-    @Query("SELECT d FROM DepartmentEntity d WHERE d.id = :id AND d.organizationId = :orgId")
-    Optional<DepartmentEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("orgId") Long orgId);
+    @Query("SELECT d FROM DepartmentEntity d JOIN FETCH d.campus c JOIN FETCH d.departmentType dt LEFT JOIN FETCH d.parent p LEFT JOIN FETCH d.headEmployee h WHERE d.id = :id AND d.organizationId = :organizationId")
+    Optional<DepartmentEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
-    @Query("SELECT d FROM DepartmentEntity d WHERE d.organizationId = :orgId AND d.campus.id = :campusId AND d.active = true")
-    List<DepartmentEntity> findAllActive(@Param("orgId") Long orgId, @Param("campusId") Long campusId);
+    @Query("SELECT d FROM DepartmentEntity d JOIN FETCH d.campus c JOIN FETCH d.departmentType dt WHERE (d.departmentName LIKE %:keyword% OR d.departmentCode LIKE %:keyword%) AND d.organizationId = :organizationId")
+    List<DepartmentEntity> searchByKeywordAndOrganizationId(@Param("keyword") String keyword, @Param("organizationId") Long organizationId);
 
-    @Query("SELECT d FROM DepartmentEntity d WHERE d.organizationId = :orgId AND d.campus.id = :campusId " +
-           "AND (LOWER(d.departmentName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-           "OR LOWER(d.departmentCode) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    List<DepartmentEntity> searchByKeyword(@Param("keyword") String keyword, @Param("orgId") Long orgId, @Param("campusId") Long campusId);
+    @Modifying
+    @Transactional
+    @Query("UPDATE DepartmentEntity d SET d.deleted = true, d.deletedAt = CURRENT_TIMESTAMP WHERE d.id = :id AND d.organizationId = :organizationId")
+    int softDeleteByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
-    @Query("SELECT COUNT(d) > 0 FROM DepartmentEntity d WHERE d.departmentCode = :code AND d.organizationId = :orgId AND d.campus.id = :campusId")
-    boolean existsByCodeAndOrganizationAndCampus(@Param("code") String code, @Param("orgId") Long orgId, @Param("campusId") Long campusId);
+    @Query("SELECT (COUNT(d) > 0) FROM DepartmentEntity d WHERE d.organizationId = :organizationId AND d.campus.id = :campusId AND d.departmentCode = :code AND d.deleted = false")
+    boolean existsByOrganizationIdAndCampusIdAndDepartmentCode(@Param("organizationId") Long organizationId, @Param("campusId") Long campusId, @Param("code") String code);
 
-    @Query("SELECT COUNT(d) > 0 FROM DepartmentEntity d WHERE d.departmentCode = :code AND d.organizationId = :orgId AND d.campus.id = :campusId AND d.id <> :id")
-    boolean existsByCodeAndOrganizationAndCampusAndIdNot(@Param("code") String code, @Param("orgId") Long orgId, @Param("campusId") Long campusId, @Param("id") Long id);
+    @Query("SELECT (COUNT(d) > 0) FROM DepartmentEntity d WHERE d.organizationId = :organizationId AND d.campus.id = :campusId AND d.departmentName = :name AND d.deleted = false")
+    boolean existsByOrganizationIdAndCampusIdAndDepartmentName(@Param("organizationId") Long organizationId, @Param("campusId") Long campusId, @Param("name") String name);
 
-    @Query("SELECT d FROM DepartmentEntity d WHERE d.parentDepartment.id = :parentId AND d.organizationId = :orgId AND d.campus.id = :campusId")
-    List<DepartmentEntity> findByParentDepartmentId(@Param("parentId") Long parentId, @Param("orgId") Long orgId, @Param("campusId") Long campusId);
+    @Query("SELECT COUNT(d) FROM DepartmentEntity d WHERE d.organizationId = :organizationId")
+    Long countByOrganizationId(@Param("organizationId") Long organizationId);
+
+    @Query("SELECT COUNT(d) FROM DepartmentEntity d WHERE d.organizationId = :organizationId AND d.active = true")
+    Long countByOrganizationIdAndActiveTrue(@Param("organizationId") Long organizationId);
 }

@@ -1,9 +1,9 @@
 package com.smartsolutions.eschool.school.mapper;
 
 import com.smartsolutions.eschool.global.error.ApiException;
-import com.smartsolutions.eschool.school.dtos.departments.request.DepartmentRequestDTO;
+import com.smartsolutions.eschool.institute.error.DepartmentErrors;
+import com.smartsolutions.eschool.school.dtos.departments.requestDto.DepartmentCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentResponseDTO;
-import com.smartsolutions.eschool.school.error.DepartmentErrors;
 import com.smartsolutions.eschool.school.model.DepartmentEntity;
 import org.springframework.http.HttpStatus;
 
@@ -19,62 +19,42 @@ public class DepartmentMapper {
         // prevent instantiation
     }
 
-    public static DepartmentEntity toEntity(DepartmentRequestDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-
-        if (dto.getDepartmentName() == null || dto.getDepartmentName().trim().isEmpty()) {
-            throw new ApiException(DepartmentErrors.INVALID_DEPARTMENT_DATA, "Department name is required",
-                    HttpStatus.BAD_REQUEST);
-        }
-        if (dto.getDepartmentCode() == null || dto.getDepartmentCode().trim().isEmpty()) {
-            throw new ApiException(DepartmentErrors.INVALID_DEPARTMENT_DATA, "Department code is required",
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        DepartmentEntity entity = new DepartmentEntity();
-        entity.setDepartmentName(dto.getDepartmentName().trim());
-        entity.setDepartmentCode(dto.getDepartmentCode().trim());
-        entity.setDescription(dto.getDescription() != null ? dto.getDescription().trim() : null);
-        entity.setActive(dto.getActive() != null ? dto.getActive() : true);
-        entity.setDeleted(false);
-
-        return entity;
-    }
-
     public static DepartmentResponseDTO toResponseDTO(DepartmentEntity entity) {
         if (entity == null) {
             return null;
         }
 
-        DepartmentResponseDTO dto = new DepartmentResponseDTO();
-        dto.setId(entity.getId());
-        dto.setDepartmentCode(entity.getDepartmentCode());
-        dto.setDepartmentName(entity.getDepartmentName());
-        dto.setDescription(entity.getDescription());
-        dto.setActive(entity.getActive());
-
-        if (entity.getParentDepartment() != null) {
-            dto.setParentDepartmentId(entity.getParentDepartment().getId());
-            dto.setParentDepartmentName(entity.getParentDepartment().getDepartmentName());
-        }
-
-        if (entity.getHeadEmployee() != null) {
-            dto.setHeadEmployeeId(entity.getHeadEmployee().getId());
-            dto.setHeadEmployeeCode(entity.getHeadEmployee().getEmployeeCode());
-            dto.setHeadEmployeeName(entity.getHeadEmployee().getFullName());
-        }
+        DepartmentResponseDTO dto = DepartmentResponseDTO.builder()
+                .id(entity.getId())
+                .organizationId(entity.getOrganizationId())
+                .departmentCode(entity.getDepartmentCode())
+                .departmentName(entity.getDepartmentName())
+                .description(entity.getDescription())
+                .active(entity.isActive())
+                .deleted(entity.isDeleted())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
 
         if (entity.getCampus() != null) {
             dto.setCampusId(entity.getCampus().getId());
             dto.setCampusName(entity.getCampus().getCampusName());
         }
 
-        dto.setDeleted(entity.getDeleted());
-        dto.setOrganizationId(entity.getOrganizationId());
-        dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
+        if (entity.getDepartmentType() != null) {
+            dto.setDepartmentTypeId(entity.getDepartmentType().getId());
+            dto.setDepartmentTypeName(entity.getDepartmentType().getName());
+        }
+
+        if (entity.getParent() != null) {
+            dto.setParentId(entity.getParent().getId());
+            dto.setParentName(entity.getParent().getDepartmentName());
+        }
+
+        if (entity.getHeadEmployee() != null) {
+            dto.setHeadEmployeeId(entity.getHeadEmployee().getId());
+            dto.setHeadEmployeeName(entity.getHeadEmployee().getFirstName() + " " + entity.getHeadEmployee().getLastName());
+        }
 
         return dto;
     }
@@ -88,33 +68,45 @@ public class DepartmentMapper {
                 .collect(Collectors.toList());
     }
 
-    public static void updateEntityFromDTO(DepartmentEntity entity, DepartmentRequestDTO dto) {
+    public static DepartmentEntity toEntity(DepartmentCreateRequestDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        if (dto.getDepartmentName() == null || dto.getDepartmentName().trim().isEmpty()) {
+            throw new ApiException(DepartmentErrors.INVALID_DEPARTMENT_DATA, "Department name is required", HttpStatus.BAD_REQUEST);
+        }
+
+        DepartmentEntity entity = new DepartmentEntity();
+        entity.setDepartmentCode(dto.getDepartmentCode() != null ? dto.getDepartmentCode().trim() : null);
+        entity.setDepartmentName(dto.getDepartmentName().trim());
+        entity.setDescription(dto.getDescription());
+        entity.setActive(dto.isActive());
+        entity.setDeleted(false);
+
+        return entity;
+    }
+
+    public static void updateEntityFromDTO(DepartmentEntity entity, DepartmentCreateRequestDTO dto) {
         if (entity == null || dto == null) {
             return;
         }
 
         if (dto.getDepartmentName() != null) {
             if (dto.getDepartmentName().trim().isEmpty()) {
-                throw new ApiException(DepartmentErrors.INVALID_DEPARTMENT_DATA, "Department name cannot be empty",
-                        HttpStatus.BAD_REQUEST);
+                throw new ApiException(DepartmentErrors.INVALID_DEPARTMENT_DATA, "Department name cannot be empty", HttpStatus.BAD_REQUEST);
             }
             entity.setDepartmentName(dto.getDepartmentName().trim());
         }
 
         if (dto.getDepartmentCode() != null) {
-            if (dto.getDepartmentCode().trim().isEmpty()) {
-                throw new ApiException(DepartmentErrors.INVALID_DEPARTMENT_DATA, "Department code cannot be empty",
-                        HttpStatus.BAD_REQUEST);
-            }
             entity.setDepartmentCode(dto.getDepartmentCode().trim());
         }
 
         if (dto.getDescription() != null) {
-            entity.setDescription(dto.getDescription().trim());
+            entity.setDescription(dto.getDescription());
         }
 
-        if (dto.getActive() != null) {
-            entity.setActive(dto.getActive());
-        }
+        entity.setActive(dto.isActive());
     }
 }

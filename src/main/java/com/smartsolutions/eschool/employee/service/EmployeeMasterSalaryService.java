@@ -11,7 +11,6 @@ import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.mapper.DepartmentMapper;
 import com.smartsolutions.eschool.school.mapper.DesignationMapper;
-import com.smartsolutions.eschool.util.SecurityUtils;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -248,7 +247,6 @@ public class EmployeeMasterSalaryService {
         // Extract current histories from the fetched joins
         EmployeeDepartmentHistoryEntity currentDept = null;
         EmployeeDesignationHistoryEntity currentDesig = null;
-        EmployeeTypeHistoryEntity currentType = null;
 
         // LEFT JOIN FETCH results will be available in memory
         if (salaryEntity instanceof org.hibernate.proxy.HibernateProxy) {
@@ -268,11 +266,11 @@ public class EmployeeMasterSalaryService {
                     .findFirst().orElse(null);
         }
 
-        if (employee.getTypeHistories() != null) {
-            currentType = employee.getTypeHistories()
-                    .stream().filter(EmployeeTypeHistoryEntity::getIsCurrent)
-                    .findFirst().orElse(null);
-        }
+//        if (employee.getTypeHistories() != null) {
+//            currentType = employee.getTypeHistories()
+//                    .stream().filter(EmployeeTypeHistoryEntity::getIsCurrent)
+//                    .findFirst().orElse(null);
+//        }
 
         String employeeTypeName = null;
         if (employee.getEmployeeType() != null) {

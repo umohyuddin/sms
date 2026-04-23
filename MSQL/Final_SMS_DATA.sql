@@ -111,6 +111,83 @@ INSERT INTO designations VALUES
 
 
 
+
+
+
+
+
+
+
+
+
+INSERT INTO department_types 
+(organization_id, code, name, description) VALUES
+
+-- Core Academic
+(1, 'ACADEMIC', 'Academic', 'Core teaching and subject-related departments'),
+
+-- Administration
+(1, 'ADMIN', 'Administration', 'Administrative and management departments'),
+
+-- Student Support
+(1, 'SUPPORT', 'Student Support', 'Departments supporting student services and wellbeing'),
+
+-- Operations / Facilities
+(1, 'OPERATIONS', 'Operations', 'Campus operations, facilities, and maintenance'),
+
+-- IT / Technical
+(1, 'IT', 'Information Technology', 'IT systems, infrastructure, and technical support'),
+
+-- Finance
+(1, 'FINANCE', 'Finance & Accounts', 'Financial operations, accounting, and budgeting'),
+
+-- Human Resources
+(1, 'HR', 'Human Resources', 'Employee management, hiring, and HR operations'),
+
+-- Academic Support
+(1, 'ACADEMIC_SUPPORT', 'Academic Support', 'Support for teaching, curriculum, and faculty'),
+
+-- Research (important for universities)
+(1, 'RESEARCH', 'Research & Development', 'Research activities, labs, and innovation'),
+
+-- Admissions
+(1, 'ADMISSIONS', 'Admissions', 'Student admissions and enrollment management'),
+
+-- Examination
+(1, 'EXAM', 'Examinations', 'Exams, results, and academic assessments'),
+
+-- Compliance / Quality
+(1, 'QUALITY', 'Quality Assurance', 'Accreditation, compliance, and quality control'),
+
+-- Legal
+(1, 'LEGAL', 'Legal Affairs', 'Legal operations and compliance'),
+
+-- Marketing / PR
+(1, 'MARKETING', 'Marketing & Communications', 'Marketing, branding, and public relations'),
+
+-- Transport
+(1, 'TRANSPORT', 'Transport', 'Transport and fleet management'),
+
+-- Hostel / Accommodation
+(1, 'HOSTEL', 'Hostel & Accommodation', 'Student housing and accommodation'),
+
+-- Health / Medical
+(1, 'MEDICAL', 'Health Services', 'Medical and healthcare services'),
+
+-- Library
+(1, 'LIBRARY', 'Library Services', 'Library and knowledge resources'),
+
+-- Security
+(1, 'SECURITY', 'Security', 'Campus safety and security management'),
+
+-- Cafeteria
+(1, 'FOOD', 'Cafeteria & Food Services', 'Food and cafeteria services');
+
+
+
+
+
+
 INSERT INTO guardian_relations 
 (organization_id, name, code, description, status, is_default)
 VALUES
@@ -1548,110 +1625,8 @@ VALUES
 );
 
 
-INSERT INTO departments
-(organization_id, department_code, department_name, description, parent_id, head_employee_id, active)
-VALUES
-(1,'SCH01','School of Science','Science related departments',NULL,1,TRUE),
-(1,'SCH02','School of Arts','Arts related departments',NULL,2,TRUE),
-(1,'SCH03','School of Commerce','Commerce related departments',NULL,3,TRUE),
-(1,'SCH04','School of Engineering','Engineering related departments',NULL,1,TRUE),
-(1,'SCH05','School of Computer Science','Computer and IT departments',NULL,2,TRUE),
-(1,'SCH06','School of Medical Sciences','Medical related departments',NULL,3,TRUE),
-(1,'SCH07','School of Education','Teacher education programs',NULL,1,TRUE),
-(1,'SCH08','School of Social Sciences','Social science departments',NULL,2,TRUE),
-
-(1,'SCI01','Department of Physics','Physics studies',NULL,3,TRUE),
-(1,'SCI02','Department of Chemistry','Chemistry studies',NULL,1,TRUE),
-(1,'SCI03','Department of Biology','Biology studies',NULL,2,TRUE),
-(1,'SCI04','Department of Mathematics','Mathematics studies',NULL,3,TRUE),
-(1,'SCI05','Department of Statistics','Statistics studies',NULL,1,TRUE),
-(1,'SCI06','Department of Environmental Science','Environmental studies',NULL,2,TRUE),
-
-(1,'ART01','Department of History','History studies',NULL,3,TRUE),
-(1,'ART02','Department of Literature','Literature studies',NULL,1,TRUE),
-(1,'ART03','Department of Fine Arts','Fine arts studies',NULL,2,TRUE),
-(1,'ART04','Department of Philosophy','Philosophy studies',NULL,3,TRUE),
-(1,'ART05','Department of Linguistics','Language studies',NULL,1,TRUE),
-
-(1,'COM01','Department of Accounting','Accounting studies',NULL,2,TRUE),
-(1,'COM02','Department of Business Administration','Business administration',NULL,3,TRUE),
-(1,'COM03','Department of Economics','Economics studies',NULL,1,TRUE),
-(1,'COM04','Department of Finance','Finance studies',NULL,2,TRUE),
-(1,'COM05','Department of Marketing','Marketing studies',NULL,3,TRUE),
-(1,'COM06','Department of Human Resource Management','HR studies',NULL,1,TRUE),
-
-(1,'CSE01','Department of Computer Science','Computer science studies',NULL,2,TRUE),
-(1,'CSE02','Department of Software Engineering','Software engineering studies',NULL,3,TRUE),
-(1,'CSE03','Department of Information Technology','IT studies',NULL,1,TRUE),
-(1,'CSE04','Department of Artificial Intelligence','AI studies',NULL,2,TRUE),
-(1,'CSE05','Department of Data Science','Data science studies',NULL,3,TRUE),
-(1,'CSE06','Department of Cyber Security','Cyber security studies',NULL,1,TRUE),
-
-(1,'ENG01','Department of Mechanical Engineering','Mechanical engineering',NULL,2,TRUE),
-(1,'ENG02','Department of Electrical Engineering','Electrical engineering',NULL,3,TRUE),
-(1,'ENG03','Department of Civil Engineering','Civil engineering',NULL,1,TRUE),
-(1,'ENG04','Department of Chemical Engineering','Chemical engineering',NULL,2,TRUE),
-(1,'ENG05','Department of Industrial Engineering','Industrial engineering',NULL,3,TRUE),
-
-(1,'MED01','Department of Medicine','Medical studies',NULL,1,TRUE),
-(1,'MED02','Department of Surgery','Surgery studies',NULL,2,TRUE),
-(1,'MED03','Department of Pharmacy','Pharmacy studies',NULL,3,TRUE),
-(1,'MED04','Department of Nursing','Nursing studies',NULL,1,TRUE),
-(1,'MED05','Department of Public Health','Public health studies',NULL,2,TRUE),
-
-(1,'ADM01','Admissions Office','Student admissions',NULL,3,TRUE),
-(1,'ADM02','Finance Office','Finance management',NULL,1,TRUE),
-(1,'ADM03','Human Resources','Staff management',NULL,2,TRUE),
-(1,'ADM04','IT Support','Technical support',NULL,3,TRUE),
-(1,'ADM05','Student Affairs','Student services',NULL,1,TRUE),
-(1,'ADM06','Library','Library management',NULL,2,TRUE),
-(1,'ADM07','Examination Department','Exam management',NULL,3,TRUE),
-(1,'ADM08','Transport Department','School transport',NULL,1,TRUE);
-
-UPDATE departments d
-JOIN departments p ON p.department_code = 'SCH01'
-SET d.parent_id = p.id
-WHERE d.department_code LIKE 'SCI%';
 
 
-UPDATE departments d
-JOIN departments p ON p.department_code = 'SCH02'
-SET d.parent_id = p.id
-WHERE d.department_code LIKE 'ART%';
-
-
-UPDATE departments d
-JOIN departments p ON p.department_code = 'SCH03'
-SET d.parent_id = p.id
-WHERE d.department_code LIKE 'COM%';
-
-
-UPDATE departments d
-JOIN departments p ON p.department_code = 'SCH04'
-SET d.parent_id = p.id
-WHERE d.department_code LIKE 'ENG%';
-
-UPDATE departments d
-JOIN departments p ON p.department_code = 'SCH05'
-SET d.parent_id = p.id
-WHERE d.department_code LIKE 'CSE%';
-
-UPDATE departments d
-JOIN departments p ON p.department_code = 'SCH06'
-SET d.parent_id = p.id
-WHERE d.department_code LIKE 'MED%';
-
-
-
-UPDATE departments d
-JOIN departments p ON p.department_code = 'SCH07'
-SET d.parent_id = p.id
-WHERE d.department_code LIKE 'EDU%';
-
-UPDATE departments d
-JOIN departments p ON p.department_code = 'SCH08'
-SET d.parent_id = p.id
-WHERE d.department_code LIKE 'SOC%';
 
 INSERT INTO campuses (organization_id, institute_id, province_id, city_id,
                       campus_name, contact, email, website, address,
@@ -1874,6 +1849,161 @@ VALUES
     (1, 10, 'B', NOW(), NOW(), 0, NULL),
     (1, 10, 'C', NOW(), NOW(), 0, NULL);
 
+
+-- ============================================================
+-- 🏢 DEPARTMENTS MASTER DATA (ALL-ENCOMPASSING PRODUCTION SET)
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- 🏥 CAMPUS 1: DOWNTOWN CAMPUS (Science, Tech & Medical University)
+-- ------------------------------------------------------------
+INSERT INTO departments 
+(organization_id, campus_id, department_type_id, department_code, department_name, description, active) VALUES
+
+-- 1. Faculty of Engineering & Tech (Downtown)
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-ENG-FAC', 'Faculty of Engineering', 'Main engineering faculty', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-CS', 'Dept of Computer Science', 'Core CS and algorithms', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-SE', 'Dept of Software Engineering', 'Software design and development', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-IT', 'Dept of Information Technology', 'IT systems and networks', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-AI', 'Dept of Artificial Intelligence', 'AI, Robotics and Machine Learning', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-DS', 'Dept of Data Science', 'Big data and analytics', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-CYB', 'Dept of Cyber Security', 'Information security', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-EE', 'Dept of Electrical Engineering', 'Power and electronics', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-ME', 'Dept of Mechanical Engineering', 'Thermodynamics and mechanics', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-CE', 'Dept of Civil Engineering', 'Structures and transport', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-CHE', 'Dept of Chemical Engineering', 'Chemical processes and labs', TRUE),
+
+-- 2. Faculty of Medical & Life Sciences (Downtown)
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-MED', 'Faculty of Medical Sciences', 'Medical and healthcare studies', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-PHARM', 'Dept of Pharmacy', 'Pharmaceutical studies', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-NURS', 'Dept of Nursing', 'Nursing and healthcare support', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-BIO', 'Dept of Biology', 'Biological sciences', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-BIOTECH', 'Dept of Biotechnology', 'Bio-engineering', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-MICRO', 'Dept of Microbiology', 'Microbial research', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-ZOO', 'Dept of Zoology', 'Animal sciences', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-BOT', 'Dept of Botany', 'Plant sciences', TRUE),
+
+-- 3. Administrative (Downtown)
+(1, 1, (SELECT id FROM department_types WHERE code = 'ADMIN' AND organization_id = 1), 'DT-ADM-REG', 'Registrar Office', 'Main campus registry', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ADMIN' AND organization_id = 1), 'DT-ADM-CONT', 'Controller Office', 'Main administrative control', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'HR' AND organization_id = 1), 'DT-HR-DEPT', 'Human Resources (HR)', 'Staff and faculty management', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'FINANCE' AND organization_id = 1), 'DT-FIN-ACC', 'Finance / Accounts', 'Payroll and accounting', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ADMISSIONS' AND organization_id = 1), 'DT-ADM-CELL', 'Admissions Office', 'Student intake', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'EXAM' AND organization_id = 1), 'DT-EXAM-DEPT', 'Examinations Department', 'Exams and results', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'IT' AND organization_id = 1), 'DT-IT-SUP', 'IT / System Support', 'Tech infrastructure', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'QUALITY' AND organization_id = 1), 'DT-QA-DEPT', 'Quality Assurance', 'Academic quality control', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ADMIN' AND organization_id = 1), 'DT-ADM-PROC', 'Procurement & Purchasing', 'Supply chain and vendor mgmt', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC_SUPPORT' AND organization_id = 1), 'DT-FAC-AFF', 'Faculty Affairs', 'Faculty records and coordination', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC_SUPPORT' AND organization_id = 1), 'DT-LMS-UNIT', 'E-Learning / LMS Center', 'Digital education support', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'RESEARCH' AND organization_id = 1), 'DT-IP-OFFICE', 'Intellectual Property (IP) Office', 'Patents and research IP', TRUE),
+
+-- 4. Specialized Units (Downtown)
+(1, 1, (SELECT id FROM department_types WHERE code = 'RESEARCH' AND organization_id = 1), 'DT-RES-LABS', 'Research Labs', 'Core research facilities', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'SUPPORT' AND organization_id = 1), 'DT-INT-OFF', 'International Office', 'Foreign student support', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC_SUPPORT' AND organization_id = 1), 'DT-RD-GRANT', 'Grants & Funding Office', 'Research grants management', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-ENV', 'Dept of Environmental Science', 'Ecology and environment', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'DT-ACAD-STAT', 'Dept of Statistics', 'Mathematical statistics', TRUE),
+(1, 1, (SELECT id FROM department_types WHERE code = 'ACADEMIC_SUPPORT' AND organization_id = 1), 'DT-TRAIN-DEV', 'Training & Development', 'Faculty training programs', TRUE);
+
+
+-- ------------------------------------------------------------
+-- 🎓 CAMPUS 2: UPTOWN CAMPUS (Business, Arts & Social Sciences)
+-- ------------------------------------------------------------
+INSERT INTO departments 
+(organization_id, campus_id, department_type_id, department_code, department_name, description, active) VALUES
+
+-- 1. Faculty of Business & Management (Uptown)
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-BUS-FAC', 'Faculty of Business', 'Main business faculty', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-BBA', 'Dept of BBA/MBA', 'Business administration', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-FIN', 'Dept of Finance', 'Financial studies', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-ACC', 'Dept of Accounting', 'Accounting and audit', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-MKT', 'Dept of Marketing', 'Marketing and sales', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-HRM', 'Dept of HRM', 'Human resources mgmt', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-SCM', 'Dept of Supply Chain', 'Logistics and operations', TRUE),
+
+-- 2. Faculty of Humanities & Social Sciences (Uptown)
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-HUM-FAC', 'Faculty of Humanities', 'Arts and social sciences', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-PSY', 'Dept of Psychology', 'Behavioral sciences', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-SOC', 'Dept of Sociology', 'Societal studies', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-POL', 'Dept of Political Science', 'Governance and politics', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-IR', 'Dept of Intl Relations', 'Global affairs', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-PHI', 'Dept of Philosophy', 'Logics and ethics', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-LAW', 'Dept of Legal Affairs', 'Legal and law studies', TRUE),
+
+-- 3. Languages & Arts (Uptown)
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-ENG', 'Dept of English', 'English linguistics', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-URD', 'Dept of Urdu', 'Urdu studies', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-ARA', 'Dept of Arabic', 'Arabic studies', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-FRN', 'Dept of French', 'French studies', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-CHI', 'Dept of Chinese', 'Chinese studies', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-HIS', 'Dept of History', 'Historical studies', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-GEO', 'Dept of Geography', 'Geographical and spatial studies', TRUE),
+
+-- 4. Student Support (Uptown)
+(1, 2, (SELECT id FROM department_types WHERE code = 'SUPPORT' AND organization_id = 1), 'UP-SS-COUNSEL', 'Student Counseling', 'Guidance and support', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'SUPPORT' AND organization_id = 1), 'UP-SS-CAREER', 'Career Services', 'Placement office', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'SUPPORT' AND organization_id = 1), 'UP-SS-ALUMNI', 'Alumni Relations', 'Alumni network', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'HOSTEL' AND organization_id = 1), 'UP-SS-HOSTEL', 'Hostel Management', 'On-campus housing', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-GER', 'Dept of German', 'German studies', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC_SUPPORT' AND organization_id = 1), 'UP-AS-TRAIN', 'Training & Development', 'Staff and faculty training', TRUE),
+(1, 2, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'UP-ACAD-DIST', 'Distance Learning', 'Online and remote education', TRUE);
+
+
+-- ------------------------------------------------------------
+-- 🌿 CAMPUS 3: RIVERSIDE CAMPUS (Comprehensive School & College)
+-- ------------------------------------------------------------
+INSERT INTO departments 
+(organization_id, campus_id, department_type_id, department_code, department_name, description, active) VALUES
+
+-- 1. General school Departments (Riverside)
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-SCH-MAT', 'Mathematics Dept', 'Core mathematics', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-SCH-SCI', 'General Science Dept', 'Physics, Chemistry, Biology', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-SCH-ENG', 'English Dept', 'Grammar and literature', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-SCH-SOC', 'Social Studies Dept', 'History and Geography', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-SCH-ISL', 'Islamic Studies Dept', 'Religious education', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-SCH-CIV', 'Civics & Pol Science', 'Citizenship education', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-SCH-ART', 'Fine Arts Dept', 'Creative arts', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-SCH-MUS', 'Music Dept', 'Musical education', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-SCH-PE', 'Physical Education', 'Sports and games', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'SUPPORT' AND organization_id = 1), 'RS-SS-DISC', 'Discipline Office', 'Student conduct and discipline', TRUE),
+
+-- 2. College Level Departments (Riverside)
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-COL-PREM', 'Pre-Medical Dept', 'College pre-med', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-COL-PREE', 'Pre-Engineering Dept', 'College pre-eng', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-COL-COM', 'Commerce Dept', 'College commerce', TRUE),
+
+-- 3. Operational & Facilities (Riverside)
+(1, 3, (SELECT id FROM department_types WHERE code = 'OPERATIONS' AND organization_id = 1), 'RS-OP-MAINT', 'Facilities & Maintenance', 'Campus upkeep', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'SECURITY' AND organization_id = 1), 'RS-OP-SEC', 'Security Department', 'Campus safety', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'OPERATIONS' AND organization_id = 1), 'RS-OP-CLEAN', 'Housekeeping', 'Cleanliness and hygiene', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'FOOD' AND organization_id = 1), 'RS-OP-FOOD', 'Cafeteria Services', 'Student food services', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'TRANSPORT' AND organization_id = 1), 'RS-OP-TRANS', 'Transport Department', 'Fleet management', TRUE),
+
+-- 4. Specialized Religious / Cultural (Riverside)
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-REL-SHARIAH', 'Shariah Department', 'Specialized religious studies', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-REL-ETHICS', 'Ethics & Moral Ed', 'Values education', TRUE),
+(1, 3, (SELECT id FROM department_types WHERE code = 'ACADEMIC' AND organization_id = 1), 'RS-CUL-AFFAIRS', 'Cultural Affairs', 'Heritage and culture', TRUE);
+
+-- Final Hierarchical Updates (Assigning Parents)
+UPDATE departments d1 
+JOIN departments d2 ON d2.department_code = 'DT-ACAD-ENG-FAC' AND d2.campus_id = 1
+SET d1.parent_id = d2.id 
+WHERE d1.department_code IN ('DT-ACAD-CS', 'DT-ACAD-SE', 'DT-ACAD-IT', 'DT-ACAD-AI', 'DT-ACAD-DS', 'DT-ACAD-CYB', 'DT-ACAD-EE', 'DT-ACAD-ME', 'DT-ACAD-CE', 'DT-ACAD-CHE') AND d1.campus_id = 1;
+
+UPDATE departments d1 
+JOIN departments d2 ON d2.department_code = 'DT-ACAD-MED' AND d2.campus_id = 1
+SET d1.parent_id = d2.id 
+WHERE d1.department_code IN ('DT-ACAD-PHARM', 'DT-ACAD-NURS', 'DT-ACAD-BIO', 'DT-ACAD-BIOTECH', 'DT-ACAD-MICRO', 'DT-ACAD-ZOO', 'DT-ACAD-BOT') AND d1.campus_id = 1;
+
+UPDATE departments d1 
+JOIN departments d2 ON d2.department_code = 'UP-ACAD-BUS-FAC' AND d2.campus_id = 2
+SET d1.parent_id = d2.id 
+WHERE d1.department_code IN ('UP-ACAD-BBA', 'UP-ACAD-FIN', 'UP-ACAD-ACC', 'UP-ACAD-MKT', 'UP-ACAD-HRM', 'UP-ACAD-SCM') AND d1.campus_id = 2;
+
+UPDATE departments d1 
+JOIN departments d2 ON d2.department_code = 'UP-ACAD-HUM-FAC' AND d2.campus_id = 2
+SET d1.parent_id = d2.id 
+WHERE d1.department_code IN ('UP-ACAD-PSY', 'UP-ACAD-SOC', 'UP-ACAD-POL', 'UP-ACAD-IR', 'UP-ACAD-PHI', 'UP-ACAD-LAW', 'UP-ACAD-HIS', 'UP-ACAD-GEO') AND d1.campus_id = 2;
 
 
 INSERT INTO charge_types
