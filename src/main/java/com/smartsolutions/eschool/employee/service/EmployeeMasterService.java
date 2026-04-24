@@ -1,13 +1,22 @@
 package com.smartsolutions.eschool.employee.service;
 
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeCreateRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeTypeCountDTO;
+import com.smartsolutions.eschool.employee.model.EmployeeAssignmentEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeDocumentEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
+import com.smartsolutions.eschool.employee.repository.EmployeeAssignmentRepository;
 import com.smartsolutions.eschool.employee.repository.EmployeeDocumentRepository;
 import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
+import com.smartsolutions.eschool.school.repository.CampusRepository;
+import com.smartsolutions.eschool.school.repository.DepartmentRepository;
+import com.smartsolutions.eschool.school.repository.DesignationRepository;
+import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.school.model.DepartmentEntity;
+import com.smartsolutions.eschool.school.model.DesignationEntity;
 import com.smartsolutions.eschool.global.configs.EmployeeDocumentConfig;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.global.utils.UploadUtil;
@@ -40,11 +49,25 @@ import java.util.stream.Collectors;
 public class EmployeeMasterService {
     private final EmployeeMasterRepository employeeRepository;
     private final EmployeeDocumentRepository employeeDocumentRepository;
+    private final EmployeeAssignmentRepository assignmentRepository;
+    private final CampusRepository campusRepository;
+    private final DepartmentRepository departmentRepository;
+    private final DesignationRepository designationRepository;
     private final EmployeeDocumentConfig feeConfig;
 
-    public EmployeeMasterService(EmployeeMasterRepository employeeRepository, EmployeeDocumentRepository employeeDocumentRepository, EmployeeDocumentConfig feeConfig) {
+    public EmployeeMasterService(EmployeeMasterRepository employeeRepository, 
+                                 EmployeeDocumentRepository employeeDocumentRepository, 
+                                 EmployeeAssignmentRepository assignmentRepository,
+                                 CampusRepository campusRepository,
+                                 DepartmentRepository departmentRepository,
+                                 DesignationRepository designationRepository,
+                                 EmployeeDocumentConfig feeConfig) {
         this.employeeRepository = employeeRepository;
         this.employeeDocumentRepository = employeeDocumentRepository;
+        this.assignmentRepository = assignmentRepository;
+        this.campusRepository = campusRepository;
+        this.departmentRepository = departmentRepository;
+        this.designationRepository = designationRepository;
         this.feeConfig = feeConfig;
     }
 
@@ -160,8 +183,43 @@ public class EmployeeMasterService {
     }
 
     @Transactional
+    public EmployeeMasterResponseDto createEmployee(EmployeeCreateRequestDto requestDto) {
+        log.info("Creating new Employee with assignment: {} {}", requestDto.getFirstName(), requestDto.getLastName());
+        try {
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            
+            // 1. Save Employee Master
+            EmployeeMasterEntity employeeEntity = MapperUtil.mapObject(requestDto, EmployeeMasterEntity.class);
+            employeeEntity.setEmployeeCode(generateEmployeeCode());
+            employeeEntity.setId(null);
+            employeeEntity.setDeleted(false);
+            employeeEntity.setOrganizationId(orgId);
+            
+            EmployeeMasterEntity savedEmployee = employeeRepository.save(employeeEntity);
+            
+            // 2. Create Assignment
+            EmployeeAssignmentEntity assignment = EmployeeAssignmentEntity.builder()
+                    .employee(savedEmployee)
+                    .campus(campusRepository.getReferenceById(requestDto.getCampusId()))
+                    .department(departmentRepository.getReferenceById(requestDto.getDepartmentId()))
+                    .designation(designationRepository.getReferenceById(requestDto.getDesignationId()))
+                    .startDate(requestDto.getAssignmentStartDate() != null ? requestDto.getAssignmentStartDate() : new Date())
+                    .isPrimary(true)
+                    .build();
+            assignment.setOrganizationId(orgId);
+            assignmentRepository.save(assignment);
+            
+            log.info("Successfully created Employee and Assignment: id={}", savedEmployee.getId());
+            return toDTO(savedEmployee);
+        } catch (Exception e) {
+            log.error("Failed to create employee with assignment", e);
+            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to create employee: " + e.getMessage());
+        }
+    }
+
+    @Transactional
     public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto employeeDTO) {
-        log.info("Creating new Employee: {} {} in database", employeeDTO.getFirstName(), employeeDTO.getLastName());
+        log.info("Creating new Employee (legacy): {} {} in database", employeeDTO.getFirstName(), employeeDTO.getLastName());
         try {
             EmployeeMasterEntity employeeEntity = MapperUtil.mapObject(employeeDTO, EmployeeMasterEntity.class);
             employeeEntity.setEmployeeCode(generateEmployeeCode());
@@ -371,7 +429,7 @@ public class EmployeeMasterService {
     EmployeeMasterResponseDto toDTO(EmployeeMasterEntity entity) {
         if (entity == null) return null;
 
-        return EmployeeMasterResponseDto.builder()
+        EmployeeMasterResponseDto dto = EmployeeMasterResponseDto.builder()
                 .id(entity.getId())
                 .employeeCode(entity.getEmployeeCode())
                 .firstName(entity.getFirstName())
@@ -396,6 +454,19 @@ public class EmployeeMasterService {
                 .bio(entity.getBio())
                 .active(entity.getActive())
                 .build();
+
+        // Enrich with current assignment
+        assignmentRepository.findPrimaryAssignmentByEmployeeId(entity.getId())
+                .ifPresent(assignment -> {
+                    dto.setCampusId(assignment.getCampus().getId());
+                    dto.setCampusName(assignment.getCampus().getCampusName());
+                    dto.setDepartmentId(assignment.getDepartment().getId());
+                    dto.setDepartmentName(assignment.getDepartment().getDepartmentName());
+                    dto.setDesignationId(assignment.getDesignation().getId());
+                    dto.setDesignationName(assignment.getDesignation().getDesignationName());
+                });
+
+        return dto;
     }
 
     private String generateEmployeeCode() {

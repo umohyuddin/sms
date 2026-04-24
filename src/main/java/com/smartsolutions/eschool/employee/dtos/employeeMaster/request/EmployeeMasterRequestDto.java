@@ -40,8 +40,4 @@ public class EmployeeMasterRequestDto {
 
     // Status
     private Boolean active = true;
-
-    // Relationships (by IDs)
-//    private Long departmentId;       // FK to Department
-//    private List<Long> roleIds;      // List of role IDs
 }

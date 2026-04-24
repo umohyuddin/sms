@@ -1671,6 +1671,34 @@ CREATE TABLE student_guardians (
     CREATE INDEX idx_employee_designation_history_designation_id ON employee_designation_history (designation_id);
     CREATE INDEX idx_employee_designation_history_department_id ON employee_designation_history (department_id);
 
+    DROP TABLE IF EXISTS employee_assignments;
+    CREATE TABLE employee_assignments (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        organization_id BIGINT NOT NULL,
+        employee_id BIGINT NOT NULL,
+        campus_id BIGINT NOT NULL,
+        department_id BIGINT NOT NULL,
+        designation_id BIGINT NOT NULL,
+        start_date DATE NOT NULL,
+        end_date DATE,
+        is_primary BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        created_by BIGINT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_by BIGINT,
+        deleted BOOLEAN DEFAULT FALSE,
+        deleted_at DATETIME,
+        deleted_by BIGINT,
+        CONSTRAINT fk_assign_employee FOREIGN KEY (employee_id) REFERENCES employee_master(id),
+        CONSTRAINT fk_assign_campus FOREIGN KEY (campus_id) REFERENCES campuses(id),
+        CONSTRAINT fk_assign_dept FOREIGN KEY (department_id) REFERENCES departments(id),
+        CONSTRAINT fk_assign_designation FOREIGN KEY (designation_id) REFERENCES designations(id)
+    );
+    CREATE INDEX idx_assign_employee_primary ON employee_assignments (employee_id, is_primary);
+    CREATE INDEX idx_assign_campus ON employee_assignments (campus_id);
+    CREATE INDEX idx_assign_dept ON employee_assignments (department_id);
+    CREATE INDEX idx_assign_designation ON employee_assignments (designation_id);
+
     DROP TABLE IF EXISTS employee_type_history;
     CREATE TABLE employee_type_history (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,

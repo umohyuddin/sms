@@ -47,6 +47,14 @@ public class EmployeeMasterResponseDto {
     private Long employeeTypeId;
     private String employeeTypeName;
 
+    // Assignment Details
+    private Long campusId;
+    private String campusName;
+    private Long departmentId;
+    private String departmentName;
+    private Long designationId;
+    private String designationName;
+
     public static EmployeeMasterResponseDto fromEntity(EmployeeMasterEntity entity) {
         if (entity == null) return null;
 

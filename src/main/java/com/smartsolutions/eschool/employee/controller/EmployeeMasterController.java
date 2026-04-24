@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.employee.controller;
 
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeAddressRequestDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeCreateRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeAddressResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
@@ -145,14 +146,14 @@ public class EmployeeMasterController {
 
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeMasterResponseDto> createEmployee(@RequestBody EmployeeMasterRequestDto requestDto) {
-        log.info("POST /api/institute/employees called with data: {}", requestDto);
+    public ResponseEntity<EmployeeMasterResponseDto> createEmployee(@RequestBody EmployeeCreateRequestDto requestDto) {
+        log.info("POST /api/institute/employees called with unified data: {}", requestDto);
         try {
             EmployeeMasterResponseDto createdEmployee = employeeFacade.createEmployee(requestDto);
-            log.info("Employee created successfully with id: {}", createdEmployee.getId());
+            log.info("Employee and Assignment created successfully with id: {}", createdEmployee.getId());
             return ResponseEntity.ok(createdEmployee);
         } catch (Exception e) {
-            log.error("Failed to create employee", e);
+            log.error("Failed to create employee with assignment", e);
             return ResponseEntity.status(500).body(null);
         }
     }

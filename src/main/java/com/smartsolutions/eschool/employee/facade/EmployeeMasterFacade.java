@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.facade;
 
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeCreateRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeAddressResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
@@ -75,6 +76,13 @@ public class EmployeeMasterFacade {
         log.info("Facade: Request to fetch Employees with probation ended before: {}", date);
         List<EmployeeMasterResponseDto> result = employeeService.getProbationEndedBefore(date);
         log.info("Facade: Successfully fetched {} Employees", result.size());
+        return result;
+    }
+
+    public EmployeeMasterResponseDto createEmployee(EmployeeCreateRequestDto requestDto) {
+        log.info("Facade: Request to create new Employee with assignment: {} {}", requestDto.getFirstName(), requestDto.getLastName());
+        EmployeeMasterResponseDto result = employeeService.createEmployee(requestDto);
+        log.info("Facade: Successfully created Employee and Assignment: id={}", result.getId());
         return result;
     }
 
