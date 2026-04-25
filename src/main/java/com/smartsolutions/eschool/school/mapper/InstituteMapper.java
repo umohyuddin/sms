@@ -60,4 +60,53 @@ public class InstituteMapper {
                 .map(InstituteMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    public static InstituteEntity toEntity(com.smartsolutions.eschool.school.dtos.institute.request.InstituteRequestDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new com.smartsolutions.eschool.global.error.ApiException(
+                    com.smartsolutions.eschool.institute.error.InstituteErrors.INVALID_INSTITUTE_DATA,
+                    "Institute name is required",
+                    org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+        InstituteEntity entity = new InstituteEntity();
+        entity.setName(dto.getName().trim());
+        entity.setAddress(dto.getAddress());
+        entity.setContactNumber(dto.getContactNumber());
+        entity.setEmail(dto.getEmail());
+        entity.setWebsite(dto.getWebsite());
+        entity.setTagLine(dto.getTagLine());
+        entity.setLogo(dto.getLogo());
+        entity.setEstablishedDate(dto.getEstablishedDate());
+        
+        return entity;
+    }
+
+    public static void updateEntityFromDTO(InstituteEntity entity, com.smartsolutions.eschool.school.dtos.institute.request.InstituteRequestDTO dto) {
+        if (entity == null || dto == null) {
+            return;
+        }
+
+        if (dto.getName() != null) {
+            if (dto.getName().trim().isEmpty()) {
+                throw new com.smartsolutions.eschool.global.error.ApiException(
+                        com.smartsolutions.eschool.institute.error.InstituteErrors.INVALID_INSTITUTE_DATA,
+                        "Institute name cannot be empty",
+                        org.springframework.http.HttpStatus.BAD_REQUEST);
+            }
+            entity.setName(dto.getName().trim());
+        }
+
+        if (dto.getAddress() != null) entity.setAddress(dto.getAddress());
+        if (dto.getContactNumber() != null) entity.setContactNumber(dto.getContactNumber());
+        if (dto.getEmail() != null) entity.setEmail(dto.getEmail());
+        if (dto.getWebsite() != null) entity.setWebsite(dto.getWebsite());
+        if (dto.getTagLine() != null) entity.setTagLine(dto.getTagLine());
+        if (dto.getLogo() != null) entity.setLogo(dto.getLogo());
+        if (dto.getEstablishedDate() != null) entity.setEstablishedDate(dto.getEstablishedDate());
+    }
 }
