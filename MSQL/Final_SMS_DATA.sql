@@ -1,7 +1,10 @@
+SET SQL_SAFE_UPDATES = 0;
 INSERT INTO academic_years
 (name, code, start_date, end_date, total_months, is_current, status, organization_id)
 VALUES
 ('Academic Year 2025-2026', 'AY2025', '2025-04-01', '2026-03-31', 12, TRUE, 'ACTIVE', 1);
+
+
 
 
 -- =========================
@@ -1624,7 +1627,43 @@ VALUES
  NOW()
 );
 
-
+INSERT INTO board_member_roles (organization_id, code, name) VALUES
+(1, 'CHAIRMAN', 'Chairman'),
+(1, 'CHAIRPERSON', 'Chairperson'),
+(1, 'PRESIDENT', 'President'),
+(1, 'VICE_CHAIRMAN', 'Vice Chairman'),
+(1, 'VICE_CHAIRPERSON', 'Vice Chairperson'),
+(1, 'VICE_PRESIDENT', 'Vice President'),
+(1, 'DIRECTOR', 'Board Director'),
+(1, 'EXECUTIVE_DIRECTOR', 'Executive Director'),
+(1, 'NON_EXECUTIVE_DIRECTOR', 'Non-Executive Director'),
+(1, 'INDEPENDENT_DIRECTOR', 'Independent Director'),
+(1, 'ADVISOR', 'Advisor'),
+(1, 'TRUSTEE', 'Trustee'),
+(1, 'GOVERNOR', 'Governor'),
+(1, 'BOARD_MEMBER', 'Board Member'),
+(1, 'SECRETARY', 'Board Secretary'),
+(1, 'ASSISTANT_SECRETARY', 'Assistant Secretary'),
+(1, 'TREASURER', 'Treasurer'),
+(1, 'ASSISTANT_TREASURER', 'Assistant Treasurer'),
+(1, 'CHANCELLOR', 'Chancellor'),
+(1, 'VICE_CHANCELLOR', 'Vice Chancellor'),
+(1, 'PRO_CHANCELLOR', 'Pro Chancellor'),
+(1, 'RECTOR', 'Rector'),
+(1, 'PROVOST', 'Provost'),
+(1, 'AUDIT_COMMITTEE_MEMBER', 'Audit Committee Member'),
+(1, 'FINANCE_COMMITTEE_MEMBER', 'Finance Committee Member'),
+(1, 'ACADEMIC_COMMITTEE_MEMBER', 'Academic Committee Member'),
+(1, 'GOVERNANCE_COMMITTEE_MEMBER', 'Governance Committee Member'),
+(1, 'LEGAL_ADVISOR', 'Legal Advisor'),
+(1, 'FINANCIAL_ADVISOR', 'Financial Advisor'),
+(1, 'STRATEGIC_ADVISOR', 'Strategic Advisor'),
+(1, 'EXTERNAL_MEMBER', 'External Board Member'),
+(1, 'INTERNAL_MEMBER', 'Internal Board Member'),
+(1, 'PATRON', 'Patron'),
+(1, 'FOUNDER', 'Founder'),
+(1, 'CO_FOUNDER', 'Co-Founder'),
+(1, 'HONORARY_MEMBER', 'Honorary Member');
 
 
 

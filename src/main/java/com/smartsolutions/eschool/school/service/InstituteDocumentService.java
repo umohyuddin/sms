@@ -22,4 +22,6 @@ public interface InstituteDocumentService {
 
     InstituteDocumentResponseDTO uploadDocument(Long instituteId, String documentType, java.time.LocalDate expiryDate,
             org.springframework.web.multipart.MultipartFile file);
+
+    org.springframework.core.io.Resource downloadDocument(Long documentId);
 }

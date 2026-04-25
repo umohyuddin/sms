@@ -14,44 +14,44 @@ import java.util.List;
 @Slf4j
 public class DepartmentTypeFacade {
 
-    private final DepartmentTypeService departmentTypeService;
+    private final DepartmentTypeService nDepartmentTypeService;
 
-    public DepartmentTypeFacade(DepartmentTypeService departmentTypeService) {
-        this.departmentTypeService = departmentTypeService;
+    public DepartmentTypeFacade(DepartmentTypeService nDepartmentTypeService) {
+        this.nDepartmentTypeService = nDepartmentTypeService;
     }
 
     public List<DepartmentTypeResponseDTO> getAll() {
         log.info("[Facade:DepartmentTypeFacade] getAll() called");
-        return departmentTypeService.getAll();
+        return nDepartmentTypeService.getAll();
     }
 
     public DepartmentTypeResponseDTO getById(Long id) {
         log.info("[Facade:DepartmentTypeFacade] getById() called - id: {}", id);
-        return departmentTypeService.getById(id);
+        return nDepartmentTypeService.getById(id);
     }
 
     public void softDeleteById(Long id) {
         log.info("[Facade:DepartmentTypeFacade] softDeleteById() called - id: {}", id);
-        departmentTypeService.softDeleteById(id);
+        nDepartmentTypeService.softDeleteById(id);
     }
 
     public DepartmentTypeResponseDTO createDepartmentType(DepartmentTypeCreateRequestDTO dto) {
         log.info("[Facade:DepartmentTypeFacade] createDepartmentType() called");
-        return departmentTypeService.createDepartmentType(dto);
+        return nDepartmentTypeService.createDepartmentType(dto);
     }
 
     public DepartmentTypeResponseDTO updateDepartmentType(Long id, DepartmentTypeCreateRequestDTO dto) {
         log.info("[Facade:DepartmentTypeFacade] updateDepartmentType() called - id: {}", id);
-        return departmentTypeService.updateDepartmentType(id, dto);
+        return nDepartmentTypeService.updateDepartmentType(id, dto);
     }
 
     public List<DepartmentTypeResponseDTO> searchByKeyword(String keyword) {
         log.info("[Facade:DepartmentTypeFacade] searchByKeyword() called - keyword: {}", keyword);
-        return departmentTypeService.searchByKeyword(keyword);
+        return nDepartmentTypeService.searchByKeyword(keyword);
     }
 
     public java.util.Map<String, Long> getStatistics() {
         log.info("[Facade:DepartmentTypeFacade] getStatistics() called");
-        return departmentTypeService.getStatistics();
+        return nDepartmentTypeService.getStatistics();
     }
 }

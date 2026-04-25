@@ -186,10 +186,7 @@ public class EmployeeMasterEntity extends AuditableEntity {
     private List<EmployeeMasterSalary> salaries;
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<EmployeeDepartmentHistoryEntity> departmentHistories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<EmployeeDesignationHistoryEntity> designationHistories = new ArrayList<>();
+    private List<EmployeeAssignmentEntity> assignments = new ArrayList<>();
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<EmployeeTypeHistoryEntity> typeHistories = new ArrayList<>();

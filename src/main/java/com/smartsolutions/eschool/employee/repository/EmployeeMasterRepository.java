@@ -19,10 +19,10 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEn
     @Query("SELECT e FROM EmployeeMasterEntity e LEFT JOIN FETCH e.employeeType WHERE e.organizationId = :organizationId")
     List<EmployeeMasterEntity> findAllNonDeleted(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.id = :id AND e.organizationId = :organizationId")
+    @Query("SELECT e FROM EmployeeMasterEntity e LEFT JOIN FETCH e.employeeType WHERE e.id = :id AND e.organizationId = :organizationId")
     Optional<EmployeeMasterEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.employeeCode = :code AND e.organizationId = :organizationId")
+    @Query("SELECT e FROM EmployeeMasterEntity e LEFT JOIN FETCH e.employeeType WHERE e.employeeCode = :code AND e.organizationId = :organizationId")
     Optional<EmployeeMasterEntity> findByEmployeeCodeAndOrganizationId(@Param("code") String code, @Param("organizationId") Long organizationId);
 
     @Query("""

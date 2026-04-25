@@ -5,36 +5,34 @@ import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeM
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeTypeCountDTO;
+import com.smartsolutions.eschool.employee.error.EmployeeErrors;
+import com.smartsolutions.eschool.employee.mapper.EmployeeMapper;
 import com.smartsolutions.eschool.employee.model.EmployeeAssignmentEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeDocumentEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.employee.repository.EmployeeAssignmentRepository;
 import com.smartsolutions.eschool.employee.repository.EmployeeDocumentRepository;
 import com.smartsolutions.eschool.employee.repository.EmployeeMasterRepository;
+import com.smartsolutions.eschool.global.configs.EmployeeDocumentConfig;
+import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.global.utils.UploadUtil;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
 import com.smartsolutions.eschool.school.repository.DepartmentRepository;
 import com.smartsolutions.eschool.school.repository.DesignationRepository;
-import com.smartsolutions.eschool.school.model.CampusEntity;
-import com.smartsolutions.eschool.school.model.DepartmentEntity;
-import com.smartsolutions.eschool.school.model.DesignationEntity;
-import com.smartsolutions.eschool.global.configs.EmployeeDocumentConfig;
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.global.utils.UploadUtil;
 import com.smartsolutions.eschool.util.MapperUtil;
+
+import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.modelmapper.MappingException;
-import org.springframework.dao.DataAccessException;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +45,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class EmployeeMasterService {
+
     private final EmployeeMasterRepository employeeRepository;
     private final EmployeeDocumentRepository employeeDocumentRepository;
     private final EmployeeAssignmentRepository assignmentRepository;
@@ -55,8 +54,8 @@ public class EmployeeMasterService {
     private final DesignationRepository designationRepository;
     private final EmployeeDocumentConfig feeConfig;
 
-    public EmployeeMasterService(EmployeeMasterRepository employeeRepository, 
-                                 EmployeeDocumentRepository employeeDocumentRepository, 
+    public EmployeeMasterService(EmployeeMasterRepository employeeRepository,
+                                 EmployeeDocumentRepository employeeDocumentRepository,
                                  EmployeeAssignmentRepository assignmentRepository,
                                  CampusRepository campusRepository,
                                  DepartmentRepository departmentRepository,
@@ -71,422 +70,359 @@ public class EmployeeMasterService {
         this.feeConfig = feeConfig;
     }
 
-    // -------------------------
-    // Get all employees
-    // -------------------------
-// -------------------------
-// Get all employees with Employee Type
-// -------------------------
+    // ─────────────────────────────────────────────
+    // READ
+    // ─────────────────────────────────────────────
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<EmployeeMasterResponseDto> getAll() {
-        log.info("Fetching all non-deleted Employees from database");
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            List<EmployeeMasterEntity> employees = employeeRepository.findAllNonDeleted(orgId);
-            List<EmployeeMasterResponseDto> dtoList = employees.stream()
-                    .map(this::toDTO)
-                    .collect(Collectors.toList());
-            log.info("Successfully fetched {} Employees", dtoList.size());
-            return dtoList;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Employees", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Unable to fetch Employees");
-        }
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] getAll() called - org: {}", orgId);
+        List<EmployeeMasterEntity> employees = employeeRepository.findAllNonDeleted(orgId);
+        List<EmployeeMasterResponseDto> dtoList = employees.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+        log.info("[Service:EmployeeMasterService] getAll() succeeded - Found {} employees", dtoList.size());
+        return dtoList;
     }
 
     @Transactional
     public EmployeeMasterResponseDto getById(Long id) {
-        log.info("Fetching Employee with id {} from database", id);
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            EmployeeMasterEntity employee = employeeRepository.findByIdAndOrganizationId(id, orgId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
-            log.info("Successfully fetched Employee: id={}", employee.getId());
-            return toDTO(employee);
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Employee ID: {}", id, e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to fetch Employee by ID");
-        }
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] getById() called - id: {}, org: {}", id, orgId);
+        EmployeeMasterEntity employee = employeeRepository.findByIdAndOrganizationId(id, orgId)
+                .orElseThrow(() -> new ApiException(EmployeeErrors.EMPLOYEE_NOT_FOUND, HttpStatus.NOT_FOUND));
+        log.info("[Service:EmployeeMasterService] getById() succeeded - id: {}", id);
+        return toDTO(employee);
     }
 
     public EmployeeMasterResponseDto getByEmployeeCode(String code) {
-        log.info("Fetching Employee with code '{}' from database", code);
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            EmployeeMasterEntity employee = employeeRepository.findByEmployeeCodeAndOrganizationId(code, orgId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee not found with code: " + code));
-            log.info("Successfully fetched Employee: code={}", code);
-            return toDTO(employee);
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Employee code: {}", code, e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to fetch Employee by code");
-        }
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] getByEmployeeCode() called - code: '{}', org: {}", code, orgId);
+        EmployeeMasterEntity employee = employeeRepository.findByEmployeeCodeAndOrganizationId(code, orgId)
+                .orElseThrow(() -> new ApiException(EmployeeErrors.EMPLOYEE_NOT_FOUND, HttpStatus.NOT_FOUND));
+        log.info("[Service:EmployeeMasterService] getByEmployeeCode() succeeded - code: '{}'", code);
+        return toDTO(employee);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<EmployeeMasterResponseDto> searchByKeyword(String keyword) {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         String searchKey = keyword == null ? "" : keyword.trim();
-        log.info("Searching Employees with keyword: '{}' in database", searchKey);
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            List<EmployeeMasterEntity> result = employeeRepository.searchByKeyword(searchKey, orgId);
-            List<EmployeeMasterResponseDto> dtoList = result.stream()
-                    .map(this::toDTO)
-                    .collect(Collectors.toList());
-            log.info("Successfully fetched {} Employees based on search", dtoList.size());
-            return dtoList;
-        } catch (Exception e) {
-            log.error("Unexpected error while searching Employees", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to search Employees");
-        }
+        log.info("[Service:EmployeeMasterService] searchByKeyword() called - keyword: '{}', org: {}", searchKey, orgId);
+        List<EmployeeMasterEntity> result = employeeRepository.searchByKeyword(searchKey, orgId);
+        List<EmployeeMasterResponseDto> dtoList = result.stream().map(this::toDTO).collect(Collectors.toList());
+        log.info("[Service:EmployeeMasterService] searchByKeyword() succeeded - Found {} employees", dtoList.size());
+        return dtoList;
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<EmployeeMasterResponseDto> getByGender(String gender) {
-        log.info("Fetching Employees by gender: '{}'", gender);
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            List<EmployeeMasterEntity> result = employeeRepository.findByGender(gender, orgId);
-            log.info("Successfully fetched {} Employees for gender: '{}'", result.size(), gender);
-            return result.stream().map(this::toDTO).collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Employees by gender", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to fetch Employees by gender");
-        }
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] getByGender() called - gender: '{}', org: {}", gender, orgId);
+        List<EmployeeMasterEntity> result = employeeRepository.findByGender(gender, orgId);
+        log.info("[Service:EmployeeMasterService] getByGender() succeeded - Found {} employees", result.size());
+        return result.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<EmployeeMasterResponseDto> getByActiveStatus(Boolean status) {
-        log.info("Fetching Employees by active status: {}", status);
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            List<EmployeeMasterEntity> result = employeeRepository.findByActiveStatus(status, orgId);
-            log.info("Successfully fetched {} Employees for active status: {}", result.size(), status);
-            return result.stream().map(this::toDTO).collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Employees by active status", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to fetch Employees by active status");
-        }
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] getByActiveStatus() called - status: {}, org: {}", status, orgId);
+        List<EmployeeMasterEntity> result = employeeRepository.findByActiveStatus(status, orgId);
+        log.info("[Service:EmployeeMasterService] getByActiveStatus() succeeded - Found {} employees", result.size());
+        return result.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<EmployeeMasterResponseDto> getProbationEndedBefore(Date date) {
-        log.info("Fetching Employees probation ended before: {}", date);
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            List<EmployeeMasterEntity> result = employeeRepository.findProbationEndedBefore(date, orgId);
-            log.info("Successfully fetched {} Employees with probation ended", result.size());
-            return result.stream().map(this::toDTO).collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Employees by probation end date", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to fetch Employees by probation end date");
-        }
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] getProbationEndedBefore() called - date: {}, org: {}", date, orgId);
+        List<EmployeeMasterEntity> result = employeeRepository.findProbationEndedBefore(date, orgId);
+        log.info("[Service:EmployeeMasterService] getProbationEndedBefore() succeeded - Found {} employees", result.size());
+        return result.stream().map(this::toDTO).collect(Collectors.toList());
     }
+
+    // ─────────────────────────────────────────────
+    // CREATE
+    // ─────────────────────────────────────────────
 
     @Transactional
     public EmployeeMasterResponseDto createEmployee(EmployeeCreateRequestDto requestDto) {
-        log.info("Creating new Employee with assignment: {} {}", requestDto.getFirstName(), requestDto.getLastName());
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            
-            // 1. Save Employee Master
-            EmployeeMasterEntity employeeEntity = MapperUtil.mapObject(requestDto, EmployeeMasterEntity.class);
-            employeeEntity.setEmployeeCode(generateEmployeeCode());
-            employeeEntity.setId(null);
-            employeeEntity.setDeleted(false);
-            employeeEntity.setOrganizationId(orgId);
-            
-            EmployeeMasterEntity savedEmployee = employeeRepository.save(employeeEntity);
-            
-            // 2. Create Assignment
-            EmployeeAssignmentEntity assignment = EmployeeAssignmentEntity.builder()
-                    .employee(savedEmployee)
-                    .campus(campusRepository.getReferenceById(requestDto.getCampusId()))
-                    .department(departmentRepository.getReferenceById(requestDto.getDepartmentId()))
-                    .designation(designationRepository.getReferenceById(requestDto.getDesignationId()))
-                    .startDate(requestDto.getAssignmentStartDate() != null ? requestDto.getAssignmentStartDate() : new Date())
-                    .isPrimary(true)
-                    .build();
-            assignment.setOrganizationId(orgId);
-            assignmentRepository.save(assignment);
-            
-            log.info("Successfully created Employee and Assignment: id={}", savedEmployee.getId());
-            return toDTO(savedEmployee);
-        } catch (Exception e) {
-            log.error("Failed to create employee with assignment", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to create employee: " + e.getMessage());
-        }
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] createEmployee(create) called - org: {}", orgId);
+
+        EmployeeMasterEntity employeeEntity = MapperUtil.mapObject(requestDto, EmployeeMasterEntity.class);
+        employeeEntity.setEmployeeCode(generateEmployeeCode());
+        employeeEntity.setId(null);
+        employeeEntity.setDeleted(false);
+        employeeEntity.setOrganizationId(orgId);
+
+        EmployeeMasterEntity savedEmployee = employeeRepository.save(employeeEntity);
+
+        // Create initial primary assignment
+        EmployeeAssignmentEntity assignment = EmployeeAssignmentEntity.builder()
+                .employee(savedEmployee)
+                .campus(campusRepository.getReferenceById(requestDto.getCampusId()))
+                .department(departmentRepository.getReferenceById(requestDto.getDepartmentId()))
+                .designation(designationRepository.getReferenceById(requestDto.getDesignationId()))
+                .startDate(requestDto.getAssignmentStartDate() != null ? requestDto.getAssignmentStartDate() : new Date())
+                .isPrimary(true)
+                .build();
+        assignment.setOrganizationId(orgId);
+        assignmentRepository.save(assignment);
+
+        log.info("[Service:EmployeeMasterService] createEmployee(create) succeeded - id: {}", savedEmployee.getId());
+        return toDTO(savedEmployee);
     }
 
     @Transactional
-    public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto employeeDTO) {
-        log.info("Creating new Employee (legacy): {} {} in database", employeeDTO.getFirstName(), employeeDTO.getLastName());
-        try {
-            EmployeeMasterEntity employeeEntity = MapperUtil.mapObject(employeeDTO, EmployeeMasterEntity.class);
-            employeeEntity.setEmployeeCode(generateEmployeeCode());
-            employeeEntity.setId(null);
-            employeeEntity.setDeleted(false);
-            
-            EmployeeMasterEntity savedEmployee = employeeRepository.save(employeeEntity);
-            log.info("Successfully created Employee: id={}, code={}", savedEmployee.getId(), savedEmployee.getEmployeeCode());
-            return toDTO(savedEmployee);
-        } catch (Exception e) {
-            log.error("Unexpected error while creating Employee: {}", employeeDTO.getFirstName(), e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to create Employee");
+    public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto requestDto) {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] createEmployee(master) called - org: {}", orgId);
+
+        EmployeeMasterEntity employeeEntity = MapperUtil.mapObject(requestDto, EmployeeMasterEntity.class);
+        employeeEntity.setEmployeeCode(generateEmployeeCode());
+        employeeEntity.setId(null);
+        employeeEntity.setDeleted(false);
+        employeeEntity.setOrganizationId(orgId);
+
+        EmployeeMasterEntity savedEmployee = employeeRepository.save(employeeEntity);
+        log.info("[Service:EmployeeMasterService] createEmployee(master) succeeded - id: {}", savedEmployee.getId());
+        return toDTO(savedEmployee);
+    }
+
+    // ─────────────────────────────────────────────
+    // UPDATE
+    // ─────────────────────────────────────────────
+
+    @Transactional
+    public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto dto) {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] updateEmployee() called - id: {}, org: {}", id, orgId);
+
+        EmployeeMasterEntity entity = employeeRepository.findByIdAndOrganizationId(id, orgId)
+                .orElseThrow(() -> new ApiException(EmployeeErrors.EMPLOYEE_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) entity.setFirstName(dto.getFirstName());
+        if (dto.getLastName() != null && !dto.getLastName().isBlank()) entity.setLastName(dto.getLastName());
+        if (dto.getDateOfBirth() != null) entity.setDateOfBirth(dto.getDateOfBirth());
+        if (dto.getGender() != null) entity.setGender(dto.getGender());
+        if (dto.getPrimaryPhone() != null) entity.setPrimaryPhone(dto.getPrimaryPhone());
+        if (dto.getSecondaryPhone() != null) entity.setSecondaryPhone(dto.getSecondaryPhone());
+        if (dto.getWorkPhone() != null) entity.setWorkPhone(dto.getWorkPhone());
+        if (dto.getEmail() != null) entity.setEmail(dto.getEmail());
+        if (dto.getReligion() != null) entity.setReligion(dto.getReligion());
+        if (dto.getNationality() != null) entity.setNationality(dto.getNationality());
+        if (dto.getMaritalStatus() != null) entity.setMaritalStatus(dto.getMaritalStatus());
+        if (dto.getBloodGroup() != null) entity.setBloodGroup(dto.getBloodGroup());
+        if (dto.getBio() != null) entity.setBio(dto.getBio());
+        if (dto.getJoiningDate() != null) entity.setJoiningDate(dto.getJoiningDate());
+
+        entity.setFullName(
+                (entity.getFirstName() != null ? entity.getFirstName() : "") + " " +
+                (entity.getMiddleName() != null ? entity.getMiddleName() + " " : "") +
+                (entity.getLastName() != null ? entity.getLastName() : "")
+        );
+
+        // Track Assignment History if IDs are provided
+        if (dto.getCampusId() != null && dto.getDepartmentId() != null && dto.getDesignationId() != null) {
+            Optional<EmployeeAssignmentEntity> currentPrimaryOpt = assignmentRepository.findPrimaryAssignmentByEmployeeId(entity.getId());
+            boolean needsNewAssignment = false;
+
+            if (currentPrimaryOpt.isPresent()) {
+                EmployeeAssignmentEntity currentPrimary = currentPrimaryOpt.get();
+                if (!currentPrimary.getCampus().getId().equals(dto.getCampusId()) ||
+                    !currentPrimary.getDepartment().getId().equals(dto.getDepartmentId()) ||
+                    !currentPrimary.getDesignation().getId().equals(dto.getDesignationId())) {
+                    // Close the old assignment
+                    currentPrimary.setIsPrimary(false);
+                    currentPrimary.setEndDate(dto.getAssignmentStartDate() != null ? dto.getAssignmentStartDate() : new Date());
+                    assignmentRepository.save(currentPrimary);
+                    needsNewAssignment = true;
+                }
+            } else {
+                needsNewAssignment = true;
+            }
+
+            if (needsNewAssignment) {
+                EmployeeAssignmentEntity newAssignment = EmployeeAssignmentEntity.builder()
+                        .employee(entity)
+                        .campus(campusRepository.getReferenceById(dto.getCampusId()))
+                        .department(departmentRepository.getReferenceById(dto.getDepartmentId()))
+                        .designation(designationRepository.getReferenceById(dto.getDesignationId()))
+                        .startDate(dto.getAssignmentStartDate() != null ? dto.getAssignmentStartDate() : new Date())
+                        .isPrimary(true)
+                        .build();
+                newAssignment.setOrganizationId(orgId);
+                assignmentRepository.save(newAssignment);
+            }
         }
+
+        EmployeeMasterEntity updated = employeeRepository.save(entity);
+        log.info("[Service:EmployeeMasterService] updateEmployee() succeeded - id: {}", updated.getId());
+        return toDTO(updated);
     }
 
     @Transactional
     public String saveProfilePhoto(Long employeeId, String file) {
-        log.info("Saving profile photo path for Employee ID: {}", employeeId);
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] saveProfilePhoto() called - employeeId: {}", employeeId);
+        EmployeeMasterEntity employee = employeeRepository.findByIdAndOrganizationId(employeeId, orgId)
+                .orElseThrow(() -> new ApiException(EmployeeErrors.EMPLOYEE_NOT_FOUND, HttpStatus.NOT_FOUND));
+        employee.setProfilePicture(file);
+        employeeRepository.save(employee);
+        log.info("[Service:EmployeeMasterService] saveProfilePhoto() succeeded - employeeId: {}", employeeId);
+        return employee.getProfilePicture();
+    }
+
+    // ─────────────────────────────────────────────
+    // DELETE
+    // ─────────────────────────────────────────────
+
+    @Transactional
+    public void delete(Long id) {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        log.info("[Service:EmployeeMasterService] delete() called - id: {}, org: {}", id, orgId);
+        int affected = employeeRepository.softDeleteByIdAndOrganizationId(id, orgId);
+        if (affected == 0) throw new ApiException(EmployeeErrors.EMPLOYEE_NOT_FOUND, HttpStatus.NOT_FOUND);
+        log.info("[Service:EmployeeMasterService] delete() succeeded - id: {}", id);
+    }
+
+    // ─────────────────────────────────────────────
+    // DOCUMENTS
+    // ─────────────────────────────────────────────
+
+    @Transactional
+    public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
+        log.info("[Service:EmployeeMasterService] saveEmployeeDocument() called - employeeId: {}, docKey: {}", employeeId, docKey);
+        String uploadDir = "uploads/employee_" + employeeId + "/documents";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll("\\s+", "_");
+        String fileName = docKey + "_" + System.currentTimeMillis() + "_" + originalFileName;
+
+        Path filePath = Paths.get(uploadDir, fileName);
+        Files.write(filePath, file.getBytes());
+
+        EmployeeDocumentEntity document = EmployeeDocumentEntity.builder()
+                .employeeId(employeeId)
+                .documentType(docKey)
+                .fileName(fileName)
+                .filePath(filePath.toString())
+                .fileType(FilenameUtils.getExtension(fileName).toUpperCase())
+                .build();
+        employeeDocumentRepository.save(document);
+        log.info("[Service:EmployeeMasterService] saveEmployeeDocument() succeeded - employeeId: {}", employeeId);
+    }
+
+    public List<EmployeeDocumentResponseDto> getDocumentsByEmployeeId(Long employeeId) {
+        log.info("[Service:EmployeeMasterService] getDocumentsByEmployeeId() called - employeeId: {}", employeeId);
+        List<EmployeeDocumentEntity> documents = employeeDocumentRepository.findByEmployeeId(employeeId);
+        log.info("[Service:EmployeeMasterService] getDocumentsByEmployeeId() succeeded - Found {} documents", documents.size());
+        return MapperUtil.mapList(documents, EmployeeDocumentResponseDto.class);
+    }
+
+    public Map<String, List<EmployeeDocumentResponseDto>> getGroupedDocuments(Long employeeId) {
+        log.info("[Service:EmployeeMasterService] getGroupedDocuments() called - employeeId: {}", employeeId);
+        List<EmployeeDocumentResponseDto> documents = getDocumentsByEmployeeId(employeeId);
+        if (documents.isEmpty()) return Collections.emptyMap();
+        Map<String, List<EmployeeDocumentResponseDto>> grouped = documents.stream()
+                .collect(Collectors.groupingBy(doc ->
+                        feeConfig.getDocumentTypes().getOrDefault(doc.getDocumentType(), "Other")
+                ));
+        log.info("[Service:EmployeeMasterService] getGroupedDocuments() succeeded - {} types", grouped.size());
+        return grouped;
+    }
+
+    public Resource downloadDocument(Long documentId, Long employeeId) {
+        log.info("[Service:EmployeeMasterService] downloadDocument() called - documentId: {}, employeeId: {}", documentId, employeeId);
+        EmployeeDocumentEntity document = employeeDocumentRepository
+                .findDocumentByIdAndEmployeeId(documentId, employeeId)
+                .orElseThrow(() -> new ApiException(EmployeeErrors.EMPLOYEE_NOT_FOUND, "Document not found for employee", HttpStatus.NOT_FOUND));
         try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            EmployeeMasterEntity employee = employeeRepository.findByIdAndOrganizationId(employeeId, orgId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + employeeId));
-            employee.setProfilePicture(file);
-            employeeRepository.save(employee);
-            log.info("Successfully updated profile photo for Employee ID: {}", employeeId);
-            return employee.getProfilePicture();
-        } catch (ResourceNotFoundException e) {
+            Path path = Paths.get(document.getFilePath());
+            Resource resource = new UrlResource(path.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new ApiException(EmployeeErrors.EMPLOYEE_NOT_FOUND, "File not found or not readable: " + document.getFilePath(), HttpStatus.NOT_FOUND);
+            }
+            log.info("[Service:EmployeeMasterService] downloadDocument() succeeded - {}", document.getFileName());
+            return resource;
+        } catch (ApiException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Unexpected error while saving profile photo for Employee ID: {}", employeeId, e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to save profile photo");
+            log.error("[Service:EmployeeMasterService] downloadDocument() failed - documentId: {}", documentId, e);
+            throw new ApiException(EmployeeErrors.EMPLOYEE_NOT_FOUND, "Failed to download document", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    // ─────────────────────────────────────────────
+    // STATISTICS & COUNTS
+    // ─────────────────────────────────────────────
+
     public long countAllEmployees() {
-        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
         return employeeRepository.countAllEmployees(orgId);
     }
 
     public long countActiveEmployees() {
-        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
         return employeeRepository.countActiveEmployees(orgId);
     }
 
     public long countInactiveEmployees() {
-        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
         return employeeRepository.countInactiveEmployees(orgId);
     }
 
-    @Transactional
-    public void delete(Long id) {
-        log.info("Soft deleting Employee ID: {} from database", id);
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            int affected = employeeRepository.softDeleteByIdAndOrganizationId(id, orgId);
-            if (affected == 0) {
-                log.warn("Employee not found for deletion: id={}", id);
-                throw new ResourceNotFoundException("Employee not found with id: " + id);
-            }
-            log.info("Successfully soft deleted Employee: id={}", id);
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while deleting Employee ID: {}", id, e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to delete Employee");
-        }
-    }
-
-    @Transactional
-    public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
-        log.info("Saving document '{}' for Employee ID: {}", docKey, employeeId);
-        try {
-            String uploadDir = "uploads/employee_" + employeeId + "/documents";
-            File dir = new File(uploadDir);
-            if (!dir.exists()) dir.mkdirs();
-
-            String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll("\\s+", "_");
-            String fileName = docKey + "_" + System.currentTimeMillis() + "_" + originalFileName;
-
-            Path filePath = Paths.get(uploadDir, fileName);
-            Files.write(filePath, file.getBytes());
-
-            EmployeeDocumentEntity document = EmployeeDocumentEntity.builder()
-                    .employeeId(employeeId)
-                    .documentType(docKey)
-                    .fileName(fileName)
-                    .filePath(filePath.toString())
-                    .fileType(FilenameUtils.getExtension(fileName).toUpperCase())
-                    .build();
-            employeeDocumentRepository.save(document);
-            log.info("Successfully saved document for Employee ID: {}", employeeId);
-        } catch (Exception e) {
-            log.error("Unexpected error while saving employee document", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to save employee document");
-        }
-    }
-
-    public List<EmployeeDocumentResponseDto> getDocumentsByEmployeeId(Long employeeId) {
-        log.info("Fetching documents for Employee ID: {}", employeeId);
-        try {
-            List<EmployeeDocumentEntity> documents = employeeDocumentRepository.findByEmployeeId(employeeId);
-            log.info("Successfully fetched {} documents for Employee ID: {}", documents.size(), employeeId);
-            return MapperUtil.mapList(documents, EmployeeDocumentResponseDto.class);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching documents for Employee ID: {}", employeeId, e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to fetch employee documents");
-        }
-    }
-
-    public Map<String, List<EmployeeDocumentResponseDto>> getGroupedDocuments(Long employeeId) {
-        log.info("Fetching and grouping documents for Employee ID: {}", employeeId);
-        try {
-            List<EmployeeDocumentResponseDto> documents = getDocumentsByEmployeeId(employeeId);
-            if (documents.isEmpty()) return Collections.emptyMap();
-
-            Map<String, List<EmployeeDocumentResponseDto>> grouped = documents.stream()
-                    .collect(Collectors.groupingBy(doc ->
-                            feeConfig.getDocumentTypes().getOrDefault(doc.getDocumentType(), "Other")
-                    ));
-            log.info("Successfully grouped documents into {} types", grouped.size());
-            return grouped;
-        } catch (Exception e) {
-            log.error("Unexpected error while grouping documents for Employee ID: {}", employeeId, e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to group employee documents");
-        }
-    }
-
-    public Resource downloadDocument(Long documentId, Long employeeId) {
-        log.info("Downloading document ID {} for Employee ID {}", documentId, employeeId);
-        try {
-            EmployeeDocumentEntity document = employeeDocumentRepository
-                    .findDocumentByIdAndEmployeeId(documentId, employeeId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Document not found for employeeId=" + employeeId + " and documentId=" + documentId));
-            Path path = Paths.get(document.getFilePath());
-            Resource resource = new UrlResource(path.toUri());
-            if (!resource.exists() || !resource.isReadable()) {
-                log.warn("Document file not found or not readable: {}", document.getFilePath());
-                throw new FileNotFoundException("File not found or not readable: " + document.getFilePath());
-            }
-            log.info("Successfully prepared document for download: {}", document.getFileName());
-            return resource;
-        } catch (ResourceNotFoundException | FileNotFoundException e) {
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException(e.getMessage());
-        } catch (Exception e) {
-            log.error("Unexpected error while downloading document", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to download document");
-        }
-    }
-
-    @Transactional
-    public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto dto) {
-        log.info("Updating Employee ID: {} in database", id);
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            EmployeeMasterEntity entity = employeeRepository.findByIdAndOrganizationId(id, orgId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
-
-            if (dto.getFirstName() != null && !dto.getFirstName().isBlank()) entity.setFirstName(dto.getFirstName());
-            if (dto.getLastName() != null && !dto.getLastName().isBlank()) entity.setLastName(dto.getLastName());
-            if (dto.getDateOfBirth() != null) entity.setDateOfBirth(dto.getDateOfBirth());
-            if (dto.getGender() != null) entity.setGender(dto.getGender());
-            if (dto.getPrimaryPhone() != null) entity.setPrimaryPhone(dto.getPrimaryPhone());
-            if (dto.getSecondaryPhone() != null) entity.setSecondaryPhone(dto.getSecondaryPhone());
-            if (dto.getWorkPhone() != null) entity.setWorkPhone(dto.getWorkPhone());
-            if (dto.getEmail() != null) entity.setEmail(dto.getEmail());
-            if (dto.getReligion() != null) entity.setReligion(dto.getReligion());
-            if (dto.getNationality() != null) entity.setNationality(dto.getNationality());
-            if (dto.getMaritalStatus() != null) entity.setMaritalStatus(dto.getMaritalStatus());
-            if (dto.getBloodGroup() != null) entity.setBloodGroup(dto.getBloodGroup());
-            if (dto.getBio() != null) entity.setBio(dto.getBio());
-            if (dto.getJoiningDate() != null) entity.setJoiningDate(dto.getJoiningDate());
-
-            entity.setFullName(
-                    (entity.getFirstName() != null ? entity.getFirstName() : "") + " " +
-                    (entity.getMiddleName() != null ? entity.getMiddleName() + " " : "") +
-                    (entity.getLastName() != null ? entity.getLastName() : "")
-            );
-
-            EmployeeMasterEntity updated = employeeRepository.save(entity);
-            log.info("Successfully updated Employee: id={}", updated.getId());
-            return toDTO(updated);
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while updating Employee ID: {}", id, e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to update Employee");
-        }
-    }
-
     public Map<String, Long> getEmployeeCountByGender() {
-        log.info("Fetching employee count by gender");
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            List<Object[]> results = employeeRepository.countEmployeesByGender(orgId);
-            Map<String, Long> genderCountMap = new HashMap<>();
-            for (Object[] row : results) {
-                genderCountMap.put((String) row[0], (Long) row[1]);
-            }
-            log.info("Successfully fetched employee count by gender: {}", genderCountMap.size());
-            return genderCountMap;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching employee count by gender", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to fetch count by gender");
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        log.info("[Service:EmployeeMasterService] getEmployeeCountByGender() called - org: {}", orgId);
+        List<Object[]> results = employeeRepository.countEmployeesByGender(orgId);
+        Map<String, Long> genderCountMap = new HashMap<>();
+        for (Object[] row : results) {
+            genderCountMap.put((String) row[0], (Long) row[1]);
         }
+        log.info("[Service:EmployeeMasterService] getEmployeeCountByGender() succeeded");
+        return genderCountMap;
     }
 
-    EmployeeMasterResponseDto toDTO(EmployeeMasterEntity entity) {
-        if (entity == null) return null;
+    public List<EmployeeTypeCountDTO> getEmployeeCountByType() {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        log.info("[Service:EmployeeMasterService] getEmployeeCountByType() called - org: {}", orgId);
+        List<EmployeeTypeCountDTO> counts = employeeRepository.countEmployeesByType(orgId);
+        log.info("[Service:EmployeeMasterService] getEmployeeCountByType() succeeded - {} types", counts.size());
+        return counts;
+    }
 
-        EmployeeMasterResponseDto dto = EmployeeMasterResponseDto.builder()
-                .id(entity.getId())
-                .employeeCode(entity.getEmployeeCode())
-                .firstName(entity.getFirstName())
-                .middleName(entity.getMiddleName())
-                .lastName(entity.getLastName())
-                .fullName(entity.getFullName())
-                .gender(entity.getGender())
-                .dateOfBirth(entity.getDateOfBirth())
-                .maritalStatus(entity.getMaritalStatus())
-                .religion(entity.getReligion())
-                .nationality(entity.getNationality())
-                .bloodGroup(entity.getBloodGroup())
-                .email(entity.getEmail())
-                .primaryPhone(entity.getPrimaryPhone())
-                .secondaryPhone(entity.getSecondaryPhone())
-                .workPhone(entity.getWorkPhone())
-                .joiningDate(entity.getJoiningDate())
-                .probationEndDate(entity.getProbationEndDate())
-                .employeeTypeId(entity.getEmployeeType() != null ? entity.getEmployeeType().getId() : null)
-                .employeeTypeName(entity.getEmployeeType() != null ? entity.getEmployeeType().getName() : null)
-                .profilePicture(entity.getProfilePicture())
-                .bio(entity.getBio())
-                .active(entity.getActive())
-                .build();
+    // ─────────────────────────────────────────────
+    // PRIVATE HELPERS
+    // ─────────────────────────────────────────────
 
-        // Enrich with current assignment
+    private EmployeeMasterResponseDto toDTO(EmployeeMasterEntity entity) {
+        EmployeeMasterResponseDto dto = EmployeeMapper.toBaseDTO(entity);
         assignmentRepository.findPrimaryAssignmentByEmployeeId(entity.getId())
-                .ifPresent(assignment -> {
-                    dto.setCampusId(assignment.getCampus().getId());
-                    dto.setCampusName(assignment.getCampus().getCampusName());
-                    dto.setDepartmentId(assignment.getDepartment().getId());
-                    dto.setDepartmentName(assignment.getDepartment().getDepartmentName());
-                    dto.setDesignationId(assignment.getDesignation().getId());
-                    dto.setDesignationName(assignment.getDesignation().getDesignationName());
-                });
-
+                .ifPresent(assignment -> EmployeeMapper.enrichWithAssignment(dto, assignment));
         return dto;
     }
 
     private String generateEmployeeCode() {
         LocalDate today = LocalDate.now();
-        String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMMdd")); 
-        int randomNum = new Random().nextInt(9000) + 1000; 
-        return "EMP" + formattedDate + randomNum; 
-    }
-
-    public List<EmployeeTypeCountDTO> getEmployeeCountByType() {
-        log.info("Fetching employee count by type");
-        try {
-            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
-            List<EmployeeTypeCountDTO> counts = employeeRepository.countEmployeesByType(orgId);
-            log.info("Successfully fetched employee count by type: {}", counts.size());
-            return counts;
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching employee count by type", e);
-            throw new com.smartsolutions.eschool.global.exception.CustomServiceException("Failed to fetch count by type");
-        }
+        String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        int randomNum = new Random().nextInt(9000) + 1000;
+        return "EMP" + formattedDate + randomNum;
     }
 }
-

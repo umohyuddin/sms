@@ -81,9 +81,6 @@ public class DepartmentTypeService {
         }
 
         DepartmentTypeEntity entity = DepartmentTypeMapper.toEntity(requestDTO);
-        // organizationId is handled by prePersist but we can set it explicitly if needed or let AuditableEntity handle it.
-        // AuditableEntity.prePersist calls SecurityUtils.getCurrentOrganizationId()
-        
         DepartmentTypeEntity saved = departmentTypeRepository.save(entity);
 
         log.info("[Service:DepartmentTypeService] createDepartmentType() succeeded - Department type created with id: {}", saved.getId());

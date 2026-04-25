@@ -2,7 +2,7 @@ package com.smartsolutions.eschool.school.service;
 
 import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.school.dtos.designations.request.DesignationRequestDTO;
-import com.smartsolutions.eschool.employee.repository.EmployeeDesignationHistoryRepository;
+import com.smartsolutions.eschool.employee.repository.EmployeeAssignmentRepository;
 import com.smartsolutions.eschool.school.dtos.designations.response.DesignationCountDTO;
 import com.smartsolutions.eschool.school.dtos.designations.response.DesignationResponseDTO;
 import com.smartsolutions.eschool.school.error.DesignationErrors;
@@ -24,12 +24,12 @@ import java.util.List;
 public class DesignationService {
 
     private final DesignationRepository designationRepository;
-    private final EmployeeDesignationHistoryRepository employeeDesignationHistoryRepository;
+    private final EmployeeAssignmentRepository employeeAssignmentRepository;
 
     public DesignationService(DesignationRepository designationRepository,
-                              EmployeeDesignationHistoryRepository employeeDesignationHistoryRepository) {
+                              EmployeeAssignmentRepository employeeAssignmentRepository) {
         this.designationRepository = designationRepository;
-        this.employeeDesignationHistoryRepository = employeeDesignationHistoryRepository;
+        this.employeeAssignmentRepository = employeeAssignmentRepository;
     }
 
     @Transactional
@@ -38,7 +38,7 @@ public class DesignationService {
         if (organizationId == null) {
             throw new ApiException(DesignationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DesignationService] createDesignation() called - name: {}", requestDTO.getDesignationName());
+        log.info("[Service:DesignationService] createDesignation() called - Creating for organization: {}", organizationId);
 
         if (requestDTO.getDesignationCode() != null && !requestDTO.getDesignationCode().trim().isEmpty()) {
             if (designationRepository.existsByCodeAndOrganizationId(requestDTO.getDesignationCode().trim(), organizationId)) {
@@ -48,7 +48,7 @@ public class DesignationService {
 
         DesignationEntity entity = DesignationMapper.toEntity(requestDTO);
         DesignationEntity saved = designationRepository.save(entity);
-        log.info("[Service:DesignationService] createDesignation() succeeded - created ID: {}", saved.getId());
+        log.info("[Service:DesignationService] createDesignation() succeeded - Designation created with id: {}", saved.getId());
         return DesignationMapper.toResponseDTO(saved);
     }
 
@@ -57,11 +57,13 @@ public class DesignationService {
         if (organizationId == null) {
             throw new ApiException(DesignationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DesignationService] getById() called - id: {}", id);
+        log.info("[Service:DesignationService] getById() called - id: {}, organization: {}", id, organizationId);
         DesignationEntity entity = designationRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new ApiException(DesignationErrors.DESIGNATION_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        return DesignationMapper.toResponseDTO(entity);
+        DesignationResponseDTO responseDTO = DesignationMapper.toResponseDTO(entity);
+        log.info("[Service:DesignationService] getById() succeeded - Found designation: {}", id);
+        return responseDTO;
     }
 
     public List<DesignationResponseDTO> getAll() {
@@ -69,9 +71,11 @@ public class DesignationService {
         if (organizationId == null) {
             throw new ApiException(DesignationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DesignationService] getAll() called");
+        log.info("[Service:DesignationService] getAll() called - Fetching all for organization: {}", organizationId);
         List<DesignationEntity> entities = designationRepository.findByOrganizationId(organizationId);
-        return DesignationMapper.toResponseDTOList(entities);
+        List<DesignationResponseDTO> responseDTOs = DesignationMapper.toResponseDTOList(entities);
+        log.info("[Service:DesignationService] getAll() succeeded - Found {} designations", responseDTOs.size());
+        return responseDTOs;
     }
 
     public List<DesignationResponseDTO> getAllActive() {
@@ -79,9 +83,11 @@ public class DesignationService {
         if (organizationId == null) {
             throw new ApiException(DesignationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DesignationService] getAllActive() called");
+        log.info("[Service:DesignationService] getAllActive() called - Fetching all active for organization: {}", organizationId);
         List<DesignationEntity> entities = designationRepository.findAllEnabled(organizationId);
-        return DesignationMapper.toResponseDTOList(entities);
+        List<DesignationResponseDTO> responseDTOs = DesignationMapper.toResponseDTOList(entities);
+        log.info("[Service:DesignationService] getAllActive() succeeded - Found {} active designations", responseDTOs.size());
+        return responseDTOs;
     }
 
     @Transactional
@@ -90,7 +96,7 @@ public class DesignationService {
         if (organizationId == null) {
             throw new ApiException(DesignationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DesignationService] updateDesignation() called - id: {}", id);
+        log.info("[Service:DesignationService] updateDesignation() called - id: {}, organization: {}", id, organizationId);
 
         DesignationEntity existing = designationRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new ApiException(DesignationErrors.DESIGNATION_NOT_FOUND, HttpStatus.NOT_FOUND));
@@ -114,9 +120,11 @@ public class DesignationService {
             throw new ApiException(DesignationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         String searchKey = keyword == null ? "" : keyword.trim();
-        log.info("[Service:DesignationService] searchByKeyword() called - keyword: {}", searchKey);
+        log.info("[Service:DesignationService] searchByKeyword() called - keyword: {}, organization: {}", searchKey, organizationId);
         List<DesignationEntity> entities = designationRepository.searchByKeywordAndOrganizationId(searchKey, organizationId);
-        return DesignationMapper.toResponseDTOList(entities);
+        List<DesignationResponseDTO> responseDTOs = DesignationMapper.toResponseDTOList(entities);
+        log.info("[Service:DesignationService] searchByKeyword() succeeded - Found {} designations", responseDTOs.size());
+        return responseDTOs;
     }
 
     @Transactional
@@ -125,7 +133,7 @@ public class DesignationService {
         if (organizationId == null) {
             throw new ApiException(DesignationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DesignationService] softDeleteById() called - id: {}", id);
+        log.info("[Service:DesignationService] softDeleteById() called - id: {}, organization: {}", id, organizationId);
 
         int result = designationRepository.softDeleteByIdAndOrganizationId(id, organizationId);
         if (result == 0) {
@@ -140,6 +148,8 @@ public class DesignationService {
             throw new ApiException(DesignationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:DesignationService] getStaffCountReport() called - organization: {}", organizationId);
-        return employeeDesignationHistoryRepository.getStaffCountByDesignation(organizationId);
+        List<DesignationCountDTO> resources = employeeAssignmentRepository.getStaffCountByDesignation(organizationId);
+        log.info("[Service:DesignationService] getStaffCountReport() succeeded - Found {} entries", resources.size());
+        return resources;
     }
 }

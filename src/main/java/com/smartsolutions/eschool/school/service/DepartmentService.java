@@ -45,9 +45,11 @@ public class DepartmentService {
         if (organizationId == null) {
             throw new ApiException(DepartmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DepartmentService] getAll() called - Organization: {}", organizationId);
+        log.info("[Service:DepartmentService] getAll() called - Fetching all for organization: {}", organizationId);
         List<DepartmentEntity> result = departmentRepository.findByOrganizationId(organizationId);
-        return DepartmentMapper.toResponseDTOList(result);
+        List<DepartmentResponseDTO> responseDTOs = DepartmentMapper.toResponseDTOList(result);
+        log.info("[Service:DepartmentService] getAll() succeeded - Found {} departments", responseDTOs.size());
+        return responseDTOs;
     }
 
     public List<DepartmentResponseDTO> getByCampusId(Long campusId) {
@@ -55,9 +57,11 @@ public class DepartmentService {
         if (organizationId == null) {
             throw new ApiException(DepartmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DepartmentService] getByCampusId() called - Campus: {}, Organization: {}", campusId, organizationId);
+        log.info("[Service:DepartmentService] getByCampusId() called - campus: {}, organization: {}", campusId, organizationId);
         List<DepartmentEntity> result = departmentRepository.findByCampusIdAndOrganizationId(campusId, organizationId);
-        return DepartmentMapper.toResponseDTOList(result);
+        List<DepartmentResponseDTO> responseDTOs = DepartmentMapper.toResponseDTOList(result);
+        log.info("[Service:DepartmentService] getByCampusId() succeeded - Found {} departments", responseDTOs.size());
+        return responseDTOs;
     }
 
     public DepartmentResponseDTO getById(Long id) {
@@ -68,7 +72,10 @@ public class DepartmentService {
         log.info("[Service:DepartmentService] getById() called - id: {}, organization: {}", id, organizationId);
         DepartmentEntity entity = departmentRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new ApiException(DepartmentErrors.DEPARTMENT_NOT_FOUND, HttpStatus.NOT_FOUND));
-        return DepartmentMapper.toResponseDTO(entity);
+
+        DepartmentResponseDTO responseDTO = DepartmentMapper.toResponseDTO(entity);
+        log.info("[Service:DepartmentService] getById() succeeded - Found department: {}", id);
+        return responseDTO;
     }
 
     @Transactional
@@ -77,7 +84,7 @@ public class DepartmentService {
         if (organizationId == null) {
             throw new ApiException(DepartmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DepartmentService] createDepartment() called - Organization: {}", organizationId);
+        log.info("[Service:DepartmentService] createDepartment() called - Creating for organization: {}", organizationId);
 
         // Validation for uniqueness
         if (requestDTO.getDepartmentCode() != null && departmentRepository.existsByOrganizationIdAndCampusIdAndDepartmentCode(organizationId, requestDTO.getCampusId(), requestDTO.getDepartmentCode().trim())) {
@@ -91,7 +98,7 @@ public class DepartmentService {
         resolveAssociations(entity, requestDTO, organizationId);
 
         DepartmentEntity saved = departmentRepository.save(entity);
-        log.info("[Service:DepartmentService] createDepartment() succeeded - id: {}", saved.getId());
+        log.info("[Service:DepartmentService] createDepartment() succeeded - Department created with id: {}", saved.getId());
         return DepartmentMapper.toResponseDTO(saved);
     }
 
@@ -137,6 +144,7 @@ public class DepartmentService {
         if (result == 0) {
             throw new ApiException(DepartmentErrors.DEPARTMENT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
+        log.info("[Service:DepartmentService] softDeleteById() succeeded - id: {}", id);
     }
 
     public List<DepartmentResponseDTO> searchByKeyword(String keyword) {
@@ -144,12 +152,15 @@ public class DepartmentService {
         if (organizationId == null) {
             throw new ApiException(DepartmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:DepartmentService] searchByKeyword() called - keyword: {}", keyword);
+        log.info("[Service:DepartmentService] searchByKeyword() called - keyword: {}, organization: {}", keyword, organizationId);
         List<DepartmentEntity> result = departmentRepository.searchByKeywordAndOrganizationId(keyword, organizationId);
-        return DepartmentMapper.toResponseDTOList(result);
+        List<DepartmentResponseDTO> responseDTOs = DepartmentMapper.toResponseDTOList(result);
+        log.info("[Service:DepartmentService] searchByKeyword() succeeded - Found {} matching departments", responseDTOs.size());
+        return responseDTOs;
     }
 
     private void resolveAssociations(DepartmentEntity entity, DepartmentCreateRequestDTO dto, Long organizationId) {
+        log.info("[Service:DepartmentService] resolveAssociations() called - campus: {}", dto.getCampusId());
         CampusEntity campus = campusRepository.findByIdAndInstituteId(dto.getCampusId(), organizationId)
                 .orElseThrow(() -> new ApiException(DepartmentErrors.CAMPUS_NOT_FOUND, HttpStatus.NOT_FOUND));
         entity.setCampus(campus);
@@ -180,9 +191,11 @@ public class DepartmentService {
         if (organizationId == null) {
             throw new ApiException(DepartmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        log.info("[Service:DepartmentService] getStatistics() called - organization: {}", organizationId);
         java.util.Map<String, Long> stats = new java.util.HashMap<>();
         stats.put("total", departmentRepository.countByOrganizationId(organizationId));
         stats.put("active", departmentRepository.countByOrganizationIdAndActiveTrue(organizationId));
+        log.info("[Service:DepartmentService] getStatistics() succeeded - Stats: {}", stats);
         return stats;
     }
 }

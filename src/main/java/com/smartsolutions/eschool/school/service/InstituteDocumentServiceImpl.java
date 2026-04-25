@@ -17,7 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -190,5 +196,30 @@ public class InstituteDocumentServiceImpl implements InstituteDocumentService {
                 log.info("[Service:InstituteDocumentServiceImpl] searchByKeyword() succeeded - Found {} documents",
                                 entities.size());
                 return InstituteDocumentMapper.toResponseDTOList(entities);
+        }
+
+        @Override
+        public Resource downloadDocument(Long documentId) {
+                Long instituteId = SecurityUtils.getCurrentOrganizationId();
+                log.info("[Service:InstituteDocumentServiceImpl] downloadDocument() called - documentId: {}, instituteId: {}",
+                                documentId, instituteId);
+
+                InstituteDocumentEntity document = instituteDocumentRepository.findByIdAndInstituteIdJpql(documentId, instituteId)
+                                .orElseThrow(() -> new ApiException(InstituteDocumentErrors.INSTITUTE_DOCUMENT_NOT_FOUND,
+                                                "Institute document not found with id: " + documentId, HttpStatus.NOT_FOUND));
+
+                Path path = Paths.get(document.getFileUrl());
+                try {
+                        Resource resource = new UrlResource(path.toUri());
+                        if (!resource.exists() || !resource.isReadable()) {
+                                log.error("[Service:InstituteDocumentServiceImpl] File not found or not readable: {}", document.getFileUrl());
+                                throw new FileNotFoundException("File not found: " + document.getFileUrl());
+                        }
+                        return resource;
+                } catch (Exception e) {
+                        log.error("[Service:InstituteDocumentServiceImpl] Error reading document file: {}", document.getFileUrl(), e);
+                        throw new ApiException(InstituteDocumentErrors.INVALID_DOCUMENT_DATA,
+                                        "Error reading document file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
         }
 }

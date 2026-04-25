@@ -301,6 +301,7 @@
         deleted BOOLEAN NOT NULL DEFAULT FALSE
     );
 
+
     DROP TABLE IF EXISTS tax_types;
     CREATE TABLE tax_types (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -423,6 +424,25 @@
     CREATE INDEX idx_institutes_country_id ON institutes (country_id);
     CREATE INDEX idx_institutes_province_id ON institutes (province_id);
     CREATE INDEX idx_institutes_city_id ON institutes (city_id);
+
+
+-- Board Member Roles Table
+CREATE TABLE board_member_roles (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(50) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    UNIQUE KEY uq_role_code_org (code, organization_id),
+    CONSTRAINT fk_board_member_roles_org FOREIGN KEY (organization_id) REFERENCES institutes(id)
+);
 
     DROP TABLE IF EXISTS permissions;
     CREATE TABLE permissions (
@@ -647,42 +667,26 @@
     DROP TABLE IF EXISTS institute_board_members;
     CREATE TABLE institute_board_members (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
-        institute_id BIGINT NOT NULL,
+        organization_id BIGINT NOT NULL,
         full_name VARCHAR(100) NOT NULL,
-        role VARCHAR(50),
+        role_id BIGINT,
         email VARCHAR(100),
         contact_number VARCHAR(20),
         term_start DATE,
         term_end DATE,
-        is_active BOOLEAN DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        FOREIGN KEY (institute_id) REFERENCES institutes(id)
+        CONSTRAINT fk_board_members_org FOREIGN KEY (organization_id) REFERENCES institutes(id),
+        CONSTRAINT fk_board_members_role FOREIGN KEY (role_id) REFERENCES board_member_roles(id)
     );
-    CREATE INDEX idx_institute_board_members_institute ON institute_board_members (institute_id);
+    CREATE INDEX idx_institute_board_members_org ON institute_board_members (organization_id);
 
-    DROP TABLE IF EXISTS institute_executives;
-    CREATE TABLE institute_executives (
-        id BIGINT PRIMARY KEY AUTO_INCREMENT,
-        institute_id BIGINT NOT NULL,
-        full_name VARCHAR(100),
-        title VARCHAR(50),
-        email VARCHAR(100),
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        created_by BIGINT,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        updated_by BIGINT,
-        deleted_at DATETIME,
-        deleted_by BIGINT,
-        FOREIGN KEY (institute_id) REFERENCES institutes(id)
-    );
-    CREATE INDEX idx_institute_executives_institute ON institute_executives (institute_id);
 
     -- =============================
     -- LEVEL 4: Campus and Academic structure
@@ -1606,27 +1610,7 @@ CREATE TABLE student_guardians (
     CREATE INDEX idx_departments_type_id ON departments (department_type_id);
 
 
-    DROP TABLE IF EXISTS employee_department_history;
-    CREATE TABLE employee_department_history (
-        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        organization_id BIGINT NOT NULL,
-        employee_id BIGINT NOT NULL,
-        department_id BIGINT NOT NULL,
-        start_date DATETIME NOT NULL,
-        end_date DATETIME,
-        is_current BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
-        created_at DATETIME,
-        created_by BIGINT,
-        updated_at DATETIME,
-        updated_by BIGINT,
-        deleted_at DATETIME,
-        deleted_by BIGINT,
-        CONSTRAINT fk_employee_history FOREIGN KEY (employee_id) REFERENCES employee_master(id),
-        CONSTRAINT fk_department_history FOREIGN KEY (department_id) REFERENCES departments(id)
-    );
-    CREATE INDEX idx_employee_department_history_employee_id ON employee_department_history (employee_id);
-    CREATE INDEX idx_employee_department_history_department_id ON employee_department_history (department_id);
+
 
     DROP TABLE IF EXISTS designations;
     CREATE TABLE designations (
@@ -1646,30 +1630,7 @@ CREATE TABLE student_guardians (
         CONSTRAINT uk_designation_org_code UNIQUE (organization_id, designation_code)
     );
 
-    DROP TABLE IF EXISTS employee_designation_history;
-    CREATE TABLE employee_designation_history (
-        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        organization_id BIGINT NOT NULL,
-        employee_id BIGINT NOT NULL,
-        designation_id BIGINT NOT NULL,
-        department_id BIGINT,
-        start_date DATETIME NOT NULL,
-        end_date DATETIME,
-        is_current BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
-        created_at DATETIME,
-        created_by BIGINT,
-        updated_at DATETIME,
-        updated_by BIGINT,
-        deleted_at DATETIME,
-        deleted_by BIGINT,
-        CONSTRAINT fk_employee_designation FOREIGN KEY (employee_id) REFERENCES employee_master(id),
-        CONSTRAINT fk_designation FOREIGN KEY (designation_id) REFERENCES designations(id),
-        CONSTRAINT fk_department_designation FOREIGN KEY (department_id) REFERENCES departments(id)
-    );
-    CREATE INDEX idx_employee_designation_history_employee_id ON employee_designation_history (employee_id);
-    CREATE INDEX idx_employee_designation_history_designation_id ON employee_designation_history (designation_id);
-    CREATE INDEX idx_employee_designation_history_department_id ON employee_designation_history (department_id);
+
 
     DROP TABLE IF EXISTS employee_assignments;
     CREATE TABLE employee_assignments (

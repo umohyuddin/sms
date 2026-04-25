@@ -12,36 +12,14 @@ import java.util.Optional;
 @Repository
 public interface InstituteBoardMemberRepository extends JpaRepository<InstituteBoardMemberEntity, Long> {
 
-    @Query("""
-            SELECT b FROM InstituteBoardMemberEntity b
-            WHERE b.id = :id
-            """)
-    Optional<InstituteBoardMemberEntity> findByIdJpql(@Param("id") Long id);
+    @Query("SELECT b FROM InstituteBoardMemberEntity b LEFT JOIN FETCH b.role r WHERE b.organizationId = :orgId AND b.deleted = false")
+    List<InstituteBoardMemberEntity> findByOrganizationId(@Param("orgId") Long orgId);
 
-    @Query("""
-            SELECT b FROM InstituteBoardMemberEntity b
-            """)
-    List<InstituteBoardMemberEntity> findAllJpql();
+    @Query("SELECT b FROM InstituteBoardMemberEntity b LEFT JOIN FETCH b.role r WHERE b.id = :id AND b.organizationId = :orgId AND b.deleted = false")
+    Optional<InstituteBoardMemberEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("orgId") Long orgId);
 
-    @Query("""
-            SELECT b FROM InstituteBoardMemberEntity b
-            WHERE b.institute.id = :instituteId
-            """)
-    List<InstituteBoardMemberEntity> findByInstituteId(@Param("instituteId") Long instituteId);
-
-    @Query("""
-            SELECT b FROM InstituteBoardMemberEntity b
-            WHERE b.isActive = true
-            """)
-    List<InstituteBoardMemberEntity> findAllActive();
-
-    @Query("""
-            SELECT b FROM InstituteBoardMemberEntity b
-            WHERE (:keyword IS NULL OR :keyword = ''
-                OR LOWER(b.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.role) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                OR LOWER(b.contactNumber) LIKE LOWER(CONCAT('%', :keyword, '%')))
-            """)
-    List<InstituteBoardMemberEntity> searchByKeyword(@Param("keyword") String keyword);
+    @Query("SELECT b FROM InstituteBoardMemberEntity b LEFT JOIN FETCH b.role r " +
+           "WHERE b.organizationId = :orgId AND b.deleted = false " +
+           "AND (LOWER(b.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.email) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    List<InstituteBoardMemberEntity> searchByKeyword(@Param("orgId") Long orgId, @Param("keyword") String keyword);
 }

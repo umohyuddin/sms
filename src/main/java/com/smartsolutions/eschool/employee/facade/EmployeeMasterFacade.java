@@ -18,142 +18,119 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
 @Component
 @Scope("prototype")
 @Slf4j
 public class EmployeeMasterFacade {
 
-    private final EmployeeMasterService employeeService;
+    private final EmployeeMasterService nEmployeeMasterService;
 
-    public EmployeeMasterFacade(EmployeeMasterService employeeService) {
-        this.employeeService = employeeService;
+    public EmployeeMasterFacade(EmployeeMasterService nEmployeeMasterService) {
+        this.nEmployeeMasterService = nEmployeeMasterService;
     }
 
     public List<EmployeeMasterResponseDto> getAllEmployees() {
-        log.info("Facade: Request to fetch all Employees");
-        List<EmployeeMasterResponseDto> result = employeeService.getAll();
-        log.info("Facade: Successfully fetched {} Employees", result.size());
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] getAllEmployees() called");
+        return nEmployeeMasterService.getAll();
     }
 
     public EmployeeMasterResponseDto getEmployeeById(Long id) {
-        log.info("Facade: Request to fetch Employee by id: {}", id);
-        EmployeeMasterResponseDto result = employeeService.getById(id);
-        log.info("Facade: Successfully fetched Employee: id={}", id);
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeById() called - id: {}", id);
+        return nEmployeeMasterService.getById(id);
     }
 
     public EmployeeMasterResponseDto getEmployeeByCode(String code) {
-        log.info("Facade: Request to fetch Employee by code: {}", code);
-        EmployeeMasterResponseDto result = employeeService.getByEmployeeCode(code);
-        log.info("Facade: Successfully fetched Employee: code={}", code);
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeByCode() called - code: {}", code);
+        return nEmployeeMasterService.getByEmployeeCode(code);
     }
 
     public List<EmployeeMasterResponseDto> searchByKeyword(String keyword) {
-        log.info("Facade: Request to search Employees by keyword: '{}'", keyword);
-        List<EmployeeMasterResponseDto> result = employeeService.searchByKeyword(keyword);
-        log.info("Facade: Search completed, found {} Employees", result.size());
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] searchByKeyword() called - keyword: {}", keyword);
+        return nEmployeeMasterService.searchByKeyword(keyword);
     }
 
     public List<EmployeeMasterResponseDto> getEmployeesByGender(String gender) {
-        log.info("Facade: Request to fetch Employees by gender: '{}'", gender);
-        List<EmployeeMasterResponseDto> result = employeeService.getByGender(gender);
-        log.info("Facade: Successfully fetched {} Employees", result.size());
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] getEmployeesByGender() called - gender: {}", gender);
+        return nEmployeeMasterService.getByGender(gender);
     }
 
     public List<EmployeeMasterResponseDto> getEmployeesByActiveStatus(Boolean status) {
-        log.info("Facade: Request to fetch Employees by active status: {}", status);
-        List<EmployeeMasterResponseDto> result = employeeService.getByActiveStatus(status);
-        log.info("Facade: Successfully fetched {} Employees", result.size());
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] getEmployeesByActiveStatus() called - status: {}", status);
+        return nEmployeeMasterService.getByActiveStatus(status);
     }
 
     public List<EmployeeMasterResponseDto> getEmployeesWithProbationEndedBefore(Date date) {
-        log.info("Facade: Request to fetch Employees with probation ended before: {}", date);
-        List<EmployeeMasterResponseDto> result = employeeService.getProbationEndedBefore(date);
-        log.info("Facade: Successfully fetched {} Employees", result.size());
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] getEmployeesWithProbationEndedBefore() called - date: {}", date);
+        return nEmployeeMasterService.getProbationEndedBefore(date);
     }
 
     public EmployeeMasterResponseDto createEmployee(EmployeeCreateRequestDto requestDto) {
-        log.info("Facade: Request to create new Employee with assignment: {} {}", requestDto.getFirstName(), requestDto.getLastName());
-        EmployeeMasterResponseDto result = employeeService.createEmployee(requestDto);
-        log.info("Facade: Successfully created Employee and Assignment: id={}", result.getId());
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] createEmployee(create) called");
+        return nEmployeeMasterService.createEmployee(requestDto);
     }
 
     public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto requestDto) {
-        log.info("Facade: Request to create new Employee: {} {}", requestDto.getFirstName(), requestDto.getLastName());
-        EmployeeMasterResponseDto result = employeeService.createEmployee(requestDto);
-        log.info("Facade: Successfully created Employee: id={}", result.getId());
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] createEmployee(master) called");
+        return nEmployeeMasterService.createEmployee(requestDto);
     }
 
     public long getTotalEmployees() {
-        return employeeService.countAllEmployees();
+        log.info("[Facade:EmployeeMasterFacade] getTotalEmployees() called");
+        return nEmployeeMasterService.countAllEmployees();
     }
 
     public long getTotalActiveEmployees() {
-        return employeeService.countActiveEmployees();
+        log.info("[Facade:EmployeeMasterFacade] getTotalActiveEmployees() called");
+        return nEmployeeMasterService.countActiveEmployees();
     }
 
     public long getTotalInactiveEmployees() {
-        return employeeService.countInactiveEmployees();
+        log.info("[Facade:EmployeeMasterFacade] getTotalInactiveEmployees() called");
+        return nEmployeeMasterService.countInactiveEmployees();
     }
 
     public String updateEmployeeProfile(Long employeeId, String file) {
-        log.info("Facade: Request to update profile photo for Employee ID: {}", employeeId);
-        String result = employeeService.saveProfilePhoto(employeeId, file);
-        log.info("Facade: Successfully updated profile photo");
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] updateEmployeeProfile() called - employeeId: {}", employeeId);
+        return nEmployeeMasterService.saveProfilePhoto(employeeId, file);
     }
 
     public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
-        log.info("Facade: Request to save document for Employee ID: {}", employeeId);
-        employeeService.saveEmployeeDocument(employeeId, docKey, file);
-        log.info("Facade: Document saved successfully");
+        log.info("[Facade:EmployeeMasterFacade] saveEmployeeDocument() called - employeeId: {}", employeeId);
+        nEmployeeMasterService.saveEmployeeDocument(employeeId, docKey, file);
     }
 
     public List<EmployeeDocumentResponseDto> getEmployeeDocuments(Long employeeId) {
-        log.info("Facade: Request to fetch documents for Employee ID: {}", employeeId);
-        List<EmployeeDocumentResponseDto> result = employeeService.getDocumentsByEmployeeId(employeeId);
-        log.info("Facade: Successfully fetched {} documents", result.size());
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeDocuments() called - employeeId: {}", employeeId);
+        return nEmployeeMasterService.getDocumentsByEmployeeId(employeeId);
     }
 
     public Map<String, List<EmployeeDocumentResponseDto>> getDocumentsByEmployeeId(Long employeeId) {
-        log.info("Facade: Request to fetch grouped documents for Employee ID: {}", employeeId);
-        return employeeService.getGroupedDocuments(employeeId);
+        log.info("[Facade:EmployeeMasterFacade] getDocumentsByEmployeeId() called - employeeId: {}", employeeId);
+        return nEmployeeMasterService.getGroupedDocuments(employeeId);
     }
 
     public Resource getDocumentById(Long documentId, Long employeeId) {
-        log.info("Facade: Request to download document ID {} for Employee ID {}", documentId, employeeId);
-        return employeeService.downloadDocument(documentId, employeeId);
+        log.info("[Facade:EmployeeMasterFacade] getDocumentById() called - documentId: {}, employeeId: {}", documentId, employeeId);
+        return nEmployeeMasterService.downloadDocument(documentId, employeeId);
     }
 
     public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto requestDto) {
-        log.info("Facade: Request to update Employee ID: {}", id);
-        EmployeeMasterResponseDto result = employeeService.updateEmployee(id, requestDto);
-        log.info("Facade: Successfully updated Employee: id={}", id);
-        return result;
+        log.info("[Facade:EmployeeMasterFacade] updateEmployee() called - id: {}", id);
+        return nEmployeeMasterService.updateEmployee(id, requestDto);
     }
 
     public void deleteEmployee(Long id) {
-        log.info("Facade: Request to delete Employee ID: {}", id);
-        employeeService.delete(id);
-        log.info("Facade: Successfully deleted Employee: id={}", id);
+        log.info("[Facade:EmployeeMasterFacade] deleteEmployee() called - id: {}", id);
+        nEmployeeMasterService.delete(id);
     }
 
     public Map<String, Long> getEmployeeCountByGender() {
-        return employeeService.getEmployeeCountByGender();
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeCountByGender() called");
+        return nEmployeeMasterService.getEmployeeCountByGender();
     }
 
     public List<EmployeeTypeCountDTO> getEmployeeCountByType() {
-        return employeeService.getEmployeeCountByType();
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeCountByType() called");
+        return nEmployeeMasterService.getEmployeeCountByType();
     }
 }
-

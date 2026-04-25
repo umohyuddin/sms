@@ -4,13 +4,17 @@ import com.smartsolutions.eschool.school.dtos.instituteDocuments.requestDto.Inst
 import com.smartsolutions.eschool.school.dtos.instituteDocuments.requestDto.InstituteDocumentUpdateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteDocuments.responseDto.InstituteDocumentResponseDTO;
 import com.smartsolutions.eschool.school.facade.InstituteDocumentFacade;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -113,5 +117,19 @@ public class InstituteDocumentController {
                 log.info("[Controller:InstituteDocumentController] uploadDocument() succeeded - Document uploaded with id: {}",
                                 responseDTO.getId());
                 return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+        }
+
+        @GetMapping("/download-document/{documentId}")
+        public ResponseEntity<Resource> downloadDocument(
+                        @Parameter(description = "ID of the document record", example = "100") @PathVariable Long documentId)
+                        throws IOException {
+                log.info("[Controller:InstituteDocumentController] GET /api/institute/documents/download-document/{} - Downloading",
+                                documentId);
+                Resource document = instituteDocumentFacade.downloadDocument(documentId);
+                return ResponseEntity.ok()
+                                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                                .header(HttpHeaders.CONTENT_DISPOSITION,
+                                                "attachment; filename=\"" + document.getFilename() + "\"")
+                                .body(document);
         }
 }

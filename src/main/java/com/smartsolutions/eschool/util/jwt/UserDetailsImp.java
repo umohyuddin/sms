@@ -45,10 +45,12 @@ public class UserDetailsImp implements UserDetails {
                 .collect(Collectors.toList());
 
         Long campusId = null;
-        if (user.getEmployee() != null && user.getEmployee().getDepartmentHistories() != null && !user.getEmployee().getDepartmentHistories().isEmpty()) {
-            // Get campus from the latest/current department history if available
-            // This is a simplified approach; in production, you'd find the active history record.
-            campusId = user.getEmployee().getDepartmentHistories().get(0).getDepartment().getCampus().getId();
+        if (user.getEmployee() != null && user.getEmployee().getAssignments() != null && !user.getEmployee().getAssignments().isEmpty()) {
+            campusId = user.getEmployee().getAssignments().stream()
+                    .filter(a -> a.getIsPrimary())
+                    .findFirst()
+                    .map(a -> a.getCampus().getId())
+                    .orElse(user.getEmployee().getAssignments().get(0).getCampus().getId());
         } else if (user.getStudent() != null && user.getStudent().getCampus() != null) {
             campusId = user.getStudent().getCampus().getId();
         }

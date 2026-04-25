@@ -33,8 +33,7 @@ public class EmployeeMasterSalaryService {
     private final EmployeeMasterSalaryRepository salaryRepository;
     private final EmployeeMasterRepository employeeMasterRepository;
     private final SalaryStructureRepository salaryStructureRepository;
-    private final EmployeeDepartmentHistoryRepository employeeDepartmentHistoryRepository;
-    private final EmployeeDesignationHistoryRepository designationHistoryRepository;
+    private final EmployeeAssignmentRepository employeeAssignmentRepository;
     private final EmployeeTypeHistoryRepository employeeTypeHistoryRepository;
 
 
@@ -244,9 +243,8 @@ public class EmployeeMasterSalaryService {
 
         var employee = salaryEntity.getEmployee();
 
-        // Extract current histories from the fetched joins
-        EmployeeDepartmentHistoryEntity currentDept = null;
-        EmployeeDesignationHistoryEntity currentDesig = null;
+        // Extract primary assignment from the fetched joins
+        EmployeeAssignmentEntity primaryAssignment = null;
 
         // LEFT JOIN FETCH results will be available in memory
         if (salaryEntity instanceof org.hibernate.proxy.HibernateProxy) {
@@ -254,15 +252,9 @@ public class EmployeeMasterSalaryService {
             org.hibernate.Hibernate.initialize(employee);
         }
 
-        if (employee.getDepartmentHistories() != null) {
-            currentDept = employee.getDepartmentHistories()
-                    .stream().filter(EmployeeDepartmentHistoryEntity::getIsCurrent)
-                    .findFirst().orElse(null);
-        }
-
-        if (employee.getDesignationHistories() != null) {
-            currentDesig = employee.getDesignationHistories()
-                    .stream().filter(EmployeeDesignationHistoryEntity::getIsCurrent)
+        if (employee.getAssignments() != null) {
+            primaryAssignment = employee.getAssignments()
+                    .stream().filter(EmployeeAssignmentEntity::getIsPrimary)
                     .findFirst().orElse(null);
         }
 
@@ -294,8 +286,8 @@ public class EmployeeMasterSalaryService {
                 .updatedAt(salaryEntity.getUpdatedAt())
                 // Nested DTOs
                 .employee(EmployeeMasterResponseDto.fromEntity(employee))
-                .designation(currentDesig != null ? DesignationMapper.toResponseDTO(currentDesig.getDesignation()) : null)
-                .department(currentDept != null ? DepartmentMapper.toResponseDTO(currentDept.getDepartment()) : null)
+                .designation(primaryAssignment != null ? DesignationMapper.toResponseDTO(primaryAssignment.getDesignation()) : null)
+                .department(primaryAssignment != null ? DepartmentMapper.toResponseDTO(primaryAssignment.getDepartment()) : null)
                 .build();
     }
 

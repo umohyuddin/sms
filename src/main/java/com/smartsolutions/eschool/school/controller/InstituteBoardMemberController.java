@@ -1,81 +1,99 @@
 package com.smartsolutions.eschool.school.controller;
 
-import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.requestDto.InstituteBoardMemberCreateRequestDTO;
-import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.requestDto.InstituteBoardMemberUpdateRequestDTO;
-import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.responseDto.InstituteBoardMemberResponseDTO;
+import com.smartsolutions.eschool.school.dtos.boardMembers.request.InstituteBoardMemberRequestDTO;
+import com.smartsolutions.eschool.school.dtos.boardMembers.response.InstituteBoardMemberResponseDTO;
 import com.smartsolutions.eschool.school.facade.InstituteBoardMemberFacade;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/institute/board-members")
+@Tag(name = "Institute Board Members", description = "Endpoints for managing institute-level board members")
 @Slf4j
 public class InstituteBoardMemberController {
 
-    private final InstituteBoardMemberFacade instituteBoardMemberFacade;
+    private final InstituteBoardMemberFacade memberFacade;
 
-    public InstituteBoardMemberController(InstituteBoardMemberFacade instituteBoardMemberFacade) {
-        this.instituteBoardMemberFacade = instituteBoardMemberFacade;
+    public InstituteBoardMemberController(InstituteBoardMemberFacade memberFacade) {
+        this.memberFacade = memberFacade;
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteBoardMemberResponseDTO> createBoardMember(@Valid @RequestBody InstituteBoardMemberCreateRequestDTO requestDTO) {
-        InstituteBoardMemberResponseDTO responseDTO = instituteBoardMemberFacade.createBoardMember(requestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    @GetMapping
+    @Operation(summary = "Get all board members", description = "Retrieves a list of all active board members for the current organization")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    public List<InstituteBoardMemberResponseDTO> getAll() {
+        log.info("[Controller:InstituteBoardMemberController] GET /api/institute/board-members - Fetching all");
+        return memberFacade.getAll();
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteBoardMemberResponseDTO>> getAll() {
-        return ResponseEntity.ok(instituteBoardMemberFacade.getAll());
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a board member by ID", description = "Retrieves details of a specific board member")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved member"),
+            @ApiResponse(responseCode = "404", description = "Member not found")
+    })
+    public InstituteBoardMemberResponseDTO getById(
+            @Parameter(description = "ID of the member", example = "1") @PathVariable Long id) {
+        log.info("[Controller:InstituteBoardMemberController] GET /api/institute/board-members/{} - Fetching by ID", id);
+        return memberFacade.getById(id);
     }
 
-    @GetMapping(value = "/institute/{instituteId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteBoardMemberResponseDTO>> getByInstituteId(@PathVariable Long instituteId) {
-        return ResponseEntity.ok(instituteBoardMemberFacade.getByInstituteId(instituteId));
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Add a new board member", description = "Registers a new board member for the current organization")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successfully created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data")
+    })
+    public InstituteBoardMemberResponseDTO create(
+            @Valid @RequestBody InstituteBoardMemberRequestDTO requestDTO) {
+        log.info("[Controller:InstituteBoardMemberController] POST /api/institute/board-members - Adding member");
+        return memberFacade.create(requestDTO);
     }
 
-    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteBoardMemberResponseDTO>> getAllActive() {
-        return ResponseEntity.ok(instituteBoardMemberFacade.getAllActive());
+    @PutMapping("/{id}")
+    @Operation(summary = "Update an existing board member", description = "Updates the details of an existing board member")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated"),
+            @ApiResponse(responseCode = "404", description = "Member not found")
+    })
+    public InstituteBoardMemberResponseDTO update(
+            @Parameter(description = "ID of the member to update", example = "1") @PathVariable Long id,
+            @Valid @RequestBody InstituteBoardMemberRequestDTO requestDTO) {
+        log.info("[Controller:InstituteBoardMemberController] PUT /api/institute/board-members/{} - Updating member", id);
+        return memberFacade.update(id, requestDTO);
     }
 
-    @GetMapping(value = "/{memberId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteBoardMemberResponseDTO> getById(@PathVariable Long memberId) {
-        return ResponseEntity.ok(instituteBoardMemberFacade.getById(memberId));
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Soft delete a board member", description = "Marks a board member as deleted")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "Member not found")
+    })
+    public void delete(
+            @Parameter(description = "ID of the member to delete", example = "1") @PathVariable Long id) {
+        log.info("[Controller:InstituteBoardMemberController] DELETE /api/institute/board-members/{} - Deleting member", id);
+        memberFacade.delete(id);
     }
 
-    @PutMapping(value = "/{memberId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteBoardMemberResponseDTO> updateBoardMember(@PathVariable Long memberId, @Valid @RequestBody InstituteBoardMemberUpdateRequestDTO requestDTO) {
-        return ResponseEntity.ok(instituteBoardMemberFacade.updateBoardMember(memberId, requestDTO));
-    }
-
-    @DeleteMapping("/{memberId}")
-    public ResponseEntity<String> deleteBoardMember(@PathVariable Long memberId) {
-        instituteBoardMemberFacade.deleteById(memberId);
-        return ResponseEntity.ok("Institute board member deleted successfully");
-    }
-
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<InstituteBoardMemberResponseDTO>> search(@RequestParam(name = "keyword") String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(instituteBoardMemberFacade.searchByKeyword(keyword.trim()));
-    }
-
-    @PutMapping(value = "/{memberId}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteBoardMemberResponseDTO> activate(@PathVariable Long memberId) {
-        return ResponseEntity.ok(instituteBoardMemberFacade.activate(memberId));
-    }
-
-    @PutMapping(value = "/{memberId}/deactivate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InstituteBoardMemberResponseDTO> deactivate(@PathVariable Long memberId) {
-        return ResponseEntity.ok(instituteBoardMemberFacade.deactivate(memberId));
+    @GetMapping("/search")
+    @Operation(summary = "Search board members", description = "Searches for board members by keyword (name or email)")
+    public List<InstituteBoardMemberResponseDTO> search(
+            @Parameter(description = "Keyword to search for", example = "Doe") @RequestParam String keyword) {
+        log.info("[Controller:InstituteBoardMemberController] GET /api/institute/board-members/search?keyword={} - Searching", keyword);
+        return memberFacade.search(keyword);
     }
 }

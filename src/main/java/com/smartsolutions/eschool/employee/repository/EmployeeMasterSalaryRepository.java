@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.employee.repository;
 
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryFullResponseDTO;
+import com.smartsolutions.eschool.employee.model.EmployeeAssignmentEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterSalary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -72,45 +73,15 @@ public interface EmployeeMasterSalaryRepository extends JpaRepository<EmployeeMa
 SELECT s
 FROM EmployeeMasterSalary s
 JOIN FETCH s.employee e
-LEFT JOIN FETCH EmployeeDepartmentHistoryEntity dept
-    ON dept.employee = e AND dept.isCurrent = true
-LEFT JOIN FETCH EmployeeDesignationHistoryEntity desig
-    ON desig.employee = e AND desig.isCurrent = true
+LEFT JOIN FETCH EmployeeAssignmentEntity assign
+    ON assign.employee = e AND assign.isPrimary = true
 LEFT JOIN FETCH EmployeeTypeHistoryEntity et
     ON et.employee = e AND et.isCurrent = true
 WHERE s.deleted = false
 """)
     List<EmployeeMasterSalary> findEmployeeSalaryDetails();
 
-//
-//    @Query("""
-//            SELECT new com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryFullResponseDTO(
-//                e.id,
-//                e.employeeCode,
-//                e.fullName,
-//                dept.department.name,
-//                desig.designation.name,
-//                et.employeeType.name,
-//                s.grossSalary,
-//                s.totalDeductions,
-//                s.netSalary,
-//                s.effectiveDate
-//            )
-//            FROM EmployeeMasterSalary s
-//            JOIN s.employee e
-//
-//            LEFT JOIN EmployeeDepartmentHistoryEntity dept
-//                ON dept.employee = e AND dept.isCurrent = true
-//
-//            LEFT JOIN EmployeeDesignationHistoryEntity desig
-//                ON desig.employee = e AND desig.isCurrent = true
-//
-//            LEFT JOIN EmployeeTypeHistoryEntity et
-//                ON et.employee = e AND et.isCurrent = true
-//
-//            WHERE s.deleted = false
-//            """)
-//    List<EmployeeSalaryFullResponseDTO> findEmployeeSalariesWithDetails();
+
 
     @Query("""
         SELECT es

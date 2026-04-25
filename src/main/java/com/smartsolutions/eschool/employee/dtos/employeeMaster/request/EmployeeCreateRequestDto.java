@@ -7,9 +7,5 @@ import java.util.Date;
 @Getter
 @Setter
 public class EmployeeCreateRequestDto extends EmployeeMasterRequestDto {
-
-    private Long campusId;
-    private Long departmentId;
-    private Long designationId;
-    private Date assignmentStartDate;
+    // All relevant fields are now inherited from EmployeeMasterRequestDto
 }

@@ -40,4 +40,10 @@ public class EmployeeMasterRequestDto {
 
     // Status
     private Boolean active = true;
+
+    // Assignment Details (Used for tracking history)
+    private Long campusId;
+    private Long departmentId;
+    private Long designationId;
+    private Date assignmentStartDate;
 }

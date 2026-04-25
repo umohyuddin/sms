@@ -1,9 +1,9 @@
 package com.smartsolutions.eschool.school.facade;
 
-import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.requestDto.InstituteBoardMemberCreateRequestDTO;
-import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.requestDto.InstituteBoardMemberUpdateRequestDTO;
-import com.smartsolutions.eschool.school.dtos.instituteBoardMembers.responseDto.InstituteBoardMemberResponseDTO;
+import com.smartsolutions.eschool.school.dtos.boardMembers.request.InstituteBoardMemberRequestDTO;
+import com.smartsolutions.eschool.school.dtos.boardMembers.response.InstituteBoardMemberResponseDTO;
 import com.smartsolutions.eschool.school.service.InstituteBoardMemberService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -11,51 +11,42 @@ import java.util.List;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class InstituteBoardMemberFacade {
 
-    private final InstituteBoardMemberService instituteBoardMemberService;
+    private final InstituteBoardMemberService memberService;
 
-    public InstituteBoardMemberFacade(InstituteBoardMemberService instituteBoardMemberService) {
-        this.instituteBoardMemberService = instituteBoardMemberService;
-    }
-
-    public InstituteBoardMemberResponseDTO createBoardMember(InstituteBoardMemberCreateRequestDTO requestDTO) {
-        return instituteBoardMemberService.createBoardMember(requestDTO);
+    public InstituteBoardMemberFacade(InstituteBoardMemberService memberService) {
+        this.memberService = memberService;
     }
 
     public List<InstituteBoardMemberResponseDTO> getAll() {
-        return instituteBoardMemberService.getAll();
-    }
-
-    public List<InstituteBoardMemberResponseDTO> getByInstituteId(Long instituteId) {
-        return instituteBoardMemberService.getByInstituteId(instituteId);
-    }
-
-    public List<InstituteBoardMemberResponseDTO> getAllActive() {
-        return instituteBoardMemberService.getAllActive();
+        log.info("[Facade:InstituteBoardMemberFacade] getAll() called");
+        return memberService.getAll();
     }
 
     public InstituteBoardMemberResponseDTO getById(Long id) {
-        return instituteBoardMemberService.getById(id);
+        log.info("[Facade:InstituteBoardMemberFacade] getById() called - id: {}", id);
+        return memberService.getById(id);
     }
 
-    public InstituteBoardMemberResponseDTO updateBoardMember(Long id, InstituteBoardMemberUpdateRequestDTO requestDTO) {
-        return instituteBoardMemberService.updateBoardMember(id, requestDTO);
+    public InstituteBoardMemberResponseDTO create(InstituteBoardMemberRequestDTO dto) {
+        log.info("[Facade:InstituteBoardMemberFacade] create() called");
+        return memberService.create(dto);
     }
 
-    public void deleteById(Long id) {
-        instituteBoardMemberService.deleteById(id);
+    public InstituteBoardMemberResponseDTO update(Long id, InstituteBoardMemberRequestDTO dto) {
+        log.info("[Facade:InstituteBoardMemberFacade] update() called - id: {}", id);
+        return memberService.update(id, dto);
     }
 
-    public List<InstituteBoardMemberResponseDTO> searchByKeyword(String keyword) {
-        return instituteBoardMemberService.searchByKeyword(keyword);
+    public void delete(Long id) {
+        log.info("[Facade:InstituteBoardMemberFacade] delete() called - id: {}", id);
+        memberService.delete(id);
     }
 
-    public InstituteBoardMemberResponseDTO activate(Long id) {
-        return instituteBoardMemberService.activate(id);
-    }
-
-    public InstituteBoardMemberResponseDTO deactivate(Long id) {
-        return instituteBoardMemberService.deactivate(id);
+    public List<InstituteBoardMemberResponseDTO> search(String keyword) {
+        log.info("[Facade:InstituteBoardMemberFacade] search() called - keyword: {}", keyword);
+        return memberService.search(keyword);
     }
 }

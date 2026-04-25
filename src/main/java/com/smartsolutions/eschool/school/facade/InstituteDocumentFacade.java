@@ -6,6 +6,7 @@ import com.smartsolutions.eschool.school.dtos.instituteDocuments.responseDto.Ins
 import com.smartsolutions.eschool.school.service.InstituteDocumentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -62,5 +63,11 @@ public class InstituteDocumentFacade {
                 "[Facade:InstituteDocumentFacade] uploadDocument() called - instituteId: {}, documentType: {}, expiryDate: {}",
                 instituteId, documentType, expiryDate);
         return instituteDocumentService.uploadDocument(instituteId, documentType, expiryDate, file);
+    }
+
+    public Resource downloadDocument(Long documentId) {
+        log.info("[Facade:InstituteDocumentFacade] downloadDocument() called - documentId: {}",
+                documentId);
+        return instituteDocumentService.downloadDocument(documentId);
     }
 }
