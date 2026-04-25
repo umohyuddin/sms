@@ -17,14 +17,11 @@ import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
-import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -38,10 +35,10 @@ public class StudentDiscountAssignmentService {
     private final AcademicYearRepository academicYearRepository;
     private final StudentFeeSummaryService studentFeeSummaryService;
 
-    public StudentDiscountAssignmentService(StudentDiscountAssignmentRepository assignmentRepository, 
-            StudentRepository studentRepository, 
-            DiscountRateRepository discountRateRepository, 
-            CampusRepository campusRepository, 
+    public StudentDiscountAssignmentService(StudentDiscountAssignmentRepository assignmentRepository,
+            StudentRepository studentRepository,
+            DiscountRateRepository discountRateRepository,
+            CampusRepository campusRepository,
             AcademicYearRepository academicYearRepository,
             StudentFeeSummaryService studentFeeSummaryService) {
         this.assignmentRepository = assignmentRepository;
@@ -59,17 +56,22 @@ public class StudentDiscountAssignmentService {
     public StudentDiscountAssignmentResponseDTO assignDiscount(@Valid StudentDiscountAssignmentRequestDTO requestDTO) {
         log.info("Assigning discount to student: {}", requestDTO.getStudentId());
         try {
-            StudentEntity student = studentRepository.findByIdAndDeletedFalse(requestDTO.getStudentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + requestDTO.getStudentId()));
+            StudentEntity student = studentRepository.findByIdAndDeletedFalse(requestDTO.getStudentId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Student not found with id: " + requestDTO.getStudentId()));
 
-            DiscountRateEntity discountRate = discountRateRepository.findById(requestDTO.getDiscountRateId()).orElseThrow(() -> new ResourceNotFoundException("Discount rate not found with id: " + requestDTO.getDiscountRateId()));
+            DiscountRateEntity discountRate = discountRateRepository.findById(requestDTO.getDiscountRateId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Discount rate not found with id: " + requestDTO.getDiscountRateId()));
 
             CampusEntity campus = null;
             if (requestDTO.getCampusId() != null) {
-                campus = campusRepository.findById(requestDTO.getCampusId()).orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + requestDTO.getCampusId()));
+                campus = campusRepository.findById(requestDTO.getCampusId()).orElseThrow(
+                        () -> new ResourceNotFoundException("Campus not found with id: " + requestDTO.getCampusId()));
             }
 
-            AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId()).orElseThrow(() -> new ResourceNotFoundException("Academic year not found with id: " + requestDTO.getAcademicYearId()));
-
+            AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Academic year not found with id: " + requestDTO.getAcademicYearId()));
 
             StudentDiscountAssignmentEntity entity = new StudentDiscountAssignmentEntity();
             entity.setStudent(student);
@@ -85,7 +87,8 @@ public class StudentDiscountAssignmentService {
                 if (Boolean.TRUE.equals(discountRate.getIsPercentage())) {
                     finalPercentage = discountRate.getValue();
                     if (requestDTO.getTotalAssignedFee() != null) {
-                        finalAmount = requestDTO.getTotalAssignedFee().multiply(finalPercentage).divide(BigDecimal.valueOf(100));
+                        finalAmount = requestDTO.getTotalAssignedFee().multiply(finalPercentage)
+                                .divide(BigDecimal.valueOf(100));
                     }
                 } else {
                     finalAmount = discountRate.getValue();
@@ -101,9 +104,8 @@ public class StudentDiscountAssignmentService {
             entity.setId(null);
             assignmentRepository.save(entity);
 
-
             log.info("Successfully assigned discount, id: {}", entity.getId());
-            
+
             // Update Summary
             Long organizationId = SecurityUtils.getCurrentOrganizationId();
             if (organizationId != null) {
@@ -123,30 +125,35 @@ public class StudentDiscountAssignmentService {
         }
     }
 
-
     @Transactional
     public StudentDiscountAssignmentResponseDTO updateDiscount(@Valid StudentDiscountAssignmentRequestDTO requestDTO) {
-        log.info("Updating discount for student: {} for academicYearId={}", requestDTO.getStudentId(), requestDTO.getAcademicYearId());
+        log.info("Updating discount for student: {} for academicYearId={}", requestDTO.getStudentId(),
+                requestDTO.getAcademicYearId());
 
         try {
             StudentEntity student = studentRepository.findByIdAndDeletedFalse(requestDTO.getStudentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + requestDTO.getStudentId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Student not found with id: " + requestDTO.getStudentId()));
 
             DiscountRateEntity discountRate = discountRateRepository.findById(requestDTO.getDiscountRateId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Discount rate not found with id: " + requestDTO.getDiscountRateId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Discount rate not found with id: " + requestDTO.getDiscountRateId()));
 
             CampusEntity campus = null;
             if (requestDTO.getCampusId() != null) {
                 campus = campusRepository.findById(requestDTO.getCampusId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + requestDTO.getCampusId()));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Campus not found with id: " + requestDTO.getCampusId()));
             }
 
             AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Academic year not found with id: " + requestDTO.getAcademicYearId()));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Academic year not found with id: " + requestDTO.getAcademicYearId()));
 
             // Check for existing discount assignment
             assignmentRepository
-                    .findDiscountByAcademic_Campus_stundentId(student.getId(), academicYear.getId(), campus != null ? campus.getId() : null)
+                    .findDiscountByAcademic_Campus_stundentId(student.getId(), academicYear.getId(),
+                            campus != null ? campus.getId() : null)
                     .ifPresent(existing -> {
                         log.info("Deleting existing discount assignment with id: {}", existing.getId());
                         assignmentRepository.delete(existing);
@@ -168,7 +175,8 @@ public class StudentDiscountAssignmentService {
                 if (Boolean.TRUE.equals(discountRate.getIsPercentage())) {
                     finalPercentage = discountRate.getValue();
                     if (requestDTO.getTotalAssignedFee() != null) {
-                        finalAmount = requestDTO.getTotalAssignedFee().multiply(finalPercentage).divide(BigDecimal.valueOf(100));
+                        finalAmount = requestDTO.getTotalAssignedFee().multiply(finalPercentage)
+                                .divide(BigDecimal.valueOf(100));
                     }
                 } else {
                     finalAmount = discountRate.getValue();
@@ -224,7 +232,8 @@ public class StudentDiscountAssignmentService {
     // GET BY ID
     // -------------------------------------------------------------------------
     public StudentDiscountAssignmentResponseDTO getById(Long assignmentId) {
-        StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId).orElseThrow(() -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
+        StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
         return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
     }
 
@@ -240,9 +249,11 @@ public class StudentDiscountAssignmentService {
     // UPDATE ASSIGNMENT
     // -------------------------------------------------------------------------
     @Transactional
-    public StudentDiscountAssignmentResponseDTO updateAssignment(Long assignmentId, @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
-        StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId).orElseThrow(() -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
-        //MapperUtil.mapObject(requestDTO, entity); // update fields from DTO
+    public StudentDiscountAssignmentResponseDTO updateAssignment(Long assignmentId,
+            @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
+        StudentDiscountAssignmentEntity entity = assignmentRepository.findByIdAndDeletedFalse(assignmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Student discount assignment not found with id: " + assignmentId));
+        // MapperUtil.mapObject(requestDTO, entity); // update fields from DTO
         assignmentRepository.save(entity);
         return MapperUtil.mapObject(entity, StudentDiscountAssignmentResponseDTO.class);
     }
@@ -279,22 +290,25 @@ public class StudentDiscountAssignmentService {
         return assignmentRepository.markAsInactive(assignmentId);
     }
 
-//    // -------------------------------------------------------------------------
-//    // SEARCH
-//    // -------------------------------------------------------------------------
-//    public List<StudentDiscountAssignmentResponseDTO> search(String keyword) {
-//        List<StudentDiscountAssignmentEntity> result = assignmentRepository.searchByKeyword(keyword);
-//        return MapperUtil.mapList(result, StudentDiscountResponseDTO.class);
-//    }
+    // // -------------------------------------------------------------------------
+    // // SEARCH
+    // // -------------------------------------------------------------------------
+    // public List<StudentDiscountAssignmentResponseDTO> search(String keyword) {
+    // List<StudentDiscountAssignmentEntity> result =
+    // assignmentRepository.searchByKeyword(keyword);
+    // return MapperUtil.mapList(result, StudentDiscountResponseDTO.class);
+    // }
 
     @Transactional(readOnly = true)
     public List<StudentDiscountAssignmentResponseDTO> getAssignedDiscount(Long studentId, Long academicYearId) {
         try {
             // Fetch all discount assignments for the student & academic year
-            List<StudentDiscountAssignmentEntity> assignments = assignmentRepository.findByStudentAndAcademicYear(studentId, academicYearId); // returns empty list if none
+            List<StudentDiscountAssignmentEntity> assignments = assignmentRepository
+                    .findByStudentAndAcademicYear(studentId, academicYearId); // returns empty list if none
             return assignments.stream().map(this::mapToResponseDto).toList();
         } catch (Exception e) {
-            log.error("Error fetching assigned discount for studentId={} and academicYearId={}", studentId, academicYearId, e);
+            log.error("Error fetching assigned discount for studentId={} and academicYearId={}", studentId,
+                    academicYearId, e);
             throw new CustomServiceException("Failed to fetch assigned discount");
         }
     }
@@ -344,17 +358,17 @@ public class StudentDiscountAssignmentService {
         return dto;
     }
 
-
     @Transactional
     public void deleteDiscount(Long studentId, Long academicYearId, Long campusId) {
         try {
             assignmentRepository
                     .findDiscountByAcademic_Campus_stundentId(studentId, academicYearId, campusId)
                     .ifPresent(existing -> {
-                        log.info("Deleting existing discount assignment with id={} for studentId={}, academicYearId={}, campusId={}",
+                        log.info(
+                                "Deleting existing discount assignment with id={} for studentId={}, academicYearId={}, campusId={}",
                                 existing.getId(), studentId, academicYearId, campusId);
                         assignmentRepository.delete(existing);
-                        
+
                         // Update Summary
                         Long organizationId = SecurityUtils.getCurrentOrganizationId();
                         if (organizationId != null) {
@@ -362,10 +376,12 @@ public class StudentDiscountAssignmentService {
                         }
                     });
         } catch (DataAccessException dae) {
-            log.error("Database error while deleting discount for studentId={}, academicYearId={}, campusId={}", studentId, academicYearId, campusId, dae);
+            log.error("Database error while deleting discount for studentId={}, academicYearId={}, campusId={}",
+                    studentId, academicYearId, campusId, dae);
             throw new CustomServiceException("Failed to delete discount due to database error");
         } catch (Exception e) {
-            log.error("Unexpected error while deleting discount for studentId={}, academicYearId={}, campusId={}", studentId, academicYearId, campusId, e);
+            log.error("Unexpected error while deleting discount for studentId={}, academicYearId={}, campusId={}",
+                    studentId, academicYearId, campusId, e);
             throw new CustomServiceException("Unexpected error occurred while deleting discount");
         }
     }

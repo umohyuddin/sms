@@ -15,7 +15,6 @@ import java.util.List;
 @Scope("prototype")
 public class FeeParticularsFacade {
 
-    private static final Log LOG = LogFactory.getLog(FeeParticularsFacade.class);
     @Autowired
     @Lazy
     private FeeParticularsService nFeeParticularsService;
@@ -23,6 +22,7 @@ public class FeeParticularsFacade {
     public List<FeeParticularsEntity> getAll() {
         return nFeeParticularsService.getAll();
     }
+
     public FeeParticularsEntity getById(Long id) {
         return nFeeParticularsService.getById(id);
     }
@@ -38,6 +38,7 @@ public class FeeParticularsFacade {
     public String update(FeeParticularsEntity pFeeParticularsEntity) {
         return nFeeParticularsService.update(pFeeParticularsEntity);
     }
+
     public String delete(Long id) {
         return nFeeParticularsService.delete(id);
     }

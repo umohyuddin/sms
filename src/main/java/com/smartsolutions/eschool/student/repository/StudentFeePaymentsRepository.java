@@ -60,6 +60,60 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             @Param("academicYearId") Long academicYearId,
             @Param("instituteId") Long instituteId
     );
+
+    @Query("""
+        SELECT COALESCE(SUM(p.amountPaid), 0)
+        FROM StudentFeePaymentEntity p
+        WHERE p.student.campus.institute.id = :instituteId
+          AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
+          AND (:academicYearId IS NULL OR p.academicYear.id = :academicYearId)
+          AND (:fromDate IS NULL OR p.paymentDate >= :fromDate)
+          AND (:toDate IS NULL OR p.paymentDate <= :toDate)
+    """)
+    Double sumCollectionByFilters(
+            @Param("campusIds") List<Long> campusIds,
+            @Param("academicYearId") Long academicYearId,
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate,
+            @Param("instituteId") Long instituteId
+    );
+
+    @Query("""
+        SELECT 'Total Collections', COALESCE(SUM(p.amountPaid), 0)
+        FROM StudentFeePaymentEntity p
+        WHERE p.student.campus.institute.id = :instituteId
+          AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
+    """)
+    List<Object[]> collectionByFeeTypeDistribution(
+            @Param("campusIds") List<Long> campusIds,
+            @Param("instituteId") Long instituteId
+    );
+
+    @Query("""
+        SELECT p.paymentDate, SUM(p.amountPaid)
+        FROM StudentFeePaymentEntity p
+        WHERE p.student.campus.institute.id = :instituteId
+          AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
+          AND p.paymentDate BETWEEN :fromDate AND :toDate
+        GROUP BY p.paymentDate
+        ORDER BY p.paymentDate
+    """)
+    List<Object[]> getRevenueTrend(
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate,
+            @Param("campusIds") List<Long> campusIds,
+            @Param("instituteId") Long instituteId
+    );
+
+    @Query("""
+        SELECT p.student.campus.campusName, SUM(p.amountPaid)
+        FROM StudentFeePaymentEntity p
+        WHERE p.student.campus.institute.id = :instituteId
+        GROUP BY p.student.campus.campusName
+    """)
+    List<Object[]> getCollectionByCampus(
+            @Param("instituteId") Long instituteId
+    );
 }
 
 

@@ -2,23 +2,12 @@ package com.smartsolutions.eschool.employee.facade;
 
 import com.smartsolutions.eschool.employee.dtos.PayRollPeriod.request.PayrollPeriodRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.PayRollPeriod.response.PayrollPeriodResponseDTO;
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.model.PayrollPeriodEntity;
-import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import com.smartsolutions.eschool.employee.service.PayRollPeriodService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
 
 @Component
 @Scope("prototype")
@@ -32,7 +21,8 @@ public class PayRollPeriodFacade {
     }
 
     public PayrollPeriodResponseDTO createPayrollPeriod(PayrollPeriodRequestDTO requestDTO) {
-        log.info("Facade: Request to create PayrollPeriod: {} to {}", requestDTO.getStartDate(), requestDTO.getEndDate());
+        log.info("Facade: Request to create PayrollPeriod: {} to {}", requestDTO.getStartDate(),
+                requestDTO.getEndDate());
         PayrollPeriodResponseDTO result = payrollService.createPayrollPeriod(requestDTO);
         log.info("Facade: Successfully created PayrollPeriod: id={}", result.getId());
         return result;
@@ -79,4 +69,3 @@ public class PayRollPeriodFacade {
         log.info("Facade: Successfully deleted PayrollPeriod: id={}", id);
     }
 }
-

@@ -1,12 +1,7 @@
 package com.smartsolutions.eschool.student.facade;
 
-import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.requestDto.FeeCatalogComponentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeCatalogComponent.responseDto.FeeComponentResponseDTO;
-import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
-import com.smartsolutions.eschool.student.dtos.responseDto.FeeCatalogDTO;
-import com.smartsolutions.eschool.student.dtos.responseDto.FeeComponentDTO;
-import com.smartsolutions.eschool.student.service.FeeCatalogService;
 import com.smartsolutions.eschool.student.service.FeeComponentService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +48,8 @@ public class FeeComponentFacade {
     // SEARCH COMPONENTS
     // ====================================
     public List<FeeComponentResponseDTO> searchFeeCatalogComponents(Long feeCatalogId, String keyword) {
-        log.info("[Facade:FeeComponentFacade] searchFeeCatalogComponents() called - catalogId: {}, keyword: {}", feeCatalogId, keyword);
+        log.info("[Facade:FeeComponentFacade] searchFeeCatalogComponents() called - catalogId: {}, keyword: {}",
+                feeCatalogId, keyword);
         return feeComponentService.search(feeCatalogId, keyword);
     }
 

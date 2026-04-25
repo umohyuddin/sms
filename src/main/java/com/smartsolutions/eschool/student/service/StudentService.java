@@ -1,9 +1,7 @@
 package com.smartsolutions.eschool.student.service;
 
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.global.configs.EmployeeDocumentConfig;
 import com.smartsolutions.eschool.global.error.ApiException;
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
@@ -46,10 +44,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -349,5 +344,83 @@ public class StudentService {
         LocalDate start = currentMonth.atDay(1);
         LocalDate end = currentMonth.atEndOfMonth();
         return studentRepository.countStudentsRegisteredBetweenAndOrganizationId(start, end, getOrgId());
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Long countStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] countStudents() called - orgId: {}", orgId);
+        Long count = studentRepository.countByFilters(filter.getCampusIds(), filter.getAcademicYearId(), orgId);
+        log.info("[Service:StudentService] countStudents() succeeded - count: {}", count);
+        return count;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Long countActiveStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] countActiveStudents() called - orgId: {}", orgId);
+        Long count = studentRepository.countActiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), orgId);
+        log.info("[Service:StudentService] countActiveStudents() succeeded - count: {}", count);
+        return count;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Long countNewAdmissions(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] countNewAdmissions() called - orgId: {}", orgId);
+        LocalDate from = filter.getFromDate() != null ? filter.getFromDate() : LocalDate.now().minusMonths(1);
+        LocalDate to = filter.getToDate() != null ? filter.getToDate() : LocalDate.now();
+        Long count = studentRepository.countNewAdmissions(from, to, filter.getCampusIds(), orgId);
+        log.info("[Service:StudentService] countNewAdmissions() succeeded - count: {}", count);
+        return count;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Map<String, Long> getGenderDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getGenderDistribution() called - orgId: {}", orgId);
+        List<Object[]> results = studentRepository.countByGenderDistribution(filter.getCampusIds(), orgId);
+        Map<String, Long> distribution = new HashMap<>();
+        for (Object[] row : results) {
+            String gender = row[0] != null ? row[0].toString() : "Unknown";
+            distribution.put(gender, (Long) row[1]);
+        }
+        log.info("[Service:StudentService] getGenderDistribution() succeeded - found distributions: {}", distribution.size());
+        return distribution;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Map<String, Long> getStudentsByStandardDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getStudentsByStandardDistribution() called - orgId: {}", orgId);
+        List<Object[]> results = studentRepository.countByStandardDistribution(filter.getCampusIds(), orgId);
+        Map<String, Long> distribution = new HashMap<>();
+        for (Object[] row : results) {
+            String standard = row[0] != null ? row[0].toString() : "N/A";
+            distribution.put(standard, (Long) row[1]);
+        }
+        log.info("[Service:StudentService] getStudentsByStandardDistribution() succeeded - found distributions: {}", distribution.size());
+        return distribution;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<Object[]> getAdmissionsTrend(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getAdmissionsTrend() called - orgId: {}", orgId);
+        LocalDate from = filter.getFromDate() != null ? filter.getFromDate() : LocalDate.now().minusMonths(1);
+        LocalDate to = filter.getToDate() != null ? filter.getToDate() : LocalDate.now();
+        List<Object[]> results = studentRepository.getAdmissionsTrend(from, to, filter.getCampusIds(), orgId);
+        log.info("[Service:StudentService] getAdmissionsTrend() succeeded - found entries: {}", results.size());
+        return results;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<Object[]> getGenderDistributionChart(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getGenderDistributionChart() called - orgId: {}", orgId);
+        List<Object[]> results = studentRepository.getGenderDistribution(filter.getCampusIds(), orgId);
+        log.info("[Service:StudentService] getGenderDistributionChart() succeeded");
+        return results;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<Object[]> getClassStrengthChart(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getClassStrengthChart() called - orgId: {}", orgId);
+        List<Object[]> results = studentRepository.getStudentStrengthByStandard(filter.getCampusIds(), orgId);
+        log.info("[Service:StudentService] getClassStrengthChart() succeeded");
+        return results;
     }
 }

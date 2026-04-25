@@ -171,6 +171,44 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             WHERE sfa.id = :id AND sfa.institute.id = :instituteId
             """)
     Optional<StudentFeeAssignmentEntity> findByIdAndInstituteId(@Param("id") Long id, @Param("instituteId") Long instituteId);
+
+    @Query("""
+        SELECT COALESCE(SUM(a.totalAmount), 0)
+        FROM StudentFeeAssignmentEntity a
+        WHERE a.institute.id = :instituteId
+          AND (:campusIds IS NULL OR a.student.campus.id IN :campusIds)
+          AND (:academicYearId IS NULL OR a.academicYear.id = :academicYearId)
+    """)
+    Double sumPendingDuesByFilters(
+            @Param("campusIds") java.util.List<Long> campusIds,
+            @Param("academicYearId") Long academicYearId,
+            @Param("instituteId") Long instituteId
+    );
+
+    @Query("""
+        SELECT a.student.standard.standardName, COALESCE(SUM(a.totalAmount), 0)
+        FROM StudentFeeAssignmentEntity a
+        WHERE a.institute.id = :instituteId
+          AND (:campusIds IS NULL OR a.student.campus.id IN :campusIds)
+        GROUP BY a.student.standard.standardName
+    """)
+    java.util.List<Object[]> pendingDuesByStandardDistribution(
+            @Param("campusIds") java.util.List<Long> campusIds,
+            @Param("instituteId") Long instituteId
+    );
+
+    @Query("""
+        SELECT 
+            'ALL',
+            COUNT(a)
+        FROM StudentFeeAssignmentEntity a
+        WHERE a.institute.id = :instituteId
+          AND (:campusIds IS NULL OR a.student.campus.id IN :campusIds)
+    """)
+    java.util.List<Object[]> getFeeStatusDistribution(
+            @Param("campusIds") java.util.List<Long> campusIds,
+            @Param("instituteId") Long instituteId
+    );
 }
 
 

@@ -9,8 +9,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Objects;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -166,7 +164,7 @@ class DataIntegrityAuditTests {
     @DisplayName("Should maintain data consistency with unique constraints")
     void testUniqueConstraintConsistency() {
         String insertSql = "INSERT INTO provinces (country_id, name) VALUES (?, ?)";
-        
+
         Long countryId = setupCountry();
 
         // First insert should succeed

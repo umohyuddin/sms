@@ -436,4 +436,24 @@ public class EmployeeMasterService {
         int randomNum = new Random().nextInt(9000) + 1000;
         return "EMP" + formattedDate + randomNum;
     }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public long countEmployees(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:EmployeeMasterService] countEmployees() called - orgId: {}", orgId);
+        long count = employeeRepository.countEmployeesByFilters(filter.getCampusIds(), orgId);
+        log.info("[Service:EmployeeMasterService] countEmployees() succeeded - count: {}", count);
+        return count;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Map<String, Long> getStaffCountByType(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:EmployeeMasterService] getStaffCountByType() called - orgId: {}", orgId);
+        List<Object[]> results = employeeRepository.countEmployeesByTypeDistribution(filter.getCampusIds(), orgId);
+        Map<String, Long> distribution = new HashMap<>();
+        for (Object[] row : results) {
+            distribution.put(row[0] != null ? row[0].toString() : "Unknown", (Long) row[1]);
+        }
+        log.info("[Service:EmployeeMasterService] getStaffCountByType() succeeded - found types: {}", distribution.size());
+        return distribution;
+    }
 }

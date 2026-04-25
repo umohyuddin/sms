@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -88,7 +87,8 @@ public class FeeCatalogService {
         }
         log.info("[Service:FeeCatalogService] getByChargeType() called - chargeTypeId: {}, institute: {}", chargeTypeId,
                 organizationId);
-        List<FeeCatalogEntity> result = feeCatalogRepository.findByChargeTypeIdAndInstituteId(chargeTypeId, organizationId);
+        List<FeeCatalogEntity> result = feeCatalogRepository.findByChargeTypeIdAndInstituteId(chargeTypeId,
+                organizationId);
         List<FeeCatalogDTO> responseDTOs = FeeCatalogMapper.toDtoList(result);
         log.info("[Service:FeeCatalogService] getByChargeType() succeeded - Found {} catalogs", responseDTOs.size());
         return responseDTOs;
@@ -104,7 +104,8 @@ public class FeeCatalogService {
         List<FeeCatalogEntity> result = feeCatalogRepository.findByRecurrenceRuleIdAndInstituteId(recurrenceRuleId,
                 organizationId);
         List<FeeCatalogDTO> responseDTOs = FeeCatalogMapper.toDtoList(result);
-        log.info("[Service:FeeCatalogService] getByRecurrenceRule() succeeded - Found {} catalogs", responseDTOs.size());
+        log.info("[Service:FeeCatalogService] getByRecurrenceRule() succeeded - Found {} catalogs",
+                responseDTOs.size());
         return responseDTOs;
     }
 

@@ -82,6 +82,23 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEn
     @org.springframework.data.jpa.repository.Modifying
     @Query("UPDATE EmployeeMasterEntity e SET e.deleted = true WHERE e.id = :id AND e.organizationId = :organizationId")
     int softDeleteByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
+
+    @Query("""
+        SELECT COUNT(e) FROM EmployeeMasterEntity e
+        LEFT JOIN EmployeeAssignmentEntity a ON a.employee.id = e.id AND a.isPrimary = true
+        WHERE e.organizationId = :organizationId AND e.deleted = false
+          AND (:campusIds IS NULL OR a.campus.id IN :campusIds)
+    """)
+    long countEmployeesByFilters(@Param("campusIds") java.util.List<Long> campusIds, @Param("organizationId") Long organizationId);
+
+    @Query("""
+        SELECT e.employeeType.name, COUNT(e) FROM EmployeeMasterEntity e
+        LEFT JOIN EmployeeAssignmentEntity a ON a.employee.id = e.id AND a.isPrimary = true
+        WHERE e.organizationId = :organizationId AND e.deleted = false
+          AND (:campusIds IS NULL OR a.campus.id IN :campusIds)
+        GROUP BY e.employeeType.name
+    """)
+    java.util.List<Object[]> countEmployeesByTypeDistribution(@Param("campusIds") java.util.List<Long> campusIds, @Param("organizationId") Long organizationId);
 }
 
 

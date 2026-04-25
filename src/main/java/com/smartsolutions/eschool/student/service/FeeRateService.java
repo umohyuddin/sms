@@ -18,12 +18,10 @@ import com.smartsolutions.eschool.student.model.FeeSlabGroupEntity;
 import com.smartsolutions.eschool.student.repository.FeeComponentRepository;
 import com.smartsolutions.eschool.student.repository.FeeRateRepository;
 import com.smartsolutions.eschool.student.repository.FeeSlabGroupRepository;
-import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
