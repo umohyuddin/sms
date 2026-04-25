@@ -80,8 +80,8 @@ public class EmployeeMasterEntity extends AuditableEntity {
     private String maritalStatus;
 
 
-    @Column(name = "cnic", length = 20)
-    private String cnic;
+    @Column(name = "national_id", length = 20)
+    private String nationalId;
 
     @Column(name = "passport_number", length = 20)
     private String passportNumber;

@@ -1049,7 +1049,7 @@ CREATE TABLE board_member_roles (
         gender VARCHAR(10),
         date_of_birth DATE,
         marital_status VARCHAR(20),
-        cnic VARCHAR(20),
+        national_id VARCHAR(20),
         passport_number VARCHAR(20),
         religion VARCHAR(50),
         nationality VARCHAR(50),

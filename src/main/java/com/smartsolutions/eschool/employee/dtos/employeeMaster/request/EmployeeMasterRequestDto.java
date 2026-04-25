@@ -23,6 +23,8 @@ public class EmployeeMasterRequestDto {
     private String maritalStatus;
     private String religion;
     private String nationality;
+    private String nationalId;
+    private String passportNumber;
     private String bloodGroup;
 
     // Employment Details

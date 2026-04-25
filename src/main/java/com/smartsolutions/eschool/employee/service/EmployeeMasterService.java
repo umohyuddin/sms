@@ -225,6 +225,8 @@ public class EmployeeMasterService {
         if (dto.getReligion() != null) entity.setReligion(dto.getReligion());
         if (dto.getNationality() != null) entity.setNationality(dto.getNationality());
         if (dto.getMaritalStatus() != null) entity.setMaritalStatus(dto.getMaritalStatus());
+        if (dto.getNationalId() != null) entity.setNationalId(dto.getNationalId());
+        if (dto.getPassportNumber() != null) entity.setPassportNumber(dto.getPassportNumber());
         if (dto.getBloodGroup() != null) entity.setBloodGroup(dto.getBloodGroup());
         if (dto.getBio() != null) entity.setBio(dto.getBio());
         if (dto.getJoiningDate() != null) entity.setJoiningDate(dto.getJoiningDate());

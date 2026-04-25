@@ -37,6 +37,8 @@ public class EmployeeMapper {
                 .maritalStatus(entity.getMaritalStatus())
                 .religion(entity.getReligion())
                 .nationality(entity.getNationality())
+                .nationalId(entity.getNationalId())
+                .passportNumber(entity.getPassportNumber())
                 .bloodGroup(entity.getBloodGroup())
                 .email(entity.getEmail())
                 .primaryPhone(entity.getPrimaryPhone())
