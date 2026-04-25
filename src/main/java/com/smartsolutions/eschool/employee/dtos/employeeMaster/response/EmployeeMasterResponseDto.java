@@ -25,7 +25,8 @@ public class EmployeeMasterResponseDto {
     private Date dateOfBirth;
     private String maritalStatus;
     private String religion;
-    private String nationality;
+    private Long countryId;
+    private String countryName;
     private String nationalId;
     private String passportNumber;
     private String bloodGroup;

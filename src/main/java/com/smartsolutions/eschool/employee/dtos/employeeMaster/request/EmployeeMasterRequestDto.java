@@ -22,7 +22,7 @@ public class EmployeeMasterRequestDto {
     private Date dateOfBirth;
     private String maritalStatus;
     private String religion;
-    private String nationality;
+    private Long countryId;
     private String nationalId;
     private String passportNumber;
     private String bloodGroup;

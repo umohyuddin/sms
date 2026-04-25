@@ -52,6 +52,7 @@ public class EmployeeMasterService {
     private final CampusRepository campusRepository;
     private final DepartmentRepository departmentRepository;
     private final DesignationRepository designationRepository;
+    private final com.smartsolutions.eschool.lookups.repository.CountryRepository countryRepository;
     private final EmployeeDocumentConfig feeConfig;
 
     public EmployeeMasterService(EmployeeMasterRepository employeeRepository,
@@ -60,6 +61,7 @@ public class EmployeeMasterService {
                                  CampusRepository campusRepository,
                                  DepartmentRepository departmentRepository,
                                  DesignationRepository designationRepository,
+                                 com.smartsolutions.eschool.lookups.repository.CountryRepository countryRepository,
                                  EmployeeDocumentConfig feeConfig) {
         this.employeeRepository = employeeRepository;
         this.employeeDocumentRepository = employeeDocumentRepository;
@@ -67,6 +69,7 @@ public class EmployeeMasterService {
         this.campusRepository = campusRepository;
         this.departmentRepository = departmentRepository;
         this.designationRepository = designationRepository;
+        this.countryRepository = countryRepository;
         this.feeConfig = feeConfig;
     }
 
@@ -166,6 +169,10 @@ public class EmployeeMasterService {
         employeeEntity.setDeleted(false);
         employeeEntity.setOrganizationId(orgId);
 
+        if (requestDto.getCountryId() != null) {
+            employeeEntity.setCountry(countryRepository.getReferenceById(requestDto.getCountryId()));
+        }
+
         EmployeeMasterEntity savedEmployee = employeeRepository.save(employeeEntity);
 
         // Create initial primary assignment
@@ -223,7 +230,9 @@ public class EmployeeMasterService {
         if (dto.getWorkPhone() != null) entity.setWorkPhone(dto.getWorkPhone());
         if (dto.getEmail() != null) entity.setEmail(dto.getEmail());
         if (dto.getReligion() != null) entity.setReligion(dto.getReligion());
-        if (dto.getNationality() != null) entity.setNationality(dto.getNationality());
+        if (dto.getCountryId() != null) {
+            entity.setCountry(countryRepository.getReferenceById(dto.getCountryId()));
+        }
         if (dto.getMaritalStatus() != null) entity.setMaritalStatus(dto.getMaritalStatus());
         if (dto.getNationalId() != null) entity.setNationalId(dto.getNationalId());
         if (dto.getPassportNumber() != null) entity.setPassportNumber(dto.getPassportNumber());

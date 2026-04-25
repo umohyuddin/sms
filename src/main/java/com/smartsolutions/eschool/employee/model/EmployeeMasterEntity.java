@@ -89,8 +89,9 @@ public class EmployeeMasterEntity extends AuditableEntity {
     @Column(length = 50)
     private String religion;
 
-    @Column(length = 50)
-    private String nationality;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private com.smartsolutions.eschool.lookups.model.CountryEntity country;
 
     @Column(name = "blood_group", length = 10)
     private String bloodGroup;

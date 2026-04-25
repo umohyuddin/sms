@@ -1052,7 +1052,7 @@ CREATE TABLE board_member_roles (
         national_id VARCHAR(20),
         passport_number VARCHAR(20),
         religion VARCHAR(50),
-        nationality VARCHAR(50),
+        country_id BIGINT,
         blood_group VARCHAR(10),
         email VARCHAR(100) NOT NULL,
         primary_phone VARCHAR(20),
@@ -1075,7 +1075,9 @@ CREATE TABLE board_member_roles (
         INDEX idx_employee_code (employee_code),
         INDEX idx_employee_active (active),
         INDEX idx_employee_type (employee_type_id),
-        CONSTRAINT fk_employee_type FOREIGN KEY (employee_type_id) REFERENCES employee_type(id)
+        INDEX idx_employee_country (country_id),
+        CONSTRAINT fk_employee_type FOREIGN KEY (employee_type_id) REFERENCES employee_type(id),
+        CONSTRAINT fk_employee_country FOREIGN KEY (country_id) REFERENCES country(id)
     );
 
 
