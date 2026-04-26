@@ -13,8 +13,11 @@ import lombok.NoArgsConstructor;
 public class DashboardKpiResponse {
     private KpiMetric totalStudents;
     private KpiMetric activeStudents;
+    private KpiMetric inactiveStudents;
     private KpiMetric newAdmissions;
+    private KpiMetric withdrawals;
     private KpiMetric totalCollection;
     private KpiMetric pendingDues;
+    private KpiMetric collectionEfficiency;
     private KpiMetric totalEmployees;
 }

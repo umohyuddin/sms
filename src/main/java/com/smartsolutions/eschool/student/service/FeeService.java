@@ -62,6 +62,23 @@ public class FeeService {
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Double getCollectionEfficiency(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:FeeService] getCollectionEfficiency() called - orgId: {}", orgId);
+        Double collection = getTotalCollection(filter, orgId);
+        Double pending = getPendingDues(filter, orgId);
+        
+        if (collection == null) collection = 0.0;
+        if (pending == null) pending = 0.0;
+        
+        double totalExpected = collection + pending;
+        if (totalExpected == 0) return 100.0;
+        
+        double efficiency = (collection / totalExpected) * 100.0;
+        log.info("[Service:FeeService] getCollectionEfficiency() succeeded - efficiency: {}%", efficiency);
+        return efficiency;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public java.util.Map<String, Double> getCollectionByFeeType(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getCollectionByFeeType() called - orgId: {}", orgId);
         java.util.List<Object[]> results = paymentsRepository.collectionByFeeTypeDistribution(

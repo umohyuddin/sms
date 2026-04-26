@@ -30,26 +30,43 @@ public class Dashboard360Facade {
     public DashboardKpiResponse getKpiSummary(DashboardFilter filter) {
         Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
         log.info("[Facade:DashboardFacade] getKpiSummary() called - orgId: {}", orgId);
-        
-        CompletableFuture<Long> totalStudentsFuture = CompletableFuture.supplyAsync(() -> nStudentService.countStudents(filter, orgId));
-        CompletableFuture<Long> activeStudentsFuture = CompletableFuture.supplyAsync(() -> nStudentService.countActiveStudents(filter, orgId));
-        CompletableFuture<Long> newAdmissionsFuture = CompletableFuture.supplyAsync(() -> nStudentService.countNewAdmissions(filter, orgId));
-        CompletableFuture<Double> totalCollectionFuture = CompletableFuture.supplyAsync(() -> nFeeService.getTotalCollection(filter, orgId));
-        CompletableFuture<Double> pendingDuesFuture = CompletableFuture.supplyAsync(() -> nFeeService.getPendingDues(filter, orgId));
-        CompletableFuture<Long> totalEmployeesFuture = CompletableFuture.supplyAsync(() -> nEmployeeService.countEmployees(filter, orgId));
+
+        CompletableFuture<Long> totalStudentsFuture = CompletableFuture
+                .supplyAsync(() -> nStudentService.countStudents(filter, orgId));
+        CompletableFuture<Long> activeStudentsFuture = CompletableFuture
+                .supplyAsync(() -> nStudentService.countActiveStudents(filter, orgId));
+        CompletableFuture<Long> inactiveStudentsFuture = CompletableFuture
+                .supplyAsync(() -> nStudentService.countInactiveStudents(filter, orgId));
+        CompletableFuture<Long> newAdmissionsFuture = CompletableFuture
+                .supplyAsync(() -> nStudentService.countNewAdmissions(filter, orgId));
+        CompletableFuture<Long> withdrawalsFuture = CompletableFuture
+                .supplyAsync(() -> nStudentService.countWithdrawals(filter, orgId));
+        CompletableFuture<Double> totalCollectionFuture = CompletableFuture
+                .supplyAsync(() -> nFeeService.getTotalCollection(filter, orgId));
+        CompletableFuture<Double> pendingDuesFuture = CompletableFuture
+                .supplyAsync(() -> nFeeService.getPendingDues(filter, orgId));
+        CompletableFuture<Double> efficiencyFuture = CompletableFuture
+                .supplyAsync(() -> nFeeService.getCollectionEfficiency(filter, orgId));
+        CompletableFuture<Long> totalEmployeesFuture = CompletableFuture
+                .supplyAsync(() -> nEmployeeService.countEmployees(filter, orgId));
 
         CompletableFuture.allOf(
-                totalStudentsFuture, activeStudentsFuture, newAdmissionsFuture,
-                totalCollectionFuture, pendingDuesFuture, totalEmployeesFuture
-        ).join();
+                totalStudentsFuture, activeStudentsFuture, inactiveStudentsFuture,
+                newAdmissionsFuture, withdrawalsFuture,
+                totalCollectionFuture, pendingDuesFuture, efficiencyFuture,
+                totalEmployeesFuture).join();
 
         try {
             return DashboardKpiResponse.builder()
                     .totalStudents(KpiMetric.builder().currentValue(totalStudentsFuture.get().doubleValue()).build())
                     .activeStudents(KpiMetric.builder().currentValue(activeStudentsFuture.get().doubleValue()).build())
+                    .inactiveStudents(
+                            KpiMetric.builder().currentValue(inactiveStudentsFuture.get().doubleValue()).build())
                     .newAdmissions(KpiMetric.builder().currentValue(newAdmissionsFuture.get().doubleValue()).build())
+                    .withdrawals(KpiMetric.builder().currentValue(withdrawalsFuture.get().doubleValue()).build())
                     .totalCollection(KpiMetric.builder().currentValue(totalCollectionFuture.get()).build())
                     .pendingDues(KpiMetric.builder().currentValue(pendingDuesFuture.get()).build())
+                    .collectionEfficiency(KpiMetric.builder().currentValue(efficiencyFuture.get()).build())
                     .totalEmployees(KpiMetric.builder().currentValue(totalEmployeesFuture.get().doubleValue()).build())
                     .build();
         } catch (Exception e) {
@@ -62,7 +79,8 @@ public class Dashboard360Facade {
         Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
         log.info("[Facade:DashboardFacade] getStudentStats() called - orgId: {}", orgId);
         return StudentDashboardResponse.builder()
-                .enrollmentTrend(KpiMetric.builder().currentValue((double) nStudentService.countStudents(filter, orgId)).build())
+                .enrollmentTrend(
+                        KpiMetric.builder().currentValue((double) nStudentService.countStudents(filter, orgId)).build())
                 .genderDistribution(nStudentService.getGenderDistribution(filter, orgId))
                 .studentsByStandard(nStudentService.getStudentsByStandardDistribution(filter, orgId))
                 .build();

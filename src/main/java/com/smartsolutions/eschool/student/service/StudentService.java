@@ -346,11 +346,10 @@ public class StudentService {
         return studentRepository.countStudentsRegisteredBetweenAndOrganizationId(start, end, getOrgId());
     }
 
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Long countStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:StudentService] countStudents() - orgId: {}, campusIds: {}, to: {}", 
                  orgId, filter.getCampusIds(), filter.getToDate());
-        Long count = studentRepository.countByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getStandardId(), filter.getSectionId(), filter.getFromDate(),filter.getToDate(), orgId);
+        Long count = studentRepository.countByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getStandardId(), filter.getSectionId(), filter.getFromDate(), filter.getToDate(), orgId);
         log.info("[Service:StudentService] countStudents() succeed - count: {}", count);
         return count;
     }
@@ -358,8 +357,29 @@ public class StudentService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Long countActiveStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:StudentService] countActiveStudents() called - orgId: {}", orgId);
-        Long count = studentRepository.countActiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getStandardId(), filter.getSectionId(),filter.getFromDate(), filter.getToDate(), orgId);
+        Long count = studentRepository.countActiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getStandardId(), filter.getSectionId(), filter.getFromDate(), filter.getToDate(), orgId);
         log.info("[Service:StudentService] countActiveStudents() succeeded - count: {}", count);
+        return count;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Long countInactiveStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] countInactiveStudents() called - orgId: {}", orgId);
+        Long count = studentRepository.countInactiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getStandardId(), filter.getSectionId(), filter.getFromDate(), filter.getToDate(), orgId);
+        log.info("[Service:StudentService] countInactiveStudents() succeeded - count: {}", count);
+        return count;
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Long countWithdrawals(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        LocalDate from = filter.getFromDate() != null ? filter.getFromDate() : LocalDate.now().minusMonths(1);
+        LocalDate to = filter.getToDate() != null ? filter.getToDate() : LocalDate.now();
+        java.time.LocalDateTime fromDateTime = from.atStartOfDay();
+        java.time.LocalDateTime toDateTime = to.atTime(java.time.LocalTime.MAX);
+        
+        log.info("[Service:StudentService] countWithdrawals() - orgId: {}, from: {}, to: {}", orgId, fromDateTime, toDateTime);
+        Long count = studentRepository.countWithdrawals(fromDateTime, toDateTime, filter.getCampusIds(), filter.getStandardId(), filter.getSectionId(), orgId);
+        log.info("[Service:StudentService] countWithdrawals() succeeded - count: {}", count);
         return count;
     }
 
