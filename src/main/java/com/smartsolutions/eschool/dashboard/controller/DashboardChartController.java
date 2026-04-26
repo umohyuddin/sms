@@ -29,6 +29,20 @@ public class DashboardChartController {
         this.nChartFacade = nChartFacade;
     }
 
+    @InitBinder
+    public void initBinder(org.springframework.web.bind.WebDataBinder binder) {
+        binder.registerCustomEditor(Long.class, new org.springframework.beans.propertyeditors.CustomNumberEditor(Long.class, true) {
+            @Override
+            public void setAsText(String text) {
+                if (text == null || text.trim().isEmpty() || "null".equalsIgnoreCase(text.trim())) {
+                    setValue(null);
+                } else {
+                    super.setAsText(text);
+                }
+            }
+        });
+    }
+
     @Operation(summary = "Get admissions trend data")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved admissions trend",
@@ -39,6 +53,7 @@ public class DashboardChartController {
     @GetMapping(value = "/admissions", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TimeSeriesChartResponse> getAdmissions(
             @Parameter(description = "Dashboard filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         log.info("[Controller:DashboardChartController] getAdmissions() called");
         TimeSeriesChartResponse response = nChartFacade.getAdmissionsTrend(filter);
         log.info("[Controller:DashboardChartController] getAdmissions() succeeded");
@@ -55,6 +70,7 @@ public class DashboardChartController {
     @GetMapping(value = "/revenue", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TimeSeriesChartResponse> getRevenue(
             @Parameter(description = "Dashboard filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         log.info("[Controller:DashboardChartController] getRevenue() called");
         TimeSeriesChartResponse response = nChartFacade.getRevenueTrend(filter);
         log.info("[Controller:DashboardChartController] getRevenue() succeeded");
@@ -71,6 +87,7 @@ public class DashboardChartController {
     @GetMapping(value = "/gender-distribution", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PieChartResponse> getGenderDistribution(
             @Parameter(description = "Dashboard filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         log.info("[Controller:DashboardChartController] getGenderDistribution() called");
         PieChartResponse response = nChartFacade.getGenderDistribution(filter);
         log.info("[Controller:DashboardChartController] getGenderDistribution() succeeded");
@@ -87,6 +104,7 @@ public class DashboardChartController {
     @GetMapping(value = "/fee-status", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PieChartResponse> getFeeStatus(
             @Parameter(description = "Dashboard filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         log.info("[Controller:DashboardChartController] getFeeStatus() called");
         PieChartResponse response = nChartFacade.getFeeStatusDistribution(filter);
         log.info("[Controller:DashboardChartController] getFeeStatus() succeeded");
@@ -103,6 +121,7 @@ public class DashboardChartController {
     @GetMapping(value = "/class-strength", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TimeSeriesChartResponse> getClassStrength(
             @Parameter(description = "Dashboard filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         log.info("[Controller:DashboardChartController] getClassStrength() called");
         TimeSeriesChartResponse response = nChartFacade.getClassStrength(filter);
         log.info("[Controller:DashboardChartController] getClassStrength() succeeded");
@@ -119,6 +138,7 @@ public class DashboardChartController {
     @GetMapping(value = "/campus-collection", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PieChartResponse> getCampusCollection(
             @Parameter(description = "Dashboard filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         log.info("[Controller:DashboardChartController] getCampusCollection() called");
         PieChartResponse response = nChartFacade.getCampusCollection(filter);
         log.info("[Controller:DashboardChartController] getCampusCollection() succeeded");

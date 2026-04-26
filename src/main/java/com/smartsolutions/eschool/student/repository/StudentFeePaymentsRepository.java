@@ -67,12 +67,16 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
         WHERE p.student.campus.institute.id = :instituteId
           AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
           AND (:academicYearId IS NULL OR p.academicYear.id = :academicYearId)
+          AND (:standardId IS NULL OR p.student.standard.id = :standardId)
+          AND (:sectionId IS NULL OR p.student.section.id = :sectionId)
           AND (:fromDate IS NULL OR p.paymentDate >= :fromDate)
           AND (:toDate IS NULL OR p.paymentDate <= :toDate)
     """)
     Double sumCollectionByFilters(
             @Param("campusIds") List<Long> campusIds,
             @Param("academicYearId") Long academicYearId,
+            @Param("standardId") Long standardId,
+            @Param("sectionId") Long sectionId,
             @Param("fromDate") LocalDate fromDate,
             @Param("toDate") LocalDate toDate,
             @Param("instituteId") Long instituteId
@@ -83,9 +87,13 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
         FROM StudentFeePaymentEntity p
         WHERE p.student.campus.institute.id = :instituteId
           AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
+          AND (:fromDate IS NULL OR p.paymentDate >= :fromDate)
+          AND (:toDate IS NULL OR p.paymentDate <= :toDate)
     """)
     List<Object[]> collectionByFeeTypeDistribution(
             @Param("campusIds") List<Long> campusIds,
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate,
             @Param("instituteId") Long instituteId
     );
 
@@ -109,9 +117,15 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
         SELECT p.student.campus.campusName, SUM(p.amountPaid)
         FROM StudentFeePaymentEntity p
         WHERE p.student.campus.institute.id = :instituteId
+          AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
+          AND (:fromDate IS NULL OR p.paymentDate >= :fromDate)
+          AND (:toDate IS NULL OR p.paymentDate <= :toDate)
         GROUP BY p.student.campus.campusName
     """)
     List<Object[]> getCollectionByCampus(
+            @Param("campusIds") List<Long> campusIds,
+            @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate,
             @Param("instituteId") Long instituteId
     );
 }

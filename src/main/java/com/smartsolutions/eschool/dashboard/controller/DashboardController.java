@@ -30,6 +30,20 @@ public class DashboardController {
         this.nDashboardFacade = nDashboardFacade;
     }
 
+    @InitBinder
+    public void initBinder(org.springframework.web.bind.WebDataBinder binder) {
+        binder.registerCustomEditor(Long.class, new org.springframework.beans.propertyeditors.CustomNumberEditor(Long.class, true) {
+            @Override
+            public void setAsText(String text) {
+                if (text == null || text.trim().isEmpty() || "null".equalsIgnoreCase(text.trim())) {
+                    setValue(null);
+                } else {
+                    super.setAsText(text);
+                }
+            }
+        });
+    }
+
     @Operation(summary = "Get high-level KPI summary")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved KPI summary",
@@ -40,6 +54,7 @@ public class DashboardController {
     @GetMapping(value = "/kpi", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DashboardKpiResponse> getKpi(
             @Parameter(description = "Dashboard universal filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
         log.info("[Controller:DashboardController] getKpi() called - tenantId={}, filters: {}", orgId, filter);
         
@@ -62,6 +77,7 @@ public class DashboardController {
     @GetMapping(value = "/students", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StudentDashboardResponse> getStudents(
             @Parameter(description = "Dashboard universal filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         log.info("[Controller:DashboardController] getStudents() called - Fetching student analytics");
         StudentDashboardResponse response = nDashboardFacade.getStudentStats(filter);
         log.info("[Controller:DashboardController] getStudents() succeeded");
@@ -78,6 +94,7 @@ public class DashboardController {
     @GetMapping(value = "/finance", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FinanceDashboardResponse> getFinance(
             @Parameter(description = "Dashboard universal filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         log.info("[Controller:DashboardController] getFinance() called - Fetching finance analytics");
         FinanceDashboardResponse response = nDashboardFacade.getFinanceStats(filter);
         log.info("[Controller:DashboardController] getFinance() succeeded");
@@ -94,6 +111,7 @@ public class DashboardController {
     @GetMapping(value = "/hr", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HrDashboardResponse> getHr(
             @Parameter(description = "Dashboard universal filters") @ModelAttribute DashboardFilter filter) {
+        filter.normalize();
         log.info("[Controller:DashboardController] getHr() called - Fetching HR analytics");
         HrDashboardResponse response = nDashboardFacade.getHrStats(filter);
         log.info("[Controller:DashboardController] getHr() succeeded");
@@ -110,6 +128,7 @@ public class DashboardController {
     public ResponseEntity<Page<AlertResponse>> getAlerts(
             @Parameter(description = "Dashboard universal filters") @ModelAttribute DashboardFilter filter,
             Pageable pageable) {
+        filter.normalize();
         log.info("[Controller:DashboardController] getAlerts() called");
         Page<AlertResponse> response = nDashboardFacade.getAlerts(filter, pageable);
         log.info("[Controller:DashboardController] getAlerts() succeeded - Found {} alerts", response.getTotalElements());
@@ -126,6 +145,7 @@ public class DashboardController {
     public ResponseEntity<Page<ActivityResponse>> getActivity(
             @Parameter(description = "Dashboard universal filters") @ModelAttribute DashboardFilter filter,
             Pageable pageable) {
+        filter.normalize();
         log.info("[Controller:DashboardController] getActivity() called");
         Page<ActivityResponse> response = nDashboardFacade.getActivity(filter, pageable);
         log.info("[Controller:DashboardController] getActivity() succeeded - Found {} activities", response.getTotalElements());

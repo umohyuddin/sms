@@ -36,6 +36,8 @@ public class FeeService {
         Double total = paymentsRepository.sumCollectionByFilters(
                 filter.getCampusIds(), 
                 filter.getAcademicYearId(), 
+                filter.getStandardId(),
+                filter.getSectionId(),
                 filter.getFromDate(), 
                 filter.getToDate(), 
                 orgId
@@ -50,6 +52,9 @@ public class FeeService {
         Double dues = assignmentRepository.sumPendingDuesByFilters(
                 filter.getCampusIds(), 
                 filter.getAcademicYearId(), 
+                filter.getStandardId(),
+                filter.getSectionId(),
+                filter.getToDate(), 
                 orgId
         );
         log.info("[Service:FeeService] getPendingDues() succeeded - dues: {}", dues);
@@ -59,7 +64,11 @@ public class FeeService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public java.util.Map<String, Double> getCollectionByFeeType(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getCollectionByFeeType() called - orgId: {}", orgId);
-        java.util.List<Object[]> results = paymentsRepository.collectionByFeeTypeDistribution(filter.getCampusIds(), orgId);
+        java.util.List<Object[]> results = paymentsRepository.collectionByFeeTypeDistribution(
+                filter.getCampusIds(), 
+                filter.getFromDate(),
+                filter.getToDate(),
+                orgId);
         java.util.Map<String, Double> distribution = new java.util.HashMap<>();
         for (Object[] row : results) {
             distribution.put(row[0] != null ? row[0].toString() : "Other", (Double) row[1]);
@@ -71,7 +80,10 @@ public class FeeService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public java.util.Map<String, Double> getPendingByStandard(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getPendingByStandard() called - orgId: {}", orgId);
-        java.util.List<Object[]> results = assignmentRepository.pendingDuesByStandardDistribution(filter.getCampusIds(), orgId);
+        java.util.List<Object[]> results = assignmentRepository.pendingDuesByStandardDistribution(
+                filter.getCampusIds(), 
+                filter.getToDate(),
+                orgId);
         java.util.Map<String, Double> distribution = new java.util.HashMap<>();
         for (Object[] row : results) {
             distribution.put(row[0] != null ? row[0].toString() : "N/A", (Double) row[1]);
@@ -117,7 +129,10 @@ public class FeeService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public java.util.List<Object[]> getFeeStatusDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getFeeStatusDistribution() called - orgId: {}", orgId);
-        java.util.List<Object[]> results = assignmentRepository.getFeeStatusDistribution(filter.getCampusIds(), orgId);
+        java.util.List<Object[]> results = assignmentRepository.getFeeStatusDistribution(
+                filter.getCampusIds(), 
+                filter.getToDate(),
+                orgId);
         log.info("[Service:FeeService] getFeeStatusDistribution() succeeded");
         return results;
     }
@@ -125,7 +140,11 @@ public class FeeService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public java.util.List<Object[]> getCampusCollectionChart(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getCampusCollectionChart() called - orgId: {}", orgId);
-        java.util.List<Object[]> results = paymentsRepository.getCollectionByCampus(orgId);
+        java.util.List<Object[]> results = paymentsRepository.getCollectionByCampus(
+                filter.getCampusIds(), 
+                filter.getFromDate(),
+                filter.getToDate(),
+                orgId);
         log.info("[Service:FeeService] getCampusCollectionChart() succeeded");
         return results;
     }

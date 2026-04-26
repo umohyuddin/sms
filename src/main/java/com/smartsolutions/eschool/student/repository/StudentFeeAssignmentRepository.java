@@ -178,10 +178,16 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
         WHERE a.institute.id = :instituteId
           AND (:campusIds IS NULL OR a.student.campus.id IN :campusIds)
           AND (:academicYearId IS NULL OR a.academicYear.id = :academicYearId)
+          AND (:standardId IS NULL OR a.student.standard.id = :standardId)
+          AND (:sectionId IS NULL OR a.student.section.id = :sectionId)
+          AND (:toDate IS NULL OR a.dueDate <= :toDate)
     """)
     Double sumPendingDuesByFilters(
             @Param("campusIds") java.util.List<Long> campusIds,
             @Param("academicYearId") Long academicYearId,
+            @Param("standardId") Long standardId,
+            @Param("sectionId") Long sectionId,
+            @Param("toDate") java.time.LocalDate toDate,
             @Param("instituteId") Long instituteId
     );
 
@@ -190,10 +196,12 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
         FROM StudentFeeAssignmentEntity a
         WHERE a.institute.id = :instituteId
           AND (:campusIds IS NULL OR a.student.campus.id IN :campusIds)
+          AND (:toDate IS NULL OR a.dueDate <= :toDate)
         GROUP BY a.student.standard.standardName
     """)
     java.util.List<Object[]> pendingDuesByStandardDistribution(
             @Param("campusIds") java.util.List<Long> campusIds,
+            @Param("toDate") java.time.LocalDate toDate,
             @Param("instituteId") Long instituteId
     );
 
@@ -204,9 +212,11 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
         FROM StudentFeeAssignmentEntity a
         WHERE a.institute.id = :instituteId
           AND (:campusIds IS NULL OR a.student.campus.id IN :campusIds)
+          AND (:toDate IS NULL OR a.dueDate <= :toDate)
     """)
     java.util.List<Object[]> getFeeStatusDistribution(
             @Param("campusIds") java.util.List<Long> campusIds,
+            @Param("toDate") java.time.LocalDate toDate,
             @Param("instituteId") Long instituteId
     );
 }
