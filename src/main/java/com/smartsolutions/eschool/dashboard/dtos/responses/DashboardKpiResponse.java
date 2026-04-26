@@ -20,4 +20,5 @@ public class DashboardKpiResponse {
     private KpiMetric pendingDues;
     private KpiMetric collectionEfficiency;
     private KpiMetric totalEmployees;
+    private java.util.Map<String, Long> genderDistribution;
 }

@@ -349,7 +349,7 @@ public class StudentService {
     public Long countStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:StudentService] countStudents() - orgId: {}, campusIds: {}, to: {}", 
                  orgId, filter.getCampusIds(), filter.getToDate());
-        Long count = studentRepository.countByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getStandardId(), filter.getSectionId(), filter.getFromDate(), filter.getToDate(), orgId);
+        Long count = studentRepository.countByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getFromDate(), filter.getToDate(), orgId);
         log.info("[Service:StudentService] countStudents() succeed - count: {}", count);
         return count;
     }
@@ -357,7 +357,7 @@ public class StudentService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Long countActiveStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:StudentService] countActiveStudents() called - orgId: {}", orgId);
-        Long count = studentRepository.countActiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getStandardId(), filter.getSectionId(), filter.getFromDate(), filter.getToDate(), orgId);
+        Long count = studentRepository.countActiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getFromDate(), filter.getToDate(), orgId);
         log.info("[Service:StudentService] countActiveStudents() succeeded - count: {}", count);
         return count;
     }
@@ -365,7 +365,7 @@ public class StudentService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Long countInactiveStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:StudentService] countInactiveStudents() called - orgId: {}", orgId);
-        Long count = studentRepository.countInactiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getStandardId(), filter.getSectionId(), filter.getFromDate(), filter.getToDate(), orgId);
+        Long count = studentRepository.countInactiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getFromDate(), filter.getToDate(), orgId);
         log.info("[Service:StudentService] countInactiveStudents() succeeded - count: {}", count);
         return count;
     }
@@ -378,7 +378,7 @@ public class StudentService {
         java.time.LocalDateTime toDateTime = to.atTime(java.time.LocalTime.MAX);
         
         log.info("[Service:StudentService] countWithdrawals() - orgId: {}, from: {}, to: {}", orgId, fromDateTime, toDateTime);
-        Long count = studentRepository.countWithdrawals(fromDateTime, toDateTime, filter.getCampusIds(), filter.getStandardId(), filter.getSectionId(), orgId);
+        Long count = studentRepository.countWithdrawals(fromDateTime, toDateTime, filter.getCampusIds(), orgId);
         log.info("[Service:StudentService] countWithdrawals() succeeded - count: {}", count);
         return count;
     }
@@ -395,9 +395,9 @@ public class StudentService {
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public Map<String, Long> getGenderDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+    public java.util.Map<String, Long> getGenderDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:StudentService] getGenderDistribution() called - orgId: {}", orgId);
-        List<Object[]> results = studentRepository.countByGenderDistribution(filter.getCampusIds(), filter.getStandardId(), filter.getSectionId(), filter.getToDate(), orgId);
+        java.util.List<Object[]> results = studentRepository.countByGenderDistribution(filter.getCampusIds(), filter.getFromDate(), filter.getToDate(), orgId);
         Map<String, Long> distribution = new HashMap<>();
         for (Object[] row : results) {
             String gender = row[0] != null ? row[0].toString() : "Unknown";

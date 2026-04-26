@@ -67,16 +67,12 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
         WHERE p.student.campus.institute.id = :instituteId
           AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
           AND (:academicYearId IS NULL OR p.academicYear.id = :academicYearId)
-          AND (:standardId IS NULL OR p.student.standard.id = :standardId)
-          AND (:sectionId IS NULL OR p.student.section.id = :sectionId)
           AND (:fromDate IS NULL OR p.paymentDate >= :fromDate)
           AND (:toDate IS NULL OR p.paymentDate <= :toDate)
     """)
     Double sumCollectionByFilters(
             @Param("campusIds") List<Long> campusIds,
             @Param("academicYearId") Long academicYearId,
-            @Param("standardId") Long standardId,
-            @Param("sectionId") Long sectionId,
             @Param("fromDate") LocalDate fromDate,
             @Param("toDate") LocalDate toDate,
             @Param("instituteId") Long instituteId

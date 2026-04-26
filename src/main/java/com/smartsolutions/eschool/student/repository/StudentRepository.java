@@ -215,16 +215,12 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
           WHERE s.organizationId = :organizationId AND s.deleted = false
             AND (:campusIds IS NULL OR s.campus.id IN :campusIds)
             AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
-            AND (:standardId IS NULL OR s.standard.id = :standardId)
-            AND (:sectionId IS NULL OR s.section.id = :sectionId)
             AND (:fromDate IS NULL OR s.enrollmentDate >= :fromDate)
             AND (:toDate IS NULL OR s.enrollmentDate <= :toDate)
       """)
   Long countByFilters(
       @Param("campusIds") List<Long> campusIds,
       @Param("academicYearId") Long academicYearId,
-      @Param("standardId") Long standardId,
-      @Param("sectionId") Long sectionId,
       @Param("fromDate") java.time.LocalDate fromDate,
       @Param("toDate") java.time.LocalDate toDate,
       @Param("organizationId") Long organizationId);
@@ -234,16 +230,12 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
           WHERE s.organizationId = :organizationId AND s.isActive = true AND s.deleted = false
             AND (:campusIds IS NULL OR s.campus.id IN :campusIds)
             AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
-            AND (:standardId IS NULL OR s.standard.id = :standardId)
-            AND (:sectionId IS NULL OR s.section.id = :sectionId)
             AND (:fromDate IS NULL OR s.enrollmentDate >= :fromDate)
             AND (:toDate IS NULL OR s.enrollmentDate <= :toDate)
       """)
   Long countActiveByFilters(
       @Param("campusIds") List<Long> campusIds,
       @Param("academicYearId") Long academicYearId,
-      @Param("standardId") Long standardId,
-      @Param("sectionId") Long sectionId,
       @Param("fromDate") java.time.LocalDate fromDate,
       @Param("toDate") java.time.LocalDate toDate,
       @Param("organizationId") Long organizationId);
@@ -253,16 +245,12 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
           WHERE s.organizationId = :organizationId AND s.isActive = false AND s.deleted = false
             AND (:campusIds IS NULL OR s.campus.id IN :campusIds)
             AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
-            AND (:standardId IS NULL OR s.standard.id = :standardId)
-            AND (:sectionId IS NULL OR s.section.id = :sectionId)
             AND (:fromDate IS NULL OR s.enrollmentDate >= :fromDate)
             AND (:toDate IS NULL OR s.enrollmentDate <= :toDate)
       """)
   Long countInactiveByFilters(
       @Param("campusIds") List<Long> campusIds,
       @Param("academicYearId") Long academicYearId,
-      @Param("standardId") Long standardId,
-      @Param("sectionId") Long sectionId,
       @Param("fromDate") java.time.LocalDate fromDate,
       @Param("toDate") java.time.LocalDate toDate,
       @Param("organizationId") Long organizationId);
@@ -274,15 +262,11 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
             AND s.deletedAt IS NULL
             AND s.updatedAt BETWEEN :fromDate AND :toDate
             AND (:campusIds IS NULL OR s.campus.id IN :campusIds)
-            AND (:standardId IS NULL OR s.standard.id = :standardId)
-            AND (:sectionId IS NULL OR s.section.id = :sectionId)
       """)
   Long countWithdrawals(
       @Param("fromDate") java.time.LocalDateTime fromDate,
       @Param("toDate") java.time.LocalDateTime toDate,
       @Param("campusIds") List<Long> campusIds,
-      @Param("standardId") Long standardId,
-      @Param("sectionId") Long sectionId,
       @Param("organizationId") Long organizationId);
 
   @Query("""
@@ -305,15 +289,13 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
             SELECT s.gender, COUNT(s) FROM StudentEntity s
             WHERE s.organizationId = :organizationId AND s.deleted = false
               AND (:campusIds IS NULL OR s.campus.id IN :campusIds)
-              AND (:standardId IS NULL OR s.standard.id = :standardId)
-              AND (:sectionId IS NULL OR s.section.id = :sectionId)
+              AND (:fromDate IS NULL OR s.enrollmentDate >= :fromDate)
               AND (:toDate IS NULL OR s.enrollmentDate <= :toDate)
             GROUP BY s.gender
         """)
     List<Object[]> countByGenderDistribution(
         @Param("campusIds") List<Long> campusIds,
-        @Param("standardId") Long standardId,
-        @Param("sectionId") Long sectionId,
+        @Param("fromDate") java.time.LocalDate fromDate,
         @Param("toDate") java.time.LocalDate toDate,
         @Param("organizationId") Long organizationId);
 

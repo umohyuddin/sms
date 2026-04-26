@@ -36,8 +36,6 @@ public class FeeService {
         Double total = paymentsRepository.sumCollectionByFilters(
                 filter.getCampusIds(), 
                 filter.getAcademicYearId(), 
-                filter.getStandardId(),
-                filter.getSectionId(),
                 filter.getFromDate(), 
                 filter.getToDate(), 
                 orgId
@@ -52,8 +50,6 @@ public class FeeService {
         Double dues = assignmentRepository.sumPendingDuesByFilters(
                 filter.getCampusIds(), 
                 filter.getAcademicYearId(), 
-                filter.getStandardId(),
-                filter.getSectionId(),
                 filter.getToDate(), 
                 orgId
         );
