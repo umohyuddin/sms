@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/class/classes")
@@ -68,26 +69,26 @@ public class SClassController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> create(@RequestBody SClassEntity sClassEntity) {
+    public ResponseEntity<Map<String, String>> create(@RequestBody SClassEntity sClassEntity) {
         log.info("POST /api/class/classes called for: {}", sClassEntity.getName());
         String result = sClassFacade.create(sClassEntity);
         log.info("POST /api/class/classes succeeded");
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(Map.of("message", result));
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> update(@RequestBody SClassEntity sClassEntity) {
+    public ResponseEntity<Map<String, String>> update(@RequestBody SClassEntity sClassEntity) {
         log.info("PUT /api/class/classes called for ID: {}", sClassEntity.getId());
         String result = sClassFacade.update(sClassEntity);
         log.info("PUT /api/class/classes succeeded");
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(Map.of("message", result));
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> delete(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
         log.info("DELETE /api/class/classes/{} called", id);
         String result = sClassFacade.delete(id);
         log.info("DELETE /api/class/classes/{} succeeded", id);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(Map.of("message", result));
     }
 }

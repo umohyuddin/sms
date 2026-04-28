@@ -11,8 +11,8 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "school_types")
-@SQLDelete(sql = "UPDATE school_types SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted = false")
+@SQLDelete(sql = "UPDATE school_types SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,10 +32,11 @@ public class SchoolTypeEntity extends ScopeAuditableEntity {
     @Column(name = "description", length = 255)
     private String description;
 
-    @Column(name = "active", nullable = false)
+    @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
-    @Column(name = "deleted", nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 }
+
 

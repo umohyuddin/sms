@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/institute/campuses-standards/sections")
@@ -78,28 +79,28 @@ public class SectionController {
     }
 
     @DeleteMapping("/{sectionId}")
-    public ResponseEntity<String> softDeleteById(@PathVariable Long sectionId) {
+    public ResponseEntity<Map<String, String>> softDeleteById(@PathVariable Long sectionId) {
         log.info("[Controller:SectionController] softDeleteById() called - Request to delete section: {}", sectionId);
         sectionFacade.softDeleteById(sectionId);
         log.info("[Controller:SectionController] softDeleteById() succeeded - Section deleted successfully");
-        return ResponseEntity.ok("Section deleted successfully");
+        return ResponseEntity.ok(Map.of("message", "Section deleted successfully"));
     }
 
     @DeleteMapping("/standard/{standardId}")
-    public ResponseEntity<String> softDeleteByStandardId(@PathVariable Long standardId) {
+    public ResponseEntity<Map<String, String>> softDeleteByStandardId(@PathVariable Long standardId) {
         log.info(
                 "[Controller:SectionController] softDeleteByStandardId() called - Request to delete sections for standard: {}",
                 standardId);
         int rows = sectionFacade.softDeleteByStandardId(standardId);
         log.info("[Controller:SectionController] softDeleteByStandardId() succeeded - Deleted {} sections", rows);
-        return ResponseEntity.ok(rows + " sections soft deleted");
+        return ResponseEntity.ok(Map.of("message", rows + " sections soft deleted"));
     }
 
     @DeleteMapping("/all")
-    public ResponseEntity<String> softDeleteAll() {
+    public ResponseEntity<Map<String, String>> softDeleteAll() {
         log.info("[Controller:SectionController] softDeleteAll() called - Request to delete all sections");
         int rows = sectionFacade.softDeleteAll();
         log.info("[Controller:SectionController] softDeleteAll() succeeded - Deleted {} sections", rows);
-        return ResponseEntity.ok(rows + " sections soft deleted");
+        return ResponseEntity.ok(Map.of("message", rows + " sections soft deleted"));
     }
 }

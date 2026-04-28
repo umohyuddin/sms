@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/institute/campuses-standards")
@@ -79,21 +80,21 @@ public class StandardController {
     }
 
     @DeleteMapping("/{standardId}")
-    public ResponseEntity<String> softDeleteById(@PathVariable Long standardId) {
+    public ResponseEntity<Map<String, String>> softDeleteById(@PathVariable Long standardId) {
         log.info("[Controller:StandardController] softDeleteById() called - Request to delete standard: {}",
                 standardId);
         standardFacade.softDeleteById(standardId);
         log.info("[Controller:StandardController] softDeleteById() succeeded - Standard deleted successfully");
-        return ResponseEntity.ok("Standard deleted successfully");
+        return ResponseEntity.ok(Map.of("message", "Standard deleted successfully"));
     }
 
     @DeleteMapping("/campus/{campusId}")
-    public ResponseEntity<String> softDeleteByCampusId(@PathVariable Long campusId) {
+    public ResponseEntity<Map<String, String>> softDeleteByCampusId(@PathVariable Long campusId) {
         log.info(
                 "[Controller:StandardController] softDeleteByCampusId() called - Request to delete standards for campus: {}",
                 campusId);
         int rows = standardFacade.softDeleteByCampusId(campusId);
         log.info("[Controller:StandardController] softDeleteByCampusId() succeeded - {} Standards deleted", rows);
-        return ResponseEntity.ok(rows + " Standards deleted");
+        return ResponseEntity.ok(Map.of("message", rows + " Standards deleted"));
     }
 }
