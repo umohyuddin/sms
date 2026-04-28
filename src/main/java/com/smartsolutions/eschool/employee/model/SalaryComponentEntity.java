@@ -1,7 +1,7 @@
 package com.smartsolutions.eschool.employee.model;
 
-
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import com.smartsolutions.eschool.global.enums.ComponentType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,15 +9,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "salary_component")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalaryComponentEntity  extends AuditableEntity {
+public class SalaryComponentEntity extends AuditableEntity {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,6 +33,4 @@ public class SalaryComponentEntity  extends AuditableEntity {
 
     @Column(nullable = false)
     private Boolean deleted = false;
-
-
 }

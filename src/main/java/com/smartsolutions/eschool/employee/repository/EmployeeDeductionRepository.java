@@ -18,38 +18,38 @@ import java.util.Optional;
 public interface EmployeeDeductionRepository extends JpaRepository<EmployeeDeductionEntity, Long> {
 
     // -------------------------
-    // Find by ID where not deleted
+    // Find by ID and organization where not deleted
     // -------------------------
-    @Query("SELECT e FROM EmployeeDeductionEntity e WHERE e.id = :id AND e.deleted = false")
-    Optional<EmployeeDeductionEntity> findByIdActive(Long id);
+    @Query("SELECT e FROM EmployeeDeductionEntity e WHERE e.id = :id AND e.organizationId = :organizationId AND e.deleted = false")
+    Optional<EmployeeDeductionEntity> findByIdAndOrganizationIdActive(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
     // -------------------------
-    // Find all active deductions
+    // Find all active deductions for an organization
     // -------------------------
-    @Query("SELECT e FROM EmployeeDeductionEntity e WHERE e.deleted = false ORDER BY e.id DESC")
-    List<EmployeeDeductionEntity> findAllActive();
+    @Query("SELECT e FROM EmployeeDeductionEntity e WHERE e.organizationId = :organizationId AND e.deleted = false ORDER BY e.id DESC")
+    List<EmployeeDeductionEntity> findAllActive(@Param("organizationId") Long organizationId);
 
     // -------------------------
-    // Find all active deductions for an employee
+    // Find all active deductions for an employee and organization
     // -------------------------
-    @Query("SELECT e FROM EmployeeDeductionEntity e WHERE e.employee.id = :employeeId AND e.deleted = false ORDER BY e.month DESC")
-    List<EmployeeDeductionEntity> findAllByEmployeeIdActive(Long employeeId);
+    @Query("SELECT e FROM EmployeeDeductionEntity e WHERE e.employee.id = :employeeId AND e.organizationId = :organizationId AND e.deleted = false ORDER BY e.month DESC")
+    List<EmployeeDeductionEntity> findAllByEmployeeIdAndOrganizationIdActive(@Param("employeeId") Long employeeId, @Param("organizationId") Long organizationId);
 
     // -------------------------
-    // Soft delete by ID
+    // Soft delete by ID and organization
     // -------------------------
     @Modifying
-    @Query("UPDATE EmployeeDeductionEntity e SET e.deleted = true WHERE e.id = :id")
-    void softDeleteById(Long id);
+    @Query("UPDATE EmployeeDeductionEntity e SET e.deleted = true WHERE e.id = :id AND e.organizationId = :organizationId")
+    void softDeleteByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
     @Query("""
                 SELECT e 
                 FROM EmployeeMasterEntity e
                 LEFT JOIN FETCH e.deductions d
-                WHERE e.id = :employeeId
+                WHERE e.id = :employeeId AND e.organizationId = :organizationId
                   AND (d.deleted = false OR d IS NULL)
             """)
-    Optional<EmployeeMasterEntity> findEmployeeWithActiveDeductions(@Param("employeeId") Long employeeId);
+    Optional<EmployeeMasterEntity> findEmployeeWithActiveDeductionsAndOrganizationId(@Param("employeeId") Long employeeId, @Param("organizationId") Long organizationId);
 
 }
 

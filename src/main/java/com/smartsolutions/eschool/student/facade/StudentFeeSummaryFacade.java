@@ -1,16 +1,11 @@
 package com.smartsolutions.eschool.student.facade;
 
 import com.smartsolutions.eschool.global.utils.SmsUtil;
-import com.smartsolutions.eschool.student.dtos.requestDto.StudentFeeAssignmentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
-import com.smartsolutions.eschool.student.dtos.responseDto.byStudentId.StudentFeeAssignmentsResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeePayment.responseDto.StudentFeePaymentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeeSummary.responseDto.StudentFeeSummaryResponseDto;
-import com.smartsolutions.eschool.student.repository.StudentFeePaymentsRepository;
-import com.smartsolutions.eschool.student.service.StudentFeeAssignmentService;
 import com.smartsolutions.eschool.student.service.StudentFeePaymentsService;
 import com.smartsolutions.eschool.student.service.StudentFeeSummaryService;
-import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -27,11 +22,11 @@ public class StudentFeeSummaryFacade {
     private final StudentFeeSummaryService studentFeeSummaryService;
     private final StudentFeePaymentsService studentFeePaymentsService;
 
-    public StudentFeeSummaryFacade(StudentFeeSummaryService studentFeeSummaryService, StudentFeePaymentsService studentFeePaymentsService) {
+    public StudentFeeSummaryFacade(StudentFeeSummaryService studentFeeSummaryService,
+            StudentFeePaymentsService studentFeePaymentsService) {
         this.studentFeeSummaryService = studentFeeSummaryService;
         this.studentFeePaymentsService = studentFeePaymentsService;
     }
-
 
     public StudentFeeSummaryDTO getByStudentId(Long id) {
         return studentFeeSummaryService.getByStudentId(id);
@@ -42,30 +37,33 @@ public class StudentFeeSummaryFacade {
     }
 
     public StudentFeeSummaryResponseDto getByStudentFeeSummaryAcademicYear(Long studentId, Long academicYearId) {
-        //Fetch all student payments for this academic year
-        List<StudentFeePaymentResponseDTO> responseDTOS = studentFeePaymentsService.getStudentPaymentsByAcademicYear(studentId, academicYearId);
+        // Fetch all student payments for this academic year
+        List<StudentFeePaymentResponseDTO> responseDTOS = studentFeePaymentsService
+                .getStudentPaymentsByAcademicYear(studentId, academicYearId);
 
-        //Fetch all student payments for this academic year
-        StudentFeeSummaryResponseDto studentFeeSummaryDTO = studentFeeSummaryService.getByStudentFeeSummaryAcademicYear(studentId, academicYearId);
+        // Fetch all student payments for this academic year
+        StudentFeeSummaryResponseDto studentFeeSummaryDTO = studentFeeSummaryService
+                .getByStudentFeeSummaryAcademicYear(studentId, academicYearId);
 
-        //Calculate monthly fee
+        // Calculate monthly fee
         BigDecimal totalAssigned = studentFeeSummaryDTO.getTotalAssignedFee();
         BigDecimal months = BigDecimal.valueOf(studentFeeSummaryDTO.getAcademicTotalMonths());
         BigDecimal monthlyFeeDecimal = totalAssigned.divide(months, RoundingMode.HALF_UP);
 
-        //Generate month names
-        List<String> academicMonths = SmsUtil.getAcademicMonths(studentFeeSummaryDTO.getAcademicStartDate(), studentFeeSummaryDTO.getAcademicTotalMonths());
+        // Generate month names
+        List<String> academicMonths = SmsUtil.getAcademicMonths(studentFeeSummaryDTO.getAcademicStartDate(),
+                studentFeeSummaryDTO.getAcademicTotalMonths());
         studentFeeSummaryDTO.setMonthsNames(academicMonths);
 
-
-        //Initialize monthly payments map
+        // Initialize monthly payments map
         Map<String, StudentFeeSummaryResponseDto.MonthlyPaymentDTO> monthMap = new HashMap<>();
         for (String month : academicMonths) {
-            StudentFeeSummaryResponseDto.MonthlyPaymentDTO dto = new StudentFeeSummaryResponseDto.MonthlyPaymentDTO(month);
+            StudentFeeSummaryResponseDto.MonthlyPaymentDTO dto = new StudentFeeSummaryResponseDto.MonthlyPaymentDTO(
+                    month);
             studentFeeSummaryDTO.getMonthlyPayments().add(dto);
             monthMap.put(month, dto);
         }
-        //Map each payment to its month
+        // Map each payment to its month
         for (StudentFeePaymentResponseDTO payment : studentFeeSummaryDTO.getStudentFeePaymentsList()) {
             StudentFeeSummaryResponseDto.MonthlyPaymentDTO dto = monthMap.get(payment.getPaymentMonth());
             if (dto != null) {
@@ -102,4 +100,3 @@ public class StudentFeeSummaryFacade {
         return studentFeeSummaryDTO;
     }
 }
-

@@ -1,23 +1,12 @@
 package com.smartsolutions.eschool.employee.facade;
 
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
 import com.smartsolutions.eschool.employee.dtos.salaryPayment.request.SalaryPaymentRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.salaryPayment.response.SalaryPaymentResponseDTO;
-import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
 import com.smartsolutions.eschool.employee.service.SalaryPaymentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
 
 @Component
 @Scope("prototype")
@@ -58,6 +47,5 @@ public class SalaryPaymentFacade {
         log.info("Facade: fetching salary payments for employeeId={}", employeeId);
         return paymentService.getPaymentsByEmployeeId(employeeId);
     }
-
 
 }

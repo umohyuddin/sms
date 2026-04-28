@@ -1,9 +1,7 @@
 package com.smartsolutions.eschool.student.service;
 
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
-import com.smartsolutions.eschool.employee.model.EmployeeDocumentEntity;
 import com.smartsolutions.eschool.global.configs.EmployeeDocumentConfig;
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
@@ -13,9 +11,11 @@ import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import com.smartsolutions.eschool.sclass.repository.SectionRepository;
 import com.smartsolutions.eschool.sclass.repository.StandardRepository;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentBasicInfoUpdateDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
+import com.smartsolutions.eschool.student.error.StudentErrors;
 import com.smartsolutions.eschool.student.mapper.StudentMapper;
 import com.smartsolutions.eschool.student.model.AdmissionTypeEntity;
 import com.smartsolutions.eschool.student.model.StudentDocumentEntity;
@@ -24,17 +24,16 @@ import com.smartsolutions.eschool.student.repository.AdmissionTypeRepository;
 import com.smartsolutions.eschool.student.repository.StudentDocumentRepository;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
+import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.modelmapper.MappingException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -45,20 +44,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class StudentService {
 
-    @Autowired
-    private StudentMapper studentMapper;
     private final EmployeeDocumentConfig feeConfig;
-
     private final StudentRepository studentRepository;
     private final CampusRepository campusRepository;
     private final StandardRepository standardRepository;
@@ -67,492 +61,432 @@ public class StudentService {
     private final AdmissionTypeRepository admissionTypeRepository;
     private final StudentDocumentRepository studentDocumentRepository;
 
-    public StudentService(EmployeeDocumentConfig feeConfig, StudentRepository studentRepository, CampusRepository campusRepository, StandardRepository standardRepository, SectionRepository sectionRepository, AcademicYearRepository academicYearRepository, AdmissionTypeRepository admissionTypeRepository, StudentDocumentRepository studentDocumentRepository) {
-        this.feeConfig = feeConfig;
-        this.studentRepository = studentRepository;
-        this.campusRepository = campusRepository;
-        this.standardRepository = standardRepository;
-        this.sectionRepository = sectionRepository;
-        this.academicYearRepository = academicYearRepository;
-        this.admissionTypeRepository = admissionTypeRepository;
-        this.studentDocumentRepository = studentDocumentRepository;
+    private Long getOrgId() {
+        Long orgId = SecurityUtils.getCurrentOrganizationId();
+        if (orgId == null) {
+            throw new ApiException(StudentErrors.ORGANIZATION_ACCESS_DENIED, "Organization ID not found in security context", HttpStatus.FORBIDDEN);
+        }
+        return orgId;
     }
 
     public List<StudentDTO> getAll() {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] getAll() called - fetching all students for org: {}", orgId);
         try {
-            log.info("Fetching all Students from database");
+            AcademicYearEntity academicYear = academicYearRepository.findByIsCurrentTrue()
+                    .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Current academic year not found", HttpStatus.NOT_FOUND));
 
-            AcademicYearEntity academicYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> new ResourceNotFoundException("Academic year not found"));
-
-            List<StudentEntity> result = studentRepository.findAllWithAssignments(academicYear.getId());
+            List<StudentEntity> result = studentRepository.findAllWithAssignments(academicYear.getId(), orgId);
             result.forEach(StudentEntity::calculateFeeAssigned);
-
-            log.info("Successfully fetched {} Students", result.size());
-            List<StudentDTO> studentDTOList = MapperUtil.mapList(result, StudentDTO.class);
-            log.info("Successfully fetched {} Students", studentDTOList);
-            return studentDTOList;
+            return StudentMapper.toDTOList(result);
         } catch (DataAccessException dae) {
-            log.error("Database error while fetching Students", dae);
-            //throw new CustomServiceException("Unable to fetch students from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to Students", me);
-            //throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Students", e);
-            //throw new ("Unexpected error occurred", e);
+            log.error("[Service:StudentService] Database error while fetching Students", dae);
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
+    }
+
+    public List<StudentDTO> getActive() {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] getActive() called for org: {}", orgId);
+        return StudentMapper.toDTOList(studentRepository.findAllByOrganizationIdAndIsActiveTrue(orgId));
+    }
+
+    public List<StudentDTO> getInactive() {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] getInactive() called for org: {}", orgId);
+        return StudentMapper.toDTOList(studentRepository.findAllByOrganizationIdAndIsActiveFalse(orgId));
     }
 
     public List<StudentDTO> getStudentsByCampus(Long campusId) {
-        try {
-            log.info("Fetching all Students by Campus from database");
-            List<StudentEntity> result = studentRepository.findByCampusId(campusId);
-            log.info("Successfully fetched {} Students by Campus", result.size());
-            List<StudentDTO> studentDTOList = MapperUtil.mapList(result, StudentDTO.class);
-            //List<StudentDTO> studentDTOList = studentMapper.toDTOList(result);
-            log.info("Successfully fetched {} Students by Campus", studentDTOList);
-            return studentDTOList;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Students by Campus", dae);
-            //throw new CustomServiceException("Unable to fetch students from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to Students by Campus", me);
-            //throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Students by Campus", e);
-            //throw new ("Unexpected error occurred", e);
-        }
-        return Collections.emptyList();
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] getStudentsByCampus() called for campus: {} org: {}", campusId, orgId);
+        return StudentMapper.toDTOList(studentRepository.findByCampusIdAndOrganizationId(campusId, orgId));
     }
 
     public List<StudentDTO> getStudentsByName(String studentName) {
-        try {
-            log.info("Fetching all Students by Name from database");
-            List<StudentEntity> result = studentRepository.searchStudentsByName(studentName);
-            log.info("Successfully fetched {} Students by Name", result.size());
-            List<StudentDTO> studentDTOList = MapperUtil.mapList(result, StudentDTO.class);
-            log.info("Successfully fetched {} Students by Name", studentDTOList);
-            return studentDTOList;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Students by Name", dae);
-            //throw new CustomServiceException("Unable to fetch students from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to Students by Name", me);
-            //throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Students by Name", e);
-            //throw new ("Unexpected error occurred", e);
-        }
-        return Collections.emptyList();
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] getStudentsByName() called for name: {} org: {}", studentName, orgId);
+        return StudentMapper.toDTOList(studentRepository.searchByKeywordAndOrganizationId(studentName, orgId));
     }
 
     public List<StudentDTO> getStudentsByStandard(Long standardId) {
-        try {
-            log.info("Fetching all Students by Standard from database");
-            List<StudentEntity> result = studentRepository.findByStandardId(standardId);
-            log.info("Successfully fetched {} Students by Standard", result.size());
-            List<StudentDTO> studentDTOList = MapperUtil.mapList(result, StudentDTO.class);
-            //List<StudentDTO> studentDTOList = studentMapper.toDTOList(result);
-            log.info("Successfully fetched {} Students by Standard", studentDTOList);
-            return studentDTOList;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Students by Standard", dae);
-            //throw new CustomServiceException("Unable to fetch students from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to Students by Standard", me);
-            //throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Students by Standard", e);
-            //throw new ("Unexpected error occurred", e);
-        }
-        return Collections.emptyList();
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] getStudentsByStandard() called for standard: {} org: {}", standardId, orgId);
+        return StudentMapper.toDTOList(studentRepository.findByStandardIdAndOrganizationId(standardId, orgId));
     }
 
     public List<StudentDTO> getStudentsBySection(Long sectionId) {
-        try {
-            log.info("Fetching all Students by Section from database");
-            List<StudentEntity> result = studentRepository.findBySectionId(sectionId);
-            log.info("Successfully fetched {} Students by Section", result.size());
-            List<StudentDTO> studentDTOList = MapperUtil.mapList(result, StudentDTO.class);
-            //List<StudentDTO> studentDTOList = studentMapper.toDTOList(result);
-            log.info("Successfully fetched {} Students by Section", studentDTOList);
-            return studentDTOList;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Students by Section", dae);
-            //throw new CustomServiceException("Unable to fetch students from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to Students by Section", me);
-            //throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Students by Section", e);
-            //throw new ("Unexpected error occurred", e);
-        }
-        return Collections.emptyList();
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] getStudentsBySection() called for section: {} org: {}", sectionId, orgId);
+        return StudentMapper.toDTOList(studentRepository.findBySectionIdAndOrganizationId(sectionId, orgId));
     }
 
     public StudentResponseDTO getById(Long id) {
-        log.info("Fetching Student with id: {}", id);
-        StudentEntity studentEntity = studentRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
-            log.info("Fetching Student with id: {}", id);
-            return new ResourceNotFoundException("Student not found with id: " + id);
-        });
-//        StudentDTO studentDTO = MapperUtil.mapObject(studentEntity, StudentDTO.class);
-        StudentResponseDTO studentDTO = mapToResponse(studentEntity);
-        log.info("Successfully fetched Standard: id={}", studentDTO.getId());
-        return studentDTO;
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] getById() called for ID: {} org: {}", id, orgId);
+        StudentEntity studentEntity = studentRepository.findByIdAndOrganizationId(id, orgId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found with id: " + id, HttpStatus.NOT_FOUND));
+        return StudentMapper.toResponseDTO(studentEntity);
     }
 
     public StudentDTO getByStudentCode(String studentCode) {
-        log.info("Fetching Student with studentCode: {}", studentCode);
-        StudentEntity studentEntity = studentRepository.findByStudentCode(studentCode).orElseThrow(() -> {
-            log.info("Fetching Student with studentCode: {}", studentCode);
-            return new ResourceNotFoundException("Student not found with id: " + studentCode);
-        });
-        StudentDTO studentDTO = MapperUtil.mapObject(studentEntity, StudentDTO.class);
-        log.info("Successfully fetched student: id={}", studentDTO.getStudentCode());
-        return studentDTO;
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] getByStudentCode() called for code: {} org: {}", studentCode, orgId);
+        StudentEntity studentEntity = studentRepository.findByStudentCodeAndOrganizationId(studentCode, orgId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found with code: " + studentCode, HttpStatus.NOT_FOUND));
+        return StudentMapper.toDTO(studentEntity);
     }
 
     @Transactional
     public StudentResponseDTO createStudent(StudentRequestDTO studentDTO) {
-        log.info("Creating new Student: {}", studentDTO);
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] createStudent() called for org: {} DTO: {}", orgId, studentDTO);
 
-        // Fetch related entities from DB
-        CampusEntity campus = campusRepository.findById(studentDTO.getCampusId()).orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + studentDTO.getCampusId()));
+        if (studentDTO.getStudentCode() != null && !studentDTO.getStudentCode().trim().isEmpty() &&
+                studentRepository.existsByOrganizationIdAndStudentCode(orgId, studentDTO.getStudentCode())) {
+            throw new ApiException(StudentErrors.DUPLICATE_STUDENT_CODE, "Student code already exists in this organization", HttpStatus.CONFLICT);
+        }
 
-        StandardEntity standard = standardRepository.findById(studentDTO.getStandardId()).orElseThrow(() -> new ResourceNotFoundException("Standard not found with id: " + studentDTO.getStandardId()));
+        CampusEntity campus = campusRepository.findById(studentDTO.getCampusId())
+                .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Campus not found", HttpStatus.BAD_REQUEST));
+        StandardEntity standard = standardRepository.findById(studentDTO.getStandardId())
+                .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Standard not found", HttpStatus.BAD_REQUEST));
+        SectionEntity section = sectionRepository.findById(studentDTO.getSectionId())
+                .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Section not found", HttpStatus.BAD_REQUEST));
+        AdmissionTypeEntity admissionType = admissionTypeRepository.findById(studentDTO.getAdmissionTypeId())
+                .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Admission Type not found", HttpStatus.BAD_REQUEST));
+        AcademicYearEntity academicYear = academicYearRepository.findById(studentDTO.getAcademicYearId() != null ? studentDTO.getAcademicYearId() : 0L)
+                .orElseGet(() -> academicYearRepository.findByIsCurrentTrue()
+                        .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Academic Year not found", HttpStatus.BAD_REQUEST)));
 
-        SectionEntity section = sectionRepository.findById(studentDTO.getSectionId()).orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + studentDTO.getSectionId()));
-
-        AdmissionTypeEntity admissionType = admissionTypeRepository.findById(studentDTO.getAdmissionTypeId()).orElseThrow(() -> new ResourceNotFoundException("Admission Type not found with id: " + studentDTO.getAdmissionTypeId()));
-
-        AcademicYearEntity academicYear = academicYearRepository.findById(studentDTO.getAcademicYearId()).orElseThrow(() -> new ResourceNotFoundException("Academic Year not found with id: " + studentDTO.getAcademicYearId()));
-
-        // Manual mapping from DTO to Entity
-        StudentEntity studentEntity = new StudentEntity();
-        studentEntity.setFirstName(studentDTO.getFirstName());
-        studentEntity.setLastName(studentDTO.getLastName());
-        studentEntity.setFullName(studentDTO.getFullName());
-        studentEntity.setStudentCode(studentDTO.getStudentCode());
-        studentEntity.setDateOfBirth(studentDTO.getDateOfBirth());
-        studentEntity.setGender(studentDTO.getGender());
-        studentEntity.setEmail(studentDTO.getEmail());
-        studentEntity.setPhone(studentDTO.getPhone());
-        studentEntity.setAddress(studentDTO.getAddress());
-        studentEntity.setCnic(studentDTO.getCnic());
-        studentEntity.setPassportNumber(studentDTO.getPassportNumber());
-        studentEntity.setReligion(studentDTO.getReligion());
-        studentEntity.setNationality(studentDTO.getNationality());
-        studentEntity.setBloodGroup(studentDTO.getBloodGroup());
-        studentEntity.setEnrollmentDate(studentDTO.getEnrollmentDate());
-        studentEntity.setIsActive(studentDTO.getIsActive() != null ? studentDTO.getIsActive() : true);
-        studentEntity.setStatus(studentDTO.getStatus());
-        studentEntity.setDeleted(false);
-
-        // Assign existing related entities
+        StudentEntity studentEntity = StudentMapper.toEntity(studentDTO);
         studentEntity.setCampus(campus);
         studentEntity.setStandard(standard);
         studentEntity.setSection(section);
         studentEntity.setAdmissionType(admissionType);
         studentEntity.setAcademicYear(academicYear);
 
-        // Save entity
         StudentEntity savedStudent = studentRepository.save(studentEntity);
-
-        String year = String.valueOf(LocalDate.now().getYear());
-        String identity = "STU"; // default identity
-        String regNo = String.format("REG%s-%s-%03d", year, identity.toUpperCase(), savedStudent.getId());
-
-        savedStudent.setStudentCode(regNo);
-        savedStudent = studentRepository.save(studentEntity);
-
-        // Map back to DTO for response
-        StudentResponseDTO responseDTO = new StudentResponseDTO();
-        responseDTO.setId(savedStudent.getId());
-        responseDTO.setFirstName(savedStudent.getFirstName());
-        responseDTO.setLastName(savedStudent.getLastName());
-        responseDTO.setFullName(savedStudent.getFullName());
-        responseDTO.setStudentCode(savedStudent.getStudentCode());
-        responseDTO.setDateOfBirth(savedStudent.getDateOfBirth());
-        responseDTO.setGender(savedStudent.getGender());
-        responseDTO.setEmail(savedStudent.getEmail());
-        responseDTO.setPhone(savedStudent.getPhone());
-        responseDTO.setAddress(savedStudent.getAddress());
-        responseDTO.setCnic(savedStudent.getCnic());
-        responseDTO.setPassportNumber(savedStudent.getPassportNumber());
-        responseDTO.setReligion(savedStudent.getReligion());
-        responseDTO.setNationality(savedStudent.getNationality());
-        responseDTO.setBloodGroup(savedStudent.getBloodGroup());
-        responseDTO.setEnrollmentDate(savedStudent.getEnrollmentDate());
-        responseDTO.setIsActive(savedStudent.getIsActive());
-        responseDTO.setStatus(savedStudent.getStatus());
-
-        // Include FK info if needed
-        responseDTO.setCampusId(savedStudent.getCampus().getId());
-        responseDTO.setStandardId(savedStudent.getStandard().getId());
-        responseDTO.setSectionId(savedStudent.getSection().getId());
-        responseDTO.setAdmissionTypeId(savedStudent.getAdmissionType().getId());
-        responseDTO.setAcademicYearId(savedStudent.getAcademicYear().getId());
-        responseDTO.setAcademicYearName(savedStudent.getAcademicYear().getName());
-
-        log.info("Successfully created Student: {}", responseDTO);
-        return responseDTO;
+        log.info("[Service:StudentService] Successfully created Student: {}", savedStudent.getId());
+        return StudentMapper.toResponseDTO(savedStudent);
     }
 
+    @Transactional
+    public StudentResponseDTO updateStudent(Long studentId, StudentRequestDTO requestDTO) {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] updateStudent() called for id: {} org: {}", studentId, orgId);
+
+        StudentEntity entity = studentRepository.findByIdAndOrganizationId(studentId, orgId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found with id: " + studentId, HttpStatus.NOT_FOUND));
+
+        if (requestDTO.getStudentCode() != null && !requestDTO.getStudentCode().equals(entity.getStudentCode()) &&
+                studentRepository.existsByOrganizationIdAndStudentCodeAndIdNot(orgId, requestDTO.getStudentCode(), studentId)) {
+            throw new ApiException(StudentErrors.DUPLICATE_STUDENT_CODE, "Student code already exists", HttpStatus.CONFLICT);
+        }
+
+        if (requestDTO.getCampusId() != null && !requestDTO.getCampusId().equals(entity.getCampus().getId())) {
+             entity.setCampus(campusRepository.findById(requestDTO.getCampusId())
+                .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Campus not found", HttpStatus.BAD_REQUEST)));
+        }
+        if (requestDTO.getStandardId() != null && !requestDTO.getStandardId().equals(entity.getStandard().getId())) {
+             entity.setStandard(standardRepository.findById(requestDTO.getStandardId())
+                .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Standard not found", HttpStatus.BAD_REQUEST)));
+        }
+        if (requestDTO.getSectionId() != null && !requestDTO.getSectionId().equals(entity.getSection().getId())) {
+             entity.setSection(sectionRepository.findById(requestDTO.getSectionId())
+                .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Section not found", HttpStatus.BAD_REQUEST)));
+        }
+        if (requestDTO.getAdmissionTypeId() != null && (entity.getAdmissionType() == null || !requestDTO.getAdmissionTypeId().equals(entity.getAdmissionType().getId()))) {
+             entity.setAdmissionType(admissionTypeRepository.findById(requestDTO.getAdmissionTypeId())
+                .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Admission Type not found", HttpStatus.BAD_REQUEST)));
+        }
+        if (requestDTO.getAcademicYearId() != null && !requestDTO.getAcademicYearId().equals(entity.getAcademicYear().getId())) {
+             entity.setAcademicYear(academicYearRepository.findById(requestDTO.getAcademicYearId())
+                .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Academic Year not found", HttpStatus.BAD_REQUEST)));
+        }
+
+        StudentMapper.updateEntityFromDTO(entity, requestDTO);
+        StudentEntity updated = studentRepository.save(entity);
+        log.info("[Service:StudentService] Successfully updated Student: {}", updated.getId());
+        return StudentMapper.toResponseDTO(updated);
+    }
+
+    @Transactional
+    public StudentResponseDTO updateStudentBasicInfo(Long studentId, StudentBasicInfoUpdateDTO basicInfoDTO) {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] updateStudentBasicInfo() called for id: {} org: {}", studentId, orgId);
+
+        StudentEntity entity = studentRepository.findByIdAndOrganizationId(studentId, orgId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found with id: " + studentId, HttpStatus.NOT_FOUND));
+
+        // Update only basic info fields
+        entity.setFirstName(basicInfoDTO.getFirstName());
+        entity.setMiddleName(basicInfoDTO.getMiddleName());
+        entity.setLastName(basicInfoDTO.getLastName());
+        entity.setFullName(basicInfoDTO.getFullName());
+        entity.setDateOfBirth(basicInfoDTO.getDateOfBirth());
+        entity.setGender(basicInfoDTO.getGender());
+        entity.setCnic(basicInfoDTO.getCnic());
+        entity.setPassportNumber(basicInfoDTO.getPassportNumber());
+        entity.setPhone(basicInfoDTO.getPhone());
+        entity.setEmail(basicInfoDTO.getEmail());
+        entity.setReligion(basicInfoDTO.getReligion());
+        entity.setNationality(basicInfoDTO.getNationality());
+        entity.setBloodGroup(basicInfoDTO.getBloodGroup());
+
+        StudentEntity updated = studentRepository.save(entity);
+        log.info("[Service:StudentService] Successfully updated basic info for Student: {}", updated.getId());
+        return StudentMapper.toResponseDTO(updated);
+    }
+
+    @Transactional
+    public void softDeleteStudent(Long studentId) {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] softDeleteStudent() called for id: {} org: {}", studentId, orgId);
+        int updated = studentRepository.softDeleteByIdAndOrganizationId(studentId, orgId);
+        if (updated == 0) {
+            throw new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found with id: " + studentId, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long sectionId, Long studentId, Long academicYearId, String kw) {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] searchStudents() called for org: {}", orgId);
+        try {
+            List<StudentEntity> result = studentRepository.searchStudentsWithFilters(campusId, standardId, sectionId, studentId, academicYearId, kw, orgId);
+            return StudentMapper.toDTOList(result);
+        } catch (Exception e) {
+            log.error("[Service:StudentService] Error searching students", e);
+            return Collections.emptyList();
+        }
+    }
+
+    public void saveStudentDocument(Long studentId, String docKey, MultipartFile file) throws IOException {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] saveStudentDocument() called for student: {} org: {}", studentId, orgId);
+        
+        // Verify student belongs to org
+        studentRepository.findByIdAndOrganizationId(studentId, orgId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found with id: " + studentId, HttpStatus.NOT_FOUND));
+
+        String uploadDir = "uploads/org_" + orgId + "/students_" + studentId + "/documents";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+
+        String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll("\\s+", "_");
+        String fileName = docKey + "_" + System.currentTimeMillis() + "_" + originalFileName;
+        Path filePath = Paths.get(uploadDir, fileName);
+        Files.write(filePath, file.getBytes());
+
+        StudentDocumentEntity document = StudentDocumentEntity.builder()
+                .studentId(studentId)
+                .documentType(docKey)
+                .fileName(fileName)
+                .filePath(filePath.toString())
+                .fileType(FilenameUtils.getExtension(fileName).toUpperCase())
+                .build();
+        studentDocumentRepository.save(document);
+    }
+
+    public List<StudentDocumentResponseDto> getDocumentsByStudentId(Long studentId) {
+        log.info("[Service:StudentService] getDocumentsByStudentId() called for student: {}", studentId);
+        List<StudentDocumentEntity> documents = studentDocumentRepository.findByStudentId(studentId);
+        if (documents.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return MapperUtil.mapList(documents, StudentDocumentResponseDto.class);
+    }
+
+    public Map<String, List<StudentDocumentResponseDto>> getGroupedDocuments(Long studentId) {
+        List<StudentDocumentResponseDto> documents = getDocumentsByStudentId(studentId);
+        if (documents.isEmpty()) return Collections.emptyMap();
+        return documents.stream().collect(Collectors.groupingBy(doc -> 
+                feeConfig.getDocumentTypes().getOrDefault(doc.getDocumentType(), "Other")));
+    }
+
+    public Resource downloadDocument(Long documentId, Long studentId) {
+        StudentDocumentEntity document = studentDocumentRepository.findDocumentByIdAndStudentId(documentId, studentId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Document not found", HttpStatus.NOT_FOUND));
+        Path path = Paths.get(document.getFilePath());
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new FileNotFoundException("File not found: " + document.getFilePath());
+            }
+            return resource;
+        } catch (Exception e) {
+            throw new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Error reading document file", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     public Long getTotalStudents() {
-        return studentRepository.countAllActiveStudents();
+        return studentRepository.countAllActiveStudents(getOrgId());
     }
 
     public Long getTotalStudentsByCampus(Long campusId) {
-        return studentRepository.countByCampus(campusId);
+        return studentRepository.countByCampusAndOrganizationId(campusId, getOrgId());
     }
 
     public Long getTotalStudentsByStandard(Long standardId) {
-        return studentRepository.countByStandard(standardId);
+        return studentRepository.countByStandardAndOrganizationId(standardId, getOrgId());
     }
 
     public Long getTotalStudentsBySection(Long sectionId) {
-        return studentRepository.countBySection(sectionId);
+        return studentRepository.countBySectionAndOrganizationId(sectionId, getOrgId());
     }
 
     public Long getTotalStudentsByGender(String gender) {
-        return studentRepository.countByGender(gender);
+        return studentRepository.countByGenderAndOrganizationId(gender, getOrgId());
     }
-
 
     public Long getStudentsRegisteredThisMonth() {
         YearMonth currentMonth = YearMonth.now();
         LocalDate start = currentMonth.atDay(1);
         LocalDate end = currentMonth.atEndOfMonth();
-
-        return studentRepository.countStudentsRegisteredBetween(start, end);
+        return studentRepository.countStudentsRegisteredBetweenAndOrganizationId(start, end, getOrgId());
     }
 
-
-    public void saveStudentDocument(Long studentId, String docKey, MultipartFile file) throws IOException {
-        //String filePath = UploadUtil.saveEmployeeDocument(studentId, docKey, file);
-        String uploadDir = "uploads/students_" + studentId + "/documents";
-        File dir = new File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
-
-
-        // Sanitize filename
-        String originalFileName = Objects.requireNonNull(file.getOriginalFilename()).replaceAll("\\s+", "_");
-        String fileName = docKey + "_" + System.currentTimeMillis() + "_" + originalFileName;
-
-        Path filePath = Paths.get(uploadDir, fileName);
-        Files.write(filePath, file.getBytes());
-
-        StudentDocumentEntity document = StudentDocumentEntity.builder().studentId(studentId).documentType(docKey).fileName(fileName).filePath(filePath.toString()).fileType(FilenameUtils.getExtension(fileName).toUpperCase()).build();
-        studentDocumentRepository.save(document);
+    public Long countStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] countStudents() - orgId: {}, campusIds: {}, to: {}", 
+                 orgId, filter.getCampusIds(), filter.getToDate());
+        Long count = studentRepository.countByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getFromDate(), filter.getToDate(), orgId);
+        log.info("[Service:StudentService] countStudents() succeed - count: {}", count);
+        return count;
     }
 
-    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long sectionId, Long studentId, Long academicYearId, String kw) {
-        try {
-            log.info("Searching students with filters → campusId={}, standardId={}, studentId={}, academicYearId={},kw={}", campusId, standardId, studentId, academicYearId, kw);
-
-            List<StudentEntity> result = studentRepository.searchStudents(campusId, standardId, sectionId, studentId, academicYearId, kw);
-
-            log.info("Student search returned {} results", result.size());
-
-            // Convert entity → DTO
-            return MapperUtil.mapList(result, StudentDTO.class);
-
-        } catch (Exception e) {
-            log.error("Error searching students", e);
-            return Collections.emptyList();
-        }
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Long countActiveStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] countActiveStudents() called - orgId: {}", orgId);
+        Long count = studentRepository.countActiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getFromDate(), filter.getToDate(), orgId);
+        log.info("[Service:StudentService] countActiveStudents() succeeded - count: {}", count);
+        return count;
     }
 
-    public List<StudentDocumentResponseDto> getDocumentsByStudentId(Long employeeId) {
-        try {
-            log.info("Fetching documents for Student with id: {}", employeeId);
-            List<StudentDocumentEntity> documents = studentDocumentRepository.findByStudentId(employeeId);
-            if (documents.isEmpty()) {
-                log.warn("No documents found for Student with id: {}", employeeId);
-                return Collections.emptyList();
-            }
-            // Map entity list to DTO list
-            List<StudentDocumentResponseDto> dtoList = MapperUtil.mapList(documents, StudentDocumentResponseDto.class);
-            log.info("Found {} documents for Employee with id: {}", dtoList.size(), employeeId);
-            return dtoList;
-        } catch (Exception e) {
-            log.error("Error fetching documents for Employee with id: {}", employeeId, e);
-            return Collections.emptyList();
-        }
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Long countInactiveStudents(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] countInactiveStudents() called - orgId: {}", orgId);
+        Long count = studentRepository.countInactiveByFilters(filter.getCampusIds(), filter.getAcademicYearId(), filter.getFromDate(), filter.getToDate(), orgId);
+        log.info("[Service:StudentService] countInactiveStudents() succeeded - count: {}", count);
+        return count;
     }
 
-
-    public Map<String, List<StudentDocumentResponseDto>> getGroupedDocuments(Long employeeId) {
-        List<StudentDocumentResponseDto> documents = getDocumentsByStudentId(employeeId);
-
-        if (documents.isEmpty()) {
-            return Collections.emptyMap();
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Long countWithdrawals(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        LocalDate from = filter.getFromDate() != null ? filter.getFromDate() : LocalDate.now().minusMonths(1);
+        LocalDate to = filter.getToDate() != null ? filter.getToDate() : LocalDate.now();
+        java.time.LocalDateTime fromDateTime = from.atStartOfDay();
+        java.time.LocalDateTime toDateTime = to.atTime(java.time.LocalTime.MAX);
+        
+        Long academicYearId = filter.getAcademicYearId();
+        if (academicYearId == null) {
+            academicYearId = academicYearRepository.findByIsCurrentTrue()
+                    .map(AcademicYearEntity::getId)
+                    .orElse(null);
         }
-
-        // Group documents by their human-readable type from config
-        Map<String, List<StudentDocumentResponseDto>> groupedDocuments = documents.stream().collect(Collectors.groupingBy(doc -> feeConfig.getDocumentTypes().getOrDefault(doc.getDocumentType(), "Other")));
-
-        return groupedDocuments;
+        
+        log.info("[Service:StudentService] countWithdrawals() - orgId: {}, academicYearId: {}, from: {}, to: {}", orgId, academicYearId, fromDateTime, toDateTime);
+        Long count = studentRepository.countWithdrawals(fromDateTime, toDateTime, filter.getCampusIds(), academicYearId, orgId);
+        log.info("[Service:StudentService] countWithdrawals() succeeded - count: {}", count);
+        return count;
     }
 
-    public Resource downloadDocument(Long documentId, Long employeeId) {
-        // 1️⃣ Fetch document from database
-        StudentDocumentEntity document = studentDocumentRepository.findDocumentByIdAndStudentId(documentId, employeeId).orElseThrow(() -> new RuntimeException("Document not found for employeeId=" + employeeId + " and documentId=" + documentId));
-        Path path = Paths.get(document.getFilePath());
-        try {
-            Resource resource = new UrlResource(path.toUri());
-            if (!resource.exists() || !resource.isReadable()) {
-                throw new FileNotFoundException("File not found or not readable: " + document.getFilePath());
-            }
-            return resource;
-        } catch (Exception e) {
-            throw new RuntimeException("Error while reading document file: " + e.getMessage(), e);
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Long countNewAdmissions(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        LocalDate from = filter.getFromDate() != null ? filter.getFromDate() : LocalDate.now().minusMonths(1);
+        LocalDate to = filter.getToDate() != null ? filter.getToDate() : LocalDate.now();
+        
+        Long academicYearId = filter.getAcademicYearId();
+        if (academicYearId == null) {
+            academicYearId = academicYearRepository.findByIsCurrentTrue()
+                    .map(AcademicYearEntity::getId)
+                    .orElse(null);
         }
+
+        log.info("[Service:StudentService] countNewAdmissions() - orgId: {}, campusIds: {}, academicYearId: {}, from: {}, to: {}", 
+                 orgId, filter.getCampusIds(), academicYearId, from, to);
+        Long count = studentRepository.countNewAdmissions(from, to, filter.getCampusIds(), academicYearId, filter.getStandardId(), filter.getSectionId(), orgId);
+        log.info("[Service:StudentService] countNewAdmissions() succeeded - count: {}", count);
+        return count;
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public java.util.Map<String, Long> getGenderDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getGenderDistribution() called - orgId: {}", orgId);
+        java.util.List<Object[]> results = studentRepository.countByGenderDistribution(filter.getCampusIds(), filter.getFromDate(), filter.getToDate(), orgId);
+        Map<String, Long> distribution = new HashMap<>();
+        for (Object[] row : results) {
+            String gender = row[0] != null ? row[0].toString() : "Unknown";
+            distribution.put(gender, (Long) row[1]);
+        }
+        log.info("[Service:StudentService] getGenderDistribution() succeeded - found distributions: {}", distribution.size());
+        return distribution;
+    }
 
-    public StudentResponseDTO updateStudent(Long studentId, @Valid StudentRequestDTO requestDTO) {
-        log.info("Updating Student with id {} using DTO {}", studentId, requestDTO);
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution> getCampusClassDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getCampusClassDistribution() called - orgId: {}", orgId);
 
-        // Fetch the existing student or throw if not found
-        StudentEntity entity = studentRepository.findByIdAndDeletedFalse(studentId).orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
-
-        // Update optional fields if provided
-        if (requestDTO.getFirstName() != null && !requestDTO.getFirstName().isBlank()) {
-            entity.setFirstName(requestDTO.getFirstName());
+        // Fallback: resolve current academic year from DB if not provided
+        Long academicYearId = filter.getAcademicYearId();
+        if (academicYearId == null) {
+            academicYearId = academicYearRepository.findByIsCurrentTrue()
+                    .map(AcademicYearEntity::getId)
+                    .orElse(null);
         }
 
-//        if (requestDTO.getMiddleName() != null) {
-//            entity.setMiddleName(requestDTO.getMiddleName());
-//        }
+        List<Object[]> results = studentRepository.getCampusClassDistribution(
+                filter.getCampusIds(), academicYearId, filter.getFromDate(), filter.getToDate(), orgId);
 
-        if (requestDTO.getLastName() != null && !requestDTO.getLastName().isBlank()) {
-            entity.setLastName(requestDTO.getLastName());
+        // Group by campusName
+        Map<String, List<Object[]>> byCampus = results.stream()
+                .collect(Collectors.groupingBy(row -> row[0] != null ? row[0].toString() : "Unknown Campus"));
+
+        List<com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution> response = new ArrayList<>();
+        for (Map.Entry<String, List<Object[]>> entry : byCampus.entrySet()) {
+            List<com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution> classes = entry.getValue().stream().map(row -> {
+                return com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution.builder()
+                        .className(row[1] != null ? row[1].toString() : "N/A")
+                        .total(((Number) row[2]).longValue())
+                        .active(row[3] != null ? ((Number) row[3]).longValue() : 0L)
+                        .male(row[4] != null ? ((Number) row[4]).longValue() : 0L)
+                        .female(row[5] != null ? ((Number) row[5]).longValue() : 0L)
+                        .other(row[6] != null ? ((Number) row[6]).longValue() : 0L)
+                        .build();
+            }).collect(Collectors.toList());
+
+            response.add(com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution.builder()
+                    .campus(entry.getKey())
+                    .classes(classes)
+                    .build());
         }
 
-        // Update full name
-        entity.setFullName(entity.getFirstName() + " " + entity.getLastName());
-
-        if (requestDTO.getCnic() != null) {
-            entity.setCnic(requestDTO.getCnic());
-        }
-
-        if (requestDTO.getPassportNumber() != null) {
-            entity.setPassportNumber(requestDTO.getPassportNumber());
-        }
-
-        if (requestDTO.getPhone() != null) {
-            entity.setPhone(requestDTO.getPhone());
-        }
-
-        if (requestDTO.getEmail() != null) {
-            entity.setEmail(requestDTO.getEmail());
-        }
-
-        if (requestDTO.getDateOfBirth() != null) {
-            entity.setDateOfBirth(requestDTO.getDateOfBirth());
-        }
-
-        if (requestDTO.getGender() != null) {
-            entity.setGender(requestDTO.getGender());
-        }
-
-        if (requestDTO.getReligion() != null) {
-            entity.setReligion(requestDTO.getReligion());
-        }
-
-        if (requestDTO.getNationality() != null) {
-            entity.setNationality(requestDTO.getNationality());
-        }
-
-        if (requestDTO.getBloodGroup() != null) {
-            entity.setBloodGroup(requestDTO.getBloodGroup());
-        }
-
-        // Save updated entity
-        StudentEntity updated = studentRepository.save(entity);
-
-        // Map to Response DTO
-        StudentResponseDTO response = mapToResponse(updated);
-        log.info("Student updated successfully: {}", response.getId());
+        log.info("[Service:StudentService] getCampusClassDistribution() succeeded - found {} campuses", response.size());
         return response;
     }
 
-    private StudentResponseDTO mapToResponse(StudentEntity student) {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<Object[]> getAdmissionsTrend(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getAdmissionsTrend() called - orgId: {}", orgId);
+        LocalDate from = filter.getFromDate() != null ? filter.getFromDate() : LocalDate.now().minusMonths(1);
+        LocalDate to = filter.getToDate() != null ? filter.getToDate() : LocalDate.now();
+        List<Object[]> results = studentRepository.getAdmissionsTrend(from, to, filter.getCampusIds(), orgId);
+        log.info("[Service:StudentService] getAdmissionsTrend() succeeded - found entries: {}", results.size());
+        return results;
+    }
 
-        if (student == null) {
-            return null;
-        }
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<Object[]> getGenderDistributionChart(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getGenderDistributionChart() called - orgId: {}", orgId);
+        List<Object[]> results = studentRepository.getGenderDistribution(filter.getCampusIds(), filter.getToDate(), orgId);
+        log.info("[Service:StudentService] getGenderDistributionChart() succeeded");
+        return results;
+    }
 
-        // Calculate transient fields
-        student.calculateFeeAssigned();
-
-        StudentResponseDTO dto = new StudentResponseDTO();
-
-        // ===== BASIC INFO =====
-        dto.setId(student.getId());
-        dto.setFirstName(student.getFirstName());
-        dto.setLastName(student.getLastName());
-        dto.setFullName(student.getFullName());
-        dto.setStudentCode(student.getStudentCode());
-
-        dto.setDateOfBirth(student.getDateOfBirth());
-        dto.setGender(student.getGender());
-
-        dto.setEmail(student.getEmail());
-        dto.setPhone(student.getPhone());
-        dto.setAddress(student.getAddress());
-
-        dto.setCnic(student.getCnic());
-        dto.setPassportNumber(student.getPassportNumber());
-
-        dto.setReligion(student.getReligion());
-        dto.setNationality(student.getNationality());
-        dto.setBloodGroup(student.getBloodGroup());
-
-        // ===== STATUS =====
-        dto.setIsActive(student.getIsActive());
-        dto.setStatus(student.getStatus());
-
-
-        // ===== ENROLLMENT =====
-        dto.setEnrollmentDate(student.getEnrollmentDate());
-
-        // ===== CAMPUS =====
-        if (student.getCampus() != null) {
-            dto.setCampusId(student.getCampus().getId());
-            dto.setCampusName(student.getCampus().getCampusName());
-        }
-
-        // ===== STANDARD =====
-        if (student.getStandard() != null) {
-            dto.setStandardId(student.getStandard().getId());
-            dto.setStandardName(student.getStandard().getStandardName());
-        }
-
-        // ===== SECTION =====
-        if (student.getSection() != null) {
-            dto.setSectionId(student.getSection().getId());
-            dto.setSectionName(student.getSection().getSectionName());
-        }
-
-        // ===== ADMISSION TYPE =====
-        if (student.getAdmissionType() != null) {
-            dto.setAdmissionTypeId(student.getAdmissionType().getId());
-            dto.setAdmissionTypeName(student.getAdmissionType().getName());
-        }
-
-        // ===== ACADEMIC YEAR (NOT NULL) =====
-        dto.setAcademicYearId(student.getAcademicYear().getId());
-        dto.setAcademicYearName(student.getAcademicYear().getName());
-
-        // ===== AUDIT =====
-        dto.setCreatedAt(student.getCreatedAt());
-        dto.setUpdatedAt(student.getUpdatedAt());
-
-        return dto;
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<Object[]> getClassStrengthChart(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getClassStrengthChart() called - orgId: {}", orgId);
+        List<Object[]> results = studentRepository.getStudentStrengthByStandard(filter.getCampusIds(), filter.getToDate(), orgId);
+        log.info("[Service:StudentService] getClassStrengthChart() succeeded");
+        return results;
     }
 }

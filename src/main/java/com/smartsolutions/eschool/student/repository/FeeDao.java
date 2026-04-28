@@ -1,6 +1,5 @@
 package com.smartsolutions.eschool.student.repository;
 
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
 import com.smartsolutions.eschool.student.model.FeeEntity;
 
 import java.util.List;

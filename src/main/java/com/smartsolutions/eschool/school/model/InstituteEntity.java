@@ -2,20 +2,16 @@ package com.smartsolutions.eschool.school.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import com.smartsolutions.eschool.lookups.model.CityEntity;
 import com.smartsolutions.eschool.lookups.model.CountryEntity;
 import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
-import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.user.model.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -23,7 +19,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InstituteEntity  extends AuditableEntity {
+public class InstituteEntity  extends ScopeAuditableEntity {
 
     @Id
     @Column(name = "id")

@@ -25,7 +25,10 @@ public class EmployeeMasterResponseDto {
     private Date dateOfBirth;
     private String maritalStatus;
     private String religion;
-    private String nationality;
+    private Long countryId;
+    private String countryName;
+    private String nationalId;
+    private String passportNumber;
     private String bloodGroup;
 
     // Employment Details
@@ -47,6 +50,14 @@ public class EmployeeMasterResponseDto {
     private Long employeeTypeId;
     private String employeeTypeName;
 
+    // Assignment Details
+    private Long campusId;
+    private String campusName;
+    private Long departmentId;
+    private String departmentName;
+    private Long designationId;
+    private String designationName;
+
     public static EmployeeMasterResponseDto fromEntity(EmployeeMasterEntity entity) {
         if (entity == null) return null;
 
@@ -55,6 +66,8 @@ public class EmployeeMasterResponseDto {
                 .employeeCode(entity.getEmployeeCode())
                 .fullName(entity.getFullName())
                 .email(entity.getEmail())
+                .nationalId(entity.getNationalId())
+                .passportNumber(entity.getPassportNumber())
                 .build();
     }
 }

@@ -36,323 +36,233 @@ public class SalaryStructureService {
         this.employeeTypeRepository = employeeTypeRepository;
     }
 
-    /* =========================
-       CREATE
-       ========================= */
-    public SalaryStructureResponseDTO createSalaryStructure(SalaryStructureRequestDTO request) {
-
-        EmployeeTypeEntity employeeType = employeeTypeRepository.findById(request.getEmployeeTypeId()).orElseThrow(() -> new IllegalArgumentException("Invalid employee type"));
-
-        salaryStructureRepository.findByEmployeeTypeIdAndIsCurrentTrue(employeeType.getId()).ifPresent(existing -> {
-            existing.setIsCurrent(false);
-            existing.setEffectiveTo(request.getEffectiveFrom().minusDays(1));
-        });
-
-        SalaryStructureEntity entity = new SalaryStructureEntity();
-        entity.setEmployeeType(employeeType);
-        entity.setBaseSalary(request.getBaseSalary());
-        entity.setEffectiveFrom(request.getEffectiveFrom());
-        entity.setEffectiveTo(null);
-        entity.setIsCurrent(true);
-
-        entity = salaryStructureRepository.save(entity);
-        return MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class);
-
-    }
-
-//    public SalaryStructureResponseDTO createSalaryStructure(@Valid SalaryStructureRequestDTO requestDTO) {
-//        log.info("Creating Salary Structure for Employee Type ID: {}", requestDTO.getEmployeeTypeId());
-//        try {
-//            EmployeeTypeEntity employeeType = employeeTypeRepository.findById(requestDTO.getEmployeeTypeId())
-//                    .orElseThrow(() -> new ResourceNotFoundException(
-//                            "Employee Type not found with id: " + requestDTO.getEmployeeTypeId()
-//                    ));
-//
-//            SalaryStructureEntity entity = MapperUtil.mapObject(requestDTO, SalaryStructureEntity.class);
-//            entity.setEmployeeType(employeeType);
-//            salaryStructureRepository.save(entity);
-//
-//            log.info("Salary Structure saved with ID: {}", entity.getId());
-//            return MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class);
-//        } catch (DataAccessException dae) {
-//            log.error("Database error while creating Salary Structure", dae);
-//            throw new CustomServiceException("Failed to create Salary Structure due to database error");
-//        } catch (Exception e) {
-//            log.error("Unexpected error while creating Salary Structure", e);
-//            throw new CustomServiceException("Failed to create Salary Structure");
-//        }
-//    }
-
-    /* =========================
-       GET BY ID
-       ========================= */
-    public SalaryStructureResponseDTO getById(Long id) {
-        log.info("Fetching Salary Structure by ID: {}", id);
-        try {
-            SalaryStructureEntity entity = salaryStructureRepository.findActiveById(id).orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
-            return MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Salary Structure", dae);
-            throw new CustomServiceException("Unable to fetch Salary Structure", dae);
-        } catch (MappingException me) {
-            log.error("Mapping error while fetching Salary Structure", me);
-            throw new CustomServiceException("Error converting Salary Structure data", me);
-        }
-    }
-
-    /* =========================
-       GET ALL ACTIVE
-       ========================= */
-    @Transactional(readOnly = true)
-    public List<SalaryStructureResponseDTO> getAllActive() {
-        log.info("Fetching all active Salary Structures");
-        try {
-            List<SalaryStructureEntity> entities = salaryStructureRepository.findAllActive();
-            return entities.stream().map(entity -> MapperUtil.mapObject(entity, SalaryStructureResponseDTO.class)).collect(Collectors.toList());
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Salary Structures", dae);
-            throw new CustomServiceException("Unable to fetch Salary Structures", dae);
-        }
-    }
-
-    /* =========================
-       UPDATE
-       ========================= */
     @Transactional
-    public SalaryStructureResponseDTO updateSalaryStructure(Long id, @Valid SalaryStructureRequestDTO requestDTO) {
-        log.info("Updating Salary Structure with ID: {}", id);
+    public SalaryStructureResponseDTO create(SalaryStructureRequestDTO request) {
+        log.info("Creating new SalaryStructure in database: for employeeType={}", request.getEmployeeTypeId());
         try {
-            SalaryStructureEntity existing = salaryStructureRepository.findActiveById(id).orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
+            EmployeeTypeEntity employeeType = employeeTypeRepository.findById(request.getEmployeeTypeId())
+                    .orElseThrow(() -> new ResourceNotFoundException("EmployeeType not found with id: " + request.getEmployeeTypeId()));
 
-            EmployeeTypeEntity employeeType = employeeTypeRepository.findById(requestDTO.getEmployeeTypeId()).orElseThrow(() -> new ResourceNotFoundException("Employee Type not found with id: " + requestDTO.getEmployeeTypeId()));
+            // Close existing current salary structure
+            salaryStructureRepository.findByEmployeeTypeId(employeeType.getId()).ifPresent(existing -> {
+                log.info("Closing existing current SalaryStructure ID: {}", existing.getId());
+                existing.setIsCurrent(false);
+                existing.setEffectiveTo(request.getEffectiveFrom().minusDays(1));
+                salaryStructureRepository.save(existing);
+            });
+
+            SalaryStructureEntity entity = new SalaryStructureEntity();
+            entity.setEmployeeType(employeeType);
+            entity.setBaseSalary(request.getBaseSalary());
+            entity.setEffectiveFrom(request.getEffectiveFrom());
+            entity.setEffectiveTo(null);
+            entity.setIsCurrent(true);
+            entity.setDeleted(false);
+
+            SalaryStructureEntity saved = salaryStructureRepository.save(entity);
+            log.info("Successfully created SalaryStructure: id={}", saved.getId());
+            return toDto(saved);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while creating SalaryStructure", e);
+            throw new CustomServiceException("Failed to create Salary Structure");
+        }
+    }
+
+    public SalaryStructureResponseDTO getById(Long id) {
+        log.info("Fetching SalaryStructure ID: {} from database", id);
+        try {
+            SalaryStructureEntity entity = salaryStructureRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
+            log.info("Successfully fetched SalaryStructure: id={}", entity.getId());
+            return toDto(entity);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching SalaryStructure ID: {}", id, e);
+            throw new CustomServiceException("Failed to fetch Salary Structure");
+        }
+    }
+
+    public List<SalaryStructureResponseDTO> getAllNonDeleted() {
+        log.info("Fetching all non-deleted SalaryStructures from database");
+        try {
+            List<SalaryStructureEntity> entities = salaryStructureRepository.findAllNonDeleted();
+            List<SalaryStructureResponseDTO> dtoList = entities.stream()
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+            log.info("Successfully fetched {} SalaryStructures", dtoList.size());
+            return dtoList;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching SalaryStructures", e);
+            throw new CustomServiceException("Failed to fetch Salary Structures");
+        }
+    }
+
+    @Transactional
+    public SalaryStructureResponseDTO update(Long id, @Valid SalaryStructureRequestDTO requestDTO) {
+        log.info("Updating SalaryStructure ID: {} in database", id);
+        try {
+            SalaryStructureEntity existing = salaryStructureRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
+
+            EmployeeTypeEntity employeeType = employeeTypeRepository.findById(requestDTO.getEmployeeTypeId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Employee Type not found with id: " + requestDTO.getEmployeeTypeId()));
 
             existing.setEmployeeType(employeeType);
             existing.setBaseSalary(requestDTO.getBaseSalary());
             existing.setEffectiveFrom(requestDTO.getEffectiveFrom());
             existing.setEffectiveTo(requestDTO.getEffectiveTo());
 
-            salaryStructureRepository.save(existing);
-
-            log.info("Salary Structure updated successfully with ID: {}", existing.getId());
-            return MapperUtil.mapObject(existing, SalaryStructureResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while updating Salary Structure", dae);
-            throw new CustomServiceException("Failed to update Salary Structure due to database error", dae);
+            SalaryStructureEntity updated = salaryStructureRepository.save(existing);
+            log.info("Successfully updated SalaryStructure: id={}", updated.getId());
+            return toDto(updated);
+        } catch (ResourceNotFoundException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Unexpected error while updating Salary Structure", e);
-            throw new CustomServiceException("Failed to update Salary Structure", e);
+            log.error("Unexpected error while updating SalaryStructure ID: {}", id, e);
+            throw new CustomServiceException("Failed to update Salary Structure");
         }
     }
 
-    /* =========================
-       SOFT DELETE
-       ========================= */
     @Transactional
-    public void softDelete(Long id) {
-        log.info("Soft delete Salary Structure ID: {}", id);
+    public void delete(Long id) {
+        log.info("Soft deleting SalaryStructure ID: {} from database", id);
         try {
-            salaryStructureRepository.softDeleteById(id);
-        } catch (DataAccessException dae) {
-            log.error("Database error while soft deleting Salary Structure with ID {}", id, dae);
-            throw new CustomServiceException("Failed to delete Salary Structure due to database error", dae);
+            int affected = salaryStructureRepository.softDeleteById(id);
+            if (affected == 0) {
+                log.warn("SalaryStructure not found for deletion: id={}", id);
+                throw new ResourceNotFoundException("Salary Structure not found with id: " + id);
+            }
+            log.info("Successfully soft deleted SalaryStructure: id={}", id);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while deleting SalaryStructure ID: {}", id, e);
+            throw new CustomServiceException("Failed to delete Salary Structure");
         }
     }
 
     @Transactional
     public SalaryStructureResponseDTO closeSalaryStructure(Long id) {
-        SalaryStructureEntity existing = salaryStructureRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
+        log.info("Closing SalaryStructure ID: {}", id);
+        try {
+            SalaryStructureEntity existing = salaryStructureRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Salary Structure not found with id: " + id));
 
-        if (!existing.getIsCurrent()) {
-            throw new CustomServiceException("Salary Structure is already closed");
-        }
-
-        existing.setIsCurrent(false); // mark as closed
-        existing.setEffectiveTo(LocalDate.now()); // optional: set today's date as end
-
-        salaryStructureRepository.save(existing);
-
-        return MapperUtil.mapObject(existing, SalaryStructureResponseDTO.class);
-    }
-
-    public List<SalaryStructureResponseDTO> searchSalaryStructures(Long employeeTypeId, String employeeTypeName, BigDecimal minSalary, BigDecimal maxSalary, LocalDate fromDate, LocalDate toDate, Boolean isCurrent) {
-        // Fetch entities from repository
-        List<SalaryStructureEntity> entities = salaryStructureRepository.searchSalaryStructures(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
-
-        // Convert to DTOs
-        return entities.stream().map(entity -> {
-            SalaryStructureResponseDTO dto = new SalaryStructureResponseDTO();
-            dto.setId(entity.getId());
-            dto.setEmployeeTypeId(entity.getEmployeeType().getId());
-            dto.setEmployeeTypeName(entity.getEmployeeType().getName());
-            dto.setBaseSalary(entity.getBaseSalary());
-            dto.setEffectiveFrom(entity.getEffectiveFrom());
-            dto.setEffectiveTo(entity.getEffectiveTo());
-            dto.setIsCurrent(entity.getIsCurrent());
-            dto.setDeleted(entity.getDeleted());
-            return dto;
-        }).collect(Collectors.toList());
-    }
-
-
-//    public List<SalaryStructureDetailDTO> getAllSalaryStructures() {
-//        // Fetch all salary structures
-//        List<SalaryStructureEntity> structures = salaryStructureRepository.findSalaryDetail();
-//
-//        return structures.stream().map(ss -> {
-//
-//            // Map components (exclude deleted)
-//            List<SalaryStructureComponentResponseDTO> componentDTOs = ss.getComponents().stream()
-//                    .filter(c -> !c.getDeleted())
-//                    .map(c -> SalaryStructureComponentResponseDTO.builder()
-//                            .id(c.getComponent().getId())
-//                            .salaryStructureId(ss.getId())
-//                            .componentName(c.getComponent().getName())
-//                            .componentType(c.getComponent().getType().toString()) // EARNING or DEDUCTION
-//                            .isPercentage(c.getComponent().getIsPercentage())
-//                            .value(c.getValue())
-//                            .build())
-//                    .toList();
-//
-//            // Initialize totals
-//            BigDecimal totalEarnings = ss.getBaseSalary(); // Base salary counted as earning
-//            BigDecimal totalDeductions = BigDecimal.ZERO;
-//
-//            // Calculate totals
-//            for (SalaryStructureComponentResponseDTO comp : componentDTOs) {
-//                BigDecimal compValue;
-//
-//                // Calculate value based on percentage or fixed
-//                if (Boolean.TRUE.equals(comp.getIsPercentage())) {
-//                    compValue = ss.getBaseSalary()
-//                            .multiply(comp.getValue().divide(BigDecimal.valueOf(100)));
-//                } else {
-//                    compValue = comp.getValue();
-//                }
-//
-//                // Sum earnings vs deductions
-//                if ("EARNING".equalsIgnoreCase(comp.getComponentType())) {
-//                    totalEarnings = totalEarnings.add(compValue);
-//                } else if ("DEDUCTION".equalsIgnoreCase(comp.getComponentType())) {
-//                    totalDeductions = totalDeductions.add(compValue);
-//                }
-//            }
-//
-//            // Net salary = total earnings - total deductions
-//            BigDecimal netSalary = totalEarnings.subtract(totalDeductions);
-//
-//            // Build DTO
-//            return SalaryStructureDetailDTO.builder()
-//                    .id(ss.getId())
-//                    .employeeTypeName(ss.getEmployeeType().getName())
-//                    .baseSalary(ss.getBaseSalary())
-//                    .effectiveFrom(ss.getEffectiveFrom())
-//                    .effectiveTo(ss.getEffectiveTo())
-//                    .components(componentDTOs)
-//                    .totalEarnings(totalEarnings)
-//                    .totalDeductions(totalDeductions)
-//                    .netSalary(netSalary)
-//                    .build();
-//
-//        }).toList();
-//    }
-
-
-    public List<SalaryStructureDetailDTO> getAllSalaryStructures() {
-        // Fetch all salary structures
-        List<SalaryStructureEntity> structures = salaryStructureRepository.findSalaryDetail();
-
-        return structures.stream().map(ss -> {
-
-            // Map components (exclude deleted)
-            List<SalaryStructureComponentResponseDTO> componentDTOs = ss.getComponents().stream()
-                    .filter(c -> !c.getDeleted())
-                    .map(c -> SalaryStructureComponentResponseDTO.builder()
-                            .id(c.getComponent().getId())
-                            .salaryStructureId(ss.getId())
-                            .componentName(c.getComponent().getName())
-                            .componentType(c.getComponent().getType().toString()) // EARNING or DEDUCTION
-                            .isPercentage(c.getComponent().getIsPercentage())
-                            .value(c.getValue())
-                            .build())
-                    .toList();
-
-            // Initialize totals
-            BigDecimal totalEarnings = ss.getBaseSalary(); // Base salary counted as earning
-            BigDecimal totalDeductions = BigDecimal.ZERO;
-            BigDecimal totalWithoutDeduction = ss.getBaseSalary(); // Initialize total without deductions
-
-            // Calculate totals
-            for (SalaryStructureComponentResponseDTO comp : componentDTOs) {
-                BigDecimal compValue;
-
-                // Calculate value based on percentage or fixed
-                if (Boolean.TRUE.equals(comp.getIsPercentage())) {
-                    compValue = ss.getBaseSalary()
-                            .multiply(comp.getValue().divide(BigDecimal.valueOf(100)));
-                } else {
-                    compValue = comp.getValue();
-                }
-
-                // Sum earnings vs deductions
-                if ("EARNING".equalsIgnoreCase(comp.getComponentType())) {
-                    totalEarnings = totalEarnings.add(compValue);
-                    totalWithoutDeduction = totalWithoutDeduction.add(compValue); // Add earnings to totalWithoutDeduction
-                } else if ("DEDUCTION".equalsIgnoreCase(comp.getComponentType())) {
-                    totalDeductions = totalDeductions.add(compValue);
-                    // Do not subtract from totalWithoutDeduction
-                }
+            if (!existing.getIsCurrent()) {
+                log.warn("SalaryStructure ID: {} is already closed", id);
+                throw new CustomServiceException("Salary Structure is already closed");
             }
 
-            // Net salary = total earnings - total deductions
-            BigDecimal netSalary = totalEarnings.subtract(totalDeductions);
+            existing.setIsCurrent(false);
+            existing.setEffectiveTo(LocalDate.now());
 
-            // Build DTO
-            return SalaryStructureDetailDTO.builder()
-                    .id(ss.getId())
-                    .employeeTypeName(ss.getEmployeeType().getName())
-                    .baseSalary(ss.getBaseSalary())
-                    .effectiveFrom(ss.getEffectiveFrom())
-                    .effectiveTo(ss.getEffectiveTo())
-                    .components(componentDTOs)
-                    .totalEarnings(totalEarnings)
-                    .totalDeductions(totalDeductions)
-                    .totalWithoutDeduction(totalWithoutDeduction) // NEW FIELD
-                    .netSalary(netSalary)
-                    .build();
-
-        }).toList();
+            SalaryStructureEntity closed = salaryStructureRepository.save(existing);
+            log.info("Successfully closed SalaryStructure ID: {}", id);
+            return toDto(closed);
+        } catch (ResourceNotFoundException | CustomServiceException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while closing SalaryStructure ID: {}", id, e);
+            throw new CustomServiceException("Failed to close Salary Structure");
+        }
     }
 
-//    public List<SalaryStructureDetailDTO> getAllSalaryStructures() {
-//        List<SalaryStructureEntity> structures = salaryStructureRepository.findSalaryDetail();
-//
-//        List<SalaryStructureDetailDTO> dtos = structures.
-//                stream().
-//                map(ss -> SalaryStructureDetailDTO.builder()
-//                        .id(ss.getId()).
-//                        employeeTypeName(ss.getEmployeeType().getName()).
-//                        baseSalary(ss.getBaseSalary()).
-//                        effectiveFrom(ss.getEffectiveFrom()).
-//                        effectiveTo(ss.getEffectiveTo()).
-//                        components(ss.getComponents().stream().map(c -> SalaryStructureComponentResponseDTO.builder().
-//                                id(c.getComponent().getId()).
-//                                salaryStructureId(ss.getId()).
-//                                componentName(c.getComponent().getName()).
-//                                componentType(c.getComponent().getType().toString())       // ComponentType enum
-//                .isPercentage(c.getComponent().getIsPercentage()).value(c.getValue()).build()).toList()).build()).toList();
-//
-//        return dtos;
-//    }
+    public List<SalaryStructureResponseDTO> searchByKeyword(String keyword) {
+        String searchKey = keyword == null ? "" : keyword.trim();
+        log.info("Searching SalaryStructures with keyword: '{}' in database", searchKey);
+        try {
+            List<SalaryStructureEntity> result = salaryStructureRepository.searchByKeyword(searchKey);
+            List<SalaryStructureResponseDTO> dtoList = result.stream()
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+            log.info("Successfully fetched {} SalaryStructures based on search", dtoList.size());
+            return dtoList;
+        } catch (Exception e) {
+            log.error("Unexpected error while searching SalaryStructures", e);
+            throw new CustomServiceException("Failed to search Salary Structures");
+        }
+    }
+
+    public List<SalaryStructureResponseDTO> searchComplex(Long employeeTypeId, String employeeTypeName, BigDecimal minSalary, BigDecimal maxSalary, LocalDate fromDate, LocalDate toDate, Boolean isCurrent) {
+        log.info("Complex search for SalaryStructures: employeeTypeId={}, employeeTypeName={}, minSalary={}, maxSalary={}, fromDate={}, toDate={}, isCurrent={}",
+                employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
+        try {
+            List<SalaryStructureEntity> entities = salaryStructureRepository.searchSalaryStructures(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
+            List<SalaryStructureResponseDTO> dtoList = entities.stream()
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+            log.info("Successfully fetched {} SalaryStructures based on complex search", dtoList.size());
+            return dtoList;
+        } catch (Exception e) {
+            log.error("Unexpected error during complex search for SalaryStructures", e);
+            throw new CustomServiceException("Failed to search Salary Structures");
+        }
+    }
+
+    public List<SalaryStructureDetailDTO> getAllSalaryStructures() {
+        log.info("Fetching all SalaryStructures with details from database");
+        try {
+            List<SalaryStructureEntity> structures = salaryStructureRepository.findSalaryDetail();
+            List<SalaryStructureDetailDTO> dtoList = structures.stream().map(this::toDetailDto).collect(Collectors.toList());
+            log.info("Successfully fetched {} SalaryStructures with details", dtoList.size());
+            return dtoList;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching SalaryStructures with details", e);
+            throw new CustomServiceException("Failed to fetch Detailed Salary Structures");
+        }
+    }
 
     public SalaryStructureDetailDTO getSalaryStructureByEmployeeType(Long employeeTypeId) {
-
-        SalaryStructureEntity ss = salaryStructureRepository.findCurrentSalaryByEmployeeType(employeeTypeId);
-
-        if (ss == null) {
-            throw new ResourceNotFoundException("No salary structure found for employee type ID: " + employeeTypeId);
+        log.info("Fetching current SalaryStructure with details for employeeTypeID: {}", employeeTypeId);
+        try {
+            SalaryStructureEntity ss = salaryStructureRepository.findCurrentSalaryByEmployeeType(employeeTypeId);
+            if (ss == null) {
+                log.warn("No current salary structure found for employee type ID: {}", employeeTypeId);
+                throw new ResourceNotFoundException("No salary structure found for employee type ID: " + employeeTypeId);
+            }
+            SalaryStructureDetailDTO dto = toDetailDto(ss);
+            log.info("Successfully fetched current SalaryStructure with details for employeeTypeID: {}", employeeTypeId);
+            return dto;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching current SalaryStructure with details for employeeTypeID: {}", employeeTypeId, e);
+            throw new CustomServiceException("Failed to fetch Salary Structure Details");
         }
+    }
 
-        // Map components (exclude deleted)
+    public Long getTotalCount() {
+        return salaryStructureRepository.count();
+    }
+
+    public Long countByEmployeeType(Long employeeTypeId) {
+        try {
+            EmployeeTypeEntity employeeType = employeeTypeRepository.findById(employeeTypeId)
+                    .orElseThrow(() -> new ResourceNotFoundException("EmployeeType not found with id: " + employeeTypeId));
+            return salaryStructureRepository.countByEmployeeType(employeeType);
+        } catch (Exception e) {
+            log.error("Error counting salary structures by employee type", e);
+            return 0L;
+        }
+    }
+
+    private SalaryStructureResponseDTO toDto(SalaryStructureEntity entity) {
+        SalaryStructureResponseDTO dto = new SalaryStructureResponseDTO();
+        dto.setId(entity.getId());
+        dto.setEmployeeTypeId(entity.getEmployeeType().getId());
+        dto.setEmployeeTypeName(entity.getEmployeeType().getName());
+        dto.setBaseSalary(entity.getBaseSalary());
+        dto.setEffectiveFrom(entity.getEffectiveFrom());
+        dto.setEffectiveTo(entity.getEffectiveTo());
+        dto.setIsCurrent(entity.getIsCurrent());
+        dto.setDeleted(entity.getDeleted());
+        return dto;
+    }
+
+    private SalaryStructureDetailDTO toDetailDto(SalaryStructureEntity ss) {
         List<SalaryStructureComponentResponseDTO> componentDTOs = ss.getComponents().stream()
                 .filter(c -> !c.getDeleted())
                 .map(c -> SalaryStructureComponentResponseDTO.builder()
@@ -366,15 +276,12 @@ public class SalaryStructureService {
                         .build())
                 .toList();
 
-        // Initialize totals
-        BigDecimal totalEarnings = ss.getBaseSalary(); // Base salary counted as earning
+        BigDecimal totalEarnings = ss.getBaseSalary();
         BigDecimal totalDeductions = BigDecimal.ZERO;
-        BigDecimal totalWithoutDeduction = ss.getBaseSalary(); // total without deductions
+        BigDecimal totalWithoutDeduction = ss.getBaseSalary();
 
-        // Calculate totals
         for (SalaryStructureComponentResponseDTO comp : componentDTOs) {
             BigDecimal compValue;
-
             if (Boolean.TRUE.equals(comp.getIsPercentage())) {
                 compValue = ss.getBaseSalary().multiply(comp.getValue().divide(BigDecimal.valueOf(100)));
             } else {
@@ -391,7 +298,6 @@ public class SalaryStructureService {
 
         BigDecimal netSalary = totalEarnings.subtract(totalDeductions);
 
-        // Build DTO
         return SalaryStructureDetailDTO.builder()
                 .id(ss.getId())
                 .employeeTypeName(ss.getEmployeeType().getName())
@@ -400,9 +306,10 @@ public class SalaryStructureService {
                 .effectiveTo(ss.getEffectiveTo())
                 .components(componentDTOs)
                 .totalEarnings(totalEarnings)
-                .totalDeductions(totalDeductions)
                 .totalWithoutDeduction(totalWithoutDeduction)
+                .totalDeductions(totalDeductions)
                 .netSalary(netSalary)
                 .build();
     }
 }
+

@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -16,6 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLRestriction("deleted = false")
 public class FeeComponentEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,4 +51,6 @@ public class FeeComponentEntity extends AuditableEntity {
 
     @OneToMany(mappedBy = "feeComponent", fetch = FetchType.LAZY)
     private List<FeeRateEntity> feeRates;
+    //private String description;
+
 }

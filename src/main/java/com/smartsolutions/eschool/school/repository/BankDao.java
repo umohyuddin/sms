@@ -11,4 +11,5 @@ public interface BankDao {
     BankEntity findById(Long id);
     List<BankEntity> findByInstitute(Long id);
     List<BankEntity> findAll();
+    List<BankEntity> searchByKeyword(String keyword);
 }

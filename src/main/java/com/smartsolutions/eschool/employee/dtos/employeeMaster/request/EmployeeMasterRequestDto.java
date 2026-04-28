@@ -22,7 +22,9 @@ public class EmployeeMasterRequestDto {
     private Date dateOfBirth;
     private String maritalStatus;
     private String religion;
-    private String nationality;
+    private Long countryId;
+    private String nationalId;
+    private String passportNumber;
     private String bloodGroup;
 
     // Employment Details
@@ -41,7 +43,9 @@ public class EmployeeMasterRequestDto {
     // Status
     private Boolean active = true;
 
-    // Relationships (by IDs)
-//    private Long departmentId;       // FK to Department
-//    private List<Long> roleIds;      // List of role IDs
+    // Assignment Details (Used for tracking history)
+    private Long campusId;
+    private Long departmentId;
+    private Long designationId;
+    private Date assignmentStartDate;
 }

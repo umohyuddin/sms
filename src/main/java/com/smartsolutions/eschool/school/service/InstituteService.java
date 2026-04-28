@@ -1,95 +1,113 @@
 package com.smartsolutions.eschool.school.service;
 
-import com.smartsolutions.eschool.lookups.model.CityEntity;
-import com.smartsolutions.eschool.lookups.model.CountryEntity;
-import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
 import com.smartsolutions.eschool.lookups.repository.CityRepository;
 import com.smartsolutions.eschool.lookups.repository.CountryRepository;
 import com.smartsolutions.eschool.lookups.repository.ProvinceRepository;
-import com.smartsolutions.eschool.school.dtos.InstituteDTO;
 import com.smartsolutions.eschool.school.dtos.institute.request.InstituteRequestDTO;
 import com.smartsolutions.eschool.school.dtos.institute.response.InstituteResponseDTO;
+import com.smartsolutions.eschool.school.mapper.InstituteMapper;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
-import com.smartsolutions.eschool.school.repository.InstituteDao;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
-import com.smartsolutions.eschool.student.dtos.StudentDTO;
-import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.util.MapperUtil;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.MappingException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
+@Slf4j
 public class InstituteService {
 
     private final InstituteRepository instituteRepository;
     private final CountryRepository countryRepository;
-
     private final ProvinceRepository provinceRepository;
     private final CityRepository cityRepository;
+    private final com.smartsolutions.eschool.school.repository.CampusRepository campusRepository;
 
-    public InstituteService(InstituteRepository instituteRepository, CountryRepository countryRepository, ProvinceRepository provinceRepository, CityRepository cityRepository) {
+    public InstituteService(InstituteRepository instituteRepository, CountryRepository countryRepository,
+                           ProvinceRepository provinceRepository, CityRepository cityRepository,
+                           com.smartsolutions.eschool.school.repository.CampusRepository campusRepository) {
         this.instituteRepository = instituteRepository;
         this.countryRepository = countryRepository;
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
+        this.campusRepository = campusRepository;
     }
 
-    // Fetch the institute
+    @Transactional(readOnly = true)
     public InstituteResponseDTO getInstitute() {
-        InstituteEntity instituteEntity = instituteRepository.getSingletonInstitute().orElse(null);
-        if (instituteEntity == null) {
-            return null; // no record found
-        }
-        return MapperUtil.mapObject(instituteEntity, InstituteResponseDTO.class);
+        log.info("[Service:InstituteService] getInstitute() called");
+        InstituteEntity instituteEntity = instituteRepository.getSingletonInstitute()
+                .orElseThrow(() -> new com.smartsolutions.eschool.global.error.ApiException(
+                        com.smartsolutions.eschool.institute.error.InstituteErrors.INSTITUTE_NOT_FOUND,
+                        org.springframework.http.HttpStatus.NOT_FOUND));
+        
+        InstituteResponseDTO responseDTO = InstituteMapper.toResponseDTO(instituteEntity);
+        log.info("[Service:InstituteService] getInstitute() succeeded - Institute: {}", responseDTO.getName());
+        return responseDTO;
+    }
+
+    @Transactional(readOnly = true)
+    public InstituteResponseDTO getById(Long id) {
+        log.info("[Service:InstituteService] getById() called - id: {}", id);
+        InstituteEntity instituteEntity = instituteRepository.findById(id)
+                .orElseThrow(() -> new com.smartsolutions.eschool.global.error.ApiException(
+                        com.smartsolutions.eschool.institute.error.InstituteErrors.INSTITUTE_NOT_FOUND,
+                        org.springframework.http.HttpStatus.NOT_FOUND));
+
+        InstituteResponseDTO responseDTO = InstituteMapper.toResponseDTO(instituteEntity);
+        log.info("[Service:InstituteService] getById() succeeded - id: {}", id);
+        return responseDTO;
     }
 
     @Transactional
     public InstituteResponseDTO updateInstitute(InstituteRequestDTO dto) {
-        InstituteEntity institute = instituteRepository.getSingletonInstitute().orElseGet(InstituteEntity::new); // create new if none exists
+        log.info("[Service:InstituteService] updateInstitute() called - id: {}", 1L);
+        InstituteEntity institute = instituteRepository.getSingletonInstitute()
+                .orElseGet(() -> {
+                    InstituteEntity newEntity = new InstituteEntity();
+                    newEntity.setId(1L);
+                    return newEntity;
+                });
 
-        // Set/update basic fields
+        InstituteMapper.updateEntityFromDTO(institute, dto);
 
-        institute.setName(dto.getName());
-        institute.setAddress(dto.getAddress());
-        institute.setContactNumber(dto.getContactNumber());
-        institute.setEmail(dto.getEmail());
-        institute.setWebsite(dto.getWebsite());
-        institute.setTagLine(dto.getTagLine());
-        institute.setLogo(dto.getLogo());
-
-        // Only set establishedDate if this is a new record
-        if (institute.getId() == null) {
-            // New record: use date from DTO if provided, else current date
-            institute.setEstablishedDate(dto.getEstablishedDate() != null ? dto.getEstablishedDate() : LocalDate.now());
-        } else {
-            // Existing record: keep current date, or fallback to now if somehow null
-            if (institute.getEstablishedDate() == null) {
-                institute.setEstablishedDate(LocalDate.now());
-            }
-        }
-
-        // Optional: assign relations if IDs are provided
         if (dto.getCountryId() != null) {
-            institute.setCountry(countryRepository.findById(dto.getCountryId()).orElseThrow(() -> new IllegalArgumentException("Invalid country ID")));
+            institute.setCountry(countryRepository.findById(dto.getCountryId())
+                    .orElseThrow(() -> new com.smartsolutions.eschool.global.error.ApiException(
+                            com.smartsolutions.eschool.institute.error.InstituteErrors.INVALID_INSTITUTE_DATA,
+                            "Invalid country ID", org.springframework.http.HttpStatus.BAD_REQUEST)));
         }
         if (dto.getProvinceId() != null) {
-            institute.setProvince(provinceRepository.findById(dto.getProvinceId()).orElseThrow(() -> new IllegalArgumentException("Invalid province ID")));
+            institute.setProvince(provinceRepository.findById(dto.getProvinceId())
+                    .orElseThrow(() -> new com.smartsolutions.eschool.global.error.ApiException(
+                            com.smartsolutions.eschool.institute.error.InstituteErrors.INVALID_INSTITUTE_DATA,
+                            "Invalid province ID", org.springframework.http.HttpStatus.BAD_REQUEST)));
         }
         if (dto.getCityId() != null) {
-            institute.setCity(cityRepository.findById(dto.getCityId()).orElseThrow(() -> new IllegalArgumentException("Invalid city ID")));
+            institute.setCity(cityRepository.findById(dto.getCityId())
+                    .orElseThrow(() -> new com.smartsolutions.eschool.global.error.ApiException(
+                            com.smartsolutions.eschool.institute.error.InstituteErrors.INVALID_INSTITUTE_DATA,
+                            "Invalid city ID", org.springframework.http.HttpStatus.BAD_REQUEST)));
         }
 
-        institute.setId(1L);
-        // Save and return
-        return MapperUtil.mapObject(instituteRepository.save(institute), InstituteResponseDTO.class);
+        InstituteEntity saved = instituteRepository.save(institute);
+        log.info("[Service:InstituteService] updateInstitute() succeeded - id: {}", saved.getId());
+        return InstituteMapper.toResponseDTO(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Long> getStatistics() {
+        log.info("[Service:InstituteService] getStatistics() called");
+        Map<String, Long> stats = new HashMap<>();
+        
+        Long instituteId = 1L; // Singleton focus
+        stats.put("totalCampuses", campusRepository.countByInstituteId(instituteId));
+        stats.put("activeCampuses", campusRepository.countByInstituteIdAndActiveTrue(instituteId));
+        stats.put("inactiveCampuses", campusRepository.countByInstituteIdAndActiveFalse(instituteId));
+        
+        log.info("[Service:InstituteService] getStatistics() succeeded");
+        return stats;
     }
 }

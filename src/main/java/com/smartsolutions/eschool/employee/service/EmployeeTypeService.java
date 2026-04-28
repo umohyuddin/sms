@@ -1,143 +1,121 @@
 package com.smartsolutions.eschool.employee.service;
 
+import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.institute.error.EmployeeTypeErrors;
 import com.smartsolutions.eschool.employee.dtos.EmployeeType.request.EmployeeTypeRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.EmployeeType.response.EmployeeTypeResponseDTO;
+import com.smartsolutions.eschool.employee.mapper.EmployeeTypeMapper;
 import com.smartsolutions.eschool.employee.model.EmployeeTypeEntity;
 import com.smartsolutions.eschool.employee.repository.EmployeeTypeRepository;
-import com.smartsolutions.eschool.global.exception.CustomServiceException;
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.util.MapperUtil;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.MappingException;
-import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
 public class EmployeeTypeService {
-
     private final EmployeeTypeRepository employeeTypeRepository;
 
     public EmployeeTypeService(EmployeeTypeRepository employeeTypeRepository) {
         this.employeeTypeRepository = employeeTypeRepository;
     }
 
-    /* ================= CREATE ================= */
-
-    @Transactional
-    public EmployeeTypeResponseDTO create(@Valid EmployeeTypeRequestDTO requestDTO) {
-        log.info("Creating EmployeeType: {}", requestDTO.getName());
-
-        try {
-            if (employeeTypeRepository.existsByNameIgnoreCaseAndDeletedFalse(requestDTO.getName())) {
-                throw new CustomServiceException("Employee Type already exists with name: " + requestDTO.getName());
-            }
-
-            EmployeeTypeEntity entity = MapperUtil.mapObject(requestDTO, EmployeeTypeEntity.class);
-            entity.setId(null);
-
-            EmployeeTypeEntity saved = employeeTypeRepository.save(entity);
-            log.info("EmployeeType created with id={}", saved.getId());
-
-            return MapperUtil.mapObject(saved, EmployeeTypeResponseDTO.class);
-
-        } catch (DataAccessException dae) {
-            log.error("Database error while creating EmployeeType", dae);
-            throw new CustomServiceException("Failed to create Employee Type", dae);
-        }
-    }
-
-    /* ================= READ ================= */
-
     public List<EmployeeTypeResponseDTO> getAll() {
-        try {
-            log.info("Fetching all Employee Types");
-            return MapperUtil.mapList(employeeTypeRepository.findAllNonDeleted(), EmployeeTypeResponseDTO.class);
-        } catch (MappingException | DataAccessException e) {
-            log.error("Error fetching Employee Types", e);
-            throw new CustomServiceException("Unable to fetch Employee Types", e);
-        }
-    }
-
-    public EmployeeTypeResponseDTO getById(Long id) {
-        log.info("Fetching EmployeeType with id={}", id);
-
-        EmployeeTypeEntity entity = employeeTypeRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new ResourceNotFoundException("Employee Type not found with id: " + id));
-
-        return MapperUtil.mapObject(entity, EmployeeTypeResponseDTO.class);
+        log.info("[Service:EmployeeTypeService] getAll() called - Fetching all employee types");
+        List<EmployeeTypeEntity> result = employeeTypeRepository.findAllNotDeleted();
+        List<EmployeeTypeResponseDTO> responseDTOs = EmployeeTypeMapper.toResponseDTOList(result);
+        log.info("[Service:EmployeeTypeService] getAll() succeeded - Found {} employee types", responseDTOs.size());
+        return responseDTOs;
     }
 
     public List<EmployeeTypeResponseDTO> getAllActive() {
-        return MapperUtil.mapList(employeeTypeRepository.findAllActive(), EmployeeTypeResponseDTO.class);
+        log.info("[Service:EmployeeTypeService] getAllActive() called - Fetching active employee types");
+        List<EmployeeTypeEntity> result = employeeTypeRepository.findAllActive();
+        List<EmployeeTypeResponseDTO> responseDTOs = EmployeeTypeMapper.toResponseDTOList(result);
+        log.info("[Service:EmployeeTypeService] getAllActive() succeeded - Found {} active employee types", responseDTOs.size());
+        return responseDTOs;
     }
 
-    public List<EmployeeTypeResponseDTO> getAllInactive() {
-        return MapperUtil.mapList(employeeTypeRepository.findAllInactive(), EmployeeTypeResponseDTO.class);
+    public EmployeeTypeResponseDTO getById(Long id) {
+        log.info("[Service:EmployeeTypeService] getById() called - id: {}", id);
+        EmployeeTypeEntity entity = employeeTypeRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ApiException(EmployeeTypeErrors.EMPLOYEE_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        EmployeeTypeResponseDTO responseDTO = EmployeeTypeMapper.toResponseDTO(entity);
+        log.info("[Service:EmployeeTypeService] getById() succeeded - Found employee type: {}", id);
+        return responseDTO;
     }
 
-    /* ================= UPDATE ================= */
+    public List<EmployeeTypeResponseDTO> searchByKeyword(String keyword) {
+        log.info("[Service:EmployeeTypeService] searchByKeyword() called - keyword: {}", keyword);
+        List<EmployeeTypeEntity> result = employeeTypeRepository.searchByKeyword(keyword);
+        List<EmployeeTypeResponseDTO> responseDTOs = EmployeeTypeMapper.toResponseDTOList(result);
+        log.info("[Service:EmployeeTypeService] searchByKeyword() succeeded - Found {} employee types", responseDTOs.size());
+        return responseDTOs;
+    }
 
     @Transactional
-    public EmployeeTypeResponseDTO update(Long id, @Valid EmployeeTypeRequestDTO requestDTO) {
-        log.info("Updating EmployeeType with id={}", id);
+    public void softDeleteById(Long id) {
+        log.info("[Service:EmployeeTypeService] softDeleteById() called - id: {}", id);
 
-        EmployeeTypeEntity entity = employeeTypeRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new ResourceNotFoundException("Employee Type not found with id: " + id));
-
-        entity.setName(requestDTO.getName());
-        entity.setDescription(requestDTO.getDescription());
-        entity.setActive(requestDTO.getActive());
-
-        EmployeeTypeEntity updated = employeeTypeRepository.save(entity);
-        log.info("EmployeeType updated successfully with id={}", updated.getId());
-
-        return MapperUtil.mapObject(updated, EmployeeTypeResponseDTO.class);
-    }
-
-    /* ================= DELETE (SOFT) ================= */
-
-    @Transactional
-    public void delete(Long id) {
-        log.info("Soft deleting EmployeeType with id={}", id);
-
-        int affected = employeeTypeRepository.softDeleteById(id);
-        if (affected == 0) {
-            throw new ResourceNotFoundException("Employee Type not found with id: " + id);
+        int result = employeeTypeRepository.softDeleteById(id);
+        if (result == 0) {
+            throw new ApiException(EmployeeTypeErrors.EMPLOYEE_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
-    }
-
-    /* ================= SEARCH ================= */
-
-    public List<EmployeeTypeResponseDTO> search(String keyword) {
-        return MapperUtil.mapList(employeeTypeRepository.searchByKeyword(keyword), EmployeeTypeResponseDTO.class);
-    }
-
-    /* ================= METRICS ================= */
-
-    public long countAll() {
-        return employeeTypeRepository.countAll();
-    }
-
-    public long countActive() {
-        return employeeTypeRepository.countActive();
-    }
-
-    public long countInactive() {
-        return employeeTypeRepository.countInactive();
-    }
-
-    /* ================= STATUS ================= */
-
-    @Transactional
-    public void activate(Long id) {
-        employeeTypeRepository.activateById(id);
+        log.info("[Service:EmployeeTypeService] softDeleteById() succeeded - id: {}", id);
     }
 
     @Transactional
-    public void deactivate(Long id) {
-        employeeTypeRepository.deactivateById(id);
+    public EmployeeTypeResponseDTO create(EmployeeTypeRequestDTO requestDTO) {
+        log.info("[Service:EmployeeTypeService] create() called - Creating: {}", requestDTO.getName());
+
+        if (requestDTO.getName() != null && !requestDTO.getName().trim().isEmpty()) {
+            if (employeeTypeRepository.existsByName(requestDTO.getName().trim())) {
+                throw new ApiException(EmployeeTypeErrors.DUPLICATE_EMPLOYEE_TYPE_NAME, "Employee type name already exists", HttpStatus.CONFLICT);
+            }
+        }
+
+        EmployeeTypeEntity entity = EmployeeTypeMapper.toEntity(requestDTO);
+        EmployeeTypeEntity saved = employeeTypeRepository.save(entity);
+
+        log.info("[Service:EmployeeTypeService] create() succeeded - Created with id: {}", saved.getId());
+        return EmployeeTypeMapper.toResponseDTO(saved);
+    }
+
+    @Transactional
+    public EmployeeTypeResponseDTO update(Long id, EmployeeTypeRequestDTO requestDTO) {
+        log.info("[Service:EmployeeTypeService] update() called - id: {}", id);
+
+        EmployeeTypeEntity existing = employeeTypeRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ApiException(EmployeeTypeErrors.EMPLOYEE_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (requestDTO.getName() != null && !requestDTO.getName().trim().equals(existing.getName())) {
+            if (employeeTypeRepository.existsByNameAndIdNot(requestDTO.getName().trim(), id)) {
+                throw new ApiException(EmployeeTypeErrors.DUPLICATE_EMPLOYEE_TYPE_NAME, "Employee type name already exists", HttpStatus.CONFLICT);
+            }
+        }
+
+        EmployeeTypeMapper.updateEntityFromDTO(existing, requestDTO);
+        EmployeeTypeEntity updated = employeeTypeRepository.save(existing);
+
+        log.info("[Service:EmployeeTypeService] update() succeeded - id: {}", id);
+        return EmployeeTypeMapper.toResponseDTO(updated);
+    }
+
+    public Map<String, Long> getStatistics() {
+        log.info("[Service:EmployeeTypeService] getStatistics() called");
+
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("totalEmployeeTypes", employeeTypeRepository.countAllNotDeleted());
+        stats.put("activeEmployeeTypes", employeeTypeRepository.countByActiveTrue());
+        stats.put("inactiveEmployeeTypes", employeeTypeRepository.countByActiveFalse());
+
+        log.info("[Service:EmployeeTypeService] getStatistics() succeeded - Stats: {}", stats);
+        return stats;
     }
 }

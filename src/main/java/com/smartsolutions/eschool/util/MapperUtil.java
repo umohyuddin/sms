@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
@@ -12,6 +13,10 @@ import java.util.stream.Collectors;
 public class MapperUtil {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final ModelMapper modelMapper = new ModelMapper();
+
+    static {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+    }
     public static <T, U> U mapObject(T source, Class<U> destinationType) {
         return modelMapper.map(source, destinationType);
     }

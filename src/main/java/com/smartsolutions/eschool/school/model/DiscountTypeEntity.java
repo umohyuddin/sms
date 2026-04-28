@@ -1,9 +1,9 @@
 package com.smartsolutions.eschool.school.model;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.lookups.model.FeeRecurrenceRuleEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "discount_type")
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DiscountTypeEntity  extends AuditableEntity {
+public class DiscountTypeEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,12 +29,13 @@ public class DiscountTypeEntity  extends AuditableEntity {
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 
-    @Column(name = "charge_type", nullable = false, length = 50)
-    private String chargeType;
-    // You can convert to ENUM later: FIXED, PERCENTAGE, PER_CREDIT, etc.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "charge_type_id", nullable = false)
+    private ChargeTypeEntity chargeType;
 
-    @Column(name = "recurrence_rule", length = 50)
-    private String recurrenceRule;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recurrence_rule_id")
+    private FeeRecurrenceRuleEntity recurrenceRule;
 
     @Column(name = "priority")
     private Integer priority = 0;

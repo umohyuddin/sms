@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,4 +102,11 @@ public interface StudentDiscountAssignmentRepository extends JpaRepository<Stude
 //            ORDER BY sda.id ASC
 //            """)
 //    List<StudentDiscountAssignmentEntity> searchByKeyword(@Param("keyword") String keyword);
+    @Query("SELECT SUM(sda.appliedAmount) FROM StudentDiscountAssignmentEntity sda " +
+            "WHERE sda.student.id = :studentId " +
+            "AND sda.academicYear.id = :academicYearId " +
+            "AND sda.deleted = false")
+    BigDecimal findTotalDiscountByStudentAndYear(
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId);
 }

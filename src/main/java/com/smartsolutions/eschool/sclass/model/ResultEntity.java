@@ -23,6 +23,9 @@ public class ResultEntity {
     @Column(name = "sbj_id", nullable = false)
     private Integer subjectId;
 
+    @Column(name = "cls_id")
+    private Integer classId;
+
     @Column(name = "std_id", nullable = false)
     private Long studentId;
 

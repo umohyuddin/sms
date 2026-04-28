@@ -1,304 +1,331 @@
 package com.smartsolutions.eschool.employee.controller;
 
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeAddressRequestDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeCreateRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeAddressResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeTypeCountDTO;
 import com.smartsolutions.eschool.employee.facade.EmployeeAddressFacade;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterFacade;
+import com.smartsolutions.eschool.global.error.ErrorResponse;
 import com.smartsolutions.eschool.global.utils.UploadUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/institute/employees")
 @Slf4j
+@Tag(name = "Employee Management", description = "Endpoints for managing institute employees, including creation, retrieval, updates, and documents.")
 public class EmployeeMasterController {
-    private final EmployeeMasterFacade employeeFacade;
-    private final EmployeeAddressFacade employeeAddressFacade;
 
-    public EmployeeMasterController(EmployeeMasterFacade employeeFacade, EmployeeAddressFacade employeeAddressFacade) {
-        this.employeeFacade = employeeFacade;
-        this.employeeAddressFacade = employeeAddressFacade;
+    private final EmployeeMasterFacade nEmployeeMasterFacade;
+    private final EmployeeAddressFacade nEmployeeAddressFacade;
+
+    public EmployeeMasterController(EmployeeMasterFacade nEmployeeMasterFacade, EmployeeAddressFacade nEmployeeAddressFacade) {
+        this.nEmployeeMasterFacade = nEmployeeMasterFacade;
+        this.nEmployeeAddressFacade = nEmployeeAddressFacade;
     }
 
-
-    // -------------------------
-    // Get all employees
-    // -------------------------
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get all employees", description = "Retrieve a list of all employees registered in the system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeMasterResponseDto.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = {"", "/list"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<EmployeeMasterResponseDto>> getAllEmployees() {
-        log.info("GET /api/institute/employees called");
-        List<EmployeeMasterResponseDto> employees = employeeFacade.getAllEmployees();
-        log.info("GET /api/institute/employees returned {} employees", employees.size());
-        return ResponseEntity.ok(employees);
+        log.info("[Controller:EmployeeMasterController] getAllEmployees() called - Request to get all employees");
+        List<EmployeeMasterResponseDto> list = nEmployeeMasterFacade.getAllEmployees();
+        log.info("[Controller:EmployeeMasterController] getAllEmployees() succeeded - Found {} employees", list.size());
+        return ResponseEntity.ok(list);
     }
 
-    // -------------------------
-    // Get employee by ID
-    // -------------------------
+    @Operation(summary = "Get employee by ID", description = "Fetch detailed information about a specific employee by their unique ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved employee",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeMasterResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Employee not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeMasterResponseDto> getEmployeeById(@PathVariable Long id) {
-        log.info("GET /api/institute/employees/{} called", id);
-        EmployeeMasterResponseDto employee = employeeFacade.getEmployeeById(id);
-        log.info("Returning Employee: id={}", employee.getId());
+    public ResponseEntity<EmployeeMasterResponseDto> getEmployeeById(
+            @Parameter(description = "Unique ID of the employee", example = "1") @PathVariable Long id) {
+        log.info("[Controller:EmployeeMasterController] getEmployeeById() called - Request to fetch employee with id: {}", id);
+        EmployeeMasterResponseDto employee = nEmployeeMasterFacade.getEmployeeById(id);
+        log.info("[Controller:EmployeeMasterController] getEmployeeById() succeeded - Found employee: {}", id);
         return ResponseEntity.ok(employee);
     }
 
-    // -------------------------
-    // Get employee by code
-    // -------------------------
-    @GetMapping(value = "/code/{employeeCode}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeMasterResponseDto> getEmployeeByCode(@PathVariable String employeeCode) {
-        log.info("GET /api/institute/employees/code/{} called", employeeCode);
-        EmployeeMasterResponseDto employee = employeeFacade.getEmployeeByCode(employeeCode);
-        log.info("Returning Employee: code={}", employee.getEmployeeCode());
+    @Operation(summary = "Get employee by Code", description = "Fetch detailed information about a specific employee by their code.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved employee",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeMasterResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Employee not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/code/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeMasterResponseDto> getEmployeeByCode(
+            @Parameter(description = "Code of the employee", example = "EMP-001") @PathVariable String code) {
+        log.info("[Controller:EmployeeMasterController] getEmployeeByCode() called - Request to fetch employee with code: {}", code);
+        EmployeeMasterResponseDto employee = nEmployeeMasterFacade.getEmployeeByCode(code);
+        log.info("[Controller:EmployeeMasterController] getEmployeeByCode() succeeded - Found employee with code: {}", code);
         return ResponseEntity.ok(employee);
     }
 
-    // -------------------------
-    // Search employees by name
-    // -------------------------
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EmployeeMasterResponseDto>> searchEmployees(@RequestParam String name) {
-        log.info("GET /api/institute/employees/search called with name={}", name);
-        List<EmployeeMasterResponseDto> employees = employeeFacade.searchEmployeesByName(name);
-        log.info("Returned {} employees matching name={}", employees.size(), name);
-        return ResponseEntity.ok(employees);
-    }
-
-    // -------------------------
-    // Filter employees by gender
-    // -------------------------
-    @GetMapping(value = "/gender/{gender}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EmployeeMasterResponseDto>> getEmployeesByGender(@PathVariable String gender) {
-        log.info("GET /api/institute/employees/gender/{} called", gender);
-        List<EmployeeMasterResponseDto> employees = employeeFacade.getEmployeesByGender(gender);
-        log.info("Returned {} employees for gender={}", employees.size(), gender);
-        return ResponseEntity.ok(employees);
-    }
-
-    // -------------------------
-    // Filter employees by active status
-    // -------------------------
-    @GetMapping(value = "/active/{status}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EmployeeMasterResponseDto>> getEmployeesByActiveStatus(@PathVariable Boolean status) {
-        log.info("GET /api/institute/employees/active/{} called", status);
-        List<EmployeeMasterResponseDto> employees = employeeFacade.getEmployeesByActiveStatus(status);
-        log.info("Returned {} employees for active status={}", employees.size(), status);
-        return ResponseEntity.ok(employees);
-    }
-
-    // -------------------------
-    // Filter employees by probation end date
-    // -------------------------
-    @GetMapping(value = "/probation-before", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EmployeeMasterResponseDto>> getEmployeesWithProbationEndedBefore(@RequestParam Date date) {
-        log.info("GET /api/institute/employees/probation-before called with date={}", date);
-        List<EmployeeMasterResponseDto> employees = employeeFacade.getEmployeesWithProbationEndedBefore(date);
-        log.info("Returned {} employees with probation ended before {}", employees.size(), date);
-        return ResponseEntity.ok(employees);
-    }
-
-    // -------------------------
-    // Create a new employee
-    // -------------------------
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeMasterResponseDto> createEmployee(@RequestBody EmployeeMasterRequestDto requestDto) {
-        log.info("POST /api/institute/employees called to create new employee: {}", requestDto);
-        EmployeeMasterResponseDto createdEmployee = employeeFacade.createEmployee(requestDto);
-        log.info("Employee created successfully with id: {}", createdEmployee.getId());
-        return ResponseEntity.ok(createdEmployee);
-    }
-
-    // -------------------------
-    // Metrics
-    // -------------------------
-    @GetMapping(value = "/count/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Long> getTotalEmployees() {
-        log.info("GET /api/institute/employees/count/all called");
-        return ResponseEntity.ok(employeeFacade.getTotalEmployees());
-    }
-
-    @GetMapping(value = "/count/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Long> getTotalActiveEmployees() {
-        log.info("GET /api/institute/employees/count/active called");
-        return ResponseEntity.ok(employeeFacade.getTotalActiveEmployees());
-    }
-
+    @Operation(summary = "Get inactive employees count", description = "Retrieve the total count of inactive employees.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved count"),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping(value = "/count/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Long> getTotalInactiveEmployees() {
-        log.info("GET /api/institute/employees/count/inactive called");
-        return ResponseEntity.ok(employeeFacade.getTotalInactiveEmployees());
+        log.info("[Controller:EmployeeMasterController] getTotalInactiveEmployees() called");
+        Long count = nEmployeeMasterFacade.getTotalInactiveEmployees();
+        log.info("[Controller:EmployeeMasterController] getTotalInactiveEmployees() succeeded - Count: {}", count);
+        return ResponseEntity.ok(count);
     }
 
-
+    @Operation(summary = "Upload profile photo", description = "Upload a profile photo for a specific employee.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Photo uploaded successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or file missing",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping(value = "/update-profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> uploadProfilePhoto(@RequestParam("employeeId") Long employeeId, @RequestPart("file") MultipartFile file) {
+    public ResponseEntity<?> uploadProfilePhoto(
+            @Parameter(description = "Employee ID") @RequestParam("employeeId") Long employeeId, 
+            @Parameter(description = "Profile photo file") @RequestPart("file") MultipartFile file) {
+        log.info("[Controller:EmployeeMasterController] uploadProfilePhoto() called - employeeId: {}", employeeId);
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Profile photo is required");
         }
         String filePath = UploadUtil.saveProfilePhoto(employeeId, file);
-        filePath = employeeFacade.updateEmployeeProfile(employeeId, filePath);
+        filePath = nEmployeeMasterFacade.updateEmployeeProfile(employeeId, filePath);
+        log.info("[Controller:EmployeeMasterController] uploadProfilePhoto() succeeded - employeeId: {}", employeeId);
         return ResponseEntity.ok(Map.of("message", "Profile photo uploaded successfully", "filePath", filePath));
     }
 
-
+    @Operation(summary = "Get profile photo", description = "Retrieve a profile photo by its filename.")
+    @ApiResponse(responseCode = "200", description = "File retrieved successfully")
     @GetMapping("/profile-photos/{fileName:.+}")
-    public ResponseEntity<Resource> getProfilePhoto(@PathVariable String fileName) throws IOException, MalformedURLException, FileNotFoundException {
-        // Optional: check if user has permission
+    public ResponseEntity<Resource> getProfilePhoto(
+            @Parameter(description = "File name") @PathVariable String fileName) throws IOException {
+        log.info("[Controller:EmployeeMasterController] getProfilePhoto() called - fileName: {}", fileName);
         Path file = Paths.get(UploadUtil.UPLOAD_DIR, fileName);
         Resource resource = new UrlResource(file.toUri());
         if (!resource.exists()) {
-            throw new FileNotFoundException("File not found");
+            throw new FileNotFoundException("File not found: " + fileName);
         }
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(resource);
     }
 
-
+    @Operation(summary = "Upload employee document", description = "Upload a document for a specific employee with a document key.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Document uploaded successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or file missing",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping(value = "/upload-document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> uploadEmployeeDocument(@RequestParam("employeeId") Long employeeId, @RequestParam("docKey") String docKey, @RequestPart("file") MultipartFile file) {
+    public ResponseEntity<?> uploadEmployeeDocument(
+            @Parameter(description = "Employee ID") @RequestParam("employeeId") Long employeeId, 
+            @Parameter(description = "Document Key (e.g., RESUME, ID_CARD)") @RequestParam("docKey") String docKey, 
+            @Parameter(description = "Document file") @RequestPart("file") MultipartFile file) throws IOException {
+        log.info("[Controller:EmployeeMasterController] uploadEmployeeDocument() called - employeeId: {}, docKey: {}", employeeId, docKey);
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("message", "File is required"));
         }
-        try {
-            // Save file to disk
-            String filePath = UploadUtil.saveEmployeeDocument(employeeId, docKey, file);
-            // Save record in database via facade
-            employeeFacade.saveEmployeeDocument(employeeId, docKey, file);
-            return ResponseEntity.ok(Map.of("message", "Document uploaded successfully", "filePath", filePath, "docKey", docKey));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "Failed to upload document", "error", e.getMessage()));
-        }
+        String filePath = UploadUtil.saveEmployeeDocument(employeeId, docKey, file);
+        nEmployeeMasterFacade.saveEmployeeDocument(employeeId, docKey, file);
+        log.info("[Controller:EmployeeMasterController] uploadEmployeeDocument() succeeded - employeeId: {}, docKey: {}", employeeId, docKey);
+        return ResponseEntity.ok(Map.of("message", "Document uploaded successfully", "filePath", filePath, "docKey", docKey));
     }
 
+    @Operation(summary = "Get employee documents", description = "Retrieve a list of all documents associated with an employee.")
+    @ApiResponse(responseCode = "200", description = "Documents retrieved successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeDocumentResponseDto.class)))
     @GetMapping(value = "/{employeeId}/documents", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getEmployeeDocuments(@PathVariable Long employeeId) {
-        log.info("GET /api/institute /employees/{}/documents called", employeeId);
-        try {
-            List<EmployeeDocumentResponseDto> documents = employeeFacade.getEmployeeDocuments(employeeId);
-            if (documents.isEmpty()) {
-                log.warn("No documents found for Employee with id: {}", employeeId);
-            } else {
-                log.info("Returned {} documents for Employee with id: {}", documents.size(), employeeId);
-            }
-            return ResponseEntity.ok(documents);
-        } catch (Exception e) {
-            log.error("Error fetching documents for Employee with id: {}", employeeId, e);
-            return ResponseEntity.status(500).build();
-        }
+    public ResponseEntity<List<EmployeeDocumentResponseDto>> getEmployeeDocuments(
+            @Parameter(description = "Employee ID") @PathVariable Long employeeId) {
+        log.info("[Controller:EmployeeMasterController] getEmployeeDocuments() called - employeeId: {}", employeeId);
+        List<EmployeeDocumentResponseDto> documents = nEmployeeMasterFacade.getEmployeeDocuments(employeeId);
+        log.info("[Controller:EmployeeMasterController] getEmployeeDocuments() succeeded - Found {} documents", documents.size());
+        return ResponseEntity.ok(documents);
     }
 
+    @Operation(summary = "Download employee document", description = "Download a specific employee document by its ID.")
+    @ApiResponse(responseCode = "200", description = "Document downloaded successfully")
     @GetMapping("/download-document/{documentId}")
-    public ResponseEntity<Resource> downloadEmployeeDocument(@PathVariable Long documentId, @RequestParam("employeeId") Long employeeId) throws IOException {
-        Resource document = employeeFacade.getDocumentById(documentId, employeeId);
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getFilename() + "\"").body(document);
+    public ResponseEntity<Resource> downloadEmployeeDocument(
+            @Parameter(description = "Document ID") @PathVariable Long documentId, 
+            @Parameter(description = "Employee ID") @RequestParam("employeeId") Long employeeId) throws IOException {
+        log.info("[Controller:EmployeeMasterController] downloadEmployeeDocument() called - documentId: {}, employeeId: {}", documentId, employeeId);
+        Resource document = nEmployeeMasterFacade.getDocumentById(documentId, employeeId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getFilename() + "\"")
+                .body(document);
     }
 
+    @Operation(summary = "Create new employee", description = "Register a new employee with the provided details.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Employee created successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeMasterResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeMasterResponseDto> createEmployee(@Valid @RequestBody EmployeeCreateRequestDto requestDto) {
+        log.info("[Controller:EmployeeMasterController] createEmployee() called - firstName: {}", requestDto.getFirstName());
+        EmployeeMasterResponseDto createdEmployee = nEmployeeMasterFacade.createEmployee(requestDto);
+        log.info("[Controller:EmployeeMasterController] createEmployee() succeeded - id: {}", createdEmployee.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee);
+    }
 
+    @Operation(summary = "Update employee", description = "Update details of an existing employee.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Employee updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeMasterResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Employee not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeMasterResponseDto> updateEmployee(@PathVariable Long id, @RequestBody EmployeeMasterRequestDto requestDto) {
-        log.info("PUT /api/institute/employees/{} called to update employee: {}", id, requestDto);
-        try {
-            EmployeeMasterResponseDto updatedEmployee = employeeFacade.updateEmployee(id, requestDto);
-            log.info("Employee updated successfully with id: {}", updatedEmployee.getId());
-            return ResponseEntity.ok(updatedEmployee);
-        } catch (Exception e) {
-            log.error("Failed to update employee with id: {}", id, e);
-            return ResponseEntity.status(500).body(null); // or you can return a custom error DTO
-        }
+    public ResponseEntity<EmployeeMasterResponseDto> updateEmployee(
+            @Parameter(description = "Employee ID") @PathVariable Long id, 
+            @Valid @RequestBody EmployeeMasterRequestDto requestDto) {
+        log.info("[Controller:EmployeeMasterController] updateEmployee() called - id: {}", id);
+        EmployeeMasterResponseDto updatedEmployee = nEmployeeMasterFacade.updateEmployee(id, requestDto);
+        log.info("[Controller:EmployeeMasterController] updateEmployee() succeeded - id: {}", updatedEmployee.getId());
+        return ResponseEntity.ok(updatedEmployee);
     }
 
-
+    @Operation(summary = "Get employee addresses", description = "Retrieve a list of addresses associated with an employee.")
+    @ApiResponse(responseCode = "200", description = "Addresses retrieved successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeAddressResponseDto.class)))
     @GetMapping(value = "/{employeeId}/addresses", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EmployeeAddressResponseDto>> getEmployeeAddresses(@PathVariable Long employeeId) {
-        log.info("GET /api/institute/employees/{}/addresses called", employeeId);
-        try {
-            List<EmployeeAddressResponseDto> addresses = employeeAddressFacade.getEmployeeAddresses(employeeId);
-            log.info("Returned {} addresses for employeeId={}", addresses.size(), employeeId);
-            return ResponseEntity.ok(addresses);
-        } catch (Exception e) {
-            log.error("Failed to fetch addresses for employeeId={}", employeeId, e);
-            return ResponseEntity.status(500).build();
-        }
+    public ResponseEntity<List<EmployeeAddressResponseDto>> getEmployeeAddresses(
+            @Parameter(description = "Employee ID") @PathVariable Long employeeId) {
+        log.info("[Controller:EmployeeMasterController] getEmployeeAddresses() called - employeeId: {}", employeeId);
+        List<EmployeeAddressResponseDto> addresses = nEmployeeAddressFacade.getEmployeeAddresses(employeeId);
+        log.info("[Controller:EmployeeMasterController] getEmployeeAddresses() succeeded - Found {} addresses for employeeId: {}", addresses.size(), employeeId);
+        return ResponseEntity.ok(addresses);
     }
 
+    @Operation(summary = "Get employee address by ID", description = "Retrieve a specific address entry by its ID.")
+    @ApiResponse(responseCode = "200", description = "Address retrieved successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeAddressResponseDto.class)))
     @GetMapping(value = "/addresses/{addressId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeAddressResponseDto> getEmployeeAddressById(@PathVariable Long addressId) {
-        log.info("GET /api/institute/employees/addresses/{} called", addressId);
-        try {
-            EmployeeAddressResponseDto address = employeeAddressFacade.getAddressById(addressId);
-            if (address == null) {
-                log.warn("Address not found with id={}", addressId);
-                return ResponseEntity.notFound().build();
-            }
-            log.info("Returning address with id={}", addressId);
-            return ResponseEntity.ok(address);
-        } catch (Exception e) {
-            log.error("Failed to fetch address with id={}", addressId, e);
-            return ResponseEntity.status(500).build();
+    public ResponseEntity<EmployeeAddressResponseDto> getEmployeeAddressById(
+            @Parameter(description = "Address ID") @PathVariable Long addressId) {
+        log.info("[Controller:EmployeeMasterController] getEmployeeAddressById() called - addressId: {}", addressId);
+        EmployeeAddressResponseDto address = nEmployeeAddressFacade.getAddressById(addressId);
+        if (address == null) {
+            log.warn("[Controller:EmployeeMasterController] getEmployeeAddressById() failed - Address not found: {}", addressId);
+            return ResponseEntity.notFound().build();
         }
+        log.info("[Controller:EmployeeMasterController] getEmployeeAddressById() succeeded - addressId: {}", addressId);
+        return ResponseEntity.ok(address);
     }
 
-
+    @Operation(summary = "Create employee address", description = "Create a new address entry for an employee.")
+    @ApiResponse(responseCode = "201", description = "Address created successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeAddressResponseDto.class)))
     @PostMapping(value = "/{employeeId}/addresses", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeAddressResponseDto> createEmployeeAddress(@PathVariable Long employeeId, @RequestBody EmployeeAddressRequestDto requestDto) {
-
-        log.info("POST /api/institute/employees/{}/addresses called with data: {}", employeeId, requestDto);
-        try {
-            requestDto.setEmployeeId(employeeId); // ensure the employeeId from path is set
-            EmployeeAddressResponseDto createdAddress = employeeAddressFacade.createAddress(requestDto);
-            log.info("Employee address created successfully with id={}", createdAddress.getId());
-            return ResponseEntity.ok(createdAddress);
-        } catch (Exception e) {
-            log.error("Failed to create employee address for employeeId={}", employeeId, e);
-            return ResponseEntity.status(500).build();
-        }
+    public ResponseEntity<EmployeeAddressResponseDto> createEmployeeAddress(
+            @Parameter(description = "Employee ID") @PathVariable Long employeeId, 
+            @Valid @RequestBody EmployeeAddressRequestDto requestDto) {
+        log.info("[Controller:EmployeeMasterController] createEmployeeAddress() called - employeeId: {}", employeeId);
+        requestDto.setEmployeeId(employeeId);
+        EmployeeAddressResponseDto createdAddress = nEmployeeAddressFacade.createAddress(requestDto);
+        log.info("[Controller:EmployeeMasterController] createEmployeeAddress() succeeded - id: {}", createdAddress.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
     }
 
-    // -------------------------
-// Update an existing employee address
-// -------------------------
+    @Operation(summary = "Update employee address", description = "Update an existing address entry for an employee.")
+    @ApiResponse(responseCode = "200", description = "Address updated successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeAddressResponseDto.class)))
     @PutMapping(value = "/addresses/{addressId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeAddressResponseDto> updateEmployeeAddress(@PathVariable Long addressId, @RequestBody EmployeeAddressRequestDto requestDto) {
-
-        log.info("PUT /api/institute/employees/addresses/{} called with data: {}", addressId, requestDto);
-        try {
-            EmployeeAddressResponseDto updatedAddress = employeeAddressFacade.updateAddress(addressId, requestDto);
-            if (updatedAddress == null) {
-                log.warn("Address not found with id={}", addressId);
-                return ResponseEntity.notFound().build();
-            }
-            log.info("Employee address updated successfully with id={}", addressId);
-            return ResponseEntity.ok(updatedAddress);
-        } catch (Exception e) {
-            log.error("Failed to update employee address with id={}", addressId, e);
-            return ResponseEntity.status(500).build();
+    public ResponseEntity<EmployeeAddressResponseDto> updateEmployeeAddress(
+            @Parameter(description = "Address ID") @PathVariable Long addressId, 
+            @Valid @RequestBody EmployeeAddressRequestDto requestDto) {
+        log.info("[Controller:EmployeeMasterController] updateEmployeeAddress() called - addressId: {}", addressId);
+        EmployeeAddressResponseDto updatedAddress = nEmployeeAddressFacade.updateAddress(addressId, requestDto);
+        if (updatedAddress == null) {
+            log.warn("[Controller:EmployeeMasterController] updateEmployeeAddress() failed - Address not found: {}", addressId);
+            return ResponseEntity.notFound().build();
         }
+        log.info("[Controller:EmployeeMasterController] updateEmployeeAddress() succeeded - addressId: {}", addressId);
+        return ResponseEntity.ok(updatedAddress);
     }
 
+    @Operation(summary = "Get employee count by type", description = "Retrieve a statistical count of employees grouped by employment type.")
+    @ApiResponse(responseCode = "200", description = "Count retrieved successfully",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeTypeCountDTO.class)))
+    @GetMapping(value = "/count-by-type", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EmployeeTypeCountDTO>> getEmployeeCountByType() {
+        log.info("[Controller:EmployeeMasterController] getEmployeeCountByType() called");
+        List<EmployeeTypeCountDTO> countList = nEmployeeMasterFacade.getEmployeeCountByType();
+        log.info("[Controller:EmployeeMasterController] getEmployeeCountByType() succeeded");
+        return ResponseEntity.ok(countList);
+    }
+
+    @Operation(summary = "Search employees", description = "Find employees by a generic keyword search.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved matching employees",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeMasterResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid search keyword",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EmployeeMasterResponseDto>> searchByKeyword(
+            @Parameter(description = "Search keyword", example = "John") @RequestParam String keyword) {
+        log.info("[Controller:EmployeeMasterController] searchByKeyword() called - keyword: '{}'", keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<EmployeeMasterResponseDto> result = nEmployeeMasterFacade.searchByKeyword(keyword.trim());
+        log.info("[Controller:EmployeeMasterController] searchByKeyword() succeeded - Found {} results", result.size());
+        return ResponseEntity.ok(result);
+    }
 }

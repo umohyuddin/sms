@@ -37,7 +37,8 @@ public class EmployeeDeductionService {
     public EmployeeDeductionResponseDTO createDeduction(EmployeeDeductionRequestDTO requestDTO) {
         log.info("Creating new deduction for employeeId={}", requestDTO.getEmployeeId());
         try {
-            EmployeeMasterEntity employee = employeeRepository.findById(requestDTO.getEmployeeId())
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            EmployeeMasterEntity employee = employeeRepository.findByIdAndOrganizationId(requestDTO.getEmployeeId(), orgId)
                     .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + requestDTO.getEmployeeId()));
 
             EmployeeDeductionEntity entity = MapperUtil.mapObject(requestDTO, EmployeeDeductionEntity.class);
@@ -60,7 +61,8 @@ public class EmployeeDeductionService {
     public EmployeeDeductionResponseDTO updateDeduction(Long id, EmployeeDeductionRequestDTO requestDTO) {
         log.info("Updating deduction id={}", id);
         try {
-            EmployeeDeductionEntity existing = deductionRepository.findById(id)
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            EmployeeDeductionEntity existing = deductionRepository.findByIdAndOrganizationIdActive(id, orgId)
                     .orElseThrow(() -> new ResourceNotFoundException("Deduction not found with id: " + id));
 
             existing.setDeductionType(requestDTO.getDeductionType());
@@ -82,7 +84,8 @@ public class EmployeeDeductionService {
        ========================= */
     public EmployeeDeductionResponseDTO getDeductionById(Long id) {
         log.info("Fetching deduction by id={}", id);
-        EmployeeDeductionEntity entity = deductionRepository.findByIdActive(id)
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        EmployeeDeductionEntity entity = deductionRepository.findByIdAndOrganizationIdActive(id, orgId)
                 .orElseThrow(() -> new ResourceNotFoundException("Deduction not found with id: " + id));
         return MapperUtil.mapObject(entity, EmployeeDeductionResponseDTO.class);
     }
@@ -92,7 +95,8 @@ public class EmployeeDeductionService {
        ========================= */
     public List<EmployeeDeductionResponseDTO> getAllDeductions() {
         log.info("Fetching all deductions");
-        List<EmployeeDeductionEntity> entities = deductionRepository.findAllActive();
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        List<EmployeeDeductionEntity> entities = deductionRepository.findAllActive(orgId);
         return entities.stream().map(e -> MapperUtil.mapObject(e, EmployeeDeductionResponseDTO.class)).collect(Collectors.toList());
     }
 
@@ -101,7 +105,8 @@ public class EmployeeDeductionService {
        ========================= */
     public List<EmployeeDeductionResponseDTO> getDeductionsForEmployee(Long employeeId) {
         log.info("Fetching deductions for employeeId={}", employeeId);
-        List<EmployeeDeductionEntity> entities = deductionRepository.findAllByEmployeeIdActive(employeeId);
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        List<EmployeeDeductionEntity> entities = deductionRepository.findAllByEmployeeIdAndOrganizationIdActive(employeeId, orgId);
         return entities.stream().map(e -> MapperUtil.mapObject(e, EmployeeDeductionResponseDTO.class)).collect(Collectors.toList());
     }
 
@@ -111,18 +116,20 @@ public class EmployeeDeductionService {
     @Transactional
     public void softDeleteDeduction(Long id) {
         log.info("Soft deleting deduction id={}", id);
-        deductionRepository.softDeleteById(id);
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        deductionRepository.softDeleteByIdAndOrganizationId(id, orgId);
         log.info("Deduction soft deleted successfully id={}", id);
     }
 
     public EmployeeWithDeductionsDTO getEmployeeWithDeductions(Long employeeId) {
         log.info("Fetching employee with deductions for employeeId={}", employeeId);
+        Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
 
-        EmployeeMasterEntity employee = employeeRepository.findById(employeeId)
+        EmployeeMasterEntity employee = employeeRepository.findByIdAndOrganizationId(employeeId, orgId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + employeeId));
 
         // Fetch active deductions only
-        List<EmployeeDeductionEntity> deductions = deductionRepository.findAllByEmployeeIdActive(employeeId);
+        List<EmployeeDeductionEntity> deductions = deductionRepository.findAllByEmployeeIdAndOrganizationIdActive(employeeId, orgId);
 
         // Map deductions to DTO
         List<EmployeeDeductionDTO> deductionDTOs = deductions.stream()

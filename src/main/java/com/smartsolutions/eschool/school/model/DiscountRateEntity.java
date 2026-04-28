@@ -6,9 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.domain.Auditable;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -35,7 +33,6 @@ public class DiscountRateEntity extends AuditableEntity {
     private Boolean isActive = true;
 
     private Boolean deleted = false;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "discount_sub_type_id", nullable = false)

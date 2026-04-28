@@ -72,7 +72,7 @@ public class InventoryDaoImp implements InventoryDao {
     public List<InventoryEntity> findByCampus(Long id) {
         String hql = "From InventoryEntity e WHERE e.campusId=:id";
         TypedQuery<InventoryEntity> query = entityManager.createQuery(hql,InventoryEntity.class);
-
+        query.setParameter("id", id);
         return query.getResultList();
     }
 
@@ -81,7 +81,6 @@ public class InventoryDaoImp implements InventoryDao {
     public List<InventoryEntity> findByInstitute(Long id) {
         String hql = "From InventoryEntity";
         TypedQuery<InventoryEntity> query = entityManager.createQuery(hql,InventoryEntity.class);
-
         return query.getResultList();
     }
 
@@ -89,7 +88,14 @@ public class InventoryDaoImp implements InventoryDao {
     public List<InventoryEntity> findAll() {
         String hql = "From InventoryEntity";
         TypedQuery<InventoryEntity> query = entityManager.createQuery(hql,InventoryEntity.class);
+        return query.getResultList();
+    }
 
+    @Override
+    public List<InventoryEntity> searchByKeyword(String keyword) {
+        String hql = "FROM InventoryEntity e WHERE LOWER(e.itemName) LIKE LOWER(:keyword) OR LOWER(e.itemCode) LIKE LOWER(:keyword)";
+        TypedQuery<InventoryEntity> query = entityManager.createQuery(hql, InventoryEntity.class);
+        query.setParameter("keyword", "%" + keyword + "%");
         return query.getResultList();
     }
 }
