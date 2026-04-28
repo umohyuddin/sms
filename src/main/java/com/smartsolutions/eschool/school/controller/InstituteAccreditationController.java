@@ -103,7 +103,7 @@ public class InstituteAccreditationController {
         log.info(
                 "[Controller:InstituteAccreditationController] deleteAccreditation() succeeded - Accreditation: {} deleted successfully",
                 accreditationId);
-        return ResponseEntity.ok("Institute accreditation deleted successfully");
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)

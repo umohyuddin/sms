@@ -79,8 +79,7 @@ public class Dashboard360Facade {
         Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
         log.info("[Facade:DashboardFacade] getStudentStats() called - orgId: {}", orgId);
         return StudentDashboardResponse.builder()
-                .enrollmentTrend(KpiMetric.builder().currentValue((double) nStudentService.countStudents(filter, orgId)).build())
-                .studentsByStandard(nStudentService.getStudentsByStandardDistribution(filter, orgId))
+                .campuses(nStudentService.getCampusClassDistribution(filter, orgId))
                 .build();
     }
 

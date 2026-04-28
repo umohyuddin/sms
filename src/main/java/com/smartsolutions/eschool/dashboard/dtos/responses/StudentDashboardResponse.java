@@ -1,20 +1,19 @@
 package com.smartsolutions.eschool.dashboard.dtos.responses;
 
-import com.smartsolutions.eschool.dashboard.dtos.KpiMetric;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Response containing detailed student analytics breakdown")
 public class StudentDashboardResponse {
-    private KpiMetric enrollmentTrend;
-    private Map<String, Long> genderDistribution;
-    private Map<String, Long> admissionBySource;
-    private Map<String, Long> studentsByStandard;
+    @Schema(description = "Hierarchical distribution of students by campus and class")
+    private List<CampusStudentDistribution> campuses;
 }

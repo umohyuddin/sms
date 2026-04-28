@@ -377,8 +377,15 @@ public class StudentService {
         java.time.LocalDateTime fromDateTime = from.atStartOfDay();
         java.time.LocalDateTime toDateTime = to.atTime(java.time.LocalTime.MAX);
         
-        log.info("[Service:StudentService] countWithdrawals() - orgId: {}, from: {}, to: {}", orgId, fromDateTime, toDateTime);
-        Long count = studentRepository.countWithdrawals(fromDateTime, toDateTime, filter.getCampusIds(), orgId);
+        Long academicYearId = filter.getAcademicYearId();
+        if (academicYearId == null) {
+            academicYearId = academicYearRepository.findByIsCurrentTrue()
+                    .map(AcademicYearEntity::getId)
+                    .orElse(null);
+        }
+        
+        log.info("[Service:StudentService] countWithdrawals() - orgId: {}, academicYearId: {}, from: {}, to: {}", orgId, academicYearId, fromDateTime, toDateTime);
+        Long count = studentRepository.countWithdrawals(fromDateTime, toDateTime, filter.getCampusIds(), academicYearId, orgId);
         log.info("[Service:StudentService] countWithdrawals() succeeded - count: {}", count);
         return count;
     }
@@ -387,9 +394,17 @@ public class StudentService {
     public Long countNewAdmissions(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         LocalDate from = filter.getFromDate() != null ? filter.getFromDate() : LocalDate.now().minusMonths(1);
         LocalDate to = filter.getToDate() != null ? filter.getToDate() : LocalDate.now();
-        log.info("[Service:StudentService] countNewAdmissions() - orgId: {}, campusIds: {}, from: {}, to: {}", 
-                 orgId, filter.getCampusIds(), from, to);
-        Long count = studentRepository.countNewAdmissions(from, to, filter.getCampusIds(), filter.getStandardId(), filter.getSectionId(), orgId);
+        
+        Long academicYearId = filter.getAcademicYearId();
+        if (academicYearId == null) {
+            academicYearId = academicYearRepository.findByIsCurrentTrue()
+                    .map(AcademicYearEntity::getId)
+                    .orElse(null);
+        }
+
+        log.info("[Service:StudentService] countNewAdmissions() - orgId: {}, campusIds: {}, academicYearId: {}, from: {}, to: {}", 
+                 orgId, filter.getCampusIds(), academicYearId, from, to);
+        Long count = studentRepository.countNewAdmissions(from, to, filter.getCampusIds(), academicYearId, filter.getStandardId(), filter.getSectionId(), orgId);
         log.info("[Service:StudentService] countNewAdmissions() succeeded - count: {}", count);
         return count;
     }
@@ -408,16 +423,45 @@ public class StudentService {
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public Map<String, Long> getStudentsByStandardDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
-        log.info("[Service:StudentService] getStudentsByStandardDistribution() called - orgId: {}", orgId);
-        List<Object[]> results = studentRepository.countByStandardDistribution(filter.getCampusIds(), filter.getToDate(), orgId);
-        Map<String, Long> distribution = new HashMap<>();
-        for (Object[] row : results) {
-            String standard = row[0] != null ? row[0].toString() : "N/A";
-            distribution.put(standard, (Long) row[1]);
+    public List<com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution> getCampusClassDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:StudentService] getCampusClassDistribution() called - orgId: {}", orgId);
+
+        // Fallback: resolve current academic year from DB if not provided
+        Long academicYearId = filter.getAcademicYearId();
+        if (academicYearId == null) {
+            academicYearId = academicYearRepository.findByIsCurrentTrue()
+                    .map(AcademicYearEntity::getId)
+                    .orElse(null);
         }
-        log.info("[Service:StudentService] getStudentsByStandardDistribution() succeeded - found distributions: {}", distribution.size());
-        return distribution;
+
+        List<Object[]> results = studentRepository.getCampusClassDistribution(
+                filter.getCampusIds(), academicYearId, filter.getFromDate(), filter.getToDate(), orgId);
+
+        // Group by campusName
+        Map<String, List<Object[]>> byCampus = results.stream()
+                .collect(Collectors.groupingBy(row -> row[0] != null ? row[0].toString() : "Unknown Campus"));
+
+        List<com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution> response = new ArrayList<>();
+        for (Map.Entry<String, List<Object[]>> entry : byCampus.entrySet()) {
+            List<com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution> classes = entry.getValue().stream().map(row -> {
+                return com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution.builder()
+                        .className(row[1] != null ? row[1].toString() : "N/A")
+                        .total(((Number) row[2]).longValue())
+                        .active(row[3] != null ? ((Number) row[3]).longValue() : 0L)
+                        .male(row[4] != null ? ((Number) row[4]).longValue() : 0L)
+                        .female(row[5] != null ? ((Number) row[5]).longValue() : 0L)
+                        .other(row[6] != null ? ((Number) row[6]).longValue() : 0L)
+                        .build();
+            }).collect(Collectors.toList());
+
+            response.add(com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution.builder()
+                    .campus(entry.getKey())
+                    .classes(classes)
+                    .build());
+        }
+
+        log.info("[Service:StudentService] getCampusClassDistribution() succeeded - found {} campuses", response.size());
+        return response;
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
