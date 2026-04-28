@@ -1,7 +1,6 @@
 package com.smartsolutions.eschool.school.facade;
 
 import com.smartsolutions.eschool.school.dtos.schoolTypes.requestDto.SchoolTypeCreateRequestDTO;
-import com.smartsolutions.eschool.school.dtos.schoolTypes.requestDto.SchoolTypeUpdateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.schoolTypes.responseDto.SchoolTypeResponseDTO;
 import com.smartsolutions.eschool.school.service.SchoolTypeService;
 import lombok.extern.slf4j.Slf4j;
@@ -9,77 +8,67 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Scope("prototype")
 @Slf4j
 public class SchoolTypeFacade {
 
-    private final SchoolTypeService schoolTypeService;
+    private final SchoolTypeService nSchoolTypeService;
 
-    public SchoolTypeFacade(SchoolTypeService schoolTypeService) {
-        this.schoolTypeService = schoolTypeService;
-    }
-
-    public SchoolTypeResponseDTO createSchoolType(SchoolTypeCreateRequestDTO requestDTO) {
-        log.info("Facade: Request to create SchoolType: {}", requestDTO.getCode());
-        SchoolTypeResponseDTO result = schoolTypeService.createSchoolType(requestDTO);
-        log.info("Facade: Successfully created SchoolType with id: {}", result.getId());
-        return result;
+    public SchoolTypeFacade(SchoolTypeService nSchoolTypeService) {
+        this.nSchoolTypeService = nSchoolTypeService;
     }
 
     public List<SchoolTypeResponseDTO> getAll() {
-        log.info("Facade: Request to fetch all SchoolTypes");
-        List<SchoolTypeResponseDTO> result = schoolTypeService.getAll();
-        log.info("Facade: Successfully fetched {} SchoolTypes", result.size());
-        return result;
+        log.info("[Facade:SchoolTypeFacade] getAll() called");
+        return nSchoolTypeService.getAll();
     }
 
     public List<SchoolTypeResponseDTO> getAllActive() {
-        log.info("Facade: Request to fetch all active SchoolTypes");
-        List<SchoolTypeResponseDTO> result = schoolTypeService.getAllActive();
-        log.info("Facade: Successfully fetched {} active SchoolTypes", result.size());
-        return result;
+        log.info("[Facade:SchoolTypeFacade] getAllActive() called");
+        return nSchoolTypeService.getAllActive();
     }
 
     public SchoolTypeResponseDTO getById(Long id) {
-        log.info("Facade: Request to fetch SchoolType by id: {}", id);
-        SchoolTypeResponseDTO result = schoolTypeService.getById(id);
-        log.info("Facade: Successfully fetched SchoolType: id={}", id);
-        return result;
+        log.info("[Facade:SchoolTypeFacade] getById() called - id: {}", id);
+        return nSchoolTypeService.getById(id);
     }
 
-    public SchoolTypeResponseDTO updateSchoolType(Long id, SchoolTypeUpdateRequestDTO requestDTO) {
-        log.info("Facade: Request to update SchoolType id: {}", id);
-        SchoolTypeResponseDTO result = schoolTypeService.updateSchoolType(id, requestDTO);
-        log.info("Facade: Successfully updated SchoolType: id={}", result.getId());
-        return result;
+    public SchoolTypeResponseDTO create(SchoolTypeCreateRequestDTO requestDTO) {
+        log.info("[Facade:SchoolTypeFacade] create() called");
+        return nSchoolTypeService.create(requestDTO);
     }
 
-    public void deleteById(Long id) {
-        log.info("Facade: Request to delete SchoolType by id: {}", id);
-        schoolTypeService.deleteById(id);
-        log.info("Facade: Successfully deleted SchoolType: id={}", id);
+    public SchoolTypeResponseDTO update(Long id, SchoolTypeCreateRequestDTO requestDTO) {
+        log.info("[Facade:SchoolTypeFacade] update() called - id: {}", id);
+        return nSchoolTypeService.update(id, requestDTO);
+    }
+
+    public void softDeleteById(Long id) {
+        log.info("[Facade:SchoolTypeFacade] softDeleteById() called - id: {}", id);
+        nSchoolTypeService.softDeleteById(id);
     }
 
     public List<SchoolTypeResponseDTO> searchByKeyword(String keyword) {
-        log.info("Facade: Request to search SchoolTypes with keyword: '{}'", keyword);
-        List<SchoolTypeResponseDTO> result = schoolTypeService.searchByKeyword(keyword);
-        log.info("Facade: Search completed, found {} SchoolTypes", result.size());
-        return result;
+        log.info("[Facade:SchoolTypeFacade] searchByKeyword() called - keyword: {}", keyword);
+        return nSchoolTypeService.searchByKeyword(keyword);
     }
 
     public SchoolTypeResponseDTO activate(Long id) {
-        log.info("Facade: Request to activate SchoolType id: {}", id);
-        SchoolTypeResponseDTO result = schoolTypeService.activate(id);
-        log.info("Facade: Successfully activated SchoolType: id={}", id);
-        return result;
+        log.info("[Facade:SchoolTypeFacade] activate() called - id: {}", id);
+        return nSchoolTypeService.activate(id);
     }
 
     public SchoolTypeResponseDTO deactivate(Long id) {
-        log.info("Facade: Request to deactivate SchoolType id: {}", id);
-        SchoolTypeResponseDTO result = schoolTypeService.deactivate(id);
-        log.info("Facade: Successfully deactivated SchoolType: id={}", id);
-        return result;
+        log.info("[Facade:SchoolTypeFacade] deactivate() called - id: {}", id);
+        return nSchoolTypeService.deactivate(id);
+    }
+
+    public Map<String, Long> getStatistics() {
+        log.info("[Facade:SchoolTypeFacade] getStatistics() called");
+        return nSchoolTypeService.getStatistics();
     }
 }
+
