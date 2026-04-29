@@ -88,7 +88,7 @@ public class StudentDaoImp implements StudentDao{
 
     @Override
     public List<StudentEntity> findByCampus(Long cmp_id) {
-        String hql = "FROM StudentEntity c WHERE c.campusId = :cmp_id";
+        String hql = "FROM StudentEntity c WHERE c.campus.id = :cmp_id";
         TypedQuery<StudentEntity> query = entityManager.createQuery(hql, StudentEntity.class);
         query.setParameter("cmp_id", cmp_id);
         return query.getResultList();

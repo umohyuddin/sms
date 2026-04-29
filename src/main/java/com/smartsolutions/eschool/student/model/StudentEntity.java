@@ -5,6 +5,8 @@ import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
+import com.smartsolutions.eschool.user.model.SystemUserEntity;
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class StudentEntity {
+public class StudentEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +30,9 @@ public class StudentEntity {
 
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
+
+    @Column(name = "middle_name", length = 50)
+    private String middleName;
 
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
@@ -80,17 +85,6 @@ public class StudentEntity {
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
     // --- RELATIONSHIPS --- //
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -115,6 +109,12 @@ public class StudentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id", nullable = false)
     private AcademicYearEntity academicYear;
+    
+    // One-to-One relationship with System User
+    @OneToOne(mappedBy = "student", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private SystemUserEntity systemUser;
+    
     // Optional: bidirectional mapping to fees
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

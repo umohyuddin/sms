@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.employee.repository;
 
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeTypeCountDTO;
 import com.smartsolutions.eschool.employee.model.EmployeeAddressEntity;
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,81 +16,89 @@ import java.util.Optional;
 public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEntity, Long> {
 
 
+    @Query("SELECT e FROM EmployeeMasterEntity e LEFT JOIN FETCH e.employeeType WHERE e.organizationId = :organizationId")
+    List<EmployeeMasterEntity> findAllNonDeleted(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT e FROM EmployeeMasterEntity e " +
-            "LEFT JOIN FETCH e.employeeType " +
-            "WHERE e.active = true")
-    List<EmployeeMasterEntity> findAllWithEmployeeType();    // -------------------------
-    // Find by ID
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.id = :id")
-    Optional<EmployeeMasterEntity> findById(@Param("id") Long id);
+    @Query("SELECT e FROM EmployeeMasterEntity e LEFT JOIN FETCH e.employeeType WHERE e.id = :id AND e.organizationId = :organizationId")
+    Optional<EmployeeMasterEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
-    // -------------------------
-    // Find by employee code
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.employeeCode = :code")
-    Optional<EmployeeMasterEntity> findByEmployeeCode(@Param("code") String code);
+    @Query("SELECT e FROM EmployeeMasterEntity e LEFT JOIN FETCH e.employeeType WHERE e.employeeCode = :code AND e.organizationId = :organizationId")
+    Optional<EmployeeMasterEntity> findByEmployeeCodeAndOrganizationId(@Param("code") String code, @Param("organizationId") Long organizationId);
 
-    // -------------------------
-    // Search by  name
-    // -------------------------
+    @Query("""
+        SELECT e FROM EmployeeMasterEntity e
+        WHERE e.organizationId = :organizationId
+          AND (LOWER(e.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.employeeCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(e.primaryPhone) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    """)
+    List<EmployeeMasterEntity> searchByKeyword(@Param("keyword") String keyword, @Param("organizationId") Long organizationId);
 
-    @Query("SELECT e FROM EmployeeMasterEntity e " +
-            "WHERE LOWER(e.firstName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :name, '%')) " +
-            "OR LOWER(e.fullName) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<EmployeeMasterEntity> searchByName(@Param("name") String name);
+    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.gender = :gender AND e.organizationId = :organizationId")
+    List<EmployeeMasterEntity> findByGender(@Param("gender") String gender, @Param("organizationId") Long organizationId);
 
-    // -------------------------
-    // Filter by gender
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.gender = :gender")
-    List<EmployeeMasterEntity> findByGender(@Param("gender") String gender);
+    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.active = :status AND e.organizationId = :organizationId")
+    List<EmployeeMasterEntity> findByActiveStatus(@Param("status") Boolean status, @Param("organizationId") Long organizationId);
 
-    // -------------------------
-    // Filter by active status
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.active = :status")
-    List<EmployeeMasterEntity> findByActiveStatus(@Param("status") Boolean status);
+    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.organizationId = :organizationId AND e.joiningDate BETWEEN :start AND :end")
+    List<EmployeeMasterEntity> findByJoiningDateBetween(@Param("start") Date start, @Param("end") Date end, @Param("organizationId") Long organizationId);
 
-    // -------------------------
-    // Filter by joining date range
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.joiningDate BETWEEN :start AND :end")
-    List<EmployeeMasterEntity> findByJoiningDateBetween(@Param("start") Date start, @Param("end") Date end);
+    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.organizationId = :organizationId AND e.probationEndDate < :date")
+    List<EmployeeMasterEntity> findProbationEndedBefore(@Param("date") Date date, @Param("organizationId") Long organizationId);
 
-    // -------------------------
-    // Filter by probation end date
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.probationEndDate < :date")
-    List<EmployeeMasterEntity> findProbationEndedBefore(@Param("date") Date date);
+    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.organizationId = :organizationId")
+    long countAllEmployees(@Param("organizationId") Long organizationId);
 
+    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = TRUE AND e.organizationId = :organizationId")
+    long countActiveEmployees(@Param("organizationId") Long organizationId);
 
-    // -------------------------
-    // Count queries
-    // -------------------------
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e")
-    long countAllEmployees();
+    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = FALSE AND e.organizationId = :organizationId")
+    long countInactiveEmployees(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = TRUE")
-    long countActiveEmployees();
+    @Query("SELECT e.gender, COUNT(e) FROM EmployeeMasterEntity e WHERE e.organizationId = :organizationId GROUP BY e.gender")
+    List<Object[]> countEmployeesByGender(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT COUNT(e) FROM EmployeeMasterEntity e WHERE e.active = FALSE")
-    long countInactiveEmployees();
+    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.organizationId = :organizationId ORDER BY e.joiningDate DESC")
+    List<EmployeeMasterEntity> findAllOrderByJoiningDateDesc(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT e.gender, COUNT(e) FROM EmployeeMasterEntity e GROUP BY e.gender")
-    List<Object[]> countEmployeesByGender();
+    @Query("SELECT e FROM EmployeeMasterEntity e WHERE e.organizationId = :organizationId ORDER BY e.dateOfBirth ASC")
+    List<EmployeeMasterEntity> findAllOrderByDateOfBirthAsc(@Param("organizationId") Long organizationId);
 
-    // -------------------------
-    // Ordering / Sorting
-    // -------------------------
-    @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.joiningDate DESC")
-    List<EmployeeMasterEntity> findAllOrderByJoiningDateDesc();
+    @Query("""
+        SELECT 
+            et.id AS employeeTypeId,
+            et.name AS employeeTypeName,
+            COUNT(e.id) AS totalEmployees
+        FROM EmployeeMasterEntity e
+        JOIN e.employeeType et
+        WHERE e.active = true AND e.organizationId = :organizationId
+        GROUP BY et.id, et.name
+    """)
+    List<EmployeeTypeCountDTO> countEmployeesByType(@Param("organizationId") Long organizationId);
 
-    @Query("SELECT e FROM EmployeeMasterEntity e ORDER BY e.dateOfBirth ASC")
-    List<EmployeeMasterEntity> findAllOrderByDateOfBirthAsc();
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE EmployeeMasterEntity e SET e.deleted = true WHERE e.id = :id AND e.organizationId = :organizationId")
+    int softDeleteByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 
+    @Query("""
+        SELECT COUNT(e) FROM EmployeeMasterEntity e
+        LEFT JOIN EmployeeAssignmentEntity a ON a.employee.id = e.id AND a.isPrimary = true
+        WHERE e.organizationId = :organizationId AND e.deleted = false
+          AND (:campusIds IS NULL OR a.campus.id IN :campusIds)
+    """)
+    long countEmployeesByFilters(@Param("campusIds") java.util.List<Long> campusIds, @Param("organizationId") Long organizationId);
 
-
+    @Query("""
+        SELECT e.employeeType.name, COUNT(e) FROM EmployeeMasterEntity e
+        LEFT JOIN EmployeeAssignmentEntity a ON a.employee.id = e.id AND a.isPrimary = true
+        WHERE e.organizationId = :organizationId AND e.deleted = false
+          AND (:campusIds IS NULL OR a.campus.id IN :campusIds)
+        GROUP BY e.employeeType.name
+    """)
+    java.util.List<Object[]> countEmployeesByTypeDistribution(@Param("campusIds") java.util.List<Long> campusIds, @Param("organizationId") Long organizationId);
 }
+
+

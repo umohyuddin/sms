@@ -1,14 +1,11 @@
 package com.smartsolutions.eschool.school.dtos.discountType.responseDto;
 
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.smartsolutions.eschool.school.dtos.chargetype.response.ChargeTypeResponseDTO;
+import com.smartsolutions.eschool.lookups.dtos.feeRecurrenceRule.responseDto.FeeRecurrenceRuleResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -20,13 +17,11 @@ public class DiscountTypeResponseDTO {
     private String code;
     private String name;
     private String description;
-
     private Boolean active;
-    private String chargeType;          // raw value
-    private String chargeTypeLabel;     // human-readable
-    private String recurrenceRule;      // raw value
-    private String recurrenceRuleLabel; // human-readable
-    //private Integer priority;
-    //private Integer displayOrder;
 
+    private ChargeTypeResponseDTO chargeType;
+    private FeeRecurrenceRuleResponseDTO recurrenceRule;
+
+    private Integer priority;
+    private Integer displayOrder;
 }

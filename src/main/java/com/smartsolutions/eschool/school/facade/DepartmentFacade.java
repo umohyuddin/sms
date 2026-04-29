@@ -1,55 +1,63 @@
 package com.smartsolutions.eschool.school.facade;
 
-import com.smartsolutions.eschool.school.dtos.departments.request.DepartmentRequestDTO;
+import com.smartsolutions.eschool.school.dtos.departments.requestDto.DepartmentCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentResponseDTO;
-import com.smartsolutions.eschool.school.dtos.discountType.requestDto.DiscountTypeRequestDTO;
-import com.smartsolutions.eschool.school.dtos.discountType.responseDto.DiscountTypeResponseDTO;
 import com.smartsolutions.eschool.school.service.DepartmentService;
-import com.smartsolutions.eschool.school.service.DiscountTypeService;
-import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class DepartmentFacade {
 
-    private final DepartmentService departmentService;
+    private final DepartmentService nDepartmentService;
 
-    public DepartmentFacade(DepartmentService departmentService) {
-        this.departmentService = departmentService;
-    }
-
-    public DepartmentResponseDTO createDepartment(@Valid DepartmentRequestDTO requestDTO) {
-        return departmentService.createDepartment(requestDTO);
+    public DepartmentFacade(DepartmentService nDepartmentService) {
+        this.nDepartmentService = nDepartmentService;
     }
 
     public List<DepartmentResponseDTO> getAll() {
-        return departmentService.getAllDepartments();
+        log.info("[Facade:DepartmentFacade] getAll() called");
+        return nDepartmentService.getAll();
     }
 
-    public DepartmentResponseDTO getById(Long departmentId) {
-        return departmentService.getDepartmentById(departmentId);
+    public List<DepartmentResponseDTO> getByCampusId(Long campusId) {
+        log.info("[Facade:DepartmentFacade] getByCampusId() called - campus: {}", campusId);
+        return nDepartmentService.getByCampusId(campusId);
     }
 
-    public List<DepartmentResponseDTO> getAllActive() {
-        return departmentService.getAllActiveDepartments();
+    public DepartmentResponseDTO getById(Long id) {
+        log.info("[Facade:DepartmentFacade] getById() called - id: {}", id);
+        return nDepartmentService.getById(id);
     }
 
-    public DepartmentResponseDTO updateDepartment(
-            Long departmentId,
-            @Valid DepartmentRequestDTO requestDTO
-    ) {
-        return departmentService.updateDepartment(departmentId, requestDTO);
+    public void softDeleteById(Long id) {
+        log.info("[Facade:DepartmentFacade] softDeleteById() called - id: {}", id);
+        nDepartmentService.softDeleteById(id);
     }
 
-
-    public List<DepartmentResponseDTO> searchDepartments(String keyword) {
-        return departmentService.searchDepartments(keyword);
+    public DepartmentResponseDTO createDepartment(DepartmentCreateRequestDTO dto) {
+        log.info("[Facade:DepartmentFacade] createDepartment() called - name: {}", dto.getDepartmentName());
+        return nDepartmentService.createDepartment(dto);
     }
-    public void deleteById(Long departmentId) {
-        departmentService.deleteDepartment(departmentId);
+
+    public DepartmentResponseDTO updateDepartment(Long id, DepartmentCreateRequestDTO dto) {
+        log.info("[Facade:DepartmentFacade] updateDepartment() called - id: {}", id);
+        return nDepartmentService.updateDepartment(id, dto);
+    }
+
+    public List<DepartmentResponseDTO> searchByKeyword(String keyword) {
+        log.info("[Facade:DepartmentFacade] searchByKeyword() called - keyword: {}", keyword);
+        return nDepartmentService.searchByKeyword(keyword);
+    }
+
+    public Map<String, Long> getStatistics() {
+        log.info("[Facade:DepartmentFacade] getStatistics() called");
+        return nDepartmentService.getStatistics();
     }
 }

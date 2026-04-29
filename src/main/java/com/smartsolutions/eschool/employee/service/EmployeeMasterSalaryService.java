@@ -7,15 +7,10 @@ import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.Em
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
 import com.smartsolutions.eschool.employee.model.*;
 import com.smartsolutions.eschool.employee.repository.*;
-import com.smartsolutions.eschool.global.enums.SalaryStatus;
 import com.smartsolutions.eschool.global.exception.CustomServiceException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.school.dtos.departments.response.DepartmentResponseDTO;
-import com.smartsolutions.eschool.school.dtos.designations.response.DesignationResponseDTO;
-import com.smartsolutions.eschool.school.model.DepartmentEntity;
-import com.smartsolutions.eschool.school.model.DesignationEntity;
-import com.smartsolutions.eschool.school.repository.DepartmentRepository;
-import com.smartsolutions.eschool.school.repository.DesignationRepository;
+import com.smartsolutions.eschool.school.mapper.DepartmentMapper;
+import com.smartsolutions.eschool.school.mapper.DesignationMapper;
 import com.smartsolutions.eschool.util.MapperUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -38,8 +33,7 @@ public class EmployeeMasterSalaryService {
     private final EmployeeMasterSalaryRepository salaryRepository;
     private final EmployeeMasterRepository employeeMasterRepository;
     private final SalaryStructureRepository salaryStructureRepository;
-    private final EmployeeDepartmentHistoryRepository employeeDepartmentHistoryRepository;
-    private final EmployeeDesignationHistoryRepository designationHistoryRepository;
+    private final EmployeeAssignmentRepository employeeAssignmentRepository;
     private final EmployeeTypeHistoryRepository employeeTypeHistoryRepository;
 
 
@@ -249,10 +243,8 @@ public class EmployeeMasterSalaryService {
 
         var employee = salaryEntity.getEmployee();
 
-        // Extract current histories from the fetched joins
-        EmployeeDepartmentHistoryEntity currentDept = null;
-        EmployeeDesignationHistoryEntity currentDesig = null;
-        EmployeeTypeHistoryEntity currentType = null;
+        // Extract primary assignment from the fetched joins
+        EmployeeAssignmentEntity primaryAssignment = null;
 
         // LEFT JOIN FETCH results will be available in memory
         if (salaryEntity instanceof org.hibernate.proxy.HibernateProxy) {
@@ -260,23 +252,17 @@ public class EmployeeMasterSalaryService {
             org.hibernate.Hibernate.initialize(employee);
         }
 
-        if (employee.getDepartmentHistories() != null) {
-            currentDept = employee.getDepartmentHistories()
-                    .stream().filter(EmployeeDepartmentHistoryEntity::getIsCurrent)
+        if (employee.getAssignments() != null) {
+            primaryAssignment = employee.getAssignments()
+                    .stream().filter(EmployeeAssignmentEntity::getIsPrimary)
                     .findFirst().orElse(null);
         }
 
-        if (employee.getDesignationHistories() != null) {
-            currentDesig = employee.getDesignationHistories()
-                    .stream().filter(EmployeeDesignationHistoryEntity::getIsCurrent)
-                    .findFirst().orElse(null);
-        }
-
-        if (employee.getTypeHistories() != null) {
-            currentType = employee.getTypeHistories()
-                    .stream().filter(EmployeeTypeHistoryEntity::getIsCurrent)
-                    .findFirst().orElse(null);
-        }
+//        if (employee.getTypeHistories() != null) {
+//            currentType = employee.getTypeHistories()
+//                    .stream().filter(EmployeeTypeHistoryEntity::getIsCurrent)
+//                    .findFirst().orElse(null);
+//        }
 
         String employeeTypeName = null;
         if (employee.getEmployeeType() != null) {
@@ -300,8 +286,8 @@ public class EmployeeMasterSalaryService {
                 .updatedAt(salaryEntity.getUpdatedAt())
                 // Nested DTOs
                 .employee(EmployeeMasterResponseDto.fromEntity(employee))
-                .designation(currentDesig != null ? DesignationResponseDTO.fromEntity(currentDesig.getDesignation()) : null)
-                .department(currentDept != null ? DepartmentResponseDTO.fromEntity(currentDept.getDepartment()) : null)
+                .designation(primaryAssignment != null ? DesignationMapper.toResponseDTO(primaryAssignment.getDesignation()) : null)
+                .department(primaryAssignment != null ? DepartmentMapper.toResponseDTO(primaryAssignment.getDepartment()) : null)
                 .build();
     }
 

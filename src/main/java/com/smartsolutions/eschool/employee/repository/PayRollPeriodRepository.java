@@ -16,28 +16,19 @@ import java.util.Optional;
 @Repository
 public interface PayRollPeriodRepository extends JpaRepository<PayrollPeriodEntity, Long> {
 
-    /* =========================
-       FIND BY ID ACTIVE
-       ========================= */
-    @Query("SELECT p FROM PayrollPeriodEntity p WHERE p.id = :id AND p.deleted = false")
-    Optional<PayrollPeriodEntity> findByIdActive(Long id);
+    @Query("SELECT p FROM PayrollPeriodEntity p WHERE p.id = :id")
+    Optional<PayrollPeriodEntity> findById(@Param("id") Long id);
 
-    /* =========================
-       FIND ALL ACTIVE
-       ========================= */
-    @Query("SELECT p FROM PayrollPeriodEntity p WHERE p.deleted = false")
-    List<PayrollPeriodEntity> findAllActive();
+    @Query("SELECT p FROM PayrollPeriodEntity p")
+    List<PayrollPeriodEntity> findAllNonDeleted();
 
-    /* =========================
-       FIND BY STATUS
-       ========================= */
-    @Query("SELECT p FROM PayrollPeriodEntity p WHERE p.status = :status AND p.deleted = false")
-    List<PayrollPeriodEntity> findAllByStatus(PayrollPeriodEntity.PayrollStatus status);
+    @Query("SELECT p FROM PayrollPeriodEntity p WHERE p.status = :status")
+    List<PayrollPeriodEntity> findAllByStatus(@Param("status") PayrollPeriodEntity.PayrollStatus status);
 
-    /* =========================
-       SOFT DELETE
-       ========================= */
+    @Query("SELECT p FROM PayrollPeriodEntity p WHERE LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<PayrollPeriodEntity> searchByKeyword(@Param("keyword") String keyword);
+
     @Modifying
     @Query("UPDATE PayrollPeriodEntity p SET p.deleted = true WHERE p.id = :id")
-    void softDeleteById(Long id);
+    int softDeleteById(@Param("id") Long id);
 }

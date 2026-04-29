@@ -29,25 +29,24 @@ public class PayRollPeriodService {
        ========================= */
     @Transactional
     public PayrollPeriodResponseDTO createPayrollPeriod(PayrollPeriodRequestDTO requestDTO) {
-        log.info("Creating new payroll period from {} to {}", requestDTO.getStartDate(), requestDTO.getEndDate());
+        log.info("Creating new PayrollPeriod in database: {} to {}", requestDTO.getStartDate(), requestDTO.getEndDate());
         try {
             PayrollPeriodEntity entity = MapperUtil.mapObject(requestDTO, PayrollPeriodEntity.class);
-            payrollRepository.save(entity);
-            return MapperUtil.mapObject(entity, PayrollPeriodResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while creating payroll period", dae);
-            throw new CustomServiceException("Failed to create payroll period due to database error");
+            entity.setDeleted(false);
+            PayrollPeriodEntity saved = payrollRepository.save(entity);
+            log.info("Successfully created PayrollPeriod: id={}", saved.getId());
+            return MapperUtil.mapObject(saved, PayrollPeriodResponseDTO.class);
+        } catch (Exception e) {
+            log.error("Unexpected error while creating PayrollPeriod", e);
+            throw new CustomServiceException("Failed to create Payroll Period");
         }
     }
 
-    /* =========================
-       UPDATE
-       ========================= */
     @Transactional
     public PayrollPeriodResponseDTO updatePayrollPeriod(Long id, PayrollPeriodRequestDTO requestDTO) {
-        log.info("Updating payroll period id={}", id);
+        log.info("Updating PayrollPeriod ID: {} in database", id);
         try {
-            PayrollPeriodEntity existing = payrollRepository.findByIdActive(id)
+            PayrollPeriodEntity existing = payrollRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Payroll period not found with id: " + id));
 
             existing.setStartDate(requestDTO.getStartDate());
@@ -55,48 +54,87 @@ public class PayRollPeriodService {
             existing.setStatus(requestDTO.getStatus());
             existing.setDescription(requestDTO.getDescription());
 
-            payrollRepository.save(existing);
-            return MapperUtil.mapObject(existing, PayrollPeriodResponseDTO.class);
-        } catch (DataAccessException dae) {
-            log.error("Database error while updating payroll period id={}", id, dae);
-            throw new CustomServiceException("Failed to update payroll period due to database error");
+            PayrollPeriodEntity updated = payrollRepository.save(existing);
+            log.info("Successfully updated PayrollPeriod: id={}", updated.getId());
+            return MapperUtil.mapObject(updated, PayrollPeriodResponseDTO.class);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while updating PayrollPeriod ID: {}", id, e);
+            throw new CustomServiceException("Failed to update Payroll Period");
         }
     }
 
-    /* =========================
-       GET BY ID
-       ========================= */
     public PayrollPeriodResponseDTO getPayrollPeriodById(Long id) {
-        log.info("Fetching payroll period by id={}", id);
-        PayrollPeriodEntity entity = payrollRepository.findByIdActive(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Payroll period not found with id: " + id));
-        return MapperUtil.mapObject(entity, PayrollPeriodResponseDTO.class);
+        log.info("Fetching PayrollPeriod ID: {} from database", id);
+        try {
+            PayrollPeriodEntity entity = payrollRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Payroll period not found with id: " + id));
+            log.info("Successfully fetched PayrollPeriod: id={}", entity.getId());
+            return MapperUtil.mapObject(entity, PayrollPeriodResponseDTO.class);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching PayrollPeriod ID: {}", id, e);
+            throw new CustomServiceException("Failed to fetch Payroll Period");
+        }
     }
 
-    /* =========================
-       GET ALL
-       ========================= */
     public List<PayrollPeriodResponseDTO> getAllPayrollPeriods() {
-        log.info("Fetching all payroll periods");
-        List<PayrollPeriodEntity> entities = payrollRepository.findAllActive();
-        return entities.stream().map(e -> MapperUtil.mapObject(e, PayrollPeriodResponseDTO.class)).collect(Collectors.toList());
+        log.info("Fetching all non-deleted PayrollPeriods from database");
+        try {
+            List<PayrollPeriodEntity> entities = payrollRepository.findAllNonDeleted();
+            List<PayrollPeriodResponseDTO> dtoList = entities.stream()
+                    .map(e -> MapperUtil.mapObject(e, PayrollPeriodResponseDTO.class))
+                    .collect(Collectors.toList());
+            log.info("Successfully fetched {} PayrollPeriods", dtoList.size());
+            return dtoList;
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching PayrollPeriods", e);
+            throw new CustomServiceException("Failed to fetch Payroll Periods");
+        }
     }
 
-    /* =========================
-       GET BY STATUS
-       ========================= */
     public List<PayrollPeriodResponseDTO> getPayrollPeriodsByStatus(PayrollPeriodEntity.PayrollStatus status) {
-        log.info("Fetching payroll periods with status={}", status);
-        List<PayrollPeriodEntity> entities = payrollRepository.findAllByStatus(status);
-        return entities.stream().map(e -> MapperUtil.mapObject(e, PayrollPeriodResponseDTO.class)).collect(Collectors.toList());
+        log.info("Fetching PayrollPeriods by status: {}", status);
+        try {
+            List<PayrollPeriodEntity> entities = payrollRepository.findAllByStatus(status);
+            log.info("Successfully fetched {} PayrollPeriods for status: {}", entities.size(), status);
+            return entities.stream().map(e -> MapperUtil.mapObject(e, PayrollPeriodResponseDTO.class)).collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Unexpected error while fetching PayrollPeriods by status", e);
+            throw new CustomServiceException("Failed to fetch Payroll Periods by status");
+        }
     }
 
-    /* =========================
-       SOFT DELETE
-       ========================= */
+    public List<PayrollPeriodResponseDTO> searchByKeyword(String keyword) {
+        String searchKey = keyword == null ? "" : keyword.trim();
+        log.info("Searching PayrollPeriods with keyword: '{}' in database", searchKey);
+        try {
+            List<PayrollPeriodEntity> result = payrollRepository.searchByKeyword(searchKey);
+            log.info("Successfully fetched {} PayrollPeriods based on search", result.size());
+            return result.stream().map(e -> MapperUtil.mapObject(e, PayrollPeriodResponseDTO.class)).collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Unexpected error while searching PayrollPeriods", e);
+            throw new CustomServiceException("Failed to search Payroll Periods");
+        }
+    }
+
     @Transactional
-    public void softDeletePayrollPeriod(Long id) {
-        log.info("Soft deleting payroll period id={}", id);
-        payrollRepository.softDeleteById(id);
+    public void delete(Long id) {
+        log.info("Soft deleting PayrollPeriod ID: {} from database", id);
+        try {
+            int affected = payrollRepository.softDeleteById(id);
+            if (affected == 0) {
+                log.warn("PayrollPeriod not found for deletion: id={}", id);
+                throw new ResourceNotFoundException("Payroll period not found with id: " + id);
+            }
+            log.info("Successfully soft deleted PayrollPeriod: id={}", id);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while deleting PayrollPeriod ID: {}", id, e);
+            throw new CustomServiceException("Failed to delete Payroll Period");
+        }
     }
 }

@@ -15,35 +15,139 @@ import java.util.Optional;
 @Repository
 public interface FeeComponentRepository extends JpaRepository<FeeComponentEntity, Long> {
 
-    @Query("SELECT fc FROM FeeComponentEntity fc " +
-            "WHERE fc.deleted = false")
-    List<FeeComponentEntity> findByDeletedFalse();
-
-    @Query("SELECT fc FROM FeeComponentEntity fc " +
-            "WHERE fc.deleted = false AND fc.id=:id")
-    Optional<FeeComponentEntity> findByIdAndDeletedFalse(@Param("id") Long id);
-
-
-    @Query("SELECT f FROM FeeComponentEntity f " +
-            "JOIN FETCH f.feeCatalog fc " +
-            "WHERE (:feeCatalogId IS NULL OR fc.id = :feeCatalogId) " +
-            "AND (:keyword IS NULL OR :keyword = '' OR LOWER(f.componentName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "     OR LOWER(f.componentCode) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-            "AND f.deleted = false " +
-            "ORDER BY f.componentName ASC")
-    List<FeeComponentEntity> searchFeeComponent(@Param("feeCatalogId") Long feeCatalogId,
-                                                @Param("keyword") String keyword);
+    @Query("""
+        SELECT DISTINCT fc
+        FROM FeeComponentEntity fc
+        JOIN FETCH fc.feeCatalog catalog
+        JOIN FETCH catalog.chargeType ct
+        LEFT JOIN FETCH catalog.recurrenceRule rr
+        JOIN FETCH catalog.institute inst
+        LEFT JOIN FETCH fc.feeRates rates
+        ORDER BY fc.componentName
+    """)
+    List<FeeComponentEntity> findAllWithDetails();
 
 
+    // ============================
+    // GET COMPONENT BY ID WITH DETAILS
+    // ============================
 
-    @Query("SELECT fc FROM FeeComponentEntity fc " +
-            "WHERE fc.feeCatalog.id = :catalogId " +
-            "AND fc.feeCatalog.deleted = false")
-    List<FeeComponentEntity> findFeeComponentsByCatalogId(@Param("catalogId") Long catalogId);
+    @Query("""
+        SELECT DISTINCT fc
+        FROM FeeComponentEntity fc
+        JOIN FETCH fc.feeCatalog catalog
+        JOIN FETCH catalog.chargeType ct
+        LEFT JOIN FETCH catalog.recurrenceRule rr
+        JOIN FETCH catalog.institute inst
+        LEFT JOIN FETCH fc.feeRates rates
+        WHERE fc.id = :id
+        AND fc.deleted = false
+    """)
+    Optional<FeeComponentEntity> findByIdWithDetails(@Param("id") Long id);
 
-    @Query("SELECT f FROM FeeComponentEntity f WHERE f.feeCatalog.id = :catalogId AND f.deleted = false")
-    List<FeeComponentEntity> getByFeeCatalogId(@Param("catalogId") Long catalogId);
 
+    // ============================
+    // GET COMPONENTS BY CATALOG
+    // ============================
+
+    @Query("""
+        SELECT DISTINCT fc
+        FROM FeeComponentEntity fc
+        JOIN FETCH fc.feeCatalog catalog
+        JOIN FETCH catalog.chargeType ct
+        LEFT JOIN FETCH catalog.recurrenceRule rr
+        LEFT JOIN FETCH fc.feeRates rates
+        WHERE catalog.id = :catalogId
+        AND fc.deleted = false
+        AND catalog.deleted = false
+        ORDER BY fc.componentName
+    """)
+    List<FeeComponentEntity> findByCatalogIdWithDetails(@Param("catalogId") Long catalogId);
+
+
+
+    // ============================
+    // GET COMPONENTS BY ORGANIZATION
+    // ============================
+
+    @Query("""
+        SELECT DISTINCT fc
+        FROM FeeComponentEntity fc
+        JOIN FETCH fc.feeCatalog catalog
+        JOIN FETCH catalog.institute inst
+        JOIN FETCH catalog.chargeType ct
+        LEFT JOIN FETCH catalog.recurrenceRule rr
+        WHERE inst.id = :organizationId
+        AND fc.deleted = false
+        AND catalog.deleted = false
+        ORDER BY fc.componentName
+    """)
+    List<FeeComponentEntity> findByOrganization(@Param("organizationId") Long organizationId);
+
+
+    // ============================
+    // SEARCH COMPONENT
+    // ============================
+
+    @Query("""
+        SELECT DISTINCT fc
+        FROM FeeComponentEntity fc
+        JOIN FETCH fc.feeCatalog catalog
+        JOIN FETCH catalog.chargeType ct
+        LEFT JOIN FETCH catalog.recurrenceRule rr
+        WHERE fc.deleted = false
+        AND catalog.deleted = false
+        AND (:catalogId IS NULL OR catalog.id = :catalogId)
+        AND (
+            :keyword IS NULL OR :keyword = '' OR
+            LOWER(fc.componentName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+            LOWER(fc.componentCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        )
+        ORDER BY fc.componentName
+    """)
+    List<FeeComponentEntity> searchComponents(
+            @Param("catalogId") Long catalogId,
+            @Param("keyword") String keyword
+    );
+
+
+    // ============================
+    // FILTER BY CHARGE TYPE
+    // ============================
+
+    @Query("""
+        SELECT DISTINCT fc
+        FROM FeeComponentEntity fc
+        JOIN FETCH fc.feeCatalog catalog
+        JOIN FETCH catalog.chargeType ct
+        WHERE ct.id = :chargeTypeId
+        AND fc.deleted = false
+        AND catalog.deleted = false
+    """)
+    List<FeeComponentEntity> findByChargeType(@Param("chargeTypeId") Long chargeTypeId);
+
+    // ============================
+    // FILTER BY RECURRENCE RULE
+    // ============================
+
+    @Query("""
+        SELECT DISTINCT fc
+        FROM FeeComponentEntity fc
+        JOIN FETCH fc.feeCatalog catalog
+        LEFT JOIN FETCH catalog.recurrenceRule rr
+        WHERE rr.id = :ruleId
+        AND fc.deleted = false
+        AND catalog.deleted = false
+    """)
+    List<FeeComponentEntity> findByRecurrenceRule(@Param("ruleId") Long ruleId);
+
+
+    // JPQL query to find duplicate component code in the same catalog
+    @Query("SELECT f FROM FeeComponentEntity f WHERE f.componentCode = :code AND f.feeCatalog.id = :catalogId AND f.deleted = false")
+    Optional<FeeComponentEntity> findByComponentCodeAndCatalogId(
+            @Param("code") String componentCode,
+            @Param("catalogId") Long feeCatalogId
+    );
 }
 
 

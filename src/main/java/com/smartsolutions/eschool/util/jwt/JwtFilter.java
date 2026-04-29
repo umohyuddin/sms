@@ -10,6 +10,7 @@ import org.slf4j.MDC;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -67,7 +68,7 @@ public class JwtFilter extends OncePerRequestFilter {
             log.info("Request Receive at filter \n authHeader - [{}],\n requestURL - [{}],\n requestURI - [{}],\n requestMethod - [{}],\n scheme - [{}],\n serverName - [{}],\n serverPort - [{}],\n contextPath - [{}],\n baseFQDN - [{}]", authHeader, requestURL, requestURI, requestMethod, scheme, serverName, serverPort, contextPath, baseFQDN);
             String path = request.getRequestURI();
             // skip public APIs
-            if (path.equals("/api/auth/generateToken") || path.startsWith("/swagger-ui") || path.startsWith("/api/institute/employees/profile-photos")|| path.contains("/profile-photos/")) {
+            if (path.equals("/api/auth/generateToken") || path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.startsWith("/api/institute/employees/profile-photos")|| path.contains("/profile-photos/")) {
                 chain.doFilter(request, response);
                 return;
             }
@@ -90,7 +91,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             if (jwtUtil.validateJwtToken(jwtToken, response)) {
                 // Get the user details from the token
-                String userName = jwtUtil.extractClaims(jwtToken).get("userName", String.class);
+                String userName = jwtUtil.extractClaims(jwtToken).get("email", String.class);
                 //Claims claims = jwtUtils.extractClaims(jwtToken);
                 //List<Map<String, Object>> roleMaps = (List<Map<String, Object>>) claims.get("userRoles");
 
@@ -139,10 +140,7 @@ public class JwtFilter extends OncePerRequestFilter {
 //                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 //                }
                 handleUserNameMDC(userName);
-                UserDetailsImp userDetails = new UserDetailsImp();
-                userDetails.setUsername("Testing");
-                userDetails.setPassword("password");
-                userDetails.setEmail("uzairanwar2299@gmail.com");
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
 
 
                 // Set the authentication object in the security context

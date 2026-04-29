@@ -3,26 +3,19 @@ package com.smartsolutions.eschool.employee.facade;
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.request.SalaryStructureRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryStructureDetailDTO;
 import com.smartsolutions.eschool.employee.dtos.SalaryStructure.response.SalaryStructureResponseDTO;
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
-import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
-import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
+import com.smartsolutions.eschool.employee.dtos.SalaryStructureComponent.response.SalaryStructureComponentResponseDTO;
 import com.smartsolutions.eschool.employee.service.SalaryStructureService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class SalaryStructureFacade {
 
     private final SalaryStructureService salaryStructureService;
@@ -31,69 +24,77 @@ public class SalaryStructureFacade {
         this.salaryStructureService = salaryStructureService;
     }
 
-    // -------------------------
-    // Basic fetch operations
-    // -------------------------
+    public SalaryStructureResponseDTO create(SalaryStructureRequestDTO requestDTO) {
+        log.info("Facade: Request to create SalaryStructure for employeeType ID: {}", requestDTO.getEmployeeTypeId());
+        SalaryStructureResponseDTO result = salaryStructureService.create(requestDTO);
+        log.info("Facade: Successfully created SalaryStructure: id={}", result.getId());
+        return result;
+    }
+
     public SalaryStructureResponseDTO getById(Long id) {
-        return salaryStructureService.getById(id);
+        log.info("Facade: Request to fetch SalaryStructure by id: {}", id);
+        SalaryStructureResponseDTO result = salaryStructureService.getById(id);
+        log.info("Facade: Successfully fetched SalaryStructure: id={}", id);
+        return result;
     }
 
-    public List<SalaryStructureResponseDTO> getAllActive() {
-        return salaryStructureService.getAllActive();
+    public List<SalaryStructureResponseDTO> getAllNonDeleted() {
+        log.info("Facade: Request to fetch all non-deleted SalaryStructures");
+        List<SalaryStructureResponseDTO> result = salaryStructureService.getAllNonDeleted();
+        log.info("Facade: Successfully fetched {} SalaryStructures", result.size());
+        return result;
     }
 
-//    public List<SalaryStructureResponseDTO> getEffectiveOn(LocalDate date) {
-//        return salaryStructureService.getEffectiveOn(date);
-//    }
-
-    // -------------------------
-    // Create / update operations
-    // -------------------------
-    public SalaryStructureResponseDTO createSalaryStructure(SalaryStructureRequestDTO requestDTO) {
-        return salaryStructureService.createSalaryStructure(requestDTO);
+    public SalaryStructureResponseDTO update(Long id, SalaryStructureRequestDTO requestDTO) {
+        log.info("Facade: Request to update SalaryStructure ID: {}", id);
+        SalaryStructureResponseDTO result = salaryStructureService.update(id, requestDTO);
+        log.info("Facade: Successfully updated SalaryStructure: id={}", result.getId());
+        return result;
     }
 
-    public SalaryStructureResponseDTO updateSalaryStructure(Long id, SalaryStructureRequestDTO requestDTO) {
-        return salaryStructureService.updateSalaryStructure(id, requestDTO);
+    public void delete(Long id) {
+        log.info("Facade: Request to delete SalaryStructure by id: {}", id);
+        salaryStructureService.delete(id);
+        log.info("Facade: Successfully deleted SalaryStructure: id={}", id);
     }
 
     public SalaryStructureResponseDTO closeSalaryStructure(Long id) {
-        return salaryStructureService.closeSalaryStructure(id);
+        log.info("Facade: Request to close SalaryStructure ID: {}", id);
+        SalaryStructureResponseDTO result = salaryStructureService.closeSalaryStructure(id);
+        log.info("Facade: Successfully closed SalaryStructure ID: {}", id);
+        return result;
     }
 
-    // -------------------------
-    // Soft delete
-    // -------------------------
-    public void softDelete(Long id) {
-        salaryStructureService.softDelete(id);
+    public List<SalaryStructureResponseDTO> searchByKeyword(String keyword) {
+        log.info("Facade: Request to search SalaryStructures by keyword: '{}'", keyword);
+        List<SalaryStructureResponseDTO> result = salaryStructureService.searchByKeyword(keyword);
+        log.info("Facade: Search completed, found {} SalaryStructures", result.size());
+        return result;
     }
 
-    // -------------------------
-    // Metrics / counts
-    // -------------------------
-//    public Long countByEmployeeType(Long employeeTypeId) {
-//        // Optionally implement in service to count by employee type
-//        return salaryStructureService.countByEmployeeType(employeeTypeId);
-//    }
-
-    // -------------------------
-    // Date range queries
-    // -------------------------
-//    public List<SalaryStructureResponseDTO> getWithinDateRange(LocalDate startDate, LocalDate endDate) {
-//        return salaryStructureService.getWithinDateRange(startDate, endDate);
-//    }
-
-    public List<SalaryStructureResponseDTO> searchSalaryStructures(Long employeeTypeId, String employeeTypeName, BigDecimal minSalary, BigDecimal maxSalary, LocalDate fromDate, LocalDate toDate, Boolean isCurrent) {
-        return salaryStructureService.searchSalaryStructures(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
+    public List<SalaryStructureResponseDTO> searchComplex(Long employeeTypeId, String employeeTypeName, BigDecimal minSalary, BigDecimal maxSalary, LocalDate fromDate, LocalDate toDate, Boolean isCurrent) {
+        log.info("Facade: Request for complex search for SalaryStructures");
+        List<SalaryStructureResponseDTO> result = salaryStructureService.searchComplex(employeeTypeId, employeeTypeName, minSalary, maxSalary, fromDate, toDate, isCurrent);
+        log.info("Facade: Complex search completed, found {} SalaryStructures", result.size());
+        return result;
     }
 
-    public List<SalaryStructureDetailDTO> findSalaryDetail() {
-        return salaryStructureService.getAllSalaryStructures();
-
-
+    public List<SalaryStructureDetailDTO> getAllSalaryStructuresWithDetails() {
+        log.info("Facade: Request to fetch all SalaryStructures with details");
+        List<SalaryStructureDetailDTO> result = salaryStructureService.getAllSalaryStructures();
+        log.info("Facade: Successfully fetched {} SalaryStructures with details", result.size());
+        return result;
     }
 
     public SalaryStructureDetailDTO getSalaryStructureByEmployeeType(Long employeeTypeId) {
-        return salaryStructureService.getSalaryStructureByEmployeeType(employeeTypeId);
+        log.info("Facade: Request to fetch current SalaryStructure details for employeeTypeID: {}", employeeTypeId);
+        SalaryStructureDetailDTO result = salaryStructureService.getSalaryStructureByEmployeeType(employeeTypeId);
+        log.info("Facade: Successfully fetched SalaryStructure details for employeeTypeID: {}", employeeTypeId);
+        return result;
+    }
+
+    public Long getTotalCount() {
+        log.info("Facade: Request to fetch total SalaryStructure count");
+        return salaryStructureService.getTotalCount();
     }
 }

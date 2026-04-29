@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "student_fee_assignments", uniqueConstraints = {@UniqueConstraint(columnNames = {"student_id", "fee_rate_id"})})
+@Table(name = "student_fee_assignments", uniqueConstraints = {@UniqueConstraint(columnNames = {"student_id", "fee_rate_id", "academic_year_id"})})
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -20,6 +21,10 @@ public class StudentFeeAssignmentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+ 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private com.smartsolutions.eschool.school.model.InstituteEntity institute;
 
     // --- Foreign Keys ---
 
@@ -30,6 +35,10 @@ public class StudentFeeAssignmentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fee_rate_id", nullable = false)
     private FeeRateEntity feeRate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academic_year_id", nullable = false)
+    private AcademicYearEntity academicYear;
 
     // --- Fields ---
 

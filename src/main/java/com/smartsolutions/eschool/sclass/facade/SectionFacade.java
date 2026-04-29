@@ -3,11 +3,7 @@ package com.smartsolutions.eschool.sclass.facade;
 import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.service.SectionService;
-import jakarta.validation.Valid;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -15,68 +11,57 @@ import java.util.List;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class SectionFacade {
-    private static final Log LOG = LogFactory.getLog(SectionFacade.class);
-    @Autowired
-    @Lazy
-    private SectionService nSectionService;
+    private final SectionService sectionService;
+
+    public SectionFacade(SectionService sectionService) {
+        this.sectionService = sectionService;
+    }
 
     public List<SectionDTO> getAll() {
-        return nSectionService.getAll();
+        log.info("[Facade:SectionFacade] getAll() called");
+        return sectionService.getAll();
     }
 
     public SectionDTO getById(Long id) {
-        return nSectionService.getById(id);
+        log.info("[Facade:SectionFacade] getById() called - id: {}", id);
+        return sectionService.getById(id);
     }
 
     public List<SectionDTO> getByStandardId(Long id) {
-        return nSectionService.getByStandardId(id);
+        log.info("[Facade:SectionFacade] getByStandardId() called - standardId: {}", id);
+        return sectionService.getByStandardId(id);
     }
 
-    public int softDeleteById(Long sectionId){
-        return nSectionService.softDeleteById(sectionId);
+    public int softDeleteById(Long sectionId) {
+        log.info("[Facade:SectionFacade] softDeleteById() called - id: {}", sectionId);
+        return sectionService.softDeleteById(sectionId);
     }
-    public int softDeleteByStandardId(Long sectionId){
-       return nSectionService.softDeleteByStandardId(sectionId);
+
+    public int softDeleteByStandardId(Long standardId) {
+        log.info("[Facade:SectionFacade] softDeleteByStandardId() called - standardId: {}", standardId);
+        return sectionService.softDeleteByStandardId(standardId);
     }
-    public int softDeleteAll(){
-        return nSectionService.softDeleteAll();
+
+    public int softDeleteAll() {
+        log.info("[Facade:SectionFacade] softDeleteAll() called");
+        return sectionService.softDeleteAll();
     }
 
     public List<SectionDTO> searchSections(Long campusId, Long standardId, String keyword) {
-        return nSectionService.searchSections(campusId,standardId,keyword);
+        log.info("[Facade:SectionFacade] searchSections() called - campusId: {}, standardId: {}, keyword: {}", campusId,
+                standardId, keyword);
+        return sectionService.searchSections(campusId, standardId, keyword);
     }
 
-    public SectionCreateRequestDTO createSection(@Valid SectionCreateRequestDTO dto) {
-       return nSectionService.createSection(dto);
+    public SectionCreateRequestDTO createSection(SectionCreateRequestDTO dto) {
+        log.info("[Facade:SectionFacade] createSection() called");
+        return sectionService.createSection(dto);
     }
 
-    public SectionDTO updateSection(Long id, @Valid SectionCreateRequestDTO dto) {
-    return nSectionService.updateSection(id,dto);
+    public SectionDTO updateSection(Long id, SectionCreateRequestDTO dto) {
+        log.info("[Facade:SectionFacade] updateSection() called - id: {}", id);
+        return sectionService.updateSection(id, dto);
     }
-
-
-//    public List<SectionEntity> getByInstituteId(Long id) {
-//        return nSectionService.getByInstituteId(id);
-//    }
-//
-//    public List<SectionEntity> getByCampusId(Long id) {
-//        return nSectionService.getByCampusId(id);
-//    }
-//
-//    public List<SectionEntity> getByClassId(Long id) {
-//        return nSectionService.getByClassId(id);
-//    }
-//
-//    public String create(SectionEntity pSectionEntity) {
-//        return nSectionService.create(pSectionEntity);
-//    }
-//
-//    public String update(SectionEntity pSectionEntity) {
-//        return nSectionService.update(pSectionEntity);
-//    }
-//
-//    public String delete(Long id) {
-//        return nSectionService.delete(id);
-//    }
 }

@@ -1,241 +1,202 @@
 package com.smartsolutions.eschool.school.service;
 
-import com.smartsolutions.eschool.global.exception.CustomServiceException;
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
-import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
-import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
-import com.smartsolutions.eschool.lookups.model.CityEntity;
-import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
+import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.institute.error.CampusErrors;
 import com.smartsolutions.eschool.lookups.repository.CityRepository;
 import com.smartsolutions.eschool.lookups.repository.ProvinceRepository;
-import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
+import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
+import com.smartsolutions.eschool.school.mapper.CampusMapper;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
-import com.smartsolutions.eschool.school.repository.InstituteDaoImp;
-import com.smartsolutions.eschool.util.MapperUtil;
-import jakarta.validation.Valid;
+import com.smartsolutions.eschool.school.repository.InstituteRepository;
+import com.smartsolutions.eschool.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.MappingException;
-import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
 @Slf4j
 public class CampusService {
 
-
     private final CampusRepository campusRepository;
-    private final InstituteDaoImp instituteDaoImp;
+    private final InstituteRepository instituteRepository;
     private final ProvinceRepository provinceRepository;
     private final CityRepository cityRepository;
 
-    public CampusService(CampusRepository campusRepository, InstituteDaoImp instituteDaoImp, ProvinceRepository provinceRepository, CityRepository cityRepository) {
+    public CampusService(CampusRepository campusRepository,
+            InstituteRepository instituteRepository,
+            ProvinceRepository provinceRepository,
+            CityRepository cityRepository) {
         this.campusRepository = campusRepository;
-        this.instituteDaoImp = instituteDaoImp;
+        this.instituteRepository = instituteRepository;
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
     }
 
     public List<CampusResponseDTO> getAll() {
-        try {
-            log.info("Fetching all Campuses from database");
-            //List<CampusEntity> result = campusDao.findAll();
-            List<CampusEntity> result = campusRepository.findByDeletedFalse();
-            log.info("Successfully fetched {} Campuses", result.size());
-            List<CampusResponseDTO> campusResponseDTOList = MapperUtil.mapList(result, CampusResponseDTO.class);
-            log.info("Successfully fetched {} Campuses", campusResponseDTOList);
-            return campusResponseDTOList;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Campuses", dae);
-            //throw new CustomServiceException("Unable to fetch students from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to Campuses", me);
-            //throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Campuses", e);
-            //throw new ("Unexpected error occurred", e);
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(CampusErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        return Collections.emptyList();
+        log.info("[Service:CampusService] getAll() called - Fetching all for institute: {}", organizationId);
+        List<CampusEntity> result = campusRepository.findByInstituteId(organizationId);
+        List<CampusResponseDTO> responseDTOs = CampusMapper.toResponseDTOList(result);
+        log.info("[Service:CampusService] getAll() succeeded - Found {} campuses", responseDTOs.size());
+        return responseDTOs;
     }
 
     public CampusResponseDTO getById(Long id) {
-        log.info("Fetching Campus with id: {}", id);
-        CampusEntity campusEntity = campusRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
-            log.info("Fetching Campus with id: {}", id);
-            return new ResourceNotFoundException("Campus not found with id: " + id);
-        });
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(CampusErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:CampusService] getById() called - id: {}, institute: {}", id, organizationId);
+        CampusEntity campusEntity = campusRepository.findByIdAndInstituteId(id, organizationId)
+                .orElseThrow(() -> new ApiException(CampusErrors.CAMPUS_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        ProvinceEntity provinceEntity = provinceRepository.findByIdAndDeletedFalse(campusEntity.getProvinceId()).orElseThrow(() -> {
-            log.info("Fetching Province with id: {}", campusEntity.getProvinceId());
-            return new ResourceNotFoundException("Province not found with id: " + id);
-        });
-        CityEntity cityEntity = cityRepository.findByIdAndDeletedFalse(campusEntity.getCityId()).orElseThrow(() -> {
-            log.info("Fetching City with id: {}", campusEntity.getCityId());
-            return new ResourceNotFoundException("City not found with id: " + id);
-        });
-
-
-        CampusResponseDTO campusResponseDTO = MapperUtil.mapObject(campusEntity, CampusResponseDTO.class);
-        campusResponseDTO.setProvince(MapperUtil.mapObject(provinceEntity, ProvinceResponseDTO.class));
-        campusResponseDTO.setCity(MapperUtil.mapObject(cityEntity, CityResponseDTO.class));
-        log.info("Successfully fetched Campus: id={}", campusResponseDTO.getId());
-        return campusResponseDTO;
+        CampusResponseDTO responseDTO = CampusMapper.toResponseDTO(campusEntity);
+        log.info("[Service:CampusService] getById() succeeded - Found campus: {}", id);
+        return responseDTO;
     }
 
-    public List<CampusResponseDTO> findByInstituteId(Long id) {
-        log.info("Fetching campuses for institute ID: {}", id);
-        if (id == null) {
-            log.error("Institute ID is null");
-            throw new IllegalArgumentException("Institute ID must not be null");
-        }
-
-        List<CampusEntity> campusEntities = campusRepository.findByInstituteIdAndDeletedFalse(id);
-        if (campusEntities.isEmpty()) {
-            log.warn("No campuses found for institute ID: {}", id);
-            return List.of(); // safe empty list
-        }
-        List<CampusResponseDTO> campusResponseDTOList = MapperUtil.mapList(campusEntities, CampusResponseDTO.class);
-        log.info("Found {} campuses for institute ID: {}", campusResponseDTOList.size(), id);
-        return campusResponseDTOList;
+    public List<CampusResponseDTO> findByInstituteId(Long instituteId) {
+        log.info("[Service:CampusService] findByInstituteId() called - Fetching for institute: {}", instituteId);
+        List<CampusEntity> campusEntities = campusRepository.findByInstituteId(instituteId);
+        return CampusMapper.toResponseDTOList(campusEntities);
     }
-
 
     public List<CampusResponseDTO> findByCampusNameContaining(String name) {
-        log.info("Fetching campuses containing name: '{}'", name);
-        if (name == null || name.trim().isEmpty()) {
-            log.error("Campus name is null or empty");
-            throw new IllegalArgumentException("Campus name must not be null or empty");
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(CampusErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-
-        List<CampusEntity> campusEntities = campusRepository.findByCampusNameContainingAndDeletedFalse(name);
-        if (campusEntities.isEmpty()) {
-            log.warn("No campuses found for institute name: {}", name);
-            return List.of(); // safe empty list
-        }
-        List<CampusResponseDTO> campusResponseDTOList = MapperUtil.mapList(campusEntities, CampusResponseDTO.class);
-        log.info("Found {} campuses containing name: '{}'", campusResponseDTOList.size(), name);
-        return campusResponseDTOList;
+        log.info("[Service:CampusService] findByCampusNameContaining() called - name: {}, institute: {}", name,
+                organizationId);
+        List<CampusEntity> campusEntities = campusRepository.findByCampusNameContaining(name);
+        List<CampusEntity> filtered = campusEntities.stream()
+                .filter(c -> c.getInstitute() != null && c.getInstitute().getId().equals(organizationId))
+                .toList();
+        return CampusMapper.toResponseDTOList(filtered);
     }
 
-    public int softDeleteById(Long id) {
-        log.info("Soft delete request received for Campus ID: {}", id);
-        try {
-            return campusRepository.softDeleteById(id);
-        } catch (Exception e) {
-            log.error("Error while soft deleting Campus with ID {}", id, e);
-            throw e;
+    @Transactional
+    public void softDeleteById(Long id) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(CampusErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        log.info("[Service:CampusService] softDeleteById() called - id: {}, institute: {}", id, organizationId);
+
+        int result = campusRepository.softDeleteByIdAndInstituteId(id, organizationId);
+        if (result == 0) {
+            throw new ApiException(CampusErrors.CAMPUS_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        log.info("[Service:CampusService] softDeleteById() succeeded - id: {}", id);
     }
 
-    public CampusCreateRequestDTO createCampus(CampusCreateRequestDTO requestDTO) {
-        log.info("Creating new Campus: {}", requestDTO);
-        try {
-//            Province province = EnumValidatorUtil.getEnumByName(Province.class, requestDTO.getProvinceName());
-//            Cities city = EnumValidatorUtil.getEnumByName(Cities.class, requestDTO.getCityName());
-            InstituteEntity instituteEntity = instituteDaoImp.findById(1L);
-            CampusEntity entity = MapperUtil.mapObject(requestDTO, CampusEntity.class);
-            entity.setId(null);
-            entity.setInstitute(instituteEntity);
-            CampusEntity campusEntity = campusRepository.save(entity);
-
-            CampusCreateRequestDTO response = MapperUtil.mapObject(campusEntity, CampusCreateRequestDTO.class);
-            log.info("Campus created successfully with ID: {}", response.getId());
-            return response;
-
-        } catch (DataAccessException dae) {
-            log.error("Database error while creating Campus", dae);
-            throw dae;
-        } catch (Exception ex) {
-            log.error("Unexpected error creating Campus");
-            throw ex;
+    @Transactional
+    public CampusResponseDTO createCampus(CampusCreateRequestDTO requestDTO) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(CampusErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-    }
+        log.info("[Service:CampusService] createCampus() called - Creating for institute: {}", organizationId);
 
-
-    public CampusResponseDTO updateCampus(Long id, @Valid CampusCreateRequestDTO requestDTO) {
-        log.info("Updating Campus with id {} using DTO {}", id, requestDTO);
-
-        CampusEntity entity = campusRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> new ResourceNotFoundException("Campus not found with id: " + id));
-
-        entity.setActive(requestDTO.isActive());
-        if (requestDTO.getCampusName() != null && !requestDTO.getCampusName().isBlank()) {
-            entity.setCampusName(requestDTO.getCampusName());
+        if (requestDTO.getCampusCode() != null && !requestDTO.getCampusCode().trim().isEmpty()) {
+            if (campusRepository.existsByInstituteIdAndCampusCode(organizationId,
+                    requestDTO.getCampusCode().trim())) {
+                throw new ApiException(CampusErrors.DUPLICATE_CAMPUS_CODE, HttpStatus.CONFLICT);
+            }
         }
 
+        InstituteEntity institute = instituteRepository.findById(organizationId)
+                .orElseThrow(() -> new ApiException(CampusErrors.INSTITUTE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        if (requestDTO.getContactNumber() != null) {
-            entity.setContactNumber(requestDTO.getContactNumber());
-        }
-
-        if (requestDTO.getEmail() != null) {
-            entity.setEmail(requestDTO.getEmail());
-        }
-
-        if (requestDTO.getWebsite() != null) {
-            entity.setWebsite(requestDTO.getWebsite());
-        }
-
-        if (requestDTO.getAddress() != null) {
-            entity.setAddress(requestDTO.getAddress());
-        }
+        CampusEntity entity = CampusMapper.toEntity(requestDTO);
+        entity.setInstitute(institute);
 
         if (requestDTO.getProvinceId() != null) {
-            entity.setProvinceId(requestDTO.getProvinceId());
+            entity.setProvince(provinceRepository.findById(requestDTO.getProvinceId()).orElse(null));
         }
-
         if (requestDTO.getCityId() != null) {
-            entity.setCityId(requestDTO.getCityId());
-        }
-        // Update Logo (byte[])
-        if (requestDTO.getLogo() != null) {
-            entity.setLogo(requestDTO.getLogo());
+            entity.setCity(cityRepository.findById(requestDTO.getCityId()).orElse(null));
         }
 
-        if (requestDTO.getInstituteId() != null && (entity.getInstitute() == null || !entity.getInstitute().getId().equals(requestDTO.getInstituteId()))) {
-            InstituteEntity institute = instituteDaoImp.findById(requestDTO.getInstituteId());
-//                    .orElseThrow(() -> new ResourceNotFoundException("Institute not found with id: " + requestDTO.getInstituteId()));
-            entity.setInstitute(institute);
+        CampusEntity saved = campusRepository.save(entity);
+
+        log.info("[Service:CampusService] createCampus() succeeded - Campus created with id: {}", saved.getId());
+        return CampusMapper.toResponseDTO(saved);
+    }
+
+    @Transactional
+    public CampusResponseDTO updateCampus(Long id, CampusCreateRequestDTO requestDTO) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(CampusErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:CampusService] updateCampus() called - id: {}, institute: {}", id, organizationId);
+
+        CampusEntity existing = campusRepository.findByIdAndInstituteId(id, organizationId)
+                .orElseThrow(() -> new ApiException(CampusErrors.CAMPUS_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (requestDTO.getCampusCode() != null && !requestDTO.getCampusCode().trim().equals(existing.getCampusCode())) {
+            if (campusRepository.existsByInstituteIdAndCampusCodeAndIdNot(organizationId,
+                    requestDTO.getCampusCode().trim(), id)) {
+                throw new ApiException(CampusErrors.DUPLICATE_CAMPUS_CODE, HttpStatus.CONFLICT);
+            }
         }
 
-        CampusEntity updated = campusRepository.save(entity);
-        CampusResponseDTO response = MapperUtil.mapObject(updated, CampusResponseDTO.class);
-        log.info("Campus updated successfully: {}", response.getId());
-        return response;
+        CampusMapper.updateEntityFromDTO(existing, requestDTO);
+
+        if (requestDTO.getProvinceId() != null) {
+            existing.setProvince(provinceRepository.findById(requestDTO.getProvinceId()).orElse(null));
+        }
+        if (requestDTO.getCityId() != null) {
+            existing.setCity(cityRepository.findById(requestDTO.getCityId()).orElse(null));
+        }
+
+        CampusEntity updated = campusRepository.save(existing);
+
+        log.info("[Service:CampusService] updateCampus() succeeded - id: {}", id);
+        return CampusMapper.toResponseDTO(updated);
     }
 
     public List<CampusResponseDTO> searchByKeyword(String keyword) {
-        try {
-            log.info("Fetching all Campuses based on search from database");
-            List<CampusEntity> result = campusRepository.searchByKeyword(keyword);
-            List<CampusResponseDTO> responseDTOS = MapperUtil.mapList(result, CampusResponseDTO.class);
-            log.info("Successfully fetched Campuses based on search {} ", responseDTOS.size());
-            return responseDTOS;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Discount Types based on search", dae);
-            throw new CustomServiceException("Unable to fetch Discount Types based on search from database", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping DiscountTpe Entity to Discount Types based on search", me);
-            throw new CustomServiceException("Error converting  Discount Types data based on search", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Discount Types based on search", e);
-            throw new CustomServiceException("Unexpected error occurred", e);
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(CampusErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        log.info("[Service:CampusService] searchByKeyword() called - keyword: {}, institute: {}", keyword,
+                organizationId);
+        List<CampusEntity> result = campusRepository.searchByKeywordAndInstituteId(keyword, organizationId);
+        List<CampusResponseDTO> responseDTOs = CampusMapper.toResponseDTOList(result);
+        log.info("[Service:CampusService] searchByKeyword() succeeded - Found {} campuses", responseDTOs.size());
+        return responseDTOs;
     }
 
     public Long getCampusCountByInstituteId(Long instituteId) {
-        if (instituteId == null) {
-            log.error("Institute ID is null");
-            throw new IllegalArgumentException("Institute ID must not be null");
+        log.info("[Service:CampusService] getCampusCountByInstituteId() called - institute: {}", instituteId);
+        return campusRepository.countByInstituteId(instituteId);
+    }
+
+    public java.util.Map<String, Long> getStatistics() {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(CampusErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        Long count = campusRepository.countByInstituteId(instituteId);
-        log.info("Found {} campuses for institute ID {}", count, instituteId);
-        return count;
+        log.info("[Service:CampusService] getStatistics() called - institute: {}", organizationId);
+
+        java.util.Map<String, Long> stats = new java.util.HashMap<>();
+        stats.put("totalCampuses", campusRepository.countByInstituteId(organizationId));
+        stats.put("activeCampuses", campusRepository.countByInstituteIdAndActiveTrue(organizationId));
+        stats.put("inactiveCampuses", campusRepository.countByInstituteIdAndActiveFalse(organizationId));
+
+        log.info("[Service:CampusService] getStatistics() succeeded - Stats: {}", stats);
+        return stats;
     }
 }
-
-

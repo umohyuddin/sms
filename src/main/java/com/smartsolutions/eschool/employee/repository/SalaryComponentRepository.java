@@ -1,13 +1,12 @@
 package com.smartsolutions.eschool.employee.repository;
 
-
 import com.smartsolutions.eschool.employee.model.SalaryComponentEntity;
-import com.smartsolutions.eschool.global.enums.ComponentType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,60 +14,56 @@ import java.util.Optional;
 @Repository
 public interface SalaryComponentRepository extends JpaRepository<SalaryComponentEntity, Long> {
 
-    /* =========================
-       FIND BY ID (ACTIVE ONLY)
-       ========================= */
-    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.id = :id AND sc.deleted = false")
-    Optional<SalaryComponentEntity> findByIdActive(Long id);
+    @Query("""
+            SELECT s
+            FROM SalaryComponentEntity s
+            WHERE s.id = :id
+              AND s.deleted = false
+            """)
+    Optional<SalaryComponentEntity> findByIdAndDeletedFalse(@Param("id") Long id);
 
-    /* =========================
-       FIND ALL ACTIVE
-       ========================= */
-    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.deleted = false ORDER BY sc.name ASC")
-    List<SalaryComponentEntity> findAllActive();
+    @Query("""
+            SELECT s
+            FROM SalaryComponentEntity s
+            WHERE s.deleted = false
+            ORDER BY s.name ASC
+            """)
+    List<SalaryComponentEntity> findAllNotDeleted();
 
-    /* =========================
-       FIND ALL INACTIVE
-       ========================= */
-    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.deleted = true ORDER BY sc.name ASC")
-    List<SalaryComponentEntity> findAllInactive();
+    @Query("""
+            SELECT s
+            FROM SalaryComponentEntity s
+            WHERE s.organizationId = :organizationId
+              AND s.deleted = false
+            ORDER BY s.name ASC
+            """)
+    List<SalaryComponentEntity> findByOrganizationId(@Param("organizationId") Long organizationId);
 
-    /* =========================
-       SEARCH BY NAME
-       ========================= */
-    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.deleted = false AND LOWER(sc.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<SalaryComponentEntity> searchByName(String keyword);
+    @Query("""
+            SELECT s
+            FROM SalaryComponentEntity s
+            WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+              AND s.deleted = false
+            ORDER BY s.name ASC
+            """)
+    List<SalaryComponentEntity> searchByKeyword(@Param("keyword") String keyword);
 
-    /* =========================
-       FIND BY TYPE
-       ========================= */
-//    @Query("SELECT sc FROM SalaryComponentEntity sc WHERE sc.deleted = false AND sc.type = :type")
-//    List<SalaryComponentEntity> findByType(ComponentType type);
-
-    /* =========================
-       SOFT DELETE
-       ========================= */
     @Modifying
-    @Query("UPDATE SalaryComponentEntity sc SET sc.deleted = true WHERE sc.id = :id")
-    int softDeleteById(Long id);
+    @Transactional
+    @Query("""
+            UPDATE SalaryComponentEntity s
+            SET s.deleted = true,
+                s.deletedAt = CURRENT_TIMESTAMP
+            WHERE s.id = :id
+            """)
+    int softDeleteById(@Param("id") Long id);
 
-    /* =========================
-       COUNT ACTIVE / INACTIVE
-       ========================= */
-    @Query("SELECT COUNT(sc) FROM SalaryComponentEntity sc WHERE sc.deleted = false")
-    Long countActive();
+    @Query("SELECT COUNT(s) FROM SalaryComponentEntity s WHERE s.deleted = false")
+    Long countAllNotDeleted();
 
-    @Query("SELECT COUNT(sc) FROM SalaryComponentEntity sc WHERE sc.deleted = true")
-    Long countInactive();
+    @Query("SELECT (COUNT(s) > 0) FROM SalaryComponentEntity s WHERE s.name = :name AND s.organizationId = :organizationId AND s.deleted = false")
+    boolean existsByNameAndOrganizationId(@Param("name") String name, @Param("organizationId") Long organizationId);
 
-    @Query("SELECT s FROM SalaryComponentEntity s " +
-            "WHERE s.deleted = false " +
-            "AND (:name IS NULL OR LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%'))) " +
-            "AND (:type IS NULL OR s.type = :type) " +
-            "AND (:isPercentage IS NULL OR s.isPercentage = :isPercentage)")
-    List<SalaryComponentEntity> search(
-            @Param("name") String name,
-            @Param("type") ComponentType type,
-            @Param("isPercentage") Boolean isPercentage
-    );
+    @Query("SELECT (COUNT(s) > 0) FROM SalaryComponentEntity s WHERE s.name = :name AND s.organizationId = :organizationId AND s.id <> :id AND s.deleted = false")
+    boolean existsByNameAndOrganizationIdAndIdNot(@Param("name") String name, @Param("organizationId") Long organizationId, @Param("id") Long id);
 }

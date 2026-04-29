@@ -2,59 +2,66 @@ package com.smartsolutions.eschool.lookups.facade;
 
 import com.smartsolutions.eschool.lookups.dtos.city.requestDto.CityRequestDTO;
 import com.smartsolutions.eschool.lookups.dtos.city.responseDto.CityResponseDTO;
-import com.smartsolutions.eschool.lookups.dtos.province.requestDto.ProvinceRequestDTO;
-import com.smartsolutions.eschool.lookups.dtos.province.responseDto.ProvinceResponseDTO;
 import com.smartsolutions.eschool.lookups.service.CityService;
-import com.smartsolutions.eschool.lookups.service.ProvinceService;
-import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class CityFacade {
-
-
     private final CityService cityService;
 
     public CityFacade(CityService cityService) {
         this.cityService = cityService;
     }
 
-    // Create or update city
-    public CityResponseDTO createCity(@Valid CityRequestDTO requestDTO) {
-        return cityService.createCity(requestDTO);
+    public List<CityResponseDTO> getAll() {
+        log.info("[Facade:CityFacade] getAll() called");
+        return cityService.getAll();
     }
 
-    // Get all active cities
     public List<CityResponseDTO> getAllActive() {
+        log.info("[Facade:CityFacade] getAllActive() called");
         return cityService.getAllActive();
     }
 
-    // Get city by ID
-    public CityResponseDTO getById(Long cityId) {
-        return cityService.getById(cityId);
+    public List<CityResponseDTO> getByProvinceId(Long provinceId) {
+        log.info("[Facade:CityFacade] getByProvinceId() called - provinceId: {}", provinceId);
+        return cityService.getByProvinceId(provinceId);
     }
 
-    // Search cities by keyword
+    public CityResponseDTO getById(Long id) {
+        log.info("[Facade:CityFacade] getById() called - id: {}", id);
+        return cityService.getById(id);
+    }
+
     public List<CityResponseDTO> searchByKeyword(String keyword) {
+        log.info("[Facade:CityFacade] searchByKeyword() called - keyword: {}", keyword);
         return cityService.searchByKeyword(keyword);
     }
 
-    // Get cities by province
-    public List<CityResponseDTO> getByProvince(Long provinceId) {
-        return cityService.getByProvince(provinceId);
+    public void softDeleteById(Long id) {
+        log.info("[Facade:CityFacade] softDeleteById() called - id: {}", id);
+        cityService.softDeleteById(id);
     }
 
-    // Soft delete city by ID
-    public int softDeleteById(Long cityId) {
-        return cityService.softDeleteById(cityId);
+    public CityResponseDTO create(CityRequestDTO dto) {
+        log.info("[Facade:CityFacade] create() called");
+        return cityService.create(dto);
     }
 
-    // Activate / Deactivate city
-    public int setActiveStatus(Long cityId, boolean status) {
-        return cityService.setActiveStatus(cityId, status);
+    public CityResponseDTO update(Long id, CityRequestDTO dto) {
+        log.info("[Facade:CityFacade] update() called - id: {}", id);
+        return cityService.update(id, dto);
+    }
+
+    public Map<String, Long> getStatistics() {
+        log.info("[Facade:CityFacade] getStatistics() called");
+        return cityService.getStatistics();
     }
 }

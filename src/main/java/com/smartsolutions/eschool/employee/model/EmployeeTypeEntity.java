@@ -1,15 +1,19 @@
 package com.smartsolutions.eschool.employee.model;
 
-import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "employee_type")
 @Getter
 @Setter
-public class EmployeeTypeEntity extends AuditableEntity {
+@NoArgsConstructor
+@AllArgsConstructor
+public class EmployeeTypeEntity extends ScopeAuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +30,4 @@ public class EmployeeTypeEntity extends AuditableEntity {
 
     @Column(nullable = false)
     private Boolean deleted = false;
-
-
-
 }

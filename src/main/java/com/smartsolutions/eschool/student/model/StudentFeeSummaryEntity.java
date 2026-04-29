@@ -19,11 +19,14 @@ public class StudentFeeSummaryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+ 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private com.smartsolutions.eschool.school.model.InstituteEntity institute;
 
     private BigDecimal totalAssignedFee;
-
+    private BigDecimal totalDiscount;
     private BigDecimal totalPaid;
-
     private BigDecimal balance;
 
     @ManyToOne
