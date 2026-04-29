@@ -3,9 +3,13 @@ package com.smartsolutions.eschool.lookups.model;
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "languages")
+@SQLDelete(sql = "UPDATE languages SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,3 +33,4 @@ public class LanguageEntity extends ScopeAuditableEntity {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 }
+

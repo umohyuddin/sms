@@ -1,7 +1,9 @@
 package com.smartsolutions.eschool.user.service;
 
 import com.smartsolutions.eschool.auth.dtos.auth.requestDto.LoginRequestDTO;
+import com.smartsolutions.eschool.auth.dtos.auth.responseDto.EmployeeDetailsDTO;
 import com.smartsolutions.eschool.auth.dtos.auth.responseDto.LoginResponseDTO;
+import com.smartsolutions.eschool.auth.dtos.auth.responseDto.StudentDetailsDTO;
 import com.smartsolutions.eschool.user.model.RoleEntity;
 import com.smartsolutions.eschool.user.model.SystemUserEntity;
 import com.smartsolutions.eschool.user.model.UserRoleId;
@@ -104,12 +106,19 @@ public class SystemUserService {
         
         // Set employee or student information
         if (result.getEmployee() != null) {
-            responseDTO.setEmployeeId(result.getEmployee().getId());
-            responseDTO.setEmployeeCode(result.getEmployee().getEmployeeCode());
+            EmployeeDetailsDTO employeeDTO = new EmployeeDetailsDTO();
+            employeeDTO.setEmployeeId(result.getEmployee().getId());
+            employeeDTO.setEmployeeCode(result.getEmployee().getEmployeeCode());
+            employeeDTO.setEmployeeFullName(result.getEmployee().getFullName());
+            employeeDTO.setEmployeeFirstName(result.getEmployee().getFirstName());
+            employeeDTO.setEmployeeLastName(result.getEmployee().getLastName());
+            responseDTO.setEmployee(employeeDTO);
         }
         if (result.getStudent() != null) {
-            responseDTO.setStudentId(result.getStudent().getId());
-            responseDTO.setStudentCode(result.getStudent().getStudentCode());
+            StudentDetailsDTO studentDTO = new StudentDetailsDTO();
+            studentDTO.setStudentId(result.getStudent().getId());
+            studentDTO.setStudentCode(result.getStudent().getStudentCode());
+            responseDTO.setStudent(studentDTO);
         }
         
         log.info("Successfully fetched user data for email: {}", loginRequestDTO.getEmail());
