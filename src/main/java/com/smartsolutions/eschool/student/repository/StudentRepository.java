@@ -305,7 +305,9 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
 
     @Query("""
         SELECT 
+            s.campus.id,
             s.campus.campusName, 
+            s.standard.id,
             s.standard.standardName, 
             COUNT(s),
             SUM(CASE WHEN s.isActive = true THEN 1 ELSE 0 END),
@@ -318,7 +320,7 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
           AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
           AND (:fromDate IS NULL OR s.enrollmentDate >= :fromDate)
           AND (:toDate IS NULL OR s.enrollmentDate <= :toDate)
-        GROUP BY s.campus.campusName, s.standard.standardName
+        GROUP BY s.campus.id, s.campus.campusName, s.standard.id, s.standard.standardName
         ORDER BY s.campus.campusName, s.standard.standardName
     """)
     List<Object[]> getCampusClassDistribution(

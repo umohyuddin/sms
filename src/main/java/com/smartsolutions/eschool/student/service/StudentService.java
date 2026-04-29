@@ -437,24 +437,29 @@ public class StudentService {
         List<Object[]> results = studentRepository.getCampusClassDistribution(
                 filter.getCampusIds(), academicYearId, filter.getFromDate(), filter.getToDate(), orgId);
 
-        // Group by campusName
+        // Group by campusName (or ID + Name)
         Map<String, List<Object[]>> byCampus = results.stream()
-                .collect(Collectors.groupingBy(row -> row[0] != null ? row[0].toString() : "Unknown Campus"));
+                .collect(Collectors.groupingBy(row -> row[1] != null ? row[1].toString() : "Unknown Campus"));
 
         List<com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution> response = new ArrayList<>();
         for (Map.Entry<String, List<Object[]>> entry : byCampus.entrySet()) {
-            List<com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution> classes = entry.getValue().stream().map(row -> {
+            List<Object[]> campusRows = entry.getValue();
+            Long campusId = campusRows.isEmpty() ? null : (Long) campusRows.get(0)[0];
+
+            List<com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution> classes = campusRows.stream().map(row -> {
                 return com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution.builder()
-                        .className(row[1] != null ? row[1].toString() : "N/A")
-                        .total(((Number) row[2]).longValue())
-                        .active(row[3] != null ? ((Number) row[3]).longValue() : 0L)
-                        .male(row[4] != null ? ((Number) row[4]).longValue() : 0L)
-                        .female(row[5] != null ? ((Number) row[5]).longValue() : 0L)
-                        .other(row[6] != null ? ((Number) row[6]).longValue() : 0L)
+                        .classId(row[2] != null ? (Long) row[2] : null)
+                        .className(row[3] != null ? row[3].toString() : "N/A")
+                        .total(((Number) row[4]).longValue())
+                        .active(row[5] != null ? ((Number) row[5]).longValue() : 0L)
+                        .male(row[6] != null ? ((Number) row[6]).longValue() : 0L)
+                        .female(row[7] != null ? ((Number) row[7]).longValue() : 0L)
+                        .other(row[8] != null ? ((Number) row[8]).longValue() : 0L)
                         .build();
             }).collect(Collectors.toList());
 
             response.add(com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution.builder()
+                    .campusId(campusId)
                     .campus(entry.getKey())
                     .classes(classes)
                     .build());

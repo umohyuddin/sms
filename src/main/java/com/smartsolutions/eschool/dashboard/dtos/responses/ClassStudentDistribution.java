@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "Distribution of students for a specific class")
 public class ClassStudentDistribution {
+    @Schema(description = "ID of the class/standard", example = "10")
+    private Long classId;
+
     @Schema(description = "Name of the class/standard", example = "Class 1")
     private String className;
     
