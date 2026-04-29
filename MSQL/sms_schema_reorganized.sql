@@ -821,8 +821,10 @@ CREATE TABLE board_member_roles (
         updated_at DATETIME,
         updated_by BIGINT,
         deleted_at DATETIME,
-        deleted_by BIGINT
+        deleted_by BIGINT,
+        CONSTRAINT fk_charge_type_organization FOREIGN KEY (organization_id) REFERENCES institutes(id)
     );
+    CREATE INDEX idx_charge_type_organization ON charge_types (organization_id);
 
 
     DROP TABLE IF EXISTS fee_catalog;
@@ -847,12 +849,16 @@ CREATE TABLE board_member_roles (
         deleted_at DATETIME,
         deleted_by BIGINT,
 
+        CONSTRAINT fk_fee_catalog_organization
+            FOREIGN KEY (organization_id) REFERENCES institutes(id),
+
         CONSTRAINT fk_fee_catalog_charge_type
             FOREIGN KEY (charge_type_id) REFERENCES charge_types(id),
 
         CONSTRAINT fk_fee_catalog_recurrence
             FOREIGN KEY (recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
     );
+    CREATE INDEX idx_fee_catalog_organization ON fee_catalog (organization_id);
 
 
 
@@ -874,8 +880,10 @@ CREATE TABLE board_member_roles (
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        CONSTRAINT fk_fee_component_catalog FOREIGN KEY (fee_catalog_id) REFERENCES fee_catalog (id)
+        CONSTRAINT fk_fee_component_catalog FOREIGN KEY (fee_catalog_id) REFERENCES fee_catalog (id),
+        CONSTRAINT fk_fee_component_organization FOREIGN KEY (organization_id) REFERENCES institutes(id)
     );
+    CREATE INDEX idx_fee_component_organization ON fee_component (organization_id);
     CREATE INDEX idx_fee_component_catalog_id ON fee_component (fee_catalog_id);
 
 
@@ -953,7 +961,7 @@ CREATE TABLE board_member_roles (
         organization_id BIGINT NOT NULL,
         campus_id BIGINT NOT NULL,
         standard_id BIGINT NOT NULL,
-        fee_component_id BIGINT,
+        fee_component_id BIGINT NOT NULL,
         academic_year_id BIGINT NOT NULL,
         description VARCHAR(255),
          fixed_amount DECIMAL(12,2),
@@ -979,13 +987,23 @@ CREATE TABLE board_member_roles (
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
+        CONSTRAINT fk_fee_rates_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
         CONSTRAINT fk_fee_rates_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
         CONSTRAINT fk_fee_rates_standard FOREIGN KEY (standard_id) REFERENCES standards (id),
         CONSTRAINT fk_fee_rates_component FOREIGN KEY (fee_component_id) REFERENCES fee_component (id),
         CONSTRAINT fk_fee_rates_charge_type FOREIGN KEY (charge_type_id) REFERENCES charge_types (id),
         CONSTRAINT fk_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
-        CONSTRAINT chk_fee_rates_dates CHECK (effective_to IS NULL OR effective_to >= effective_from)
+        CONSTRAINT chk_fee_rates_dates CHECK (effective_to IS NULL OR effective_to >= effective_from),
+        -- Ensure only one pricing method is used
+        CONSTRAINT chk_fee_rates_pricing_mode CHECK (
+            (CASE WHEN fixed_amount IS NOT NULL THEN 1 ELSE 0 END +
+             CASE WHEN percentage_value IS NOT NULL THEN 1 ELSE 0 END +
+             CASE WHEN unit_price IS NOT NULL THEN 1 ELSE 0 END +
+             CASE WHEN slab_group_id IS NOT NULL THEN 1 ELSE 0 END) = 1
+        ),
+        CONSTRAINT uq_fee_rate UNIQUE (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, effective_from)
     );
+    CREATE INDEX idx_fee_rates_organization ON fee_rates (organization_id);
     CREATE INDEX idx_fee_rates_campus_id ON fee_rates (campus_id);
     CREATE INDEX idx_fee_rates_standard_id ON fee_rates (standard_id);
     CREATE INDEX idx_fee_rates_component_id ON fee_rates (fee_component_id);
@@ -1294,16 +1312,18 @@ CREATE TABLE student_guardians (
         student_id BIGINT NOT NULL,
         fee_rate_id BIGINT NOT NULL,
         academic_year_id BIGINT NOT NULL,
-        total_amount DOUBLE NOT NULL,
+        total_amount DECIMAL(12,2) NOT NULL,
         due_date DATE,
         assigned_date DATE,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        CONSTRAINT fk_sfa_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
         CONSTRAINT fk_sfa_student FOREIGN KEY (student_id) REFERENCES students (id),
         CONSTRAINT fk_sfa_fee_rate FOREIGN KEY (fee_rate_id) REFERENCES fee_rates (id),
         CONSTRAINT fk_sfa_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
         CONSTRAINT chk_student_fee_assign_amount CHECK (total_amount >= 0)
     );
+    CREATE INDEX idx_sfa_organization ON student_fee_assignments (organization_id);
     ALTER TABLE student_fee_assignments ADD CONSTRAINT uq_student_fee_unique UNIQUE (student_id, fee_rate_id, academic_year_id);
     CREATE INDEX idx_student_fee_assign_fee_rate_id ON student_fee_assignments (fee_rate_id);
     CREATE INDEX idx_student_fee_assign_academic_year_id ON student_fee_assignments (academic_year_id);
@@ -1315,15 +1335,17 @@ CREATE TABLE student_guardians (
         academic_year_id BIGINT NOT NULL,
         student_id BIGINT NOT NULL,
         payment_date DATE,
-        amount_paid DOUBLE NOT NULL,
+        amount_paid DECIMAL(12,2) NOT NULL,
         payment_month VARCHAR(20) NOT NULL,
         payment_year INT NOT NULL,
         payment_mode VARCHAR(50),
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_sfp_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
         CONSTRAINT fk_fee_payment_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
         CONSTRAINT fk_sfp_student FOREIGN KEY (student_id) REFERENCES students (id),
         CONSTRAINT chk_student_fee_payment_amount CHECK (amount_paid >= 0)
     );
+    CREATE INDEX idx_sfp_organization ON student_fee_payments (organization_id);
     CREATE INDEX idx_student_fee_payments_academic_year_id ON student_fee_payments (academic_year_id);
     CREATE INDEX idx_student_fee_payments_student_id ON student_fee_payments (student_id);
 
@@ -1338,11 +1360,13 @@ CREATE TABLE student_guardians (
         total_paid DECIMAL(10, 2) NOT NULL DEFAULT 0,
         balance DECIMAL(10, 2) NOT NULL DEFAULT 0,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        CONSTRAINT fk_student_fee_summary_student FOREIGN KEY (student_id) REFERENCES students (id),
+        CONSTRAINT fk_student_fee_summary_organization FOREIGN KEY (organization_id) REFERENCES institutes(id),
+        CONSTRAINT fk_student_fee_summary_student FOREIGN KEY (student_id) REFERENCES students(id),
         CONSTRAINT fk_Student_fee_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
         CONSTRAINT chk_student_fee_summary_totals CHECK (total_assigned_fee >= 0 AND total_paid >= 0 AND balance >= 0)
     );
-    ALTER TABLE student_fee_summary ADD CONSTRAINT uq_student_fee_summary UNIQUE (student_id, academic_year_id);
+    CREATE INDEX idx_student_fee_summary_organization ON student_fee_summary (organization_id);
+    ALTER TABLE student_fee_summary ADD CONSTRAINT uq_student_fee_summary UNIQUE (organization_id, student_id, academic_year_id);
     CREATE INDEX idx_student_fee_summary_academic_year_id ON student_fee_summary (academic_year_id);
 
     DROP TABLE IF EXISTS discount_type;
@@ -1365,9 +1389,11 @@ CREATE TABLE student_guardians (
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT uq_discount_type_code UNIQUE (code),
+        CONSTRAINT fk_discount_type_organization FOREIGN KEY (organization_id) REFERENCES institutes(id),
         CONSTRAINT fk_discount_type_charge_type FOREIGN KEY (charge_type_id) REFERENCES charge_types(id),
         CONSTRAINT fk_discount_type_recurrence_rule FOREIGN KEY (recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
     );
+    CREATE INDEX idx_discount_type_organization ON discount_type (organization_id);
 
     DROP TABLE IF EXISTS discount_sub_type;
     CREATE TABLE discount_sub_type (
@@ -1387,8 +1413,10 @@ CREATE TABLE student_guardians (
         deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
+        CONSTRAINT fk_discount_sub_type_organization FOREIGN KEY (organization_id) REFERENCES institutes(id),
         CONSTRAINT fk_discount_type FOREIGN KEY (discount_type_id) REFERENCES discount_type (id)
     );
+    CREATE INDEX idx_discount_sub_type_organization ON discount_sub_type (organization_id);
     CREATE INDEX idx_discount_sub_type_discount_type_id ON discount_sub_type (discount_type_id);
 
     DROP TABLE IF EXISTS discount_rate;
@@ -1410,11 +1438,13 @@ CREATE TABLE student_guardians (
         updated_by BIGINT NULL,
         deleted_at DATETIME,
         deleted_by BIGINT,
+        CONSTRAINT fk_discount_rate_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
         CONSTRAINT fk_discount_rate_discount_sub_type FOREIGN KEY (discount_sub_type_id) REFERENCES discount_sub_type (id),
         CONSTRAINT fk_discount_rate_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
         CONSTRAINT fk_discount_rate_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
         CONSTRAINT chk_discount_rate_value CHECK (value >= 0)
     );
+    CREATE INDEX idx_discount_rate_organization ON discount_rate (organization_id);
     CREATE INDEX idx_discount_rate_discount_sub_type_id ON discount_rate (discount_sub_type_id);
     CREATE INDEX idx_discount_rate_campus_id ON discount_rate (campus_id);
     CREATE INDEX idx_discount_rate_academic_year_id ON discount_rate (academic_year_id);
@@ -1438,6 +1468,7 @@ CREATE TABLE student_guardians (
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
+        CONSTRAINT fk_sda_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
         CONSTRAINT fk_sda_student FOREIGN KEY (student_id) REFERENCES students (id),
         CONSTRAINT fk_sda_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
         CONSTRAINT fk_sda_rate FOREIGN KEY (discount_rate_id) REFERENCES discount_rate (id),
@@ -1445,6 +1476,7 @@ CREATE TABLE student_guardians (
         CONSTRAINT chk_student_discount_amount CHECK (applied_amount IS NULL OR applied_amount >= 0),
         CONSTRAINT chk_student_discount_percentage CHECK (applied_percentage IS NULL OR (applied_percentage >= 0 AND applied_percentage <= 100))
     );
+    CREATE INDEX idx_student_discount_assignment_organization ON student_discount_assignment (organization_id);
     ALTER TABLE student_discount_assignment ADD CONSTRAINT uq_student_discount_unique UNIQUE (student_id, discount_rate_id, academic_year_id);
     CREATE INDEX idx_student_discount_assignment_campus_id ON student_discount_assignment (campus_id);
     CREATE INDEX idx_student_discount_assignment_rate_id ON student_discount_assignment (discount_rate_id);

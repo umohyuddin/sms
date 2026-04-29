@@ -434,34 +434,65 @@ public class StudentService {
                     .orElse(null);
         }
 
-        List<Object[]> results = studentRepository.getCampusClassDistribution(
+        List<Object[]> results = studentRepository.getCampusClassSectionDistribution(
                 filter.getCampusIds(), academicYearId, filter.getFromDate(), filter.getToDate(), orgId);
 
-        // Group by campusName (or ID + Name)
-        Map<String, List<Object[]>> byCampus = results.stream()
-                .collect(Collectors.groupingBy(row -> row[1] != null ? row[1].toString() : "Unknown Campus"));
+        // Group by Campus ID
+        Map<Long, List<Object[]>> byCampus = results.stream()
+                .collect(Collectors.groupingBy(row -> row[0] != null ? (Long) row[0] : -1L));
 
         List<com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution> response = new ArrayList<>();
-        for (Map.Entry<String, List<Object[]>> entry : byCampus.entrySet()) {
-            List<Object[]> campusRows = entry.getValue();
-            Long campusId = campusRows.isEmpty() ? null : (Long) campusRows.get(0)[0];
 
-            List<com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution> classes = campusRows.stream().map(row -> {
-                return com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution.builder()
-                        .classId(row[2] != null ? (Long) row[2] : null)
-                        .className(row[3] != null ? row[3].toString() : "N/A")
-                        .total(((Number) row[4]).longValue())
-                        .active(row[5] != null ? ((Number) row[5]).longValue() : 0L)
-                        .male(row[6] != null ? ((Number) row[6]).longValue() : 0L)
-                        .female(row[7] != null ? ((Number) row[7]).longValue() : 0L)
-                        .other(row[8] != null ? ((Number) row[8]).longValue() : 0L)
-                        .build();
-            }).collect(Collectors.toList());
+        for (Map.Entry<Long, List<Object[]>> campusEntry : byCampus.entrySet()) {
+            List<Object[]> campusRows = campusEntry.getValue();
+            String campusName = campusRows.isEmpty() ? "Unknown Campus" : (campusRows.get(0)[1] != null ? campusRows.get(0)[1].toString() : "Unknown Campus");
+
+            // Group by Class ID within the campus
+            Map<Long, List<Object[]>> byClass = campusRows.stream()
+                    .collect(Collectors.groupingBy(row -> row[2] != null ? (Long) row[2] : -1L));
+
+            List<com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution> classDistributions = new ArrayList<>();
+
+            for (Map.Entry<Long, List<Object[]>> classEntry : byClass.entrySet()) {
+                List<Object[]> classRows = classEntry.getValue();
+                String className = classRows.isEmpty() ? "N/A" : (classRows.get(0)[3] != null ? classRows.get(0)[3].toString() : "N/A");
+
+                // Map rows to Sections
+                List<com.smartsolutions.eschool.dashboard.dtos.responses.SectionStudentDistribution> sectionDistributions = classRows.stream()
+                        .map(row -> com.smartsolutions.eschool.dashboard.dtos.responses.SectionStudentDistribution.builder()
+                                .sectionId(row[4] != null ? (Long) row[4] : null)
+                                .sectionName(row[5] != null ? row[5].toString() : "Unassigned")
+                                .total(((Number) row[6]).longValue())
+                                .active(row[7] != null ? ((Number) row[7]).longValue() : 0L)
+                                .male(row[8] != null ? ((Number) row[8]).longValue() : 0L)
+                                .female(row[9] != null ? ((Number) row[9]).longValue() : 0L)
+                                .other(row[10] != null ? ((Number) row[10]).longValue() : 0L)
+                                .build())
+                        .collect(Collectors.toList());
+
+                // Calculate totals for the Class (sum of its sections)
+                long classTotal = sectionDistributions.stream().mapToLong(s -> s.getTotal()).sum();
+                long classActive = sectionDistributions.stream().mapToLong(s -> s.getActive()).sum();
+                long classMale = sectionDistributions.stream().mapToLong(s -> s.getMale()).sum();
+                long classFemale = sectionDistributions.stream().mapToLong(s -> s.getFemale()).sum();
+                long classOther = sectionDistributions.stream().mapToLong(s -> s.getOther()).sum();
+
+                classDistributions.add(com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution.builder()
+                        .classId(classEntry.getKey() == -1L ? null : classEntry.getKey())
+                        .className(className)
+                        .total(classTotal)
+                        .active(classActive)
+                        .male(classMale)
+                        .female(classFemale)
+                        .other(classOther)
+                        .sections(sectionDistributions)
+                        .build());
+            }
 
             response.add(com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution.builder()
-                    .campusId(campusId)
-                    .campus(entry.getKey())
-                    .classes(classes)
+                    .campusId(campusEntry.getKey() == -1L ? null : campusEntry.getKey())
+                    .campus(campusName)
+                    .classes(classDistributions)
                     .build());
         }
 

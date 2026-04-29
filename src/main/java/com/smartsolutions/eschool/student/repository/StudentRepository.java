@@ -331,6 +331,38 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
         @Param("organizationId") Long organizationId);
 
     @Query("""
+        SELECT 
+            c.id,
+            c.campusName, 
+            st.id,
+            st.standardName, 
+            sec.id,
+            sec.sectionName,
+            COUNT(s),
+            SUM(CASE WHEN s.isActive = true THEN 1 ELSE 0 END),
+            SUM(CASE WHEN UPPER(s.gender) = 'MALE' THEN 1 ELSE 0 END),
+            SUM(CASE WHEN UPPER(s.gender) = 'FEMALE' THEN 1 ELSE 0 END),
+            SUM(CASE WHEN UPPER(s.gender) = 'OTHER' THEN 1 ELSE 0 END)
+        FROM StudentEntity s
+        LEFT JOIN s.campus c
+        LEFT JOIN s.standard st
+        LEFT JOIN s.section sec
+        WHERE s.organizationId = :organizationId AND s.deleted = false
+          AND (:campusIds IS NULL OR c.id IN :campusIds)
+          AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
+          AND (:fromDate IS NULL OR s.enrollmentDate >= :fromDate)
+          AND (:toDate IS NULL OR s.enrollmentDate <= :toDate)
+        GROUP BY c.id, c.campusName, st.id, st.standardName, sec.id, sec.sectionName
+        ORDER BY c.campusName, st.standardName, sec.sectionName
+    """)
+    List<Object[]> getCampusClassSectionDistribution(
+        @Param("campusIds") List<Long> campusIds,
+        @Param("academicYearId") Long academicYearId,
+        @Param("fromDate") java.time.LocalDate fromDate,
+        @Param("toDate") java.time.LocalDate toDate, 
+        @Param("organizationId") Long organizationId);
+
+    @Query("""
             SELECT s.gender, COUNT(s)
             FROM StudentEntity s
             WHERE s.campus.institute.id = :organizationId

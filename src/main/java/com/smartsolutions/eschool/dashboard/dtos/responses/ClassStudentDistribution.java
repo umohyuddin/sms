@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -32,4 +34,7 @@ public class ClassStudentDistribution {
     
     @Schema(description = "Number of students with other or unassigned gender", example = "5")
     private Long other;
+
+    @Schema(description = "Breakdown of students by section within this class")
+    private List<SectionStudentDistribution> sections;
 }
