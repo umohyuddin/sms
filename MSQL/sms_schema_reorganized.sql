@@ -791,19 +791,36 @@ CREATE TABLE board_member_roles (
     DROP TABLE IF EXISTS fee_recurrence_rules;
     CREATE TABLE fee_recurrence_rules (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
-        code VARCHAR(30) UNIQUE NOT NULL,
+
+        -- NULL = global system rule (e.g. Monthly, Quarterly); NOT NULL = tenant-custom rule
+        organization_id BIGINT NULL,
+
+        code VARCHAR(30) NOT NULL,
         name VARCHAR(100) NOT NULL,
         description VARCHAR(255),
+
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
         is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
         deleted_at DATETIME,
-        deleted_by BIGINT
+        deleted_by BIGINT,
+
+        -- code must be unique within each org (NULLs treated as distinct, safe for global rows)
+        CONSTRAINT uq_fee_recurrence_rule_org_code UNIQUE (organization_id, code),
+
+        -- Composite key required for composite FK references from child tables
+        CONSTRAINT uq_fee_recurrence_rule_org_id UNIQUE (organization_id, id),
+
+        CONSTRAINT fk_fee_recurrence_rule_org
+            FOREIGN KEY (organization_id) REFERENCES institutes(id)
     );
+    -- Index on code alone for fast scoped lookups when org is not leading filter
     CREATE INDEX idx_fee_recurrence_rule_code ON fee_recurrence_rules (code);
+    CREATE INDEX idx_fee_recurrence_rule_org  ON fee_recurrence_rules (organization_id);
 
 
 
@@ -822,7 +839,9 @@ CREATE TABLE board_member_roles (
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        CONSTRAINT fk_charge_type_organization FOREIGN KEY (organization_id) REFERENCES institutes(id)
+        CONSTRAINT fk_charge_type_organization FOREIGN KEY (organization_id) REFERENCES institutes(id),
+        -- Composite key required for composite FK references from child tables
+        CONSTRAINT uq_charge_types_org_id UNIQUE (organization_id, id)
     );
     CREATE INDEX idx_charge_type_organization ON charge_types (organization_id);
 
@@ -832,7 +851,8 @@ CREATE TABLE board_member_roles (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
         organization_id BIGINT NOT NULL,
 
-        code VARCHAR(50) NOT NULL UNIQUE,
+        -- Scoped to org: two tenants can both use code 'TUITION'
+        code VARCHAR(50) NOT NULL,
         name VARCHAR(100) NOT NULL,
         description VARCHAR(255),
 
@@ -852,13 +872,25 @@ CREATE TABLE board_member_roles (
         CONSTRAINT fk_fee_catalog_organization
             FOREIGN KEY (organization_id) REFERENCES institutes(id),
 
+        -- Composite FK: ensures charge_type belongs to same tenant
         CONSTRAINT fk_fee_catalog_charge_type
-            FOREIGN KEY (charge_type_id) REFERENCES charge_types(id),
+            FOREIGN KEY (organization_id, charge_type_id)
+            REFERENCES charge_types(organization_id, id),
 
+        -- Composite FK: ensures recurrence rule belongs to same tenant (or is a global rule)
         CONSTRAINT fk_fee_catalog_recurrence
-            FOREIGN KEY (recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
+            FOREIGN KEY (organization_id, recurrence_rule_id)
+            REFERENCES fee_recurrence_rules(organization_id, id),
+
+        -- code unique per org (not globally)
+        CONSTRAINT uq_fee_catalog_org_code UNIQUE (organization_id, code),
+        -- Composite key required for composite FK references from child tables
+        CONSTRAINT uq_fee_catalog_org_id UNIQUE (organization_id, id)
     );
     CREATE INDEX idx_fee_catalog_organization ON fee_catalog (organization_id);
+    -- Standalone index on code for fast scoped lookups (e.g. WHERE code = 'TUITION')
+    -- UNIQUE (organization_id, code) alone is not efficient when organization_id is not the leading filter
+    CREATE INDEX idx_fee_catalog_code ON fee_catalog (code);
 
 
 
@@ -880,8 +912,15 @@ CREATE TABLE board_member_roles (
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        CONSTRAINT fk_fee_component_catalog FOREIGN KEY (fee_catalog_id) REFERENCES fee_catalog (id),
-        CONSTRAINT fk_fee_component_organization FOREIGN KEY (organization_id) REFERENCES institutes(id)
+        CONSTRAINT fk_fee_component_organization FOREIGN KEY (organization_id) REFERENCES institutes(id),
+        -- Composite FK: ensures fee_catalog belongs to same tenant
+        CONSTRAINT fk_fee_component_catalog
+            FOREIGN KEY (organization_id, fee_catalog_id)
+            REFERENCES fee_catalog(organization_id, id),
+        -- Prevent duplicate component codes within same org+catalog
+        CONSTRAINT uq_fee_component_code UNIQUE (organization_id, fee_catalog_id, component_code),
+        -- Composite key required for composite FK references from child tables
+        CONSTRAINT uq_fee_component_org_id UNIQUE (organization_id, id)
     );
     CREATE INDEX idx_fee_component_organization ON fee_component (organization_id);
     CREATE INDEX idx_fee_component_catalog_id ON fee_component (fee_catalog_id);
@@ -910,8 +949,13 @@ CREATE TABLE board_member_roles (
         deleted_at DATETIME,
         deleted_by BIGINT,
 
+        -- Composite FK: ensures fee_component belongs to same tenant
         CONSTRAINT fk_fee_slab_group_component
-            FOREIGN KEY (fee_component_id) REFERENCES fee_component(id)
+            FOREIGN KEY (organization_id, fee_component_id)
+            REFERENCES fee_component(organization_id, id),
+
+        -- Composite key required for composite FK references from child tables
+        CONSTRAINT uq_fee_slab_groups_org_id UNIQUE (organization_id, id)
     );
 
     DROP TABLE IF EXISTS fee_slabs;
@@ -939,8 +983,10 @@ CREATE TABLE board_member_roles (
         deleted_at DATETIME,
         deleted_by BIGINT,
 
+        -- Composite FK: ensures slab_group belongs to same tenant
         CONSTRAINT fk_fee_slabs_group
-            FOREIGN KEY (slab_group_id) REFERENCES fee_slab_groups(id),
+            FOREIGN KEY (organization_id, slab_group_id)
+            REFERENCES fee_slab_groups(organization_id, id),
 
         CONSTRAINT chk_fee_slab_amount
             CHECK (amount >= 0),
@@ -990,8 +1036,13 @@ CREATE TABLE board_member_roles (
         CONSTRAINT fk_fee_rates_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
         CONSTRAINT fk_fee_rates_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
         CONSTRAINT fk_fee_rates_standard FOREIGN KEY (standard_id) REFERENCES standards (id),
-        CONSTRAINT fk_fee_rates_component FOREIGN KEY (fee_component_id) REFERENCES fee_component (id),
-        CONSTRAINT fk_fee_rates_charge_type FOREIGN KEY (charge_type_id) REFERENCES charge_types (id),
+        -- Composite FKs: enforce same-tenant references
+        CONSTRAINT fk_fee_rates_component
+            FOREIGN KEY (organization_id, fee_component_id)
+            REFERENCES fee_component(organization_id, id),
+        CONSTRAINT fk_fee_rates_charge_type
+            FOREIGN KEY (organization_id, charge_type_id)
+            REFERENCES charge_types(organization_id, id),
         CONSTRAINT fk_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
         CONSTRAINT chk_fee_rates_dates CHECK (effective_to IS NULL OR effective_to >= effective_from),
         -- Ensure only one pricing method is used
@@ -1319,7 +1370,10 @@ CREATE TABLE student_guardians (
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         CONSTRAINT fk_sfa_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
         CONSTRAINT fk_sfa_student FOREIGN KEY (student_id) REFERENCES students (id),
-        CONSTRAINT fk_sfa_fee_rate FOREIGN KEY (fee_rate_id) REFERENCES fee_rates (id),
+        -- Composite FK: ensures fee_rate belongs to same tenant
+        CONSTRAINT fk_sfa_fee_rate
+            FOREIGN KEY (organization_id, fee_rate_id)
+            REFERENCES fee_rates(organization_id, id),
         CONSTRAINT fk_sfa_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
         CONSTRAINT chk_student_fee_assign_amount CHECK (total_amount >= 0)
     );
@@ -1388,10 +1442,16 @@ CREATE TABLE student_guardians (
         updated_by BIGINT,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        CONSTRAINT uq_discount_type_code UNIQUE (code),
+        -- code unique per org, not globally
+        CONSTRAINT uq_discount_type_code UNIQUE (organization_id, code),
         CONSTRAINT fk_discount_type_organization FOREIGN KEY (organization_id) REFERENCES institutes(id),
-        CONSTRAINT fk_discount_type_charge_type FOREIGN KEY (charge_type_id) REFERENCES charge_types(id),
-        CONSTRAINT fk_discount_type_recurrence_rule FOREIGN KEY (recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
+        -- Composite FK: ensures charge_type belongs to same tenant
+        CONSTRAINT fk_discount_type_charge_type
+            FOREIGN KEY (organization_id, charge_type_id)
+            REFERENCES charge_types(organization_id, id),
+        CONSTRAINT fk_discount_type_recurrence_rule FOREIGN KEY (recurrence_rule_id) REFERENCES fee_recurrence_rules(id),
+        -- Composite key required for composite FK references from child tables
+        CONSTRAINT uq_discount_type_org_id UNIQUE (organization_id, id)
     );
     CREATE INDEX idx_discount_type_organization ON discount_type (organization_id);
 
@@ -1400,7 +1460,8 @@ CREATE TABLE student_guardians (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
         organization_id BIGINT NOT NULL,
         discount_type_id BIGINT NOT NULL,
-        code VARCHAR(50) UNIQUE NOT NULL,
+        -- Scoped to org: global UNIQUE would block cross-tenant reuse
+        code VARCHAR(50) NOT NULL,
         name VARCHAR(150) NOT NULL,
         description VARCHAR(500),
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -1414,7 +1475,14 @@ CREATE TABLE student_guardians (
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_discount_sub_type_organization FOREIGN KEY (organization_id) REFERENCES institutes(id),
-        CONSTRAINT fk_discount_type FOREIGN KEY (discount_type_id) REFERENCES discount_type (id)
+        -- Composite FK: ensures discount_type belongs to same tenant
+        CONSTRAINT fk_discount_type
+            FOREIGN KEY (organization_id, discount_type_id)
+            REFERENCES discount_type(organization_id, id),
+        -- code unique per org+discount_type
+        CONSTRAINT uq_discount_sub_type_code UNIQUE (organization_id, discount_type_id, code),
+        -- Composite key required for composite FK references from child tables
+        CONSTRAINT uq_discount_sub_type_org_id UNIQUE (organization_id, id)
     );
     CREATE INDEX idx_discount_sub_type_organization ON discount_sub_type (organization_id);
     CREATE INDEX idx_discount_sub_type_discount_type_id ON discount_sub_type (discount_type_id);
@@ -1439,10 +1507,15 @@ CREATE TABLE student_guardians (
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_discount_rate_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
-        CONSTRAINT fk_discount_rate_discount_sub_type FOREIGN KEY (discount_sub_type_id) REFERENCES discount_sub_type (id),
+        -- Composite FK: ensures discount_sub_type belongs to same tenant
+        CONSTRAINT fk_discount_rate_discount_sub_type
+            FOREIGN KEY (organization_id, discount_sub_type_id)
+            REFERENCES discount_sub_type(organization_id, id),
         CONSTRAINT fk_discount_rate_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
         CONSTRAINT fk_discount_rate_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
-        CONSTRAINT chk_discount_rate_value CHECK (value >= 0)
+        CONSTRAINT chk_discount_rate_value CHECK (value >= 0),
+        -- Composite key required for composite FK references from child tables
+        CONSTRAINT uq_discount_rate_org_id UNIQUE (organization_id, id)
     );
     CREATE INDEX idx_discount_rate_organization ON discount_rate (organization_id);
     CREATE INDEX idx_discount_rate_discount_sub_type_id ON discount_rate (discount_sub_type_id);
@@ -1471,7 +1544,10 @@ CREATE TABLE student_guardians (
         CONSTRAINT fk_sda_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
         CONSTRAINT fk_sda_student FOREIGN KEY (student_id) REFERENCES students (id),
         CONSTRAINT fk_sda_campus FOREIGN KEY (campus_id) REFERENCES campuses (id),
-        CONSTRAINT fk_sda_rate FOREIGN KEY (discount_rate_id) REFERENCES discount_rate (id),
+        -- Composite FK: ensures discount_rate belongs to same tenant
+        CONSTRAINT fk_sda_rate
+            FOREIGN KEY (organization_id, discount_rate_id)
+            REFERENCES discount_rate(organization_id, id),
         CONSTRAINT fk_sda_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
         CONSTRAINT chk_student_discount_amount CHECK (applied_amount IS NULL OR applied_amount >= 0),
         CONSTRAINT chk_student_discount_percentage CHECK (applied_percentage IS NULL OR (applied_percentage >= 0 AND applied_percentage <= 100))
