@@ -1314,17 +1314,17 @@ VALUES
  TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
 
 (1, 'TRANSPORT', 'Transport Services Fee', 'Fee related to student transportation services',
- (SELECT id FROM charge_types WHERE code='SLAB'),
+ (SELECT id FROM charge_types WHERE code='FIXED'),
  (SELECT id FROM fee_recurrence_rules WHERE code='MONTHLY'),
  TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
 
 (1, 'ACTIVITY', 'Student Activities Fee', 'Fee related to extracurricular and student activities',
- (SELECT id FROM charge_types WHERE code='CONDITIONAL'),
+ (SELECT id FROM charge_types WHERE code='FIXED'),
  (SELECT id FROM fee_recurrence_rules WHERE code='PER_TERM'),
  TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
 
 (1, 'RESOURCE', 'Learning Resource Fee', 'Fee related to learning materials and resources',
- (SELECT id FROM charge_types WHERE code='PER_UNIT'),
+ (SELECT id FROM charge_types WHERE code='FIXED'),
  (SELECT id FROM fee_recurrence_rules WHERE code='ANNUAL'),
  TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
 
@@ -1521,7 +1521,7 @@ VALUES
 -- VALUES
 -- (1, 1, 1,
 --  (SELECT id FROM fee_component WHERE component_code='RES-MATERIAL' AND organization_id=1),
---  1, (SELECT id FROM charge_types WHERE code='PER_UNIT'),
+--  1, (SELECT id FROM charge_types WHERE code='FIXED'),
 --  50.00, 'PKR', '2025-04-01', TRUE, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 7. PENALTY & FINES (Percentage Based)
