@@ -45,7 +45,6 @@ public class EmployeeTypeHistoryService {
         newHistory.setEmployeeType(type);
         newHistory.setStartDate(LocalDateTime.now());
         newHistory.setIsCurrent(true);
-        newHistory.setCreatedAt(LocalDateTime.now());
         newHistory.setCreatedBy(createdBy);
 
         EmployeeTypeHistoryEntity saved = historyRepository.save(newHistory);

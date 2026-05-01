@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,28 +16,29 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-public class StudentFeeSummaryEntity {
+public class StudentFeeSummaryEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
- 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organization_id", nullable = false)
-    private com.smartsolutions.eschool.school.model.InstituteEntity institute;
+
+    // organization_id is inherited from AuditableEntity
 
     private BigDecimal totalAssignedFee;
     private BigDecimal totalDiscount;
     private BigDecimal totalPaid;
     private BigDecimal balance;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private StudentEntity student;
+
     // Replace string with FK to AcademicYearEntity
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id", nullable = false)
     private AcademicYearEntity academicYear;
 
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
 }
 
 

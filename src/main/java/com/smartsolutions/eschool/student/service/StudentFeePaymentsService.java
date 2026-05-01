@@ -81,13 +81,12 @@ public class StudentFeePaymentsService {
 
         StudentFeePaymentEntity payment = new StudentFeePaymentEntity();
         payment.setStudent(student);
-        payment.setInstitute(institute);
+        payment.setOrganizationId(organizationId);
         payment.setPaymentDate(requestDTO.getPaymentDate());
         payment.setAmountPaid(requestDTO.getAmountPaid());
         payment.setPaymentMonth(requestDTO.getPaymentMonth());
         payment.setPaymentYear(requestDTO.getPaymentYear());
         payment.setPaymentMode(requestDTO.getPaymentMode());
-        payment.setCreatedAt(LocalDateTime.now());
         payment.setAcademicYear(currentYear);
 
         studentFeePaymentsRepository.save(payment);

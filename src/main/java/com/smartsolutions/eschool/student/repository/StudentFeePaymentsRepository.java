@@ -16,7 +16,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             SELECT p FROM StudentFeePaymentEntity p
             WHERE p.student.id = :studentId
             AND p.academicYear.id = :academicYearId
-            AND p.student.campus.institute.id = :instituteId
+            AND p.organizationId = :instituteId
             """)
     List<StudentFeePaymentEntity> findPaymentsByStudentAndAcademicYear(
             @Param("studentId") Long studentId,
@@ -28,7 +28,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             SELECT COALESCE(SUM(p.amountPaid), 0)
             FROM StudentFeePaymentEntity p
             WHERE p.academicYear.id = :academicYearId
-            AND p.student.campus.institute.id = :instituteId
+            AND p.organizationId = :instituteId
             """)
     Double getTotalFeeCollected(
             @Param("academicYearId") Long academicYearId,
@@ -40,7 +40,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             FROM StudentFeePaymentEntity sfp
             WHERE sfp.academicYear.id = :academicYearId
             AND sfp.paymentDate <= :endOfMonth
-            AND sfp.student.campus.institute.id = :instituteId
+            AND sfp.organizationId = :instituteId
             """)
     Double getTotalCollectedUpToMonth(
             @Param("academicYearId") Long academicYearId,
@@ -53,7 +53,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             FROM StudentFeePaymentEntity p
             WHERE p.student.id = :studentId
             AND p.academicYear.id = :academicYearId
-            AND p.student.campus.institute.id = :instituteId
+            AND p.organizationId = :instituteId
             """)
     java.math.BigDecimal findTotalPaidByStudentAndYear(
             @Param("studentId") Long studentId,
@@ -64,7 +64,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
     @Query("""
         SELECT COALESCE(SUM(p.amountPaid), 0)
         FROM StudentFeePaymentEntity p
-        WHERE p.student.campus.institute.id = :instituteId
+        WHERE p.organizationId = :instituteId
           AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
           AND (:academicYearId IS NULL OR p.academicYear.id = :academicYearId)
           AND (:fromDate IS NULL OR p.paymentDate >= :fromDate)
@@ -81,7 +81,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
     @Query("""
         SELECT 'Total Collections', COALESCE(SUM(p.amountPaid), 0)
         FROM StudentFeePaymentEntity p
-        WHERE p.student.campus.institute.id = :instituteId
+        WHERE p.organizationId = :instituteId
           AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
           AND (:fromDate IS NULL OR p.paymentDate >= :fromDate)
           AND (:toDate IS NULL OR p.paymentDate <= :toDate)
@@ -96,7 +96,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
     @Query("""
         SELECT p.paymentDate, SUM(p.amountPaid)
         FROM StudentFeePaymentEntity p
-        WHERE p.student.campus.institute.id = :instituteId
+        WHERE p.organizationId = :instituteId
           AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
           AND p.paymentDate BETWEEN :fromDate AND :toDate
         GROUP BY p.paymentDate
@@ -112,7 +112,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
     @Query("""
         SELECT p.student.campus.campusName, SUM(p.amountPaid)
         FROM StudentFeePaymentEntity p
-        WHERE p.student.campus.institute.id = :instituteId
+        WHERE p.organizationId = :instituteId
           AND (:campusIds IS NULL OR p.student.campus.id IN :campusIds)
           AND (:fromDate IS NULL OR p.paymentDate >= :fromDate)
           AND (:toDate IS NULL OR p.paymentDate <= :toDate)

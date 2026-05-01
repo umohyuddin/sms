@@ -87,7 +87,6 @@ public class EmployeeMasterSalaryService {
             entity.setEmployee(employee);
             entity.setSalaryStructure(structure);
             entity.setEffectiveDate(LocalDate.now());
-            entity.setCreatedAt(LocalDateTime.now());
             entity.setDeleted(false);
 
             // Save
@@ -145,7 +144,6 @@ public class EmployeeMasterSalaryService {
             existing.setNetSalary(requestDTO.getNetSalary());
             existing.setEffectiveDate(requestDTO.getEffectiveDate());
             //existing.setStatus(requestDTO.getStatus());
-            existing.setUpdatedAt(LocalDateTime.now());
 
             salaryRepository.save(existing);
             log.info("Salary updated successfully with id={}", existing.getId());
@@ -165,7 +163,6 @@ public class EmployeeMasterSalaryService {
         try {
             EmployeeMasterSalary existing = salaryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Salary not found with id=" + id));
             existing.setDeleted(true);
-            existing.setUpdatedAt(LocalDateTime.now());
             salaryRepository.save(existing);
             log.info("Salary soft deleted with id={}", id);
         } catch (DataAccessException dae) {

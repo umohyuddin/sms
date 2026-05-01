@@ -13,7 +13,7 @@ public abstract class AuditableEntity {
     @Column(name = "organization_id", nullable = false, updatable = false)
     private Long organizationId;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "created_by", updatable = false)
@@ -22,7 +22,7 @@ public abstract class AuditableEntity {
     @Column(name = "updated_by")
     private Long updatedBy;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
@@ -33,14 +33,12 @@ public abstract class AuditableEntity {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
         this.createdBy = getCurrentUser();
         this.organizationId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
         this.updatedBy = getCurrentUser();
     }
 

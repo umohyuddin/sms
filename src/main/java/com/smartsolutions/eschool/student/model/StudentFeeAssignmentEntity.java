@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -17,14 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class StudentFeeAssignmentEntity {
+public class StudentFeeAssignmentEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
- 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organization_id", nullable = false)
-    private com.smartsolutions.eschool.school.model.InstituteEntity institute;
+
+    // organization_id is inherited from AuditableEntity
 
     // --- Foreign Keys ---
 
@@ -51,12 +49,6 @@ public class StudentFeeAssignmentEntity {
     @Column(name = "assigned_date")
     private LocalDate assignedDate;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-//    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = false)
-//    private List<StudentFeePaymentEntity> payments;
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
 }

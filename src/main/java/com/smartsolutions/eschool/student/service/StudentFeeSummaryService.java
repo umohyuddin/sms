@@ -92,7 +92,7 @@ public class StudentFeeSummaryService {
 
                     newSummary.setStudent(student);
                     newSummary.setAcademicYear(academicYear);
-                    newSummary.setInstitute(institute);
+                    newSummary.setOrganizationId(organizationId);
                     return newSummary;
                 });
 

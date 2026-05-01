@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.student.model;
 
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,25 +17,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class StudentFeePaymentEntity {
+public class StudentFeePaymentEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
- 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organization_id", nullable = false)
-    private com.smartsolutions.eschool.school.model.InstituteEntity institute;
+
+    // organization_id is inherited from AuditableEntity
 
     // --- Foreign Keys ---
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private StudentEntity student;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "assignment_id", nullable = false)
-//    private StudentFeeAssignmentEntity assignment;
 
     // --- Fields ---
 
@@ -53,10 +48,10 @@ public class StudentFeePaymentEntity {
     @Column(name = "payment_mode", length = 50)
     private String paymentMode;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id", nullable = false)
     private AcademicYearEntity academicYear;
+
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
 }

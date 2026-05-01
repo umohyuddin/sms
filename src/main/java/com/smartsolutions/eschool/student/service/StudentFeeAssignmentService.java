@@ -115,7 +115,7 @@ public class StudentFeeAssignmentService {
             StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
             assignment.setStudent(student);
             assignment.setFeeRate(feeRate);
-            assignment.setInstitute(institute);
+            assignment.setOrganizationId(organizationId);
             assignment.setAcademicYear(academicYear);
 
             String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
@@ -207,7 +207,7 @@ public class StudentFeeAssignmentService {
             StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
             assignment.setStudent(student);
             assignment.setFeeRate(feeRate);
-            assignment.setInstitute(institute);
+            assignment.setOrganizationId(organizationId);
             assignment.setAcademicYear(academicYear);
 
             String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
