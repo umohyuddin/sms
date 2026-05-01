@@ -997,7 +997,7 @@ CREATE TABLE board_member_roles (
         -- Slab group reference
         slab_group_id BIGINT,
 
-        charge_type_id BIGINT NOT NULL,
+        charge_type_id BIGINT NULL,
         priority INT DEFAULT 0,
 
         currency VARCHAR(3),
@@ -1039,12 +1039,12 @@ CREATE TABLE board_member_roles (
     CREATE INDEX idx_fee_rates_academic_year_id ON fee_rates (academic_year_id);
 
 
-    DROP TABLE IF EXISTS institute_financial_settings;
-    CREATE TABLE institute_financial_settings (
+    DROP TABLE IF EXISTS campus_financial_settings;
+    CREATE TABLE campus_financial_settings (
         id BIGINT PRIMARY KEY AUTO_INCREMENT,
         institute_id BIGINT NOT NULL,
+        campus_id BIGINT NOT NULL,
         academic_year_id BIGINT NOT NULL,
-        fee_recurrence_rule_id BIGINT,
         currency_id INT,
         language_id BIGINT,
         locale VARCHAR(10),
@@ -1052,9 +1052,7 @@ CREATE TABLE board_member_roles (
         late_fee_applicable BOOLEAN DEFAULT FALSE,
         late_fee_type VARCHAR(20),
         late_fee_amount DECIMAL(10, 2),
-        is_tax_applicable BOOLEAN DEFAULT FALSE,
         tax_type_id BIGINT,
-        is_tax_inclusive BOOLEAN DEFAULT FALSE,
         allow_refunds BOOLEAN DEFAULT FALSE,
         refund_policy_url VARCHAR(255),
         refund_window_days INT,
@@ -1075,10 +1073,12 @@ CREATE TABLE board_member_roles (
         FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
         FOREIGN KEY (currency_id) REFERENCES currencies(id),
         FOREIGN KEY (tax_type_id) REFERENCES tax_types(id),
-        FOREIGN KEY (fee_recurrence_rule_id) REFERENCES fee_recurrence_rules(id)
+        FOREIGN KEY (campus_id) REFERENCES campuses(id),
+        UNIQUE (campus_id, academic_year_id)
     );
-    CREATE INDEX idx_institute_financial_settings_institute ON institute_financial_settings (institute_id);
-    CREATE INDEX idx_institute_financial_settings_academic_year ON institute_financial_settings (academic_year_id);
+    CREATE INDEX idx_campus_financial_settings_institute ON campus_financial_settings (institute_id);
+    CREATE INDEX idx_campus_financial_settings_campus ON campus_financial_settings (campus_id);
+    CREATE INDEX idx_campus_financial_settings_academic_year ON campus_financial_settings (academic_year_id);
 
     -- =============================
     -- LEVEL 5: Employee and Student

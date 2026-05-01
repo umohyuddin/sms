@@ -11,13 +11,12 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FinancialSettingsResponseDTO {
+public class CampusFinancialSettingsResponseDTO {
 
     private Long id;
     private Long instituteId;
+    private Long campusId;
     private Long academicYearId;
-
-    private Long feeRecurrenceRuleId;
 
     // Currency & Localization
     private Integer currencyId;
@@ -31,9 +30,7 @@ public class FinancialSettingsResponseDTO {
     private BigDecimal lateFeeValue;
 
     // Tax Rules
-    private Boolean taxApplicable;
     private Long taxTypeId;
-    private Boolean taxIncludedInFee;
 
     // Refund Rules
     private Boolean refundsAllowed;

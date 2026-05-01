@@ -1,31 +1,31 @@
 package com.smartsolutions.eschool.institute.mapper;
 
 import com.smartsolutions.eschool.global.error.ApiException;
-import com.smartsolutions.eschool.institute.dtos.financialSettings.requestDto.FinancialSettingsRequestDTO;
-import com.smartsolutions.eschool.institute.dtos.financialSettings.responseDto.FinancialSettingsResponseDTO;
-import com.smartsolutions.eschool.institute.entity.InstituteFinancialSettings;
+import com.smartsolutions.eschool.institute.dtos.financialSettings.requestDto.CampusFinancialSettingsRequestDTO;
+import com.smartsolutions.eschool.institute.dtos.financialSettings.responseDto.CampusFinancialSettingsResponseDTO;
+import com.smartsolutions.eschool.institute.entity.CampusFinancialSettings;
 import com.smartsolutions.eschool.institute.enums.RefundType;
-import com.smartsolutions.eschool.institute.error.InstituteFinancialSettingsErrors;
+import com.smartsolutions.eschool.institute.error.CampusFinancialSettingsErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-public class FinancialSettingsMapper {
+public class CampusFinancialSettingsMapper {
 
-    private FinancialSettingsMapper() {
+    private CampusFinancialSettingsMapper() {
         // prevent instantiation
     }
 
-    public static InstituteFinancialSettings toEntity(FinancialSettingsRequestDTO dto) {
+    public static CampusFinancialSettings toEntity(CampusFinancialSettingsRequestDTO dto) {
         if (dto == null) {
             return null;
         }
 
         validateDTO(dto);
 
-        InstituteFinancialSettings entity = new InstituteFinancialSettings();
+        CampusFinancialSettings entity = new CampusFinancialSettings();
         entity.setInstituteId(dto.getInstituteId());
+        entity.setCampusId(dto.getCampusId());
         entity.setAcademicYearId(dto.getAcademicYearId());
-        entity.setFeeRecurrenceRuleId(dto.getFeeRecurrenceRuleId());
         entity.setCurrencyId(dto.getCurrencyId());
         entity.setLanguageId(dto.getLanguageId());
         entity.setLocale(dto.getLocale());
@@ -33,9 +33,7 @@ public class FinancialSettingsMapper {
         entity.setLateFeeApplicable(dto.getLateFeeApplicable() != null ? dto.getLateFeeApplicable() : false);
         entity.setLateFeeType(dto.getLateFeeType());
         entity.setLateFeeValue(dto.getLateFeeValue());
-        entity.setTaxApplicable(dto.getTaxApplicable() != null ? dto.getTaxApplicable() : false);
         entity.setTaxTypeId(dto.getTaxTypeId());
-        entity.setTaxIncludedInFee(dto.getTaxIncludedInFee() != null ? dto.getTaxIncludedInFee() : false);
         entity.setRefundsAllowed(dto.getRefundsAllowed() != null ? dto.getRefundsAllowed() : false);
         entity.setRefundPolicyUrl(dto.getRefundPolicyUrl());
         entity.setRefundWindowDays(dto.getRefundWindowDays());
@@ -50,16 +48,16 @@ public class FinancialSettingsMapper {
         return entity;
     }
 
-    public static FinancialSettingsResponseDTO toDTO(InstituteFinancialSettings entity) {
+    public static CampusFinancialSettingsResponseDTO toDTO(CampusFinancialSettings entity) {
         if (entity == null) {
             return null;
         }
 
-        FinancialSettingsResponseDTO dto = new FinancialSettingsResponseDTO();
+        CampusFinancialSettingsResponseDTO dto = new CampusFinancialSettingsResponseDTO();
         dto.setId(entity.getId());
         dto.setInstituteId(entity.getInstituteId());
+        dto.setCampusId(entity.getCampusId());
         dto.setAcademicYearId(entity.getAcademicYearId());
-        dto.setFeeRecurrenceRuleId(entity.getFeeRecurrenceRuleId());
         dto.setCurrencyId(entity.getCurrencyId());
         dto.setLanguageId(entity.getLanguageId());
         dto.setLocale(entity.getLocale());
@@ -67,9 +65,7 @@ public class FinancialSettingsMapper {
         dto.setLateFeeApplicable(entity.getLateFeeApplicable());
         dto.setLateFeeType(entity.getLateFeeType());
         dto.setLateFeeValue(entity.getLateFeeValue());
-        dto.setTaxApplicable(entity.getTaxApplicable());
         dto.setTaxTypeId(entity.getTaxTypeId());
-        dto.setTaxIncludedInFee(entity.getTaxIncludedInFee());
         dto.setRefundsAllowed(entity.getRefundsAllowed());
         dto.setRefundPolicyUrl(entity.getRefundPolicyUrl());
         dto.setRefundWindowDays(entity.getRefundWindowDays());
@@ -86,7 +82,7 @@ public class FinancialSettingsMapper {
         return dto;
     }
 
-    public static void updateEntityFromDTO(FinancialSettingsRequestDTO dto, InstituteFinancialSettings entity) {
+    public static void updateEntityFromDTO(CampusFinancialSettingsRequestDTO dto, CampusFinancialSettings entity) {
         if (dto == null || entity == null) {
             return;
         }
@@ -94,16 +90,13 @@ public class FinancialSettingsMapper {
         validateDTO(dto);
 
         entity.setCurrencyId(dto.getCurrencyId());
-        entity.setFeeRecurrenceRuleId(dto.getFeeRecurrenceRuleId());
         entity.setLanguageId(dto.getLanguageId());
         entity.setLocale(dto.getLocale());
         entity.setAllowPartialPayments(dto.getAllowPartialPayments() != null ? dto.getAllowPartialPayments() : false);
         entity.setLateFeeApplicable(dto.getLateFeeApplicable() != null ? dto.getLateFeeApplicable() : false);
         entity.setLateFeeType(dto.getLateFeeType());
         entity.setLateFeeValue(dto.getLateFeeValue());
-        entity.setTaxApplicable(dto.getTaxApplicable() != null ? dto.getTaxApplicable() : false);
         entity.setTaxTypeId(dto.getTaxTypeId());
-        entity.setTaxIncludedInFee(dto.getTaxIncludedInFee() != null ? dto.getTaxIncludedInFee() : false);
         entity.setRefundsAllowed(dto.getRefundsAllowed() != null ? dto.getRefundsAllowed() : false);
         entity.setRefundPolicyUrl(dto.getRefundPolicyUrl());
         entity.setRefundWindowDays(dto.getRefundWindowDays());
@@ -115,24 +108,27 @@ public class FinancialSettingsMapper {
         entity.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
     }
 
-    private static void validateDTO(FinancialSettingsRequestDTO dto) {
+    private static void validateDTO(CampusFinancialSettingsRequestDTO dto) {
         if (dto.getInstituteId() == null) {
-            throw new ApiException(InstituteFinancialSettingsErrors.INSTITUTE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            throw new ApiException(CampusFinancialSettingsErrors.INSTITUTE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
+        if (dto.getCampusId() == null) {
+            throw new ApiException(CampusFinancialSettingsErrors.CAMPUS_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
         if (dto.getAcademicYearId() == null) {
-            throw new ApiException(InstituteFinancialSettingsErrors.ACADEMIC_YEAR_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            throw new ApiException(CampusFinancialSettingsErrors.ACADEMIC_YEAR_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
 
         if (Boolean.TRUE.equals(dto.getRefundsAllowed())) {
             if (dto.getRefundType() == null) {
-                throw new ApiException(InstituteFinancialSettingsErrors.REFUND_TYPE_REQUIRED, HttpStatus.BAD_REQUEST);
+                throw new ApiException(CampusFinancialSettingsErrors.REFUND_TYPE_REQUIRED, HttpStatus.BAD_REQUEST);
             }
             if (dto.getRefundType() == RefundType.PERCENTAGE && dto.getMaxRefundPercentage() == null) {
-                throw new ApiException(InstituteFinancialSettingsErrors.INVALID_REFUND_VALUE,
+                throw new ApiException(CampusFinancialSettingsErrors.INVALID_REFUND_VALUE,
                         "Refund percentage is required for PERCENTAGE refund type", HttpStatus.BAD_REQUEST);
             }
             if (dto.getRefundType() == RefundType.FIXED && dto.getMaxRefundAmount() == null) {
-                throw new ApiException(InstituteFinancialSettingsErrors.INVALID_REFUND_VALUE,
+                throw new ApiException(CampusFinancialSettingsErrors.INVALID_REFUND_VALUE,
                         "Refund amount is required for FIXED refund type", HttpStatus.BAD_REQUEST);
             }
         }

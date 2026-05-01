@@ -13,14 +13,14 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "institute_financial_settings", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_institute_academic_year", columnNames = { "institute_id", "academic_year_id" })
+@Table(name = "campus_financial_settings", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_campus_academic_year", columnNames = { "campus_id", "academic_year_id" })
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class InstituteFinancialSettings extends ScopeAuditableEntity {
+public class CampusFinancialSettings extends ScopeAuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +29,11 @@ public class InstituteFinancialSettings extends ScopeAuditableEntity {
     @Column(name = "institute_id", nullable = false)
     private Long instituteId;
 
+    @Column(name = "campus_id", nullable = false)
+    private Long campusId;
+
     @Column(name = "academic_year_id", nullable = false)
     private Long academicYearId;
-
-    @Column(name = "fee_recurrence_rule_id")
-    private Long feeRecurrenceRuleId;
 
     // Currency & Localization
     @Column(name = "currency_id", nullable = false)
@@ -59,14 +59,8 @@ public class InstituteFinancialSettings extends ScopeAuditableEntity {
     private BigDecimal lateFeeValue;
 
     // Tax Rules
-    @Column(name = "is_tax_applicable")
-    private Boolean taxApplicable = false;
-
     @Column(name = "tax_type_id")
     private Long taxTypeId;
-
-    @Column(name = "is_tax_inclusive")
-    private Boolean taxIncludedInFee = false;
 
     // Refund Rules
     @Column(name = "allow_refunds")

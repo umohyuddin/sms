@@ -12,15 +12,16 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FinancialSettingsRequestDTO {
+public class CampusFinancialSettingsRequestDTO {
 
     @NotNull(message = "Institute ID is required")
     private Long instituteId;
 
+    @NotNull(message = "Campus ID is required")
+    private Long campusId;
+
     @NotNull(message = "Academic Year ID is required")
     private Long academicYearId;
-
-    private Long feeRecurrenceRuleId;
 
     // Currency & Localization
     @NotNull(message = "Currency ID is required")
@@ -40,9 +41,7 @@ public class FinancialSettingsRequestDTO {
     private BigDecimal lateFeeValue;
 
     // Tax Rules
-    private Boolean taxApplicable;
     private Long taxTypeId;
-    private Boolean taxIncludedInFee;
 
     // Refund Rules
     private Boolean refundsAllowed;

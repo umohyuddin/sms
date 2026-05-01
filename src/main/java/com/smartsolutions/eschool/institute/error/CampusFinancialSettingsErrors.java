@@ -6,13 +6,14 @@ import com.smartsolutions.eschool.global.error.ErrorCategory;
 import lombok.Getter;
 
 @Getter
-public enum InstituteFinancialSettingsErrors implements BaseErrorCode {
+public enum CampusFinancialSettingsErrors implements BaseErrorCode {
 
-    INSTITUTE_FINANCIAL_SETTINGS_NOT_FOUND(AppModule.SCHOOL, ErrorCategory.BUSINESS, 1,
-            "Institute financial settings not found"),
-    INSTITUTE_FINANCIAL_SETTINGS_ALREADY_EXISTS(AppModule.SCHOOL, ErrorCategory.BUSINESS, 2,
-            "Financial settings already exist for this institute and academic year"),
+    CAMPUS_FINANCIAL_SETTINGS_NOT_FOUND(AppModule.SCHOOL, ErrorCategory.BUSINESS, 1,
+            "Campus financial settings not found"),
+    CAMPUS_FINANCIAL_SETTINGS_ALREADY_EXISTS(AppModule.SCHOOL, ErrorCategory.BUSINESS, 2,
+            "Financial settings already exist for this campus and academic year"),
     INSTITUTE_NOT_FOUND(AppModule.SCHOOL, ErrorCategory.BUSINESS, 3, "Institute not found"),
+    CAMPUS_NOT_FOUND(AppModule.SCHOOL, ErrorCategory.BUSINESS, 9, "Campus not found"),
     ACADEMIC_YEAR_NOT_FOUND(AppModule.SCHOOL, ErrorCategory.BUSINESS, 4, "Academic year not found"),
     ORGANIZATION_ACCESS_DENIED(AppModule.SCHOOL, ErrorCategory.SECURITY, 5,
             "You do not have access to this organization's financial settings"),
@@ -27,7 +28,7 @@ public enum InstituteFinancialSettingsErrors implements BaseErrorCode {
     private final int number;
     private final String message;
 
-    InstituteFinancialSettingsErrors(AppModule module, ErrorCategory category, int number, String message) {
+    CampusFinancialSettingsErrors(AppModule module, ErrorCategory category, int number, String message) {
         this.module = module;
         this.category = category;
         this.number = number;
