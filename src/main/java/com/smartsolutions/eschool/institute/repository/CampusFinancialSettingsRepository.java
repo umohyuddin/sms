@@ -35,4 +35,6 @@ public interface CampusFinancialSettingsRepository extends JpaRepository<CampusF
             Long academicYearId);
 
     Optional<CampusFinancialSettings> findByIdAndIsDeletedFalse(Long id);
+
+    java.util.List<CampusFinancialSettings> findAllByCampusIdAndIsDeletedFalse(Long campusId);
 }

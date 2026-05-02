@@ -36,4 +36,9 @@ public class CampusFinancialSettingsFacade {
         log.info("[Facade:CampusFinancialSettingsFacade] softDeleteById() called - ID: {}", id);
         service.softDeleteById(id);
     }
+
+    public java.util.List<CampusFinancialSettingsResponseDTO> getAllByCampusId(Long campusId) {
+        log.info("[Facade:CampusFinancialSettingsFacade] getAllByCampusId() called - campus: {}", campusId);
+        return service.getAllByCampusId(campusId);
+    }
 }

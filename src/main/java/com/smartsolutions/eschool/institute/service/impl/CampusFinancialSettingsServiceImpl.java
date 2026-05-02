@@ -15,12 +15,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.smartsolutions.eschool.lookups.repository.CurrencyRepository;
+import com.smartsolutions.eschool.lookups.repository.LanguageRepository;
+import com.smartsolutions.eschool.lookups.repository.TaxTypeRepository;
+import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
+import com.smartsolutions.eschool.school.repository.CampusRepository;
+import com.smartsolutions.eschool.school.repository.InstituteRepository;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettingsService {
 
     private final CampusFinancialSettingsRepository repository;
+    private final InstituteRepository instituteRepository;
+    private final CampusRepository campusRepository;
+    private final AcademicYearRepository academicYearRepository;
+    private final CurrencyRepository currencyRepository;
+    private final LanguageRepository languageRepository;
+    private final TaxTypeRepository taxTypeRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -33,7 +46,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
                 .orElseThrow(() -> new ApiException(
                         CampusFinancialSettingsErrors.CAMPUS_FINANCIAL_SETTINGS_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        return CampusFinancialSettingsMapper.toDTO(settings);
+        return populateNames(CampusFinancialSettingsMapper.toDTO(settings));
     }
 
     @Override
@@ -63,7 +76,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
         CampusFinancialSettings saved = repository.save(entity);
 
         log.info("[Service:CampusFinancialSettingsServiceImpl] create() succeeded - ID: {}", saved.getId());
-        return CampusFinancialSettingsMapper.toDTO(saved);
+        return populateNames(CampusFinancialSettingsMapper.toDTO(saved));
     }
 
     @Override
@@ -84,7 +97,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
         CampusFinancialSettings updated = repository.save(existing);
 
         log.info("[Service:CampusFinancialSettingsServiceImpl] update() succeeded - ID: {}", id);
-        return CampusFinancialSettingsMapper.toDTO(updated);
+        return populateNames(CampusFinancialSettingsMapper.toDTO(updated));
     }
 
     @Override
@@ -105,5 +118,48 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
         repository.save(settings);
 
         log.info("[Service:CampusFinancialSettingsServiceImpl] softDeleteById() succeeded - ID: {}", id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<CampusFinancialSettingsResponseDTO> getAllByCampusId(Long campusId) {
+        log.info("[Service:CampusFinancialSettingsServiceImpl] getAllByCampusId() called - campus: {}", campusId);
+        return repository.findAllByCampusIdAndIsDeletedFalse(campusId)
+                .stream()
+                .map(CampusFinancialSettingsMapper::toDTO)
+                .map(this::populateNames)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    private CampusFinancialSettingsResponseDTO populateNames(CampusFinancialSettingsResponseDTO dto) {
+        if (dto == null)
+            return null;
+
+        if (dto.getInstituteId() != null) {
+            instituteRepository.findById(dto.getInstituteId())
+                    .ifPresent(i -> dto.setInstituteName(i.getName()));
+        }
+        if (dto.getCampusId() != null) {
+            campusRepository.findById(dto.getCampusId())
+                    .ifPresent(c -> dto.setCampusName(c.getCampusName()));
+        }
+        if (dto.getAcademicYearId() != null) {
+            academicYearRepository.findById(dto.getAcademicYearId())
+                    .ifPresent(ay -> dto.setAcademicYearName(ay.getName()));
+        }
+        if (dto.getCurrencyId() != null) {
+            currencyRepository.findById(dto.getCurrencyId())
+                    .ifPresent(c -> dto.setCurrencyName(c.getName()));
+        }
+        if (dto.getLanguageId() != null) {
+            languageRepository.findById(dto.getLanguageId())
+                    .ifPresent(l -> dto.setLanguageName(l.getName()));
+        }
+        if (dto.getTaxTypeName() == null && dto.getTaxTypeId() != null) {
+            taxTypeRepository.findById(dto.getTaxTypeId())
+                    .ifPresent(t -> dto.setTaxTypeName(t.getName()));
+        }
+
+        return dto;
     }
 }

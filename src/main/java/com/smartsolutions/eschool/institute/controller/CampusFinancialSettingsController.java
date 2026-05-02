@@ -59,4 +59,12 @@ public class CampusFinancialSettingsController {
         log.info("[Controller:CampusFinancialSettingsController] delete() succeeded - ID: {}", id);
         return ResponseEntity.ok("Financial settings deleted successfully");
     }
+
+    @GetMapping(value = "/campus/{campusId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<java.util.List<CampusFinancialSettingsResponseDTO>> getAllByCampusId(@PathVariable Long campusId) {
+        log.info("[Controller:CampusFinancialSettingsController] getAllByCampusId() called - campus: {}", campusId);
+        java.util.List<CampusFinancialSettingsResponseDTO> responseList = facade.getAllByCampusId(campusId);
+        log.info("[Controller:CampusFinancialSettingsController] getAllByCampusId() succeeded");
+        return ResponseEntity.ok(responseList);
+    }
 }

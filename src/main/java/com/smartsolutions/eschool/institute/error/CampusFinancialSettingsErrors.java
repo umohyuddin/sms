@@ -21,7 +21,9 @@ public enum CampusFinancialSettingsErrors implements BaseErrorCode {
             "A database error occurred while processing financial settings"),
     REFUND_TYPE_REQUIRED(AppModule.SCHOOL, ErrorCategory.VALIDATION, 7,
             "Refund type is required when refunds are allowed"),
-    INVALID_REFUND_VALUE(AppModule.SCHOOL, ErrorCategory.VALIDATION, 8, "Invalid refund percentage or amount provided");
+    INVALID_REFUND_VALUE(AppModule.SCHOOL, ErrorCategory.VALIDATION, 8, "Invalid refund percentage or amount provided"),
+    LATE_FEE_TYPE_REQUIRED(AppModule.SCHOOL, ErrorCategory.VALIDATION, 10, "Late fee type is required when late fees are applicable"),
+    INVALID_LATE_FEE_VALUE(AppModule.SCHOOL, ErrorCategory.VALIDATION, 11, "Invalid late fee percentage or amount provided");
 
     private final AppModule module;
     private final ErrorCategory category;

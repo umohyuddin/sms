@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.institute.dtos.financialSettings.requestDto.CampusFinancialSettingsRequestDTO;
 import com.smartsolutions.eschool.institute.dtos.financialSettings.responseDto.CampusFinancialSettingsResponseDTO;
 import com.smartsolutions.eschool.institute.entity.CampusFinancialSettings;
+import com.smartsolutions.eschool.institute.enums.LateFeeType;
 import com.smartsolutions.eschool.institute.enums.RefundType;
 import com.smartsolutions.eschool.institute.error.CampusFinancialSettingsErrors;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,14 @@ public class CampusFinancialSettingsMapper {
         entity.setAllowPartialPayments(dto.getAllowPartialPayments() != null ? dto.getAllowPartialPayments() : false);
         entity.setLateFeeApplicable(dto.getLateFeeApplicable() != null ? dto.getLateFeeApplicable() : false);
         entity.setLateFeeType(dto.getLateFeeType());
-        entity.setLateFeeValue(dto.getLateFeeValue());
+        entity.setLateFeeFixedAmount(dto.getLateFeeFixedAmount());
+        entity.setLateFeePercentage(dto.getLateFeePercentage());
+        entity.setGraceDays(dto.getGraceDays() != null ? dto.getGraceDays() : 0);
+        entity.setLateFeeFrequency(dto.getLateFeeFrequency());
+        entity.setLateFeeMaxAmount(dto.getLateFeeMaxAmount());
+        entity.setLateFeeApplyOn(dto.getLateFeeApplyOn());
+        entity.setSendPaymentReminder(dto.getSendPaymentReminder() != null ? dto.getSendPaymentReminder() : false);
+        entity.setReminderDaysBeforeDue(dto.getReminderDaysBeforeDue() != null ? dto.getReminderDaysBeforeDue() : 0);
         entity.setTaxTypeId(dto.getTaxTypeId());
         entity.setRefundsAllowed(dto.getRefundsAllowed() != null ? dto.getRefundsAllowed() : false);
         entity.setRefundPolicyUrl(dto.getRefundPolicyUrl());
@@ -64,7 +72,14 @@ public class CampusFinancialSettingsMapper {
         dto.setAllowPartialPayments(entity.getAllowPartialPayments());
         dto.setLateFeeApplicable(entity.getLateFeeApplicable());
         dto.setLateFeeType(entity.getLateFeeType());
-        dto.setLateFeeValue(entity.getLateFeeValue());
+        dto.setLateFeeFixedAmount(entity.getLateFeeFixedAmount());
+        dto.setLateFeePercentage(entity.getLateFeePercentage());
+        dto.setGraceDays(entity.getGraceDays());
+        dto.setLateFeeFrequency(entity.getLateFeeFrequency());
+        dto.setLateFeeMaxAmount(entity.getLateFeeMaxAmount());
+        dto.setLateFeeApplyOn(entity.getLateFeeApplyOn());
+        dto.setSendPaymentReminder(entity.getSendPaymentReminder());
+        dto.setReminderDaysBeforeDue(entity.getReminderDaysBeforeDue());
         dto.setTaxTypeId(entity.getTaxTypeId());
         dto.setRefundsAllowed(entity.getRefundsAllowed());
         dto.setRefundPolicyUrl(entity.getRefundPolicyUrl());
@@ -95,7 +110,14 @@ public class CampusFinancialSettingsMapper {
         entity.setAllowPartialPayments(dto.getAllowPartialPayments() != null ? dto.getAllowPartialPayments() : false);
         entity.setLateFeeApplicable(dto.getLateFeeApplicable() != null ? dto.getLateFeeApplicable() : false);
         entity.setLateFeeType(dto.getLateFeeType());
-        entity.setLateFeeValue(dto.getLateFeeValue());
+        entity.setLateFeeFixedAmount(dto.getLateFeeFixedAmount());
+        entity.setLateFeePercentage(dto.getLateFeePercentage());
+        entity.setGraceDays(dto.getGraceDays() != null ? dto.getGraceDays() : 0);
+        entity.setLateFeeFrequency(dto.getLateFeeFrequency());
+        entity.setLateFeeMaxAmount(dto.getLateFeeMaxAmount());
+        entity.setLateFeeApplyOn(dto.getLateFeeApplyOn());
+        entity.setSendPaymentReminder(dto.getSendPaymentReminder() != null ? dto.getSendPaymentReminder() : false);
+        entity.setReminderDaysBeforeDue(dto.getReminderDaysBeforeDue() != null ? dto.getReminderDaysBeforeDue() : 0);
         entity.setTaxTypeId(dto.getTaxTypeId());
         entity.setRefundsAllowed(dto.getRefundsAllowed() != null ? dto.getRefundsAllowed() : false);
         entity.setRefundPolicyUrl(dto.getRefundPolicyUrl());
@@ -130,6 +152,19 @@ public class CampusFinancialSettingsMapper {
             if (dto.getRefundType() == RefundType.FIXED && dto.getMaxRefundAmount() == null) {
                 throw new ApiException(CampusFinancialSettingsErrors.INVALID_REFUND_VALUE,
                         "Refund amount is required for FIXED refund type", HttpStatus.BAD_REQUEST);
+            }
+        }
+        if (Boolean.TRUE.equals(dto.getLateFeeApplicable())) {
+            if (dto.getLateFeeType() == null) {
+                throw new ApiException(CampusFinancialSettingsErrors.LATE_FEE_TYPE_REQUIRED, HttpStatus.BAD_REQUEST);
+            }
+            if (dto.getLateFeeType() == LateFeeType.PERCENTAGE && dto.getLateFeePercentage() == null) {
+                throw new ApiException(CampusFinancialSettingsErrors.INVALID_LATE_FEE_VALUE,
+                        "Late fee percentage is required for PERCENTAGE late fee type", HttpStatus.BAD_REQUEST);
+            }
+            if (dto.getLateFeeType() == LateFeeType.FIXED && dto.getLateFeeFixedAmount() == null) {
+                throw new ApiException(CampusFinancialSettingsErrors.INVALID_LATE_FEE_VALUE,
+                        "Late fee amount is required for FIXED late fee type", HttpStatus.BAD_REQUEST);
             }
         }
     }

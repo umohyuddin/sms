@@ -1,5 +1,7 @@
 package com.smartsolutions.eschool.institute.dtos.financialSettings.responseDto;
 
+import com.smartsolutions.eschool.institute.enums.LateFeeApplyOn;
+import com.smartsolutions.eschool.institute.enums.LateFeeFrequency;
 import com.smartsolutions.eschool.institute.enums.LateFeeType;
 import com.smartsolutions.eschool.institute.enums.RefundType;
 import lombok.AllArgsConstructor;
@@ -15,22 +17,35 @@ public class CampusFinancialSettingsResponseDTO {
 
     private Long id;
     private Long instituteId;
+    private String instituteName;
     private Long campusId;
+    private String campusName;
     private Long academicYearId;
+    private String academicYearName;
 
     // Currency & Localization
     private Integer currencyId;
+    private String currencyName;
     private Long languageId;
+    private String languageName;
     private String locale;
 
     // Fee Structure Rules
     private Boolean allowPartialPayments;
     private Boolean lateFeeApplicable;
     private LateFeeType lateFeeType;
-    private BigDecimal lateFeeValue;
+    private BigDecimal lateFeeFixedAmount;
+    private BigDecimal lateFeePercentage;
+    private Integer graceDays;
+    private LateFeeFrequency lateFeeFrequency;
+    private BigDecimal lateFeeMaxAmount;
+    private LateFeeApplyOn lateFeeApplyOn;
+    private Boolean sendPaymentReminder;
+    private Integer reminderDaysBeforeDue;
 
     // Tax Rules
     private Long taxTypeId;
+    private String taxTypeName;
 
     // Refund Rules
     private Boolean refundsAllowed;

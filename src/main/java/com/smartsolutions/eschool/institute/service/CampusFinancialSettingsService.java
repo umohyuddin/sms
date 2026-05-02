@@ -12,4 +12,6 @@ public interface CampusFinancialSettingsService {
     CampusFinancialSettingsResponseDTO update(Long id, CampusFinancialSettingsRequestDTO requestDTO);
 
     void softDeleteById(Long id);
+    
+    java.util.List<CampusFinancialSettingsResponseDTO> getAllByCampusId(Long campusId);
 }

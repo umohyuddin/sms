@@ -1,5 +1,7 @@
 package com.smartsolutions.eschool.institute.dtos.financialSettings.requestDto;
 
+import com.smartsolutions.eschool.institute.enums.LateFeeApplyOn;
+import com.smartsolutions.eschool.institute.enums.LateFeeFrequency;
 import com.smartsolutions.eschool.institute.enums.LateFeeType;
 import com.smartsolutions.eschool.institute.enums.RefundType;
 import jakarta.validation.constraints.*;
@@ -37,8 +39,17 @@ public class CampusFinancialSettingsRequestDTO {
     private Boolean lateFeeApplicable;
     private LateFeeType lateFeeType;
 
-    @DecimalMin(value = "0.0", inclusive = true, message = "Late fee value must be non-negative")
-    private BigDecimal lateFeeValue;
+    @DecimalMin(value = "0.0", inclusive = true, message = "Late fee amount must be non-negative")
+    private BigDecimal lateFeeFixedAmount;
+    private BigDecimal lateFeePercentage;
+
+    private Integer graceDays;
+    private LateFeeFrequency lateFeeFrequency;
+    private BigDecimal lateFeeMaxAmount;
+    private LateFeeApplyOn lateFeeApplyOn;
+
+    private Boolean sendPaymentReminder;
+    private Integer reminderDaysBeforeDue;
 
     // Tax Rules
     private Long taxTypeId;

@@ -2,6 +2,8 @@ package com.smartsolutions.eschool.institute.entity;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
+import com.smartsolutions.eschool.institute.enums.LateFeeApplyOn;
+import com.smartsolutions.eschool.institute.enums.LateFeeFrequency;
 import com.smartsolutions.eschool.institute.enums.LateFeeType;
 import com.smartsolutions.eschool.institute.enums.RefundType;
 import jakarta.persistence.*;
@@ -55,8 +57,31 @@ public class CampusFinancialSettings extends ScopeAuditableEntity {
     @Column(name = "late_fee_type", length = 20)
     private LateFeeType lateFeeType;
 
-    @Column(name = "late_fee_amount", precision = 10, scale = 2)
-    private BigDecimal lateFeeValue;
+    @Column(name = "late_fee_fixed_amount", precision = 10, scale = 2)
+    private BigDecimal lateFeeFixedAmount;
+
+    @Column(name = "late_fee_percentage", precision = 5, scale = 2)
+    private BigDecimal lateFeePercentage;
+
+    @Column(name = "grace_days")
+    private Integer graceDays = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "late_fee_frequency", length = 20)
+    private LateFeeFrequency lateFeeFrequency;
+
+    @Column(name = "late_fee_max_amount", precision = 10, scale = 2)
+    private BigDecimal lateFeeMaxAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "late_fee_apply_on", length = 20)
+    private LateFeeApplyOn lateFeeApplyOn;
+
+    @Column(name = "send_payment_reminder")
+    private Boolean sendPaymentReminder = false;
+
+    @Column(name = "reminder_days_before_due")
+    private Integer reminderDaysBeforeDue = 0;
 
     // Tax Rules
     @Column(name = "tax_type_id")
