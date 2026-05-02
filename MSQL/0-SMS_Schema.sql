@@ -988,9 +988,10 @@ CREATE TABLE board_member_roles (
         fee_component_id BIGINT NOT NULL,
         academic_year_id BIGINT NOT NULL,
         description VARCHAR(255),
-         fixed_amount DECIMAL(12,2),
+        fixed_amount DECIMAL(12,2),
         -- Percentage
         percentage_value DECIMAL(5,2),
+
         percentage_of_component_id BIGINT,
         -- Per unit
         unit_price DECIMAL(12,2),
