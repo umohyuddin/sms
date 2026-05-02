@@ -154,4 +154,18 @@ public class FeeRateMapper {
         return entity;
     }
 
+    public static void updateEntityFromDTO(FeeRateEntity entity, FeeRateCreateRequestDTO dto) {
+        if (entity == null || dto == null)
+            return;
+
+        entity.setFixedAmount(dto.getFixedAmount());
+        entity.setPercentageValue(dto.getPercentageValue());
+        entity.setUnitPrice(dto.getUnitPrice());
+        entity.setPriority(dto.getPriority() != null ? dto.getPriority() : 0);
+
+        entity.setCurrency(dto.getCurrency());
+        entity.setEffectiveFrom(dto.getEffectiveFrom());
+        entity.setEffectiveTo(dto.getEffectiveTo());
+        entity.setActive(dto.isActive());
+    }
 }
