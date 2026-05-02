@@ -115,6 +115,20 @@ public interface FeeRateRepository extends JpaRepository<FeeRateEntity, Long> {
       @Param("academicYearId") Long academicYearId);
 
   @Query("""
+          SELECT f FROM FeeRateEntity f
+          WHERE f.campus.id = :campusId
+            AND f.standard.id = :standardId
+            AND f.academicYear.id = :academicYearId
+            AND (:feeComponentId IS NULL AND f.feeComponent IS NULL OR f.feeComponent.id = :feeComponentId)
+            AND f.deleted = false
+      """)
+  List<FeeRateEntity> findActiveFeeRatesByComponent(
+      @Param("campusId") Long campusId,
+      @Param("standardId") Long standardId,
+      @Param("academicYearId") Long academicYearId,
+      @Param("feeComponentId") Long feeComponentId);
+
+  @Query("""
           SELECT fr FROM FeeRateEntity fr
           LEFT JOIN FETCH fr.feeComponent fc
           LEFT JOIN FETCH fc.feeCatalog fcat

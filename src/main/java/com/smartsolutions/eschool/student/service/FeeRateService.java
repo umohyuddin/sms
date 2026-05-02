@@ -178,15 +178,17 @@ public class FeeRateService {
         }
 
         // Check for overlapping FeeRates
-        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRates(campus.getId(), standard.getId(),
-                academicYear.getId());
+        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRatesByComponent(campus.getId(),
+                standard.getId(),
+                academicYear.getId(), feeComponent != null ? feeComponent.getId() : null);
 
         if (!CollectionUtils.isEmpty(overlapping)) {
             for (FeeRateEntity fr : overlapping) {
                 LocalDate existingFrom = fr.getEffectiveFrom();
-                LocalDate existingTo = fr.getEffectiveTo() != null ? fr.getEffectiveTo() : LocalDate.MAX;
+                // Fallback to Academic Year end date if effectiveTo is null
+                LocalDate existingTo = fr.getEffectiveTo() != null ? fr.getEffectiveTo() : academicYear.getEndDate();
                 LocalDate newFrom = from;
-                LocalDate newTo = to != null ? to : LocalDate.MAX;
+                LocalDate newTo = to != null ? to : academicYear.getEndDate();
 
                 boolean isOverlapping = !(newTo.isBefore(existingFrom) || newFrom.isAfter(existingTo));
                 if (isOverlapping) {
@@ -269,8 +271,9 @@ public class FeeRateService {
         }
 
         // Check for overlapping FeeRates (excluding the current record)
-        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRates(campus.getId(), standard.getId(),
-                academicYear.getId());
+        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRatesByComponent(campus.getId(),
+                standard.getId(),
+                academicYear.getId(), feeComponent != null ? feeComponent.getId() : null);
 
         if (!CollectionUtils.isEmpty(overlapping)) {
             for (FeeRateEntity fr : overlapping) {
@@ -278,9 +281,10 @@ public class FeeRateService {
                     continue; // skip current fee rate
 
                 LocalDate existingFrom = fr.getEffectiveFrom();
-                LocalDate existingTo = fr.getEffectiveTo() != null ? fr.getEffectiveTo() : LocalDate.MAX;
+                // Fallback to Academic Year end date if effectiveTo is null
+                LocalDate existingTo = fr.getEffectiveTo() != null ? fr.getEffectiveTo() : academicYear.getEndDate();
                 LocalDate newFrom = from;
-                LocalDate newTo = to != null ? to : LocalDate.MAX;
+                LocalDate newTo = to != null ? to : academicYear.getEndDate();
 
                 boolean isOverlapping = !(newTo.isBefore(existingFrom) || newFrom.isAfter(existingTo));
                 if (isOverlapping) {
