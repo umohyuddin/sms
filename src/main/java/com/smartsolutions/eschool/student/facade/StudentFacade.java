@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.global.configs.GenderConfig;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentBasicInfoUpdateDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentSearchRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
@@ -147,9 +148,9 @@ public class StudentFacade {
         return studentDashboardDTO;
     }
 
-    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long sectionId, Long studentId, Long academicYearId, String kw) {
-        log.info("[Facade:StudentFacade] searchStudents() called");
-        return studentService.searchStudents(campusId, standardId, sectionId, studentId, academicYearId, kw);
+    public List<StudentDTO> searchStudents(StudentSearchRequestDTO searchRequest) {
+        log.info("[Facade:StudentFacade] searchStudents() called - Params: {}", searchRequest);
+        return studentService.searchStudents(searchRequest);
     }
 
     public void saveStudentDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {

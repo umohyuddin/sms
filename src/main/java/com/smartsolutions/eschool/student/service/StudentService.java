@@ -13,6 +13,7 @@ import com.smartsolutions.eschool.sclass.repository.StandardRepository;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentBasicInfoUpdateDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentSearchRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
 import com.smartsolutions.eschool.student.error.StudentErrors;
@@ -249,11 +250,32 @@ public class StudentService {
         }
     }
 
-    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long sectionId, Long studentId, Long academicYearId, String kw) {
+    public List<StudentDTO> searchStudents(StudentSearchRequestDTO searchRequest) {
         Long orgId = getOrgId();
-        log.info("[Service:StudentService] searchStudents() called for org: {}", orgId);
+        log.info("[Service:StudentService] searchStudents() called for org: {} - Params: {}", orgId, searchRequest);
         try {
-            List<StudentEntity> result = studentRepository.searchStudentsWithFilters(campusId, standardId, sectionId, studentId, academicYearId, kw, orgId);
+            String kw = (searchRequest.getKeyword() != null && !searchRequest.getKeyword().isBlank()) ? searchRequest.getKeyword().trim() : null;
+            
+            Long academicYearId = searchRequest.getAcademicYearId();
+            if (academicYearId == null) {
+                academicYearId = academicYearRepository.findByIsCurrentTrue()
+                        .map(AcademicYearEntity::getId)
+                        .orElse(null);
+                log.info("[Service:StudentService] No academicYearId provided, defaulting to current year: {}", academicYearId);
+            }
+
+            List<StudentEntity> result = studentRepository.searchStudentsWithFilters(
+                    searchRequest.getCampusId(), 
+                    searchRequest.getStandardId(), 
+                    searchRequest.getSectionId(), 
+                    searchRequest.getStudentId(), 
+                    academicYearId, 
+                    searchRequest.getIsActive(), 
+                    kw, 
+                    orgId);
+            
+            // Calculate fee assignment status for each student to match getAll() response
+            result.forEach(StudentEntity::calculateFeeAssigned);
             return StudentMapper.toDTOList(result);
         } catch (Exception e) {
             log.error("[Service:StudentService] Error searching students", e);

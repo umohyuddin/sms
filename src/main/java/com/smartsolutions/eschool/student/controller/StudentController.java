@@ -7,6 +7,7 @@ import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequest
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentSearchRequestDTO;
 import com.smartsolutions.eschool.student.facade.StudentFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -184,7 +185,7 @@ public class StudentController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Search students", description = "Filter students by campus, standard, section, or keyword.")
+    @Operation(summary = "Search students (Generic)", description = "Filter students by campus, standard, section, academic year, status (active/inactive), or keyword.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved search results",
                     content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = StudentDTO.class)))),
@@ -193,15 +194,9 @@ public class StudentController {
     })
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StudentDTO>> searchStudents(
-            @Parameter(description = "ID of the campus", example = "1") @RequestParam(required = false) Long campusId,
-            @Parameter(description = "ID of the academic standard", example = "5") @RequestParam(required = false) Long standardId,
-            @Parameter(description = "ID of the section", example = "1") @RequestParam(required = false) Long sectionId,
-            @Parameter(description = "Direct ID search", example = "10") @RequestParam(required = false) Long studentId,
-            @Parameter(description = "ID of the academic year", example = "2024") @RequestParam(required = false) Long academicYearId,
-            @Parameter(description = "Keyword search (name/code)", example = "Arslan") @RequestParam(required = false) String keyword) {
-        log.info("[Controller:StudentController] GET /api/institute/students/search - Searching with keyword: {}", keyword);
-        String kw = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
-        List<StudentDTO> students = studentFacade.searchStudents(campusId, standardId, sectionId, studentId, academicYearId, kw);
+            @org.springdoc.core.annotations.ParameterObject StudentSearchRequestDTO searchRequest) {
+        log.info("[Controller:StudentController] GET /api/institute/students/search - Params: {}", searchRequest);
+        List<StudentDTO> students = studentFacade.searchStudents(searchRequest);
         return ResponseEntity.ok(students);
     }
 
@@ -226,6 +221,9 @@ public class StudentController {
         return ResponseEntity.ok(resources);
     }
 
+
+
+    //no need of this
     @Operation(summary = "Get dashboard statistics", description = "Retrieve high-level statistics for students based on filters.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved dashboard data",

@@ -122,21 +122,25 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
       "campus",
       "standard",
       "section",
-      "academicYear"
+      "academicYear",
+      "feeAssignments"
   })
   @Query("""
-          SELECT s FROM StudentEntity s
+          SELECT DISTINCT s FROM StudentEntity s
+          LEFT JOIN s.feeAssignments fa
           WHERE s.deleted = false AND s.organizationId = :organizationId
             AND (:campusId IS NULL OR s.campus.id = :campusId)
             AND (:standardId IS NULL OR s.standard.id = :standardId)
             AND (:sectionId IS NULL OR s.section.id = :sectionId)
             AND (:studentId IS NULL OR s.id = :studentId)
             AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
+            AND (:isActive IS NULL OR s.isActive = :isActive)
             AND (
                   :keyword IS NULL
                   OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                   OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                   OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                  OR LOWER(s.studentCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 )
       """)
   List<StudentEntity> searchStudentsWithFilters(
@@ -145,6 +149,7 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
       @Param("sectionId") Long sectionId,
       @Param("studentId") Long studentId,
       @Param("academicYearId") Long academicYearId,
+      @Param("isActive") Boolean isActive,
       @Param("keyword") String keyword,
       @Param("organizationId") Long organizationId);
 
