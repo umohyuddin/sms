@@ -13,11 +13,11 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDate;
 
 @Entity
+@SQLDelete(sql = "UPDATE student_attendance SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "student_attendance", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"organization_id", "student_id", "attendance_date"})
 })
-@SQLDelete(sql = "UPDATE student_attendance SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -64,9 +64,6 @@ public class StudentAttendanceEntity extends AuditableEntity {
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
-
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 
     public enum AttendanceStatus {
         PRESENT, ABSENT, LEAVE

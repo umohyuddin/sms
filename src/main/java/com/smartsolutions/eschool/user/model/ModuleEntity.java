@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.user.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
@@ -8,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@SQLDelete(sql = "UPDATE ModuleEntity SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(
         name = "modules",
         uniqueConstraints = {
@@ -47,7 +52,4 @@ public class ModuleEntity extends ScopeAuditableEntity {
 
     @Column(name = "active", nullable = false)
     private Boolean active = true;
-
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
 }

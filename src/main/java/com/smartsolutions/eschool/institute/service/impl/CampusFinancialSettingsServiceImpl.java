@@ -114,7 +114,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
                 .orElseThrow(() -> new ApiException(
                         CampusFinancialSettingsErrors.CAMPUS_FINANCIAL_SETTINGS_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        settings.setIsDeleted(true);
+        settings.setDeleted(true);
         repository.save(settings);
 
         log.info("[Service:CampusFinancialSettingsServiceImpl] softDeleteById() succeeded - ID: {}", id);
@@ -124,7 +124,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
     @Transactional(readOnly = true)
     public java.util.List<CampusFinancialSettingsResponseDTO> getAllByCampusId(Long campusId) {
         log.info("[Service:CampusFinancialSettingsServiceImpl] getAllByCampusId() called - campus: {}", campusId);
-        return repository.findAllByCampusIdAndIsDeletedFalse(campusId)
+        return repository.findAllByCampusIdAndDeletedFalse(campusId)
                 .stream()
                 .map(CampusFinancialSettingsMapper::toDTO)
                 .map(this::populateNames)

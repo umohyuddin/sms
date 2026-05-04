@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.student.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -8,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@SQLDelete(sql = "UPDATE student_guardians SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "student_guardians", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"organization_id", "student_id", "guardian_id"})
 })
@@ -37,7 +42,4 @@ public class StudentGuardianEntity extends AuditableEntity {
 
     @Column(name = "status", nullable = false, length = 20)
     private String status = "ACTIVE";
-
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
 }

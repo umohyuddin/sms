@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.employee.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
@@ -8,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@SQLDelete(sql = "UPDATE employee_type SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "employee_type")
 @Getter
 @Setter
@@ -27,7 +32,4 @@ public class EmployeeTypeEntity extends ScopeAuditableEntity {
 
     @Column(nullable = false)
     private Boolean active = true;
-
-    @Column(nullable = false)
-    private Boolean deleted = false;
 }

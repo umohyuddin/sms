@@ -1,4 +1,8 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,37 +13,20 @@ import java.time.LocalDateTime;
 
 
 @Entity
+@SQLDelete(sql = "UPDATE rules SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "rules")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RulesEntity {
+public class RulesEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "inst_id")
-    private Integer instituteId;
-
     @Lob
     @Column(name = "rules", columnDefinition = "LONGTEXT")
     private String rules;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-    @PrePersist
-    public  void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 }

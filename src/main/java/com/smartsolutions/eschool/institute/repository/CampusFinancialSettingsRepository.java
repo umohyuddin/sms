@@ -15,7 +15,7 @@ public interface CampusFinancialSettingsRepository extends JpaRepository<CampusF
                 SELECT s FROM CampusFinancialSettings s
                 WHERE s.campusId = :campusId
                   AND s.academicYearId = :academicYearId
-                  AND s.isDeleted = false
+                  AND s.deleted = false
             """)
     Optional<CampusFinancialSettings> findByCampusIdAndAcademicYearIdJpql(
             @Param("campusId") Long campusId,
@@ -25,16 +25,16 @@ public interface CampusFinancialSettingsRepository extends JpaRepository<CampusF
                 SELECT s FROM CampusFinancialSettings s
                 WHERE s.id = :id
                   AND s.instituteId = :instituteId
-                  AND s.isDeleted = false
+                  AND s.deleted = false
             """)
     Optional<CampusFinancialSettings> findByIdAndInstituteIdJpql(
             @Param("id") Long id,
             @Param("instituteId") Long instituteId);
 
-    Optional<CampusFinancialSettings> findByCampusIdAndAcademicYearIdAndIsDeletedFalse(Long campusId,
+    Optional<CampusFinancialSettings> findByCampusIdAndAcademicYearIdAndDeletedFalse(Long campusId,
             Long academicYearId);
 
-    Optional<CampusFinancialSettings> findByIdAndIsDeletedFalse(Long id);
+    Optional<CampusFinancialSettings> findByIdAndDeletedFalse(Long id);
 
-    java.util.List<CampusFinancialSettings> findAllByCampusIdAndIsDeletedFalse(Long campusId);
+    java.util.List<CampusFinancialSettings> findAllByCampusIdAndDeletedFalse(Long campusId);
 }

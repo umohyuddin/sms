@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.student.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
@@ -11,6 +14,8 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
+@SQLDelete(sql = "UPDATE student_fee_summary SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "student_fee_summary", uniqueConstraints = {@UniqueConstraint(columnNames = {"student_id", "academic_year_id"})})
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,9 +41,6 @@ public class StudentFeeSummaryEntity extends AuditableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id", nullable = false)
     private AcademicYearEntity academicYear;
-
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
 }
 
 

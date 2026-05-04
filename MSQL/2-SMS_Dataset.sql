@@ -246,7 +246,7 @@ VALUES
 -- ============================================================
 -- Lookup Data: Languages
 -- ============================================================
-INSERT INTO languages (iso_code, name, is_active, is_deleted, created_at, created_by, updated_at) VALUES
+INSERT INTO languages (iso_code, name, is_active, deleted, created_at, created_by, updated_at) VALUES
 ('aa', 'Afar', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('ab', 'Abkhaz', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('af', 'Afrikaans', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
@@ -622,7 +622,7 @@ VALUES
 
 
 
-INSERT INTO school_types (code, name, description, is_active, is_deleted, created_at, updated_at) VALUES
+INSERT INTO school_types (code, name, description, is_active, deleted, created_at, updated_at) VALUES
 ('PUBLIC', 'Public School', 'Funded and operated by the government, free for students.', TRUE, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('PRIVATE', 'Private School', 'Privately funded school, requires tuition fees.', TRUE, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('CHARTER', 'Charter School', 'Publicly funded independent school with special curriculum.', TRUE, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -778,7 +778,7 @@ VALUES
 ON DUPLICATE KEY UPDATE
     name = VALUES(name),
     is_active = TRUE,
-    is_deleted = FALSE;
+    deleted = FALSE;
 
 -- 2. INSERT SUBJECTS
 -- Note: subject_group_id is fetched dynamically to ensure correctness regardless of ID generation.
@@ -904,7 +904,7 @@ ON DUPLICATE KEY UPDATE
     subject_group_id = VALUES(subject_group_id),
     is_core = VALUES(is_core),
     is_active = TRUE,
-    is_deleted = FALSE;
+    deleted = FALSE;
 
 
 
@@ -1601,7 +1601,7 @@ INSERT INTO exam_type
     name,
     description,
     is_active,
-    is_deleted,
+    deleted,
     created_at,
     updated_at,
     created_by
@@ -6309,7 +6309,7 @@ FROM standard_subjects ss
 CROSS JOIN exam_terms et
 WHERE ss.academic_year_id = 1 
   AND et.academic_year_id = 1
-  AND ss.is_deleted = FALSE;
+  AND ss.deleted = FALSE;
 
 -- Verification counts
 SELECT 'Weightage Records Created' as Category, COUNT(*) as Count FROM exam_weightage;
@@ -6326,7 +6326,7 @@ INSERT INTO campus_financial_settings
     late_fee_apply_on, send_payment_reminder, reminder_days_before_due, tax_type_id, 
     allow_refunds, refund_policy_url, refund_window_days, refund_type, 
     refund_percentage, refund_fixed_amount, invoice_mandatory, receipt_mandatory, 
-    is_active, is_deleted, created_by
+    is_active, deleted, created_by
 ) 
 VALUES
 -- Campus 1: Main Campus

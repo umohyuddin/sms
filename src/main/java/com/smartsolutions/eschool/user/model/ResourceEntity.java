@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.user.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
@@ -13,6 +16,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@SQLDelete(sql = "UPDATE resources SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "resources")
 public class ResourceEntity extends ScopeAuditableEntity {
 
@@ -50,9 +55,6 @@ public class ResourceEntity extends ScopeAuditableEntity {
 
     @Column(nullable = true)
     private String owner;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 
 }
 

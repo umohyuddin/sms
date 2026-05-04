@@ -1,4 +1,5 @@
 package com.smartsolutions.eschool.employee.model;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -10,13 +11,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE SalaryStructureEntity SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(
         name = "salary_structure",
         uniqueConstraints = {
@@ -28,8 +31,6 @@ import java.util.List;
 )
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE salary_structure SET deleted = true WHERE id = ?")
-@Where(clause = "deleted = false")
 public class SalaryStructureEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,9 +49,6 @@ public class SalaryStructureEntity extends AuditableEntity {
 
     @Column(name = "effective_to")
     private LocalDate effectiveTo;
-
-    @Column(nullable = false)
-    private Boolean deleted = false;
 
     @Column(nullable = false)
     private Boolean isCurrent = true;

@@ -9,12 +9,12 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
+@SQLDelete(sql = "UPDATE charge_types SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "charge_types")
 @Getter
 @Setter
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE charge_types SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted = false")
 public class ChargeTypeEntity extends ScopeAuditableEntity {
 
     @Id
@@ -32,7 +32,4 @@ public class ChargeTypeEntity extends ScopeAuditableEntity {
 
     @Column(name = "is_active")
     private Boolean active = true;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 }

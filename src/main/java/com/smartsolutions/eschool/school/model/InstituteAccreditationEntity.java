@@ -1,4 +1,5 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
@@ -7,18 +8,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+
 
 import java.time.LocalDate;
 
 @Entity
+@SQLDelete(sql = "UPDATE institute_accreditations SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "institute_accreditations")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE institute_accreditations SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@Where(clause = "is_deleted = false")
 public class InstituteAccreditationEntity extends ScopeAuditableEntity {
 
     @Id
@@ -43,7 +44,4 @@ public class InstituteAccreditationEntity extends ScopeAuditableEntity {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
-
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 }

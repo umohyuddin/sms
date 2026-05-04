@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.institute.entity;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
@@ -15,6 +18,8 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
+@SQLDelete(sql = "UPDATE campus_financial_settings SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "campus_financial_settings", uniqueConstraints = {
         @UniqueConstraint(name = "uk_campus_academic_year", columnNames = { "campus_id", "academic_year_id" })
 })
@@ -116,7 +121,4 @@ public class CampusFinancialSettings extends ScopeAuditableEntity {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
-
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
 }

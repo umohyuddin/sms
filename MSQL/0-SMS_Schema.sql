@@ -25,6 +25,7 @@
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT uk_academic_year_code UNIQUE (code),
@@ -42,11 +43,11 @@
         name VARCHAR(100) NOT NULL,
         description VARCHAR(255),
         is_active BOOLEAN DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT chk_school_type_code_not_empty CHECK (LENGTH(code) > 0),
@@ -61,11 +62,11 @@
         iso_code VARCHAR(10) UNIQUE,
         name VARCHAR(50) NOT NULL,
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT chk_language_name_not_empty CHECK (LENGTH(name) > 0)
@@ -80,11 +81,11 @@
         name VARCHAR(100) NOT NULL,
         symbol VARCHAR(10),
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -95,11 +96,11 @@
         code VARCHAR(10) UNIQUE,
         name VARCHAR(50) NOT NULL,
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -110,11 +111,11 @@
         code VARCHAR(20) UNIQUE,
         name VARCHAR(100) NOT NULL,
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -126,11 +127,11 @@
         name VARCHAR(100) NOT NULL,
         description VARCHAR(255),
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -147,6 +148,7 @@
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -162,9 +164,9 @@
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE
     );
 
     DROP TABLE IF EXISTS modules;
@@ -183,9 +185,9 @@
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE
     );
 
     DROP TABLE IF EXISTS employee_type;
@@ -195,11 +197,11 @@
         name VARCHAR(50) NOT NULL UNIQUE,
         description VARCHAR(255),
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -212,11 +214,11 @@
         name VARCHAR(100) NOT NULL,
         description VARCHAR(255),
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT chk_department_type_code_not_empty CHECK (LENGTH(code) > 0),
@@ -233,11 +235,11 @@
         name VARCHAR(100) NOT NULL,
         type ENUM('EARNING','DEDUCTION') NOT NULL,
         is_percentage BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -257,9 +259,9 @@
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         CONSTRAINT fk_province_country FOREIGN KEY (country_id) REFERENCES country(id),
         CONSTRAINT uq_country_province UNIQUE (country_id, name)
     );
@@ -276,9 +278,9 @@
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         CONSTRAINT fk_province FOREIGN KEY (province_id) REFERENCES provinces (id)
     );
     CREATE INDEX idx_cities_province_id ON cities (province_id);
@@ -296,9 +298,9 @@
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE
     );
 
 
@@ -310,11 +312,11 @@
         tax_percentage DECIMAL(5,2) NOT NULL DEFAULT 0.00,
         country_id BIGINT,
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_tax_country FOREIGN KEY (country_id) REFERENCES country(id)
@@ -328,11 +330,11 @@
         country_id BIGINT,
         description VARCHAR(255),
         is_active BOOLEAN DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT chk_education_board_name_not_empty CHECK (LENGTH(name) > 0),
@@ -364,9 +366,9 @@
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         FOREIGN KEY (module_id) REFERENCES modules(id)
     );
 
@@ -379,11 +381,11 @@
         effective_from DATE NOT NULL,
         effective_to DATE,
         is_current BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_salary_employee_type FOREIGN KEY (employee_type_id) REFERENCES employee_type(id),
@@ -409,11 +411,11 @@
         city_id BIGINT NOT NULL,
         established_date DATE,
         logo_url VARCHAR(255),
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT chk_single_institute CHECK (id = 1),
@@ -460,9 +462,9 @@ CREATE TABLE board_member_roles (
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         FOREIGN KEY (module_id) REFERENCES modules(id),
         FOREIGN KEY (resource_id) REFERENCES resources(id),
         FOREIGN KEY (action_id) REFERENCES actions(id),
@@ -473,7 +475,7 @@ CREATE TABLE board_member_roles (
     CREATE TABLE institute_languages (
         institute_id BIGINT,
         language_id BIGINT,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (institute_id, language_id),
@@ -494,11 +496,11 @@ CREATE TABLE board_member_roles (
         phone VARCHAR(20),
         email VARCHAR(100),
         is_primary BOOLEAN DEFAULT FALSE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (institute_id) REFERENCES institutes(id),
@@ -506,7 +508,7 @@ CREATE TABLE board_member_roles (
     );
     CREATE INDEX idx_institute_contacts_institute ON institute_contacts (institute_id);
     CREATE INDEX idx_institute_contacts_role ON institute_contacts (role_id);
-    CREATE INDEX idx_institute_contacts_deleted ON institute_contacts (is_deleted);
+    CREATE INDEX idx_institute_contacts_deleted ON institute_contacts (deleted);
 
     DROP TABLE IF EXISTS refund_policies;
     CREATE TABLE refund_policies (
@@ -519,11 +521,11 @@ CREATE TABLE board_member_roles (
         max_refund_amount DECIMAL(10,2),
         allowed_after_days INT,
         is_active BOOLEAN DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (institute_id) REFERENCES institutes(id),
@@ -536,11 +538,11 @@ CREATE TABLE board_member_roles (
         institute_id BIGINT NOT NULL,
         platform VARCHAR(50),
         url VARCHAR(255),
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (institute_id) REFERENCES institutes(id)
@@ -554,11 +556,11 @@ CREATE TABLE board_member_roles (
         facility_type_id BIGINT NOT NULL,
         description VARCHAR(255),
         capacity INT,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_facility_institute FOREIGN KEY (institute_id) REFERENCES institutes(id),
@@ -572,11 +574,11 @@ CREATE TABLE board_member_roles (
         education_level VARCHAR(50),
         curriculum VARCHAR(100),
         board VARCHAR(100),
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (institute_id) REFERENCES institutes(id)
@@ -594,11 +596,11 @@ CREATE TABLE board_member_roles (
         payment_cycle VARCHAR(20),
         subscription_start DATE,
         subscription_end DATE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (institute_id) REFERENCES institutes(id)
@@ -613,11 +615,11 @@ CREATE TABLE board_member_roles (
         file_name VARCHAR(150),
         file_url VARCHAR(255),
         expiry_date DATE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (institute_id) REFERENCES institutes(id)
@@ -633,11 +635,11 @@ CREATE TABLE board_member_roles (
         valid_from DATE,
         valid_to DATE,
         is_active BOOLEAN DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (institute_id) REFERENCES institutes(id)
@@ -655,11 +657,11 @@ CREATE TABLE board_member_roles (
         `values` TEXT,
         about_chairperson TEXT,
         organization_email VARCHAR(100),
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (institute_id) REFERENCES institutes(id)
@@ -677,11 +679,11 @@ CREATE TABLE board_member_roles (
         term_start DATE,
         term_end DATE,
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_board_members_org FOREIGN KEY (organization_id) REFERENCES institutes(id),
@@ -709,11 +711,11 @@ CREATE TABLE board_member_roles (
         address VARCHAR(255),
         active BOOLEAN NOT NULL DEFAULT TRUE,
         logo LONGBLOB,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_campuses_institute FOREIGN KEY (institute_id) REFERENCES institutes (id) ON DELETE SET NULL ON UPDATE CASCADE,
@@ -737,11 +739,11 @@ CREATE TABLE board_member_roles (
         name VARCHAR(150) NOT NULL,
         description VARCHAR(500),
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -754,11 +756,11 @@ CREATE TABLE board_member_roles (
         standard_name VARCHAR(50) NOT NULL,
         standard_code VARCHAR(50),
         description VARCHAR(500),
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         UNIQUE (campus_id, standard_name),
@@ -776,11 +778,11 @@ CREATE TABLE board_member_roles (
         standard_id BIGINT NOT NULL,
         section_name VARCHAR(10) NOT NULL,
         section_code VARCHAR(15),
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         UNIQUE KEY uq_standard_section_name (standard_id, section_name),
@@ -797,11 +799,11 @@ CREATE TABLE board_member_roles (
         name VARCHAR(100) NOT NULL,
         description VARCHAR(255),
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -816,11 +818,11 @@ CREATE TABLE board_member_roles (
         name VARCHAR(255) NOT NULL,
         description VARCHAR(255),
         is_active BOOLEAN DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -840,12 +842,12 @@ CREATE TABLE board_member_roles (
         recurrence_rule_id BIGINT,
 
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -882,12 +884,12 @@ CREATE TABLE board_member_roles (
         account_code VARCHAR(50),
         taxable BOOLEAN NOT NULL DEFAULT FALSE,
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         discount_able BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_fee_component_organization FOREIGN KEY (organization_id) REFERENCES institutes(id),
@@ -918,12 +920,12 @@ CREATE TABLE board_member_roles (
         description VARCHAR(255),
 
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -952,12 +954,12 @@ CREATE TABLE board_member_roles (
         currency VARCHAR(3),
 
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -1005,11 +1007,11 @@ CREATE TABLE board_member_roles (
         effective_from DATE NOT NULL,
         effective_to DATE,
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_fee_rates_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
@@ -1074,11 +1076,11 @@ CREATE TABLE board_member_roles (
         invoice_mandatory BOOLEAN DEFAULT TRUE,
         receipt_mandatory BOOLEAN DEFAULT TRUE,
         is_active BOOLEAN DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (institute_id) REFERENCES institutes(id),
@@ -1123,11 +1125,11 @@ CREATE TABLE board_member_roles (
         profile_picture VARCHAR(255),
         bio TEXT,
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         UNIQUE KEY uq_employee_code (employee_code),
@@ -1243,7 +1245,7 @@ CREATE TABLE guardians (
         is_active TINYINT(1) DEFAULT 1,
         status VARCHAR(50),
         enrollment_date DATE NOT NULL,
-        deleted TINYINT(1) DEFAULT 0,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         campus_id BIGINT,
         standard_id BIGINT,
         section_id BIGINT,
@@ -1335,11 +1337,11 @@ CREATE TABLE student_guardians (
         file_path VARCHAR(500) NOT NULL,
         file_type VARCHAR(50),
         document_type VARCHAR(100) NOT NULL,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_student_document_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
@@ -1444,11 +1446,11 @@ CREATE TABLE student_guardians (
         priority INT NOT NULL DEFAULT 0,
         display_order INT NOT NULL DEFAULT 0,
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         -- code unique per org, not globally
@@ -1504,7 +1506,6 @@ CREATE TABLE student_guardians (
         effective_from DATE NULL,
         effective_to DATE NULL,
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         discount_sub_type_id BIGINT NOT NULL,
         campus_id BIGINT NULL,
         academic_year_id BIGINT NOT NULL,
@@ -1512,6 +1513,7 @@ CREATE TABLE student_guardians (
         created_by BIGINT NULL,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT NULL,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_discount_rate_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
@@ -1542,11 +1544,11 @@ CREATE TABLE student_guardians (
         applied_percentage DECIMAL(5, 2),
         reason VARCHAR(255),
         is_active BOOLEAN DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_sda_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
@@ -1575,6 +1577,7 @@ CREATE TABLE student_guardians (
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         PRIMARY KEY (role_id, permission_id),
@@ -1606,11 +1609,11 @@ CREATE TABLE student_guardians (
         file_path VARCHAR(500) NOT NULL,
         file_type VARCHAR(50),
         document_type VARCHAR(100) NOT NULL,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_teacher FOREIGN KEY (employee_id) REFERENCES employee_master (id)
@@ -1629,11 +1632,11 @@ CREATE TABLE student_guardians (
         province_id BIGINT,
         postal_code VARCHAR(20),
         country_id BIGINT NOT NULL,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES employee_master (id),
@@ -1657,11 +1660,11 @@ CREATE TABLE student_guardians (
         phone_secondary VARCHAR(20),
         email VARCHAR(255),
         address VARCHAR(500),
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_employee_emergency FOREIGN KEY (employee_id) REFERENCES employee_master (id)
@@ -1679,11 +1682,11 @@ CREATE TABLE student_guardians (
         year_of_passing INT,
         grade VARCHAR(20),
         certificate VARCHAR(255),
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_employee_qualification FOREIGN KEY (employee_id) REFERENCES employee_master (id)
@@ -1702,11 +1705,11 @@ CREATE TABLE student_guardians (
         parent_id BIGINT NULL,
         head_employee_id BIGINT NULL,
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         -- FKs
@@ -1740,11 +1743,11 @@ CREATE TABLE student_guardians (
         designation_name VARCHAR(150) NOT NULL,
         description VARCHAR(255),
         active BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT uk_designation_org_code UNIQUE (organization_id, designation_code)
@@ -1767,7 +1770,7 @@ CREATE TABLE student_guardians (
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
-        deleted BOOLEAN DEFAULT FALSE,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_assign_employee FOREIGN KEY (employee_id) REFERENCES employee_master(id),
@@ -1789,11 +1792,11 @@ CREATE TABLE student_guardians (
         start_date DATETIME NOT NULL,
         end_date DATETIME,
         is_current BOOLEAN NOT NULL DEFAULT TRUE,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT fk_employee_type_history_employee FOREIGN KEY (employee_id) REFERENCES employee_master(id),
@@ -1813,11 +1816,11 @@ CREATE TABLE student_guardians (
         salary_structure_id BIGINT NOT NULL,
         component_id BIGINT NOT NULL,
         value DECIMAL(12,2) NOT NULL,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (salary_structure_id) REFERENCES salary_structure(id),
@@ -1835,11 +1838,11 @@ CREATE TABLE student_guardians (
         total_deductions DECIMAL(12,2) NOT NULL,
         net_salary DECIMAL(12,2) NOT NULL,
         effective_date DATE NOT NULL,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (employee_id) REFERENCES employee_master(id),
@@ -1857,11 +1860,11 @@ CREATE TABLE student_guardians (
         deduction_type VARCHAR(50) NOT NULL,
         amount DECIMAL(12,2) NOT NULL,
         month DATE NOT NULL,
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (employee_id) REFERENCES employee_master(id),
@@ -1877,11 +1880,11 @@ CREATE TABLE student_guardians (
         end_date DATE NOT NULL,
         status ENUM('PENDING','COMPLETED','CANCELLED') NOT NULL DEFAULT 'PENDING',
         description VARCHAR(255),
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         CONSTRAINT chk_payroll_period_dates CHECK (end_date >= start_date)
@@ -1897,11 +1900,11 @@ CREATE TABLE student_guardians (
         transaction_reference VARCHAR(100),
         amount_paid DECIMAL(12,2) NOT NULL,
         remarks VARCHAR(255),
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (employee_salary_id) REFERENCES employee_salary(id),
@@ -1918,11 +1921,11 @@ CREATE TABLE student_guardians (
         amount DECIMAL(12,2) NOT NULL,
         payroll_period_id BIGINT NOT NULL,
         remarks VARCHAR(255),
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (employee_id) REFERENCES employee_master(id),
@@ -1942,11 +1945,11 @@ CREATE TABLE student_guardians (
         start_date DATE,
         end_date DATE,
         balance DECIMAL(12,2),
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (employee_id) REFERENCES employee_master(id),
@@ -1961,11 +1964,11 @@ CREATE TABLE student_guardians (
         employee_salary_id BIGINT NOT NULL,
         payroll_period_id BIGINT NOT NULL,
         slip_url VARCHAR(255),
-        deleted BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (employee_salary_id) REFERENCES employee_salary(id),
@@ -1984,12 +1987,12 @@ CREATE TABLE student_guardians (
         name VARCHAR(100) NOT NULL,
       description VARCHAR(255),
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -2008,12 +2011,12 @@ CREATE TABLE student_guardians (
         subject_group_id BIGINT,  -- link to subject_groups
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2037,16 +2040,16 @@ CREATE TABLE student_guardians (
         practical_marks INT,
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
-    UNIQUE (organization_id, standard_id, subject_id, academic_year_id, is_deleted),
+    UNIQUE (organization_id, standard_id, subject_id, academic_year_id, deleted),
 
         FOREIGN KEY (standard_id) REFERENCES standards(id),
         FOREIGN KEY (subject_id) REFERENCES subjects(id),
@@ -2071,12 +2074,12 @@ CREATE TABLE student_guardians (
         effective_to DATE,
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2102,7 +2105,7 @@ CREATE TABLE student_attendance (
     remarks VARCHAR(255),
 
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by BIGINT,
@@ -2134,12 +2137,12 @@ CREATE TABLE student_attendance (
         remarks VARCHAR(255),
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2164,7 +2167,6 @@ CREATE TABLE student_attendance (
         description TEXT,
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         organization_id BIGINT NOT NULL,
 
@@ -2172,7 +2174,7 @@ CREATE TABLE student_attendance (
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
-
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -2188,12 +2190,12 @@ CREATE TABLE student_attendance (
         academic_year_id BIGINT NOT NULL,   -- FK to academic_years table
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2212,12 +2214,12 @@ CREATE TABLE student_attendance (
         description VARCHAR(255),
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         UNIQUE (organization_id, code)
@@ -2233,12 +2235,12 @@ CREATE TABLE student_attendance (
         remarks VARCHAR(50),
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT
     );
@@ -2260,12 +2262,12 @@ CREATE TABLE student_attendance (
         academic_year_id BIGINT NOT NULL,
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2288,12 +2290,12 @@ CREATE TABLE student_attendance (
         evaluated_at DATETIME,
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2314,12 +2316,12 @@ CREATE TABLE student_attendance (
         file_type VARCHAR(50),
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2352,12 +2354,12 @@ CREATE TABLE student_attendance (
                DEFAULT 'DRAFT',
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
         FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
@@ -2382,12 +2384,12 @@ CREATE TABLE student_attendance (
         evaluator_id BIGINT,
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2406,12 +2408,12 @@ CREATE TABLE student_attendance (
         status ENUM('PRESENT','ABSENT','UFM') NOT NULL,
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2432,12 +2434,12 @@ CREATE TABLE student_attendance (
         remarks VARCHAR(255),
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2456,13 +2458,13 @@ CREATE TABLE student_attendance (
         weight_percentage DECIMAL(5,2) NOT NULL,
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         -- Audit fields
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2489,13 +2491,13 @@ CREATE TABLE student_attendance (
         generated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         -- Audit fields
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2515,13 +2517,13 @@ CREATE TABLE student_attendance (
         file_url VARCHAR(255),
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         -- Audit fields
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2540,12 +2542,12 @@ CREATE TABLE student_attendance (
         grade VARCHAR(10),
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2563,12 +2565,12 @@ CREATE TABLE student_attendance (
         remarks VARCHAR(255),
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 
@@ -2592,12 +2594,12 @@ CREATE TABLE student_attendance (
         room VARCHAR(50),
 
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
-        is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
         deleted_by BIGINT,
 

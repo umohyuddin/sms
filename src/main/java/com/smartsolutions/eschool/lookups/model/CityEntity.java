@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.lookups.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
@@ -7,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@SQLDelete(sql = "UPDATE cities SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "cities")
 @Getter
 @Setter

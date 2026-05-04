@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -6,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@SQLDelete(sql = "UPDATE subjects SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "subjects")
 @Getter
 @Setter
@@ -29,7 +34,4 @@ public class AcademicSubjectEntity extends AuditableEntity {
 
     @Column(name = "active", nullable = false)
     private Boolean active = true;
-
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
 }

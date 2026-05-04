@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.academic.entity.master;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
@@ -8,6 +11,8 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
+@SQLDelete(sql = "UPDATE employee_attendance SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "employee_attendance")
 @Getter
 @Setter
@@ -33,9 +38,6 @@ public class EmployeeAttendanceEntity extends AuditableEntity {
 
     @Column(name = "remarks", length = 255)
     private String remarks;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
     public enum AttendanceStatus {
         PRESENT, ABSENT, LEAVE, HALF_DAY
     }

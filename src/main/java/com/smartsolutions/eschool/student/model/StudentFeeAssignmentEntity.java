@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.student.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
@@ -12,6 +15,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE student_fee_assignments SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "student_fee_assignments", uniqueConstraints = {@UniqueConstraint(columnNames = {"student_id", "fee_rate_id", "academic_year_id"})})
 @AllArgsConstructor
 @NoArgsConstructor
@@ -48,7 +53,4 @@ public class StudentFeeAssignmentEntity extends AuditableEntity {
 
     @Column(name = "assigned_date")
     private LocalDate assignedDate;
-
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
 }

@@ -7,16 +7,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
+@SQLDelete(sql = "UPDATE institute_academic_offerings SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "institute_academic_offerings")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE institute_academic_offerings SET is_deleted = true WHERE id = ?")
-@Where(clause = "is_deleted = false")
 public class InstituteAcademicOfferingEntity extends ScopeAuditableEntity {
 
     @Id
@@ -36,6 +36,4 @@ public class InstituteAcademicOfferingEntity extends ScopeAuditableEntity {
     @Column(name = "board", length = 100)
     private String board;
 
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
 }

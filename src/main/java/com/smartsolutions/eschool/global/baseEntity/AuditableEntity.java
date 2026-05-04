@@ -31,6 +31,9 @@ public abstract class AuditableEntity {
     @Column(name = "deleted_by")
     private Long deletedBy;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
     @PrePersist
     public void prePersist() {
         this.createdBy = getCurrentUser();

@@ -7,9 +7,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "board_member_roles")
 @SQLDelete(sql = "UPDATE board_member_roles SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Table(name = "board_member_roles")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -33,7 +33,4 @@ public class BoardMemberRoleEntity extends AuditableEntity {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 }

@@ -51,7 +51,7 @@ public class CampusFinancialSettingsMapper {
         entity.setInvoiceMandatory(dto.getInvoiceMandatory() != null ? dto.getInvoiceMandatory() : false);
         entity.setReceiptMandatory(dto.getReceiptMandatory() != null ? dto.getReceiptMandatory() : true);
         entity.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
-        entity.setIsDeleted(false);
+        entity.setDeleted(false);
 
         return entity;
     }

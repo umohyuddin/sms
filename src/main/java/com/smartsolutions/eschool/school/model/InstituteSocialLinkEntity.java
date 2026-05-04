@@ -1,4 +1,5 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
@@ -7,16 +8,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+
 
 @Entity
+@SQLDelete(sql = "UPDATE institute_social_links SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "institute_social_links")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE institute_social_links SET is_deleted = true WHERE id = ?")
-@Where(clause = "is_deleted = false")
 public class InstituteSocialLinkEntity extends ScopeAuditableEntity {
 
     @Id
@@ -32,7 +33,4 @@ public class InstituteSocialLinkEntity extends ScopeAuditableEntity {
 
     @Column(name = "url", length = 255)
     private String url;
-
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
 }

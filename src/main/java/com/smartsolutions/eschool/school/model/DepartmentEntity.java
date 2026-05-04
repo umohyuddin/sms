@@ -10,9 +10,9 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 @Entity
-@Table(name = "departments")
 @SQLDelete(sql = "UPDATE departments SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Table(name = "departments")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -54,9 +54,6 @@ public class DepartmentEntity extends AuditableEntity {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    @Builder.Default
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<DepartmentEntity> subDepartments;

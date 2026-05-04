@@ -14,9 +14,9 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 @Entity
-@Table(name = "campuses")
 @SQLDelete(sql = "UPDATE campuses SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Table(name = "campuses")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -54,8 +54,6 @@ public class CampusEntity extends AuditableEntity {
     @Column(name = "logo", nullable = true, columnDefinition = "LONGBLOB")
     private byte[] logo;
 
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "province_id")

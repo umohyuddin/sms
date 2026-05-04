@@ -144,7 +144,7 @@ public class InstituteContactServiceImpl implements InstituteContactService {
                 ));
 
         // Soft delete
-        entity.setIsDeleted(true);
+        entity.setDeleted(true);
         entity.setDeletedAt(LocalDateTime.now());
         entity.setDeletedBy(1L); // TODO: Replace with current user ID from context
 

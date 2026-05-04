@@ -1,5 +1,9 @@
 package com.smartsolutions.eschool.academic.entity.master;
 
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
+
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.sclass.model.SectionEntity;
@@ -10,6 +14,8 @@ import lombok.*;
 import java.time.LocalTime;
 
 @Entity
+@SQLDelete(sql = "UPDATE timetable SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "timetable")
 @Getter
 @Setter
@@ -54,10 +60,6 @@ public class TimetableEntity extends AuditableEntity {
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private boolean active = true;
-
-    @Column(name = "is_deleted", nullable = false)
-    @Builder.Default
-    private boolean deleted = false;
 
     public enum DayOfWeek {
         MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY

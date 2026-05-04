@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -11,6 +14,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@SQLDelete(sql = "UPDATE discount_rate SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "discount_rate")
 @Getter
 @Setter

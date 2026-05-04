@@ -12,9 +12,9 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 @Entity
-@Table(name = "fee_catalog")
 @SQLDelete(sql = "UPDATE fee_catalog SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Table(name = "fee_catalog")
 @Getter
 @Setter
 @NoArgsConstructor

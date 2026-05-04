@@ -32,6 +32,9 @@ public abstract class ScopeAuditableEntity {
     @Column(name = "deleted_by")
     private Long deletedBy;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
     @PrePersist
     public void prePersist() {
         this.createdBy = getCurrentUser();
@@ -44,7 +47,6 @@ public abstract class ScopeAuditableEntity {
 
 
     private Long getCurrentUser() {
-        // Integrate with Spring Security or any auth system
-        return 1L;
+        return com.smartsolutions.eschool.util.SecurityUtils.getCurrentUserId();
     }
 }

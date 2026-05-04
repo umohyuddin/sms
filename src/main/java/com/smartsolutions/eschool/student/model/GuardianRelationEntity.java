@@ -10,9 +10,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "guardian_relations")
 @SQLDelete(sql = "UPDATE guardian_relations SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Table(name = "guardian_relations")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,7 +40,4 @@ public class GuardianRelationEntity extends AuditableEntity {
 
     @Column(name = "status", nullable = false, length = 20)
     private String status = "ACTIVE";
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 }

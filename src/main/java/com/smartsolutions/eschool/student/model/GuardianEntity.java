@@ -11,11 +11,11 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
+@SQLDelete(sql = "UPDATE guardians SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "guardians", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"organization_id", "cnic"})
 })
-@SQLDelete(sql = "UPDATE guardians SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -70,7 +70,4 @@ public class GuardianEntity extends AuditableEntity {
 
     @Column(name = "status", length = 20)
     private String status;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 }

@@ -12,13 +12,13 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE fee_slab_groups SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "fee_slab_groups")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE fee_slab_groups SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted = false")
 public class FeeSlabGroupEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,9 +39,6 @@ public class FeeSlabGroupEntity extends AuditableEntity {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 
     @OneToMany(mappedBy = "slabGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FeeSlabEntity> slabs;

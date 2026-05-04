@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.academic.entity.mapping;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
@@ -12,6 +15,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@SQLDelete(sql = "UPDATE student_assessments SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "student_assessments")
 @Getter
 @Setter
@@ -55,10 +60,6 @@ public class StudentAssessmentEntity extends AuditableEntity {
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
-
-    @Builder.Default
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 
     public enum SubmissionStatus {
         NOT_SUBMITTED, SUBMITTED, GRADED

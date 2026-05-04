@@ -101,7 +101,7 @@ public class InstituteDocumentServiceImpl implements InstituteDocumentService {
                         entity.setFileName(file.getOriginalFilename());
                         entity.setFileUrl(filePath);
                         entity.setExpiryDate(expiryDate);
-                        entity.setIsDeleted(false);
+                        entity.setDeleted(false);
 
                         InstituteDocumentEntity saved = instituteDocumentRepository.save(entity);
 

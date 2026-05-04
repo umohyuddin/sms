@@ -3,7 +3,7 @@
 
 
 INSERT INTO education_boards
-(code, name, country_id, description, is_active, is_deleted)
+(code, name, country_id, description, is_active, deleted)
 VALUES
 -- Federal
 ('FBISE', 'Federal Board of Intermediate and Secondary Education', 98,
@@ -112,7 +112,7 @@ VALUES
 -- student registration, class assignment, scholarship
 -- management, and special programs.
 -- ============================================================
-INSERT INTO institute_social_links(institute_id, platform, url, is_deleted, created_by)VALUES
+INSERT INTO institute_social_links(institute_id, platform, url, deleted, created_by)VALUES
 (1, 'Facebook',  'https://www.facebook.com/institute1', FALSE, 1),
 (1, 'Instagram', 'https://www.instagram.com/institute1', FALSE, 1),
 (1, 'LinkedIn',  'https://www.linkedin.com/company/institute1', FALSE, 1),
@@ -125,7 +125,7 @@ INSERT INTO institute_social_links(institute_id, platform, url, is_deleted, crea
 -- ============================================================
 -- Lookup Data: Education Levels
 -- ============================================================
-INSERT INTO education_levels (code, name, is_active, is_deleted, created_at, created_by) VALUES
+INSERT INTO education_levels (code, name, is_active, deleted, created_at, created_by) VALUES
 ('PS', 'Early Childhood / Pre-Primary Education', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
 ('P', 'Primary / Elementary Education', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
 ('M', 'Lower Secondary / Middle Education', TRUE, FALSE, CURRENT_TIMESTAMP, 1),

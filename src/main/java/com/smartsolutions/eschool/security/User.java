@@ -1,4 +1,7 @@
 //package com.smartsolutions.eschool.security;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 //
 //
 //import jakarta.persistence.*;
@@ -17,6 +20,8 @@
 //import java.util.stream.Collectors;
 //
 ////@Entity
+@SQLDelete(sql = "UPDATE user SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 //@Data
 ////@Table(name = "user")
 //@NoArgsConstructor

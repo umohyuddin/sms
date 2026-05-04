@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.academic.entity.master;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
@@ -9,6 +12,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@SQLDelete(sql = "UPDATE student_academic_history SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "student_academic_history")
 @Getter
 @Setter
@@ -46,9 +51,6 @@ public class StudentAcademicHistoryEntity extends AuditableEntity {
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
-
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 
     public enum AcademicStatus {
         PROMOTED, RETAINED, WITHDRAWN

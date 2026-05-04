@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.user.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -15,6 +18,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@SQLDelete(sql = "UPDATE RoleEntity SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(
         name = "roles",
         uniqueConstraints = {
@@ -44,9 +49,6 @@ public class RoleEntity extends AuditableEntity {
 
     @Column(name = "active")
     private Boolean active = true;
-
-    @Column(name = "deleted")
-    private Boolean deleted = false;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

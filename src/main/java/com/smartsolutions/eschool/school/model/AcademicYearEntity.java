@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.global.enums.AcademicYearStatus;
@@ -12,6 +15,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@SQLDelete(sql = "UPDATE academic_years SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "academic_years",
         uniqueConstraints = {@UniqueConstraint(name = "uk_academic_year_code", columnNames = {"code"}), @UniqueConstraint(name = "uk_academic_year_date_range", columnNames = {"start_date", "end_date"})},
         indexes = {@Index(name = "idx_academic_year_status", columnList = "status"), @Index(name = "idx_academic_year_is_current", columnList = "is_current")}

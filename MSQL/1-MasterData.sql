@@ -395,7 +395,7 @@ VALUES
  NULL, NULL, 'STUDENT', TRUE, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
-INSERT INTO fee_recurrence_rules(code, name, description, is_active, is_deleted, created_at, created_by, updated_at)
+INSERT INTO fee_recurrence_rules(code, name, description, is_active, deleted, created_at, created_by, updated_at)
 VALUES
 ('ONE_TIME', 'One Time', 'Fee charged only once (e.g., admission or registration fee)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('MONTHLY', 'Monthly', 'Fee charged every month (common for tuition fees)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
@@ -407,7 +407,7 @@ VALUES
 
 
 
-INSERT INTO facility_types (code, name, description, is_active, is_deleted, created_at, created_by, updated_at) VALUES
+INSERT INTO facility_types (code, name, description, is_active, deleted, created_at, created_by, updated_at) VALUES
 ('LAB', 'Laboratory', 'Science, computer, or language labs', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('LIBRARY', 'Library', 'Reading, reference, digital library', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('PLAYGROUND', 'Playground', 'Outdoor sports and recreation area', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
@@ -431,7 +431,7 @@ INSERT INTO facility_types (code, name, description, is_active, is_deleted, crea
 
 
 
-INSERT INTO currencies (iso_code, name, symbol, is_active, is_deleted, created_at, created_by, updated_at) VALUES
+INSERT INTO currencies (iso_code, name, symbol, is_active, deleted, created_at, created_by, updated_at) VALUES
 ('AFN', 'Afghan Afghani', '؋', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('ALL', 'Albanian Lek', 'L', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('DZD', 'Algerian Dinar', 'د.ج', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
@@ -504,7 +504,7 @@ ON DUPLICATE KEY UPDATE name=VALUES(name), updated_at=VALUES(updated_at);
 DELETE FROM tax_types;
 
 INSERT INTO tax_types
-(id, code, name, tax_percentage, country_id, is_active, is_deleted, created_at, created_by, updated_at, updated_by)
+(id, code, name, tax_percentage, country_id, is_active, deleted, created_at, created_by, updated_at, updated_by)
 VALUES
 (1,'AF_TAX','Afghanistan Tax',15.00,1,TRUE,FALSE,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,1),
 (2,'AL_TAX','Albania Tax',20.00,2,TRUE,FALSE,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,1),
