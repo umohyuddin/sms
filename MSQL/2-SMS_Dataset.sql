@@ -6330,42 +6330,42 @@ INSERT INTO campus_financial_settings
 ) 
 VALUES
 -- Campus 1: Main Campus
-(1, 1, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 1, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 1000.00, 0.00, 5, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 10, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 40, 'FIXED', 0.00, 1000.00, TRUE, TRUE, TRUE, FALSE, 1),
 -- Campus 2: City Campus
-(1, 2, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 2, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 1000.00, 0.00, 5, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 10, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 40, 'FIXED', 0.00, 1000.00, TRUE, TRUE, TRUE, FALSE, 1),
 -- Campus 3: North Campus
-(1, 3, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 3, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 1000.00, 0.00, 5, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 10, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 40, 'FIXED', 0.00, 1000.00, TRUE, TRUE, TRUE, FALSE, 1),
 -- Campus 4: South Campus
-(1, 4, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 4, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 1000.00, 0.00, 5, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 10, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 40, 'FIXED', 0.00, 1000.00, TRUE, TRUE, TRUE, FALSE, 1),
 -- Campus 5: East Campus
-(1, 5, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 5, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 1000.00, 0.00, 5, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 10, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 40, 'FIXED', 0.00, 1000.00, TRUE, TRUE, TRUE, FALSE, 1),
 -- Campus 6: West Campus
-(1, 6, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 6, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 1000.00, 0.00, 5, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 10, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 40, 'FIXED', 0.00, 1000.00, TRUE, TRUE, TRUE, FALSE, 1),
 -- Campus 7: Elite Campus
-(1, 7, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 7, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 2000.00, 0.00, 3, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 15, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 60, 'FIXED', 0.00, 2000.00, TRUE, TRUE, TRUE, FALSE, 1),
 -- Campus 8: Professional Campus
-(1, 8, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 8, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 1500.00, 0.00, 5, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 10, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 30, 'FIXED', 0.00, 1500.00, TRUE, TRUE, TRUE, FALSE, 1),
 -- Campus 9: Digital Campus
-(1, 9, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 9, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 500.00, 0.00, 7, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 7, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 20, 'FIXED', 0.00, 500.00, TRUE, TRUE, TRUE, FALSE, 1),
 -- Campus 10: Model Campus
-(1, 10, 5, (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
+(1, 10, (SELECT id FROM academic_years WHERE code='AY2025' LIMIT 1), (SELECT id FROM currencies WHERE iso_code='PKR' LIMIT 1), (SELECT id FROM languages WHERE iso_code='en' LIMIT 1), 'en-PK', 
  TRUE, TRUE, 'FIXED', 1000.00, 0.00, 5, 'ONE_TIME', 0.00, 'OUTSTANDING', TRUE, 10, (SELECT id FROM tax_types WHERE code='PK_TAX' LIMIT 1), 
  TRUE, NULL, 40, 'FIXED', 0.00, 1000.00, TRUE, TRUE, TRUE, FALSE, 1);
