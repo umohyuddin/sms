@@ -501,7 +501,7 @@ ON DUPLICATE KEY UPDATE name=VALUES(name), updated_at=VALUES(updated_at);
 -- ====================================================
 -- TAX TYPES (Comprehensive List 1-246)
 -- ====================================================
-DELETE FROM tax_types;
+-- DELETE FROM tax_types;
 
 INSERT INTO tax_types
 (id, code, name, tax_percentage, country_id, is_active, deleted, created_at, created_by, updated_at, updated_by)

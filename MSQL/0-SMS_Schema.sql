@@ -166,7 +166,7 @@
         updated_by BIGINT,
         deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
-        deleted_by BIGINT,
+        deleted_by BIGINT
     );
 
     DROP TABLE IF EXISTS modules;
@@ -187,7 +187,7 @@
         updated_by BIGINT,
         deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
-        deleted_by BIGINT,
+        deleted_by BIGINT
     );
 
     DROP TABLE IF EXISTS employee_type;
@@ -300,7 +300,7 @@
         updated_by BIGINT,
         deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at DATETIME,
-        deleted_by BIGINT,
+        deleted_by BIGINT
     );
 
 
@@ -1319,7 +1319,12 @@ CREATE TABLE student_guardians (
         is_active BOOLEAN DEFAULT TRUE,
         is_verified BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        deleted_at DATETIME,
+        deleted_by BIGINT,
         CONSTRAINT fk_system_user_employee FOREIGN KEY (employee_id) REFERENCES employee_master(id) ON DELETE SET NULL,
         CONSTRAINT fk_system_user_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
         INDEX idx_user_type (user_type),
@@ -1589,8 +1594,14 @@ CREATE TABLE student_guardians (
     CREATE TABLE user_roles (
         user_id BIGINT NOT NULL,
         role_id BIGINT NOT NULL,
+        organization_id BIGINT,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        deleted_at DATETIME,
+        deleted_by BIGINT,
         PRIMARY KEY (user_id, role_id),
         FOREIGN KEY (user_id) REFERENCES system_users(id),
         FOREIGN KEY (role_id) REFERENCES roles(id)

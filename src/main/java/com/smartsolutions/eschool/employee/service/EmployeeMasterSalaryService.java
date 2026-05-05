@@ -318,7 +318,7 @@ public class EmployeeMasterSalaryService {
         // 3. Calculate components
         for (SalaryStructureComponentEntity comp : salaryStructure.getComponents()) {
 
-            if (Boolean.TRUE.equals(comp.getDeleted())) continue;
+            if (comp.isDeleted()) continue;
 
             BigDecimal calculatedAmount;
 

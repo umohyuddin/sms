@@ -30,7 +30,7 @@ public class DesignationMapper {
         dto.setDesignationName(entity.getDesignationName());
         dto.setDescription(entity.getDescription());
         dto.setActive(entity.getActive());
-        dto.setDeleted(entity.getDeleted());
+        dto.setDeleted(entity.isDeleted());
 
         return dto;
     }

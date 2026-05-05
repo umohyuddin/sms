@@ -21,6 +21,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class RoleService {
 
     private final RoleRepository roleRepository;

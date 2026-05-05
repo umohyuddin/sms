@@ -20,8 +20,8 @@ import org.hibernate.annotations.SQLDelete;
 //import java.util.stream.Collectors;
 //
 ////@Entity
-@SQLDelete(sql = "UPDATE user SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted = false")
+//@SQLDelete(sql = "UPDATE user SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+//@SQLRestriction("deleted = false")
 //@Data
 ////@Table(name = "user")
 //@NoArgsConstructor
