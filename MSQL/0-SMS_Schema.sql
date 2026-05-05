@@ -2619,3 +2619,39 @@ CREATE TABLE student_attendance (
         FOREIGN KEY (subject_id) REFERENCES subjects(id),
         FOREIGN KEY (teacher_id) REFERENCES employee_master(id)
     );
+
+    DROP TABLE IF EXISTS user_account_info;
+    CREATE TABLE user_account_info (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        organization_id BIGINT NOT NULL,
+        system_user_id BIGINT NOT NULL UNIQUE,
+        requires_password_change BOOLEAN NOT NULL DEFAULT FALSE,
+        last_login_at DATETIME,
+        last_login_ip VARCHAR(50),
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        created_by BIGINT,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        deleted_at DATETIME,
+        deleted_by BIGINT,
+        FOREIGN KEY (system_user_id) REFERENCES system_users(id)
+    );
+
+    DROP TABLE IF EXISTS user_account_deactivation_logs;
+    CREATE TABLE user_account_deactivation_logs (
+        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        organization_id BIGINT NOT NULL,
+        system_user_id BIGINT NOT NULL,
+        reason VARCHAR(255) NOT NULL,
+        deactivated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        deactivated_by BIGINT,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        created_by BIGINT,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_by BIGINT,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
+        deleted_at DATETIME,
+        deleted_by BIGINT,
+        FOREIGN KEY (system_user_id) REFERENCES system_users(id)
+    );

@@ -24,8 +24,24 @@ import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.repository.AdmissionTypeRepository;
 import com.smartsolutions.eschool.student.repository.StudentDocumentRepository;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
+import com.smartsolutions.eschool.user.mapper.SystemUserMapper;
+import com.smartsolutions.eschool.user.model.SystemUserEntity;
+import com.smartsolutions.eschool.user.model.UserAccountDeactivationLogEntity;
+import com.smartsolutions.eschool.user.model.UserAccountInfoEntity;
+import com.smartsolutions.eschool.user.model.UserRolesEntity;
+import com.smartsolutions.eschool.user.model.UserRoleId;
+import com.smartsolutions.eschool.user.repository.RoleRepository;
+import com.smartsolutions.eschool.user.repository.SystemUserRepository;
+import com.smartsolutions.eschool.user.repository.UserAccountDeactivationLogRepository;
+import com.smartsolutions.eschool.user.repository.UserAccountInfoRepository;
+import com.smartsolutions.eschool.user.repository.UserRolesRepository;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentLoginActivationRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentLoginDeactivationRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentLoginResponseDTO;
 import com.smartsolutions.eschool.util.MapperUtil;
 import com.smartsolutions.eschool.util.SecurityUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import java.time.LocalDateTime;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +77,12 @@ public class StudentService {
     private final AcademicYearRepository academicYearRepository;
     private final AdmissionTypeRepository admissionTypeRepository;
     private final StudentDocumentRepository studentDocumentRepository;
+    private final SystemUserRepository systemUserRepository;
+    private final RoleRepository roleRepository;
+    private final UserRolesRepository userRolesRepository;
+    private final UserAccountInfoRepository userAccountInfoRepository;
+    private final UserAccountDeactivationLogRepository userAccountDeactivationLogRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private Long getOrgId() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
@@ -546,5 +568,86 @@ public class StudentService {
         List<Object[]> results = studentRepository.getStudentStrengthByStandard(filter.getCampusIds(), filter.getToDate(), orgId);
         log.info("[Service:StudentService] getClassStrengthChart() succeeded");
         return results;
+    }
+
+    @Transactional
+    public StudentLoginResponseDTO activateStudentLogin(Long studentId, StudentLoginActivationRequestDTO req) {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] activateStudentLogin() called for student: {} org: {}", studentId, orgId);
+
+        StudentEntity student = studentRepository.findByIdAndOrganizationId(studentId, orgId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found", HttpStatus.NOT_FOUND));
+
+        if (systemUserRepository.existsByStudentId(studentId)) {
+            throw new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Student login already activated", HttpStatus.CONFLICT);
+        }
+
+        if (student.getEmail() == null || student.getEmail().isBlank()) {
+            throw new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Student email is required for login activation", HttpStatus.BAD_REQUEST);
+        }
+
+        // Create System User
+        String encodedPassword = passwordEncoder.encode(req.getPassword());
+        SystemUserEntity user = SystemUserMapper.toEntity(student, encodedPassword, orgId);
+        SystemUserEntity savedUser = systemUserRepository.save(user);
+
+        // Assign Default Student Role
+//        roleRepository.findByCodeAndOrganizationId("STUDENT", orgId)
+//                .ifPresent(role -> {
+//                    UserRolesEntity userRole = new UserRolesEntity();
+//                    userRole.setUser(savedUser);
+//                    userRole.setRole(role);
+//                    userRole.setId(new UserRoleId(savedUser.getId(), role.getId()));
+//                    userRole.setOrganizationId(orgId);
+//                    userRolesRepository.save(userRole);
+//                });
+
+        // Create Account Info
+        UserAccountInfoEntity accountInfo = UserAccountInfoEntity.builder()
+                .organizationId(orgId)
+                .systemUser(savedUser)
+                .requiresPasswordChange(true)
+                .build();
+        userAccountInfoRepository.save(accountInfo);
+
+        log.info("[Service:StudentService] Successfully activated login for student: {}", studentId);
+        return StudentLoginResponseDTO.builder()
+                .studentId(studentId)
+                .systemUserId(savedUser.getId())
+                .username(savedUser.getUsername())
+                .status("ACTIVATED")
+                .message("Student login has been successfully activated.")
+                .build();
+    }
+
+    @Transactional
+    public StudentLoginResponseDTO deactivateStudentLogin(Long studentId, StudentLoginDeactivationRequestDTO req) {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] deactivateStudentLogin() called for student: {} org: {}", studentId, orgId);
+
+        SystemUserEntity user = systemUserRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student login account not found", HttpStatus.NOT_FOUND));
+
+        user.setIsActive(false);
+        systemUserRepository.save(user);
+
+        // Log Deactivation
+        UserAccountDeactivationLogEntity logEntry = UserAccountDeactivationLogEntity.builder()
+                .organizationId(orgId)
+                .systemUser(user)
+                .reason(req.getReason())
+                .deactivatedAt(LocalDateTime.now())
+                .deactivatedBy(SecurityUtils.getCurrentUserId())
+                .build();
+        userAccountDeactivationLogRepository.save(logEntry);
+
+        log.info("[Service:StudentService] Successfully deactivated login for student: {}", studentId);
+        return StudentLoginResponseDTO.builder()
+                .studentId(studentId)
+                .systemUserId(user.getId())
+                .username(user.getUsername())
+                .status("DEACTIVATED")
+                .message("Student login has been successfully deactivated.")
+                .build();
     }
 }

@@ -5,8 +5,11 @@ import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentBasicInfoUpdateDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentSearchRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentLoginActivationRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentLoginDeactivationRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentLoginResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
 import com.smartsolutions.eschool.student.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -171,5 +174,15 @@ public class StudentFacade {
     public Resource getDocumentById(Long documentId, Long employeeId) {
         log.info("[Facade:StudentFacade] getDocumentById() called");
         return studentService.downloadDocument(documentId, employeeId);
+    }
+
+    public StudentLoginResponseDTO activateStudentLogin(Long studentId, StudentLoginActivationRequestDTO req) {
+        log.info("[Facade:StudentFacade] activateStudentLogin() called for student: {}", studentId);
+        return studentService.activateStudentLogin(studentId, req);
+    }
+
+    public StudentLoginResponseDTO deactivateStudentLogin(Long studentId, StudentLoginDeactivationRequestDTO req) {
+        log.info("[Facade:StudentFacade] deactivateStudentLogin() called for student: {}", studentId);
+        return studentService.deactivateStudentLogin(studentId, req);
     }
 }

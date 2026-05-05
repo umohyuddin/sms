@@ -5,11 +5,21 @@ SET SQL_SAFE_UPDATES = 0;
 INSERT INTO institute_social_links 
 (institute_id, platform, url, created_by, updated_by) 
 VALUES
-(1, 'Facebook', 'https://www.facebook.com/smartsolutions.edu', 1, 1),
-(1, 'Twitter', 'https://twitter.com/smartsolutionsedu', 1, 1),
-(1, 'LinkedIn', 'https://www.linkedin.com/company/smartsolutions-edu', 1, 1),
-(1, 'Instagram', 'https://www.instagram.com/smartsolutions.edu', 1, 1),
-(1, 'YouTube', 'https://www.youtube.com/c/SmartSolutionsEdu', 1, 1);
+(1, 'facebook', 'https://www.facebook.com/smartsolutions.edu', 1, 1),
+(1, 'twitter', 'https://twitter.com/smartsolutionsedu', 1, 1),
+(1, 'linkedIn', 'https://www.linkedin.com/company/smartsolutions-edu', 1, 1),
+(1, 'instagram', 'https://www.instagram.com/smartsolutions.edu', 1, 1),
+(1, 'youTube', 'https://www.youtube.com/c/SmartSolutionsEdu', 1, 1);
+
+
+INSERT INTO institute_facilities 
+(institute_id, facility_type_id, description, capacity, created_by) 
+VALUES
+(1, (SELECT id FROM facility_types WHERE code = 'LAB'), 'Main Science Laboratory', 30, 1),
+(1, (SELECT id FROM facility_types WHERE code = 'LIBRARY'), 'Central Library', 50, 1),
+(1, (SELECT id FROM facility_types WHERE code = 'COMPUTER_ROOM'), 'Computer Lab 1', 25, 1),
+(1, (SELECT id FROM facility_types WHERE code = 'SPORTS_GROUND'), 'Cricket Ground', NULL, 1),
+(1, (SELECT id FROM facility_types WHERE code = 'CAFETERIA'), 'Main Cafeteria', 100, 1);
 
 
 INSERT INTO board_member_roles (organization_id, code, name, created_at, updated_at) VALUES
