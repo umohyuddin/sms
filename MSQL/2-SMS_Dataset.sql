@@ -22,6 +22,14 @@ VALUES
 (1, (SELECT id FROM facility_types WHERE code = 'CAFETERIA'), 'Main Cafeteria', 100, 1);
 
 
+INSERT INTO institute_accreditations 
+(institute_id, authority_name, license_number, valid_from, valid_to, created_by) 
+VALUES
+(1, 'Ministry of Education', 'MOE-PAK-2024-001', '2024-01-01', '2029-12-31', 1),
+(1, 'BISE Lahore', 'BISE-LHR-9982', '2023-06-15', '2026-06-14', 1),
+(1, 'ISO 9001:2015', 'CERT-9001-SS-2022', '2022-01-01', '2025-12-31', 1);
+
+
 INSERT INTO board_member_roles (organization_id, code, name, created_at, updated_at) VALUES
 (1, 'CHAIRMAN', 'Chairman', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (1, 'CHAIRPERSON', 'Chairperson', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
@@ -59,6 +67,21 @@ INSERT INTO board_member_roles (organization_id, code, name, created_at, updated
 (1, 'FOUNDER', 'Founder', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (1, 'CO_FOUNDER', 'Co-Founder', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (1, 'HONORARY_MEMBER', 'Honorary Member', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+INSERT INTO institute_board_members 
+(organization_id, full_name, role_id, email, contact_number, term_start, term_end, created_by) 
+VALUES
+(1, 'Dr. Ahmed Khan', (SELECT id FROM board_member_roles WHERE code = 'CHAIRMAN' AND organization_id = 1), 'ahmed.khan@example.com', '+92-300-1112223', '2023-01-01', '2026-12-31', 1),
+(1, 'Mrs. Saira Ali', (SELECT id FROM board_member_roles WHERE code = 'PRESIDENT' AND organization_id = 1), 'saira.ali@example.com', '+92-300-4445556', '2024-01-01', '2027-12-31', 1),
+(1, 'Mr. Rizwan Ahmed', (SELECT id FROM board_member_roles WHERE code = 'SECRETARY' AND organization_id = 1), 'rizwan.ahmed@example.com', '+92-300-7778889', '2023-01-01', '2026-12-31', 1),
+(1, 'Ms. Fatima Noor', (SELECT id FROM board_member_roles WHERE code = 'TREASURER' AND organization_id = 1), 'fatima.noor@example.com', '+92-300-9990001', '2024-01-01', '2027-12-31', 1),
+(1, 'Mr. Bilal Sheikh', (SELECT id FROM board_member_roles WHERE code = 'DIRECTOR' AND organization_id = 1), 'bilal.sheikh@example.com', '+92-300-2223334', '2023-06-01', '2026-05-31', 1),
+(1, 'Prof. Yasmin Shah', (SELECT id FROM board_member_roles WHERE code = 'VICE_CHAIRMAN' AND organization_id = 1), 'yasmin.shah@example.com', '+92-300-3334445', '2023-01-01', '2026-12-31', 1),
+(1, 'Mr. Khalid Mansoor', (SELECT id FROM board_member_roles WHERE code = 'ADVISOR' AND organization_id = 1), 'khalid.mansoor@example.com', '+92-300-5556667', '2024-01-01', '2025-12-31', 1),
+(1, 'Dr. Zafar Iqbal', (SELECT id FROM board_member_roles WHERE code = 'FOUNDER' AND organization_id = 1), 'zafar.iqbal@example.com', '+92-300-8889990', '2005-08-15', NULL, 1),
+(1, 'Ms. Nadia Hasan', (SELECT id FROM board_member_roles WHERE code = 'GOVERNOR' AND organization_id = 1), 'nadia.hasan@example.com', '+92-300-6667778', '2022-01-01', '2025-12-31', 1),
+(1, 'Adv. Salman Faris', (SELECT id FROM board_member_roles WHERE code = 'LEGAL_ADVISOR' AND organization_id = 1), 'salman.faris@example.com', '+92-300-1239876', '2023-01-01', '2026-12-31', 1);
 
 
 INSERT INTO academic_years
