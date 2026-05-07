@@ -1,25 +1,25 @@
 package com.smartsolutions.eschool.student.service;
 
+import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.student.error.StudentErrors;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeeSummary.responseDto.StudentFeeSummaryResponseDto;
-import com.smartsolutions.eschool.student.mapper.StudentFeeAssignmentMapper;
+import com.smartsolutions.eschool.student.mapper.StudentFeeSummaryMapper;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeSummaryEntity;
 import com.smartsolutions.eschool.student.repository.*;
-import com.smartsolutions.eschool.util.MapperUtil;
+import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.MappingException;
-import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -52,142 +52,116 @@ public class StudentFeeSummaryService {
 
     @Transactional
     public StudentFeeSummaryDTO updateSummary(Long studentId, Long academicYearId, Long organizationId) {
-        log.info(
-                "[Service:StudentFeeSummaryService] updateSummary() called - studentId={}, academicYearId={}, organizationId={}",
+        log.info("[Service:StudentFeeSummaryService] updateSummary() called - studentId={}, academicYearId={}, organizationId={}",
                 studentId, academicYearId, organizationId);
 
-        // 1. Calculate Totals
-        Double totalAssignedDouble = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, academicYearId,
-                organizationId);
+        Double totalAssignedDouble = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, academicYearId, organizationId);
         BigDecimal totalAssigned = BigDecimal.valueOf(totalAssignedDouble != null ? totalAssignedDouble : 0.0);
 
-        BigDecimal totalDiscount = studentDiscountAssignmentRepository.findTotalDiscountByStudentAndYear(studentId,
-                academicYearId);
-        if (totalDiscount == null)
-            totalDiscount = BigDecimal.ZERO;
+        BigDecimal totalDiscount = studentDiscountAssignmentRepository.findTotalDiscountByStudentAndYear(studentId, academicYearId);
+        if (totalDiscount == null) totalDiscount = BigDecimal.ZERO;
 
-        BigDecimal totalPaid = studentFeePaymentsRepository.findTotalPaidByStudentAndYear(studentId, academicYearId,
-                organizationId);
-        if (totalPaid == null)
-            totalPaid = BigDecimal.ZERO;
+        BigDecimal totalPaid = studentFeePaymentsRepository.findTotalPaidByStudentAndYear(studentId, academicYearId, organizationId);
+        if (totalPaid == null) totalPaid = BigDecimal.ZERO;
 
-        // Balance = Assigned - Discount - Paid
         BigDecimal balance = totalAssigned.subtract(totalDiscount).subtract(totalPaid);
 
-        // 2. Fetch or Create Summary Entity
         StudentFeeSummaryEntity summary = studentFeeSummaryRepository
                 .findByStudentIdAndAcademicYearId(studentId, academicYearId)
                 .orElseGet(() -> {
                     log.info("[Service:StudentFeeSummaryService] Creating new summary entity");
                     StudentFeeSummaryEntity newSummary = new StudentFeeSummaryEntity();
-
                     StudentEntity student = studentRepository.findById(studentId)
                             .orElseThrow(() -> new ResourceNotFoundException("Student not found: " + studentId));
                     AcademicYearEntity academicYear = academicYearRepository.findById(academicYearId)
-                            .orElseThrow(
-                                    () -> new ResourceNotFoundException("Academic Year not found: " + academicYearId));
-                    InstituteEntity institute = instituteRepository.findById(organizationId)
-                            .orElseThrow(
-                                    () -> new ResourceNotFoundException("Organization not found: " + organizationId));
-
+                            .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found: " + academicYearId));
                     newSummary.setStudent(student);
                     newSummary.setAcademicYear(academicYear);
                     newSummary.setOrganizationId(organizationId);
                     return newSummary;
                 });
 
-        // 3. Update fields
         summary.setTotalAssignedFee(totalAssigned);
         summary.setTotalDiscount(totalDiscount);
         summary.setTotalPaid(totalPaid);
         summary.setBalance(balance);
 
         studentFeeSummaryRepository.save(summary);
-        log.info(
-                "[Service:StudentFeeSummaryService] Summary updated successfully - totalAssigned={}, totalDiscount={}, totalPaid={}, balance={}",
-                totalAssigned, totalDiscount, totalPaid, balance);
+        log.info("[Service:StudentFeeSummaryService] updateSummary() succeeded - id={}", summary.getId());
 
-        // 4. Return DTO (Using provide mapper if it exists, otherwise MapperUtil)
-        return StudentFeeAssignmentMapper.toSummaryDTO(summary);
+        return StudentFeeSummaryMapper.toSummaryDTO(summary);
     }
 
-    // public List<FeeComponentDTO> searchFeeComponent(String keyword) {
-    // try {
-    // log.info("Fetching all FeeComponent based on keyword from database");
-    // List<FeeComponentEntity> result =
-    // feeComponentRepository.searchFeeComponent(keyword);
-    // log.info("Successfully fetched {} FeeComponent based on keyword",
-    // result.size());
-    // List<FeeComponentDTO> FeeComponentDTOList = MapperUtil.mapList(result,
-    // FeeComponentDTO.class);
-    // log.info("Successfully fetched FeeComponent based on keyword");
-    // return FeeComponentDTOList;
-    // } catch (DataAccessException dae) {
-    // log.error("Database error while fetching FeeComponent based on keyword",
-    // dae);
-    // //throw new CustomServiceException("Unable to fetch students from database",
-    // dae);
-    // } catch (MappingException me) {
-    // log.error("Error mapping StudentEntity to FeeComponent based on keyword",
-    // me);
-    // //throw new CustomServiceException("Error converting student data", me);
-    // } catch (Exception e) {
-    // log.error("Unexpected error while fetching FeeComponent based on keyword",
-    // e);
-    // //throw new ("Unexpected error occurred", e);
-    // }
-    // return Collections.emptyList();
-    // }
-
+    @Transactional
     public StudentFeeSummaryDTO getByStudentId(Long id) {
-        log.info("Fetching Student Fee Summary with id: {}", id);
-        StudentFeeSummaryEntity studentFeeSummaryEntity = studentFeeSummaryRepository.findByStudentId(id)
-                .orElseThrow(() -> {
-                    log.info("Fetching Student Fee Summary with id: {}", id);
-                    return new ResourceNotFoundException("Fee Summary not found with id: " + id);
-                });
-
-        StudentFeeSummaryDTO studentFeeSummaryDTO = MapperUtil.mapObject(studentFeeSummaryEntity,
-                StudentFeeSummaryDTO.class);
-        log.info("Successfully fetched Student Fee Summary: id={}", studentFeeSummaryDTO.getStudentId());
-        return studentFeeSummaryDTO;
-    }
-
-    public List<StudentFeeSummaryDTO> getAll() {
-        try {
-            log.info("Fetching all Student fee summary from database");
-            List<StudentFeeSummaryEntity> result = studentFeeSummaryRepository.findAllStudentFeeSummary();
-            log.info("Successfully fetched {} Students fee summary", result.size());
-            List<StudentFeeSummaryDTO> studentFeeSummaryDTOS = MapperUtil.mapList(result, StudentFeeSummaryDTO.class);
-            log.info("Successfully fetched Student fee summary");
-            return studentFeeSummaryDTOS;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching Student fee summary", dae);
-            // throw new CustomServiceException("Unable to fetch students from database",
-            // dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to Student fee summary", me);
-            // throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching Student fee summary", e);
-            // throw new ("Unexpected error occurred", e);
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(StudentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        return Collections.emptyList();
+        log.info("[Service:StudentFeeSummaryService] getByStudentId() called - studentId: {}, institute: {}", id, organizationId);
+        
+        StudentFeeSummaryEntity entity = studentFeeSummaryRepository.findByStudentId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Fee Summary not found for student id: " + id));
+
+        if (!entity.getOrganizationId().equals(organizationId)) {
+            throw new ApiException(StudentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+
+        StudentFeeSummaryDTO dto = StudentFeeSummaryMapper.toSummaryDTO(entity);
+        log.info("[Service:StudentFeeSummaryService] getByStudentId() succeeded");
+        return dto;
     }
 
-    public StudentFeeSummaryResponseDto getByStudentFeeSummaryAcademicYear(Long studentId, Long academicYearId) {
-        log.info("Fetching Student Fee Summary for studentId={} and academicYearId={}", studentId, academicYearId);
-        StudentFeeSummaryEntity studentFeeSummaryEntity = studentFeeSummaryRepository
-                .findByStudentIdAndAcademicYearId(studentId, academicYearId).orElseThrow(() -> {
-                    log.error("Student Fee Summary not found for studentId={} and academicYearId={}", studentId,
-                            academicYearId);
-                    return new ResourceNotFoundException("Fee Summary not found for studentId: " + studentId
-                            + " and academicYearId: " + academicYearId);
-                });
-        StudentFeeSummaryResponseDto studentFeeSummaryDTO = MapperUtil.mapObject(studentFeeSummaryEntity,
-                StudentFeeSummaryResponseDto.class);
-        log.info("Successfully fetched Student Fee Summary for studentId={} and academicYearId={}", studentId,
-                academicYearId);
-        return studentFeeSummaryDTO;
+    @Transactional
+    public List<StudentFeeSummaryDTO> getAll() {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(StudentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:StudentFeeSummaryService] getAll() called - institute: {}", organizationId);
+        
+        List<StudentFeeSummaryEntity> result = studentFeeSummaryRepository.findByOrganizationId(organizationId);
+        List<StudentFeeSummaryDTO> dtos = StudentFeeSummaryMapper.toSummaryDTOList(result);
+        
+        log.info("[Service:StudentFeeSummaryService] getAll() succeeded - Found {} summaries", dtos.size());
+        return dtos;
+    }
+
+    @Transactional
+    public StudentFeeSummaryResponseDto getDetailedSummary(Long studentId, Long academicYearId) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(StudentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:StudentFeeSummaryService] getDetailedSummary() called - studentId: {}, academicYearId: {}, institute: {}", 
+                studentId, academicYearId, organizationId);
+
+        StudentFeeSummaryEntity entity = studentFeeSummaryRepository
+                .findByStudentIdAndAcademicYearId(studentId, academicYearId)
+                .orElseThrow(() -> new ResourceNotFoundException("Fee Summary not found for studentId: " + studentId + " and academicYearId: " + academicYearId));
+
+        if (!entity.getOrganizationId().equals(organizationId)) {
+            throw new ApiException(StudentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+
+        StudentFeeSummaryResponseDto dto = StudentFeeSummaryMapper.toDetailedResponseDTO(entity);
+        log.info("[Service:StudentFeeSummaryService] getDetailedSummary() succeeded");
+        return dto;
+    }
+
+    @Transactional
+    public List<StudentFeeSummaryDTO> searchByKeyword(String keyword) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(StudentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:StudentFeeSummaryService] searchByKeyword() called - keyword: {}, institute: {}", keyword, organizationId);
+        
+        List<StudentFeeSummaryEntity> result = studentFeeSummaryRepository.searchByKeywordAndOrganizationId(keyword, organizationId);
+        List<StudentFeeSummaryDTO> dtos = StudentFeeSummaryMapper.toSummaryDTOList(result);
+        
+        log.info("[Service:StudentFeeSummaryService] searchByKeyword() succeeded - Found {} matching summaries", dtos.size());
+        return dtos;
     }
 }
+
