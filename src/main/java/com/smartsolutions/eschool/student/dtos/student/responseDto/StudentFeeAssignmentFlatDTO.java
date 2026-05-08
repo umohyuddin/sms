@@ -71,6 +71,9 @@ public class StudentFeeAssignmentFlatDTO {
 
     @Schema(description = "The date the assignment was applied", example = "2024-04-01")
     private LocalDate assignedDate;
+    
+    @Schema(description = "Late fee amount applied to this assignment", example = "100.00")
+    private BigDecimal lateFeeAmount;
 
     @Schema(description = "Deadline for payment", example = "2024-05-15")
     private LocalDate dueDate;

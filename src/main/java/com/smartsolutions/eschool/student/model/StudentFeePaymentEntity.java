@@ -28,6 +28,9 @@ public class StudentFeePaymentEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name = "receipt_number", unique = true, length = 50)
+    private String receiptNumber;
 
     // organization_id is inherited from AuditableEntity
 
@@ -48,14 +51,18 @@ public class StudentFeePaymentEntity extends AuditableEntity {
     @Column(name = "late_fee_paid", precision = 12, scale = 2)
     private BigDecimal lateFeePaid = BigDecimal.ZERO;
 
+    @Column(name = "tax_paid", precision = 12, scale = 2)
+    private BigDecimal taxPaid = BigDecimal.ZERO;
+
     @Column(name = "payment_month", nullable = false, length = 20)
     private String paymentMonth;
 
     @Column(name = "payment_year", nullable = false)
     private Integer paymentYear;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_mode", length = 50)
-    private String paymentMode;
+    private com.smartsolutions.eschool.student.enums.PaymentMode paymentMode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id", nullable = false)

@@ -216,6 +216,21 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             @Param("toDate") java.time.LocalDate toDate,
             @Param("instituteId") Long instituteId
     );
+
+    @Query("""
+        SELECT a FROM StudentFeeAssignmentEntity a
+        JOIN FETCH a.student s
+        JOIN FETCH s.campus c
+        JOIN FETCH a.academicYear ay
+        WHERE a.dueDate <= :targetDate
+          AND a.dueDate >= CURRENT_DATE
+          AND a.deleted = false
+          AND (a.lastReminderSentAt IS NULL OR a.lastReminderSentAt < :reminderWindowStart)
+    """)
+    List<StudentFeeAssignmentEntity> findUpcomingAssignmentsForReminder(
+            @Param("targetDate") java.time.LocalDate targetDate,
+            @Param("reminderWindowStart") java.time.LocalDateTime reminderWindowStart
+    );
 }
 
 

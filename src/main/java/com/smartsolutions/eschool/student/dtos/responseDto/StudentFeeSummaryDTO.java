@@ -27,6 +27,12 @@ public class StudentFeeSummaryDTO {
 
     @Schema(description = "Total amount paid to date", example = "20000.00")
     private BigDecimal totalPaid;
+    
+    @Schema(description = "Total late fee amount applied", example = "500.00")
+    private BigDecimal totalLateFee;
+
+    @Schema(description = "Total tax amount applied", example = "250.00")
+    private BigDecimal totalTax;
 
     @Schema(description = "Remaining outstanding balance", example = "35000.00")
     private BigDecimal balance;

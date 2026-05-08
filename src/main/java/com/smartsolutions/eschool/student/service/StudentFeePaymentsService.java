@@ -6,6 +6,7 @@ import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
 import com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto.StudentFeePaymentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto.LateFeeWaiverRequestDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeePayment.responseDto.StudentFeePaymentResponseDTO;
 import com.smartsolutions.eschool.student.error.StudentFeeAssignmentErrors;
 import com.smartsolutions.eschool.student.model.*;
@@ -43,6 +44,11 @@ public class StudentFeePaymentsService {
     private final InstituteFinancialSettingsRepository instituteFinancialSettingsRepository;
     private final CampusFinancialSettingsRepository campusFinancialSettingsRepository;
     private final StudentFeeInvoiceRepository studentFeeInvoiceRepository;
+    private final LateFeeCalculationService lateFeeCalculationService;
+    private final com.smartsolutions.eschool.lookups.repository.TaxTypeRepository taxTypeRepository;
+    private final FeeReceiptService feeReceiptService;
+    private final JournalEntryService journalEntryService;
+    private final GLAccountService glAccountService;
 
     public StudentFeePaymentsService(StudentRepository studentRepository, 
             StudentFeeAssignmentRepository studentFeeAssignmentRepository, 
@@ -52,7 +58,12 @@ public class StudentFeePaymentsService {
             InstituteRepository instituteRepository,
             InstituteFinancialSettingsRepository instituteFinancialSettingsRepository,
             CampusFinancialSettingsRepository campusFinancialSettingsRepository,
-            StudentFeeInvoiceRepository studentFeeInvoiceRepository) {
+            StudentFeeInvoiceRepository studentFeeInvoiceRepository,
+            com.smartsolutions.eschool.lookups.repository.TaxTypeRepository taxTypeRepository,
+            FeeReceiptService feeReceiptService,
+            LateFeeCalculationService lateFeeCalculationService,
+            JournalEntryService journalEntryService,
+            GLAccountService glAccountService) {
         this.studentRepository = studentRepository;
         this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
         this.studentFeeSummaryService = studentFeeSummaryService;
@@ -62,6 +73,11 @@ public class StudentFeePaymentsService {
         this.instituteFinancialSettingsRepository = instituteFinancialSettingsRepository;
         this.campusFinancialSettingsRepository = campusFinancialSettingsRepository;
         this.studentFeeInvoiceRepository = studentFeeInvoiceRepository;
+        this.taxTypeRepository = taxTypeRepository;
+        this.feeReceiptService = feeReceiptService;
+        this.lateFeeCalculationService = lateFeeCalculationService;
+        this.journalEntryService = journalEntryService;
+        this.glAccountService = glAccountService;
     }
 
     @Transactional
@@ -160,45 +176,79 @@ public class StudentFeePaymentsService {
 
         // Late Fee Calculation
         BigDecimal calculatedLateFee = BigDecimal.ZERO;
-        if (Boolean.TRUE.equals(lateFeeApplicable) && invoice != null && invoice.getDueDate() != null) {
-            LocalDate dueDateWithGrace = invoice.getDueDate().plusDays(graceDays != null ? graceDays : 0);
-            if (requestDTO.getPaymentDate().isAfter(dueDateWithGrace)) {
-                long overdueDays = ChronoUnit.DAYS.between(dueDateWithGrace, requestDTO.getPaymentDate());
+        
+        if (Boolean.TRUE.equals(lateFeeApplicable)) {
+            if (invoice != null && invoice.getDueDate() != null && campusSettings.isPresent()) {
+                // Use the dedicated service for consistency
+                calculatedLateFee = lateFeeCalculationService.calculateLateFee(
+                        invoice.getTotalAmount(), 
+                        invoice.getDueDate(), 
+                        requestDTO.getPaymentDate(), 
+                        campusSettings.get());
                 
-                if (LateFeeType.FIXED.equals(lateFeeType)) {
-                    calculatedLateFee = lateFeeFixedAmount != null ? lateFeeFixedAmount : BigDecimal.ZERO;
-                } else if (LateFeeType.PERCENTAGE.equals(lateFeeType)) {
-                    BigDecimal baseAmount = invoice.getTotalAmount();
-                    calculatedLateFee = baseAmount.multiply(lateFeePercentage.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
-                }
-
-                if (LateFeeFrequency.PER_DAY.equals(lateFeeFrequency)) {
-                    calculatedLateFee = calculatedLateFee.multiply(BigDecimal.valueOf(overdueDays));
-                }
-
-                if (lateFeeMaxAmount != null && lateFeeMaxAmount.compareTo(BigDecimal.ZERO) > 0) {
-                    calculatedLateFee = calculatedLateFee.min(lateFeeMaxAmount);
-                }
-                
-                // Update Invoice with late fee if not already recorded or if it increased
-                if (invoice != null && calculatedLateFee.compareTo(invoice.getLateFeeAmount()) > 0) {
+                // Update Invoice with late fee
+                if (calculatedLateFee.compareTo(invoice.getLateFeeAmount()) > 0) {
                     invoice.setLateFeeAmount(calculatedLateFee);
-                    // New Balance = (Total + LateFee) - Paid - Discount
                     invoice.setBalance(invoice.getTotalAmount().add(calculatedLateFee)
                             .subtract(invoice.getPaidAmount())
                             .subtract(invoice.getDiscountAmount()));
                     studentFeeInvoiceRepository.save(invoice);
                 }
+            } else {
+                // Assignment-level late fee calculation (backup if no invoice exists)
+                if (campusSettings.isPresent()) {
+                    for (StudentFeeAssignmentEntity assignment : assignments) {
+                        BigDecimal lateFee = lateFeeCalculationService.calculateLateFee(assignment, campusSettings.get());
+                        if (lateFee.compareTo(BigDecimal.ZERO) > 0) {
+                            assignment.setLateFeeAmount(lateFee);
+                            studentFeeAssignmentRepository.save(assignment);
+                            calculatedLateFee = calculatedLateFee.add(lateFee);
+                        }
+                    }
+                }
+            }
+            
+            if (calculatedLateFee.compareTo(BigDecimal.ZERO) > 0) {
+                log.info("[Service:StudentFeePaymentsService] Total late fee calculated: {}", calculatedLateFee);
+            }
+        }
 
-                log.info("[Service:StudentFeePaymentsService] Late fee calculated: {} | overdueDays={}", calculatedLateFee, overdueDays);
+        // Overpayment Validation
+        com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO summary = studentFeeSummaryService
+                .updateSummary(studentId, currentYear.getId(), organizationId);
+        
+        BigDecimal currentBalance = summary.getBalance();
+        BigDecimal totalPaying = requestDTO.getAmountPaid().add(requestDTO.getLateFeePaid() != null ? requestDTO.getLateFeePaid() : calculatedLateFee);
+
+        if (totalPaying.compareTo(currentBalance) > 0) {
+            log.warn("[Service:StudentFeePaymentsService] Overpayment rejected | studentId={}, totalPaying={}, balance={}",
+                    studentId, totalPaying, currentBalance);
+            throw new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, 
+                    "Total payment amount (" + totalPaying + ") exceeds the outstanding balance of " + currentBalance, HttpStatus.BAD_REQUEST);
+        }
+
+        // Duplicate Payment Prevention
+        if (Boolean.FALSE.equals(allowPartialPayments)) {
+            if (studentFeePaymentsRepository.existsByStudentIdAndAcademicYearIdAndPaymentMonthAndPaymentYearAndDeletedFalse(
+                    studentId, currentYear.getId(), requestDTO.getPaymentMonth(), requestDTO.getPaymentYear())) {
+                log.warn("[Service:StudentFeePaymentsService] Duplicate payment rejected | studentId={}, month={}, year={}",
+                        studentId, requestDTO.getPaymentMonth(), requestDTO.getPaymentYear());
+                throw new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, 
+                        "Payment for " + requestDTO.getPaymentMonth() + " " + requestDTO.getPaymentYear() + " has already been recorded.", HttpStatus.CONFLICT);
+            }
+        } else {
+            // If partial payments are allowed, prevent exact identical duplicates to avoid accidental double-clicks
+            if (studentFeePaymentsRepository.existsByStudentIdAndAcademicYearIdAndPaymentMonthAndPaymentYearAndAmountPaidAndDeletedFalse(
+                    studentId, currentYear.getId(), requestDTO.getPaymentMonth(), requestDTO.getPaymentYear(), requestDTO.getAmountPaid())) {
+                log.warn("[Service:StudentFeePaymentsService] Identical duplicate payment rejected | studentId={}, amount={}, month={}",
+                        studentId, requestDTO.getAmountPaid(), requestDTO.getPaymentMonth());
+                throw new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, 
+                        "An identical payment for this month and year has already been recorded.", HttpStatus.CONFLICT);
             }
         }
 
         if (Boolean.FALSE.equals(allowPartialPayments)) {
             // Calculate what should be the monthly installment
-            com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO summary = studentFeeSummaryService
-                    .updateSummary(studentId, currentYear.getId(), organizationId);
-            
             BigDecimal totalAssigned = summary.getTotalAssignedFee();
             long totalMonths = summary.getAcademicTotalMonths();
             
@@ -224,9 +274,31 @@ public class StudentFeePaymentsService {
         payment.setPaymentMode(requestDTO.getPaymentMode());
         payment.setAcademicYear(currentYear);
         payment.setLateFeePaid(requestDTO.getLateFeePaid() != null ? requestDTO.getLateFeePaid() : calculatedLateFee);
+        
+        // Tax Calculation for Payment
+        BigDecimal taxPaid = BigDecimal.ZERO;
+        if (campusSettings.isPresent() && campusSettings.get().getTaxTypeId() != null) {
+            var taxType = taxTypeRepository.findById(campusSettings.get().getTaxTypeId());
+            if (taxType.isPresent()) {
+                // Calculate tax on the amountPaid (assumed exclusive for calculation)
+                taxPaid = requestDTO.getAmountPaid().multiply(taxType.get().getTaxPercentage().divide(BigDecimal.valueOf(100), 4, java.math.RoundingMode.HALF_UP));
+            }
+        }
+        payment.setTaxPaid(taxPaid);
+        
+        payment.setReceiptNumber("RCP-" + currentYear.getName().substring(0, 4) + "-" + System.currentTimeMillis() % 100000);
 
         studentFeePaymentsRepository.save(payment);
         log.info("[Service:StudentFeePaymentsService] Fee payment recorded successfully | paymentId={}", payment.getId());
+
+        // --- GL Integration ---
+        try {
+            postFeePaymentToGL(payment, currentYear);
+        } catch (Exception e) {
+            log.error("[Service:StudentFeePaymentsService] GL Posting failed for paymentId {}: {}", payment.getId(), e.getMessage());
+            // Optional: throw exception if GL posting is mandatory
+        }
+        // -----------------------
 
         // Update Summary
         studentFeeSummaryService.updateSummary(studentId, currentYear.getId(), organizationId);
@@ -275,5 +347,72 @@ public class StudentFeePaymentsService {
         
         LocalDate endOfCurrentMonth = YearMonth.now().atEndOfMonth();
         return studentFeePaymentsRepository.getTotalCollectedUpToMonth(currentYear.getId(), endOfCurrentMonth, organizationId);
+    }
+
+    public byte[] generateReceipt(Long paymentId) {
+        StudentFeePaymentEntity payment = studentFeePaymentsRepository.findById(paymentId)
+                .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Payment not found", HttpStatus.NOT_FOUND));
+        return feeReceiptService.generateReceiptPdf(payment);
+    }
+
+    @Transactional
+    public void waiveLateFee(LateFeeWaiverRequestDTO requestDTO) {
+        log.info("[Service:StudentFeePaymentsService] waiveLateFee() called for assignmentId={}", requestDTO.getAssignmentId());
+        
+        StudentFeeAssignmentEntity assignment = studentFeeAssignmentRepository.findById(requestDTO.getAssignmentId())
+                .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Assignment not found", HttpStatus.NOT_FOUND));
+        
+        if (requestDTO.getWaivedAmount().compareTo(assignment.getLateFeeAmount()) > 0) {
+            throw new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Waived amount cannot exceed current late fee", HttpStatus.BAD_REQUEST);
+        }
+        
+        assignment.setWaivedAmount(requestDTO.getWaivedAmount());
+        assignment.setWaivedReason(requestDTO.getReason());
+        studentFeeAssignmentRepository.save(assignment);
+        
+        // Update summary to reflect the change
+        studentFeeSummaryService.updateSummary(assignment.getStudent().getId(), assignment.getAcademicYear().getId(), assignment.getOrganizationId());
+        
+        log.info("[Service:StudentFeePaymentsService] Late fee waived successfully | assignmentId={}", assignment.getId());
+    }
+
+    private void postFeePaymentToGL(StudentFeePaymentEntity payment, AcademicYearEntity academicYear) {
+        log.info("[Service:StudentFeePaymentsService] Posting to GL for paymentId={}", payment.getId());
+        
+        JournalEntryEntity entry = new JournalEntryEntity();
+        entry.setOrganizationId(payment.getOrganizationId());
+        entry.setCampusId(payment.getStudent().getCampus().getId());
+        entry.setAcademicYear(academicYear);
+        entry.setEntryDate(payment.getPaymentDate());
+        entry.setReferenceNumber(payment.getReceiptNumber());
+        entry.setDescription("Fee payment received from student: " + payment.getStudent().getFullName());
+        entry.setEntryType("FEE_PAYMENT");
+
+        // DEBIT: Cash or Bank
+        JournalEntryLineEntity debitLine = new JournalEntryLineEntity();
+        String cashAccountCode = "1111"; // Default Cash in Hand
+        if ("Bank".equalsIgnoreCase(payment.getPaymentMode()) || "Online".equalsIgnoreCase(payment.getPaymentMode())) {
+            cashAccountCode = "1113"; // Bank Account
+        }
+        debitLine.setAccount(glAccountService.getAccountByCode(payment.getOrganizationId(), cashAccountCode));
+        debitLine.setDebit(payment.getAmountPaid().add(payment.getLateFeePaid() != null ? payment.getLateFeePaid() : BigDecimal.ZERO));
+        debitLine.setCredit(BigDecimal.ZERO);
+        debitLine.setDescription("Fee received - Receipt: " + payment.getReceiptNumber());
+        debitLine.setCampusId(entry.getCampusId());
+        debitLine.setReferenceId(payment.getStudent().getId());
+        entry.addLine(debitLine);
+
+        // CREDIT: Student Receivable
+        JournalEntryLineEntity creditLine = new JournalEntryLineEntity();
+        creditLine.setAccount(glAccountService.getAccountByCode(payment.getOrganizationId(), "1121")); // Student Fee Receivable
+        creditLine.setDebit(BigDecimal.ZERO);
+        creditLine.setCredit(debitLine.getDebit());
+        creditLine.setDescription("Fee receivable cleared for student: " + payment.getStudent().getFullName());
+        creditLine.setCampusId(entry.getCampusId());
+        creditLine.setReferenceId(payment.getStudent().getId());
+        entry.addLine(creditLine);
+
+        journalEntryService.postJournalEntry(entry);
+        log.info("[Service:StudentFeePaymentsService] GL Journal Entry posted successfully for paymentId={}", payment.getId());
     }
 }

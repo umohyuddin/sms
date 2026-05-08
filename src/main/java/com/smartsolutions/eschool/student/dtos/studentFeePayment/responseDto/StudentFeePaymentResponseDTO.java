@@ -18,6 +18,9 @@ import java.util.List;
 public class StudentFeePaymentResponseDTO {
     @Schema(description = "Unique ID of the payment record", example = "1001")
     private Long id;
+    
+    @Schema(description = "Unique receipt number", example = "RCP-2024-0001")
+    private String receiptNumber;
 
     @Schema(description = "ID of the student", example = "5001")
     private Long studentId;
@@ -38,7 +41,7 @@ public class StudentFeePaymentResponseDTO {
     private Integer paymentYear;
 
     @Schema(description = "Mode of payment", example = "CASH")
-    private String paymentMode;
+    private com.smartsolutions.eschool.student.enums.PaymentMode paymentMode;
 
     @Schema(description = "System recording timestamp", example = "2024-04-01T10:00:00")
     private LocalDateTime createdAt;
@@ -64,7 +67,7 @@ public class StudentFeePaymentResponseDTO {
         @Schema(description = "Amount paid", example = "2500.00")
         private BigDecimal amountPaid;
         @Schema(description = "Mode of payment", example = "CASH")
-        private String paymentMode;
+        private com.smartsolutions.eschool.student.enums.PaymentMode paymentMode;
 
         // Constructor from original DTO
         public PartialPaymentDTO(StudentFeePaymentResponseDTO p) {

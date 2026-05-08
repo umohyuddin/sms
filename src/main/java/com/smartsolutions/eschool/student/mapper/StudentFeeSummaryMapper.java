@@ -22,6 +22,8 @@ public class StudentFeeSummaryMapper {
         dto.setTotalAssignedFee(entity.getTotalAssignedFee());
         dto.setTotalDiscount(entity.getTotalDiscount());
         dto.setTotalPaid(entity.getTotalPaid());
+        dto.setTotalLateFee(entity.getTotalLateFee());
+        dto.setTotalTax(entity.getTotalTax());
         dto.setBalance(entity.getBalance());
 
         if (entity.getStudent() != null) {
@@ -58,6 +60,8 @@ public class StudentFeeSummaryMapper {
         dto.setId(entity.getId());
         dto.setTotalAssignedFee(entity.getTotalAssignedFee());
         dto.setTotalPaid(entity.getTotalPaid());
+        dto.setTotalLateFee(entity.getTotalLateFee());
+        dto.setTotalTax(entity.getTotalTax());
         dto.setBalance(entity.getBalance());
 
         if (entity.getStudent() != null) {

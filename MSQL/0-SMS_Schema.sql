@@ -1362,6 +1362,10 @@ CREATE TABLE student_guardians (
         academic_year_id BIGINT NOT NULL,
         total_amount DECIMAL(12,2) NOT NULL,
         due_date DATE,
+        late_fee_amount DECIMAL(12, 2) DEFAULT 0.00,
+        waived_amount DECIMAL(12, 2) DEFAULT 0.00,
+        waived_reason VARCHAR(255),
+        last_reminder_sent_at DATETIME,
         assigned_date DATE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
@@ -1387,14 +1391,17 @@ CREATE TABLE student_guardians (
     DROP TABLE IF EXISTS student_fee_payments;
     CREATE TABLE student_fee_payments (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        receipt_number VARCHAR(50) UNIQUE,
         organization_id BIGINT NOT NULL,
         academic_year_id BIGINT NOT NULL,
         student_id BIGINT NOT NULL,
         payment_date DATE,
         amount_paid DECIMAL(12,2) NOT NULL,
+        late_fee_paid DECIMAL(12, 2) DEFAULT 0.00,
+        tax_paid DECIMAL(12, 2) DEFAULT 0.00,
         payment_month VARCHAR(20) NOT NULL,
         payment_year INT NOT NULL,
-        payment_mode VARCHAR(50),
+        payment_mode ENUM('CASH', 'BANK_TRANSFER', 'CHEQUE', 'ONLINE'),
         
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
@@ -1421,6 +1428,8 @@ CREATE TABLE student_guardians (
         total_assigned_fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
         total_discount DECIMAL(10, 2) NOT NULL DEFAULT 0,
         total_paid DECIMAL(10, 2) NOT NULL DEFAULT 0,
+        total_late_fee DECIMAL(12, 2) DEFAULT 0.00,
+        total_tax DECIMAL(12, 2) DEFAULT 0.00,
         balance DECIMAL(10, 2) NOT NULL DEFAULT 0,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1438,6 +1447,50 @@ CREATE TABLE student_guardians (
     CREATE INDEX idx_student_fee_summary_organization ON student_fee_summary (organization_id);
     ALTER TABLE student_fee_summary ADD CONSTRAINT uq_student_fee_summary UNIQUE (organization_id, student_id, academic_year_id);
     CREATE INDEX idx_student_fee_summary_academic_year_id ON student_fee_summary (academic_year_id);
+
+    DROP TABLE IF EXISTS student_fee_invoice_details;
+    DROP TABLE IF EXISTS student_fee_invoices;
+
+    CREATE TABLE student_fee_invoices (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        invoice_number VARCHAR(50) UNIQUE NOT NULL,
+        student_id BIGINT NOT NULL,
+        academic_year_id BIGINT NOT NULL,
+        month VARCHAR(20) NOT NULL,
+        year INT NOT NULL,
+        total_amount DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+        late_fee_amount DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+        discount_amount DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+        paid_amount DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+        balance DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+        due_date DATE,
+        invoice_date DATE NOT NULL,
+        status ENUM('UNPAID', 'PARTIAL', 'PAID', 'CANCELLED') DEFAULT 'UNPAID',
+        organization_id BIGINT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        created_by VARCHAR(50),
+        updated_by VARCHAR(50),
+        deleted BOOLEAN DEFAULT FALSE,
+        deleted_at TIMESTAMP,
+        deleted_by VARCHAR(50),
+        CONSTRAINT fk_invoice_student FOREIGN KEY (student_id) REFERENCES students(id),
+        CONSTRAINT fk_invoice_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
+    );
+
+    CREATE TABLE student_fee_invoice_details (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        invoice_id BIGINT NOT NULL,
+        fee_assignment_id BIGINT NOT NULL,
+        amount DECIMAL(12, 2) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        CONSTRAINT fk_detail_invoice FOREIGN KEY (invoice_id) REFERENCES student_fee_invoices(id),
+        CONSTRAINT fk_detail_assignment FOREIGN KEY (fee_assignment_id) REFERENCES student_fee_assignments(id)
+    );
+
+    CREATE INDEX idx_invoice_student_year ON student_fee_invoices(student_id, academic_year_id);
+    CREATE INDEX idx_invoice_org ON student_fee_invoices(organization_id);
 
     DROP TABLE IF EXISTS discount_type;
     CREATE TABLE discount_type (

@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.student.facade;
 
 
 import com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto.StudentFeePaymentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto.LateFeeWaiverRequestDTO;
 import com.smartsolutions.eschool.student.service.StudentFeePaymentsService;
 import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
@@ -30,6 +31,14 @@ public class StudentFeePaymentsFacade {
 
     public BigDecimal getCollectedUpToCurrentMonth(){
         return studentFeePaymentsService.getCollectedUpToCurrentMonth();
+    }
+
+    public byte[] generateReceipt(Long paymentId) {
+        return studentFeePaymentsService.generateReceipt(paymentId);
+    }
+
+    public void waiveLateFee(LateFeeWaiverRequestDTO requestDTO) {
+        studentFeePaymentsService.waiveLateFee(requestDTO);
     }
 }
 

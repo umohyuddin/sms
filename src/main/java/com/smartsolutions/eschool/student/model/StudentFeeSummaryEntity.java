@@ -31,6 +31,8 @@ public class StudentFeeSummaryEntity extends AuditableEntity {
     private BigDecimal totalAssignedFee;
     private BigDecimal totalDiscount;
     private BigDecimal totalPaid;
+    private BigDecimal totalLateFee = BigDecimal.ZERO;
+    private BigDecimal totalTax = BigDecimal.ZERO;
     private BigDecimal balance;
 
     @ManyToOne(fetch = FetchType.LAZY)

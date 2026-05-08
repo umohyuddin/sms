@@ -125,6 +125,14 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             @Param("toDate") LocalDate toDate,
             @Param("instituteId") Long instituteId
     );
+
+    boolean existsByStudentIdAndAcademicYearIdAndPaymentMonthAndPaymentYearAndDeletedFalse(
+            Long studentId, Long academicYearId, String paymentMonth, Integer paymentYear
+    );
+
+    boolean existsByStudentIdAndAcademicYearIdAndPaymentMonthAndPaymentYearAndAmountPaidAndDeletedFalse(
+            Long studentId, Long academicYearId, String paymentMonth, Integer paymentYear, java.math.BigDecimal amountPaid
+    );
 }
 
 

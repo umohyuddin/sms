@@ -51,5 +51,5 @@ public class StudentFeePaymentRequestDTO {
     private Integer paymentYear;
 
     @Schema(description = "Method of payment", example = "CASH")
-    private String paymentMode;   // Cash, Bank, Online
+    private com.smartsolutions.eschool.student.enums.PaymentMode paymentMode;   // Cash, Bank, Online
 }
