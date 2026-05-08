@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
@@ -41,9 +42,9 @@ public class Dashboard360Facade {
                 .supplyAsync(() -> nStudentService.countNewAdmissions(filter, orgId));
         CompletableFuture<Long> withdrawalsFuture = CompletableFuture
                 .supplyAsync(() -> nStudentService.countWithdrawals(filter, orgId));
-        CompletableFuture<Double> totalCollectionFuture = CompletableFuture
+        CompletableFuture<BigDecimal> totalCollectionFuture = CompletableFuture
                 .supplyAsync(() -> nFeeService.getTotalCollection(filter, orgId));
-        CompletableFuture<Double> pendingDuesFuture = CompletableFuture.supplyAsync(() -> nFeeService.getPendingDues(filter, orgId));
+        CompletableFuture<BigDecimal> pendingDuesFuture = CompletableFuture.supplyAsync(() -> nFeeService.getPendingDues(filter, orgId));
         CompletableFuture<Double> efficiencyFuture = CompletableFuture.supplyAsync(() -> nFeeService.getCollectionEfficiency(filter, orgId));
         CompletableFuture<Long> totalEmployeesFuture = CompletableFuture.supplyAsync(() -> nEmployeeService.countEmployees(filter, orgId));
         CompletableFuture<java.util.Map<String, Long>> genderFuture = CompletableFuture.supplyAsync(() -> nStudentService.getGenderDistribution(filter, orgId));
@@ -57,16 +58,16 @@ public class Dashboard360Facade {
 
         try {
             return DashboardKpiResponse.builder()
-                    .totalStudents(KpiMetric.builder().currentValue(totalStudentsFuture.get().doubleValue()).build())
-                    .activeStudents(KpiMetric.builder().currentValue(activeStudentsFuture.get().doubleValue()).build())
+                    .totalStudents(KpiMetric.builder().currentValue(BigDecimal.valueOf(totalStudentsFuture.get())).build())
+                    .activeStudents(KpiMetric.builder().currentValue(BigDecimal.valueOf(activeStudentsFuture.get())).build())
                     .inactiveStudents(
-                            KpiMetric.builder().currentValue(inactiveStudentsFuture.get().doubleValue()).build())
-                    .newAdmissions(KpiMetric.builder().currentValue(newAdmissionsFuture.get().doubleValue()).build())
-                    .withdrawals(KpiMetric.builder().currentValue(withdrawalsFuture.get().doubleValue()).build())
+                            KpiMetric.builder().currentValue(BigDecimal.valueOf(inactiveStudentsFuture.get())).build())
+                    .newAdmissions(KpiMetric.builder().currentValue(BigDecimal.valueOf(newAdmissionsFuture.get())).build())
+                    .withdrawals(KpiMetric.builder().currentValue(BigDecimal.valueOf(withdrawalsFuture.get())).build())
                     .totalCollection(KpiMetric.builder().currentValue(totalCollectionFuture.get()).build())
                     .pendingDues(KpiMetric.builder().currentValue(pendingDuesFuture.get()).build())
-                    .collectionEfficiency(KpiMetric.builder().currentValue(efficiencyFuture.get()).build())
-                    .totalEmployees(KpiMetric.builder().currentValue(totalEmployeesFuture.get().doubleValue()).build())
+                    .collectionEfficiency(KpiMetric.builder().currentValue(BigDecimal.valueOf(efficiencyFuture.get())).build())
+                    .totalEmployees(KpiMetric.builder().currentValue(BigDecimal.valueOf(totalEmployeesFuture.get())).build())
                     .genderDistribution(genderFuture.get())
                     .build();
         } catch (Exception e) {

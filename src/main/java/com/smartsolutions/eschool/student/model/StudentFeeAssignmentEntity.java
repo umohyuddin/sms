@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -45,8 +46,8 @@ public class StudentFeeAssignmentEntity extends AuditableEntity {
 
     // --- Fields ---
 
-    @Column(name = "total_amount", nullable = false)
-    private Double totalAmount;
+    @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
+    private BigDecimal totalAmount;
 
     @Column(name = "due_date")
     private LocalDate dueDate;

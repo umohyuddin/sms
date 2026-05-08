@@ -55,8 +55,8 @@ public class StudentFeeSummaryService {
         log.info("[Service:StudentFeeSummaryService] updateSummary() called - studentId={}, academicYearId={}, organizationId={}",
                 studentId, academicYearId, organizationId);
 
-        Double totalAssignedDouble = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, academicYearId, organizationId);
-        BigDecimal totalAssigned = BigDecimal.valueOf(totalAssignedDouble != null ? totalAssignedDouble : 0.0);
+        BigDecimal totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, academicYearId, organizationId);
+        if (totalAssigned == null) totalAssigned = BigDecimal.ZERO;
 
         BigDecimal totalDiscount = studentDiscountAssignmentRepository.findTotalDiscountByStudentAndYear(studentId, academicYearId);
         if (totalDiscount == null) totalDiscount = BigDecimal.ZERO;

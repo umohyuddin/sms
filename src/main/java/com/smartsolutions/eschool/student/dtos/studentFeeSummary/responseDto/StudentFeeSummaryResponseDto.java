@@ -86,7 +86,7 @@ public class StudentFeeSummaryResponseDto {
         public PartialPaymentDTO(StudentFeePaymentResponseDTO p) {
             this.id = p.getId();
             this.paymentDate = p.getPaymentDate();
-            this.amountPaid = BigDecimal.valueOf(p.getAmountPaid());
+            this.amountPaid = p.getAmountPaid();
             this.paymentMode = p.getPaymentMode();
         }
     }

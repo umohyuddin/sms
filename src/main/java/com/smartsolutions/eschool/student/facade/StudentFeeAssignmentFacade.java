@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ public class StudentFeeAssignmentFacade {
         return studentFeeAssignmentService.getFeeAssignmentByStudentId(studentId, academicYearId);
     }
 
-    public Double getTotalFeeAssigned(Long academicYearId) {
+    public BigDecimal getTotalFeeAssigned(Long academicYearId) {
         log.info("[Facade:StudentFeeAssignmentFacade] getTotalFeeAssigned() called - academicYearId={}", academicYearId);
         return studentFeeAssignmentService.getTotalFeeAssigned(academicYearId);
     }

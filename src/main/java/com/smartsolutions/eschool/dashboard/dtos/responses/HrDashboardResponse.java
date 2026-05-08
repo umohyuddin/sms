@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Data
@@ -15,5 +16,5 @@ import java.util.Map;
 public class HrDashboardResponse {
     private KpiMetric employeeRetention;
     private Map<String, Long> staffByType;
-    private Map<String, Double> attendanceSummary;
+    private Map<String, BigDecimal> attendanceSummary;
 }

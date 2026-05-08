@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Data
@@ -14,7 +15,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class FinanceDashboardResponse {
     private KpiMetric revenueTrend;
-    private Map<String, Double> collectionByFeeType;
-    private Map<String, Double> pendingByStandard;
-    private Double occupancyRate; // relevant for boarding/seat capacity
+    private Map<String, BigDecimal> collectionByFeeType;
+    private Map<String, BigDecimal> pendingByStandard;
+    private BigDecimal occupancyRate; // relevant for boarding/seat capacity
 }

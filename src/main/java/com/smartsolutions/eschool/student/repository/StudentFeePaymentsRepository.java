@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             WHERE p.academicYear.id = :academicYearId
             AND p.organizationId = :instituteId
             """)
-    Double getTotalFeeCollected(
+    BigDecimal getTotalFeeCollected(
             @Param("academicYearId") Long academicYearId,
             @Param("instituteId") Long instituteId
     );
@@ -42,7 +43,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
             AND sfp.paymentDate <= :endOfMonth
             AND sfp.organizationId = :instituteId
             """)
-    Double getTotalCollectedUpToMonth(
+    BigDecimal getTotalCollectedUpToMonth(
             @Param("academicYearId") Long academicYearId,
             @Param("endOfMonth") LocalDate endOfMonth,
             @Param("instituteId") Long instituteId
@@ -70,7 +71,7 @@ public interface StudentFeePaymentsRepository extends JpaRepository<StudentFeePa
           AND (:fromDate IS NULL OR p.paymentDate >= :fromDate)
           AND (:toDate IS NULL OR p.paymentDate <= :toDate)
     """)
-    Double sumCollectionByFilters(
+    BigDecimal sumCollectionByFilters(
             @Param("campusIds") List<Long> campusIds,
             @Param("academicYearId") Long academicYearId,
             @Param("fromDate") LocalDate fromDate,

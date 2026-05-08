@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class StudentFeePaymentResponseDTO {
     private LocalDate paymentDate;
 
     @Schema(description = "Amount paid", example = "5000.00")
-    private Double amountPaid;
+    private BigDecimal amountPaid;
 
     @Schema(description = "Month for which fee was paid", example = "April")
     private String paymentMonth;
@@ -61,7 +62,7 @@ public class StudentFeePaymentResponseDTO {
         @Schema(description = "Date of payment", example = "2024-04-01")
         private LocalDate paymentDate;
         @Schema(description = "Amount paid", example = "2500.00")
-        private Double amountPaid;
+        private BigDecimal amountPaid;
         @Schema(description = "Mode of payment", example = "CASH")
         private String paymentMode;
 
@@ -85,7 +86,7 @@ public class StudentFeePaymentResponseDTO {
         @Schema(description = "Month name", example = "April")
         private String month;
         @Schema(description = "Total paid in this month", example = "5000.00")
-        private Double totalPaid = 0.0;
+        private BigDecimal totalPaid = BigDecimal.ZERO;
         @Schema(description = "List of installments for this month")
         private List<PartialPaymentDTO> partialPayments = new ArrayList<>();
 
@@ -94,7 +95,9 @@ public class StudentFeePaymentResponseDTO {
         }
 
         public void addPartialPayment(PartialPaymentDTO payment) {
-            this.totalPaid += payment.getAmountPaid();
+            if (payment.getAmountPaid() != null) {
+                this.totalPaid = this.totalPaid.add(payment.getAmountPaid());
+            }
             this.partialPayments.add(payment);
         }
     }

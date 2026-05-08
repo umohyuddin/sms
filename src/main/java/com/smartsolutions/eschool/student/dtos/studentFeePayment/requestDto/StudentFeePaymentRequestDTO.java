@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -35,7 +36,10 @@ public class StudentFeePaymentRequestDTO {
     @NotNull(message = "Amount paid is required")
     @Positive(message = "Amount must be greater than zero")
     @Schema(description = "Monetary amount paid", example = "5000.00")
-    private Double amountPaid;
+    private BigDecimal amountPaid;
+
+    @Schema(description = "Late fee amount paid (if any)", example = "200.00")
+    private BigDecimal lateFeePaid;
 
     @NotNull(message = "Payment month is required")
     @Size(min = 3, max = 20, message = "Payment month must be valid")

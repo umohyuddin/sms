@@ -67,7 +67,7 @@ public class StudentFeeAssignmentFlatDTO {
     private Long assignmentId;
 
     @Schema(description = "Aggregated total amount for this assignment", example = "15000.00")
-    private Double totalAmount;
+    private BigDecimal totalAmount;
 
     @Schema(description = "The date the assignment was applied", example = "2024-04-01")
     private LocalDate assignedDate;

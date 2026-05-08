@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
               AND a.academicYear.id = :academicYearId
               AND a.organizationId = :instituteId
             """)
-    Double findTotalAssignedFee(
+    BigDecimal findTotalAssignedFee(
             @Param("studentId") Long studentId,
             @Param("academicYearId") Long academicYearId,
             @Param("instituteId") Long instituteId
@@ -88,7 +89,7 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             WHERE a.academicYear.id = :academicYearId
               AND a.organizationId = :instituteId
             """)
-    Double getTotalFeeAssigned(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
+    BigDecimal getTotalFeeAssigned(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT COALESCE(SUM(a.totalAmount), 0)
@@ -97,7 +98,7 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
               AND a.academicYear.id = :academicYearId
               AND a.organizationId = :instituteId
             """)
-    Double getOverdueAmount(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
+    BigDecimal getOverdueAmount(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT sfa FROM StudentFeeAssignmentEntity sfa
@@ -180,7 +181,7 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
           AND (:academicYearId IS NULL OR a.academicYear.id = :academicYearId)
           AND (:toDate IS NULL OR a.dueDate <= :toDate)
     """)
-    Double sumPendingDuesByFilters(
+    BigDecimal sumPendingDuesByFilters(
             @Param("campusIds") java.util.List<Long> campusIds,
             @Param("academicYearId") Long academicYearId,
             @Param("toDate") java.time.LocalDate toDate,

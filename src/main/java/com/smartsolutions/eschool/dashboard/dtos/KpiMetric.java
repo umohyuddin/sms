@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class KpiMetric {
-    private Double currentValue;
-    private Double previousValue;
-    private Double percentageChange;
+    private BigDecimal currentValue;
+    private BigDecimal previousValue;
+    private BigDecimal percentageChange;
     private TrendDirection trendDirection;
 
     public enum TrendDirection {

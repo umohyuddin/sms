@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.lookups.dtos;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Getter
@@ -11,15 +12,15 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class DashboardFinancialDTO {
-    private double assignedMonthlyFee;
-    private double collectedMonthlyFee;
-    private double outstandingMonthlyFee;
-    private double collectionPercentageMonthlyFee;
+    private BigDecimal assignedMonthlyFee;
+    private BigDecimal collectedMonthlyFee;
+    private BigDecimal outstandingMonthlyFee;
+    private BigDecimal collectionPercentageMonthlyFee;
     private String monthName;
 
-    private double assignedYearlyFee;
-    private double collectedYearlyFee;
-    private double outstandingYearlyFee;
-    private double collectionPercentageYearlyFee;
+    private BigDecimal assignedYearlyFee;
+    private BigDecimal collectedYearlyFee;
+    private BigDecimal outstandingYearlyFee;
+    private BigDecimal collectionPercentageYearlyFee;
     private String academicYearName;
 }

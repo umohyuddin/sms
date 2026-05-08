@@ -121,8 +121,9 @@ public class StudentFeeAssignmentService {
             String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
                     ? feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getName() : "ONE_TIME";
             
-            double baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount().doubleValue() : 0.0;
-            double totalAmount = baseAmount * getRecurrenceMultiplier(recurrenceRule, (int) finalTotalMonths);
+            BigDecimal baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount() : BigDecimal.ZERO;
+            BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(recurrenceRule, (int) finalTotalMonths));
+            BigDecimal totalAmount = baseAmount.multiply(multiplier);
 
             assignment.setTotalAmount(totalAmount);
             assignment.setAssignedDate(LocalDate.now());
@@ -135,8 +136,8 @@ public class StudentFeeAssignmentService {
         log.info("[Service:StudentFeeAssignmentService] Saved {} fee assignments", savedAssignments.size());
 
         // Total assigned fee
-        Double totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId(), organizationId);
-        if (totalAssigned == null) totalAssigned = 0.0;
+        BigDecimal totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId(), organizationId);
+        if (totalAssigned == null) totalAssigned = BigDecimal.ZERO;
 
         // Handle Discount if provided
         if (dto.getDiscountComponentId() != null) {
@@ -152,7 +153,7 @@ public class StudentFeeAssignmentService {
             discountRequest.setAcademicYearId(dto.getAcademicYearId());
             discountRequest.setCampusId(dto.getCampusId());
             discountRequest.setDiscountRateId(discountRate.getId());
-            discountRequest.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
+            discountRequest.setTotalAssignedFee(totalAssigned);
             studentDiscountAssignmentService.assignDiscount(discountRequest);
         }
 
@@ -161,7 +162,7 @@ public class StudentFeeAssignmentService {
     }
 
     private StudentFeeSummaryDTO updateSummary(StudentEntity student, AcademicYearEntity academicYear, 
-            InstituteEntity institute, Double totalAssigned) {
+            InstituteEntity institute, BigDecimal totalAssigned) {
         return studentFeeSummaryService.updateSummary(student.getId(), academicYear.getId(), institute.getId());
     }
 
@@ -213,8 +214,9 @@ public class StudentFeeAssignmentService {
             String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
                     ? feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getName() : "ONE_TIME";
             
-            double baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount().doubleValue() : 0.0;
-            double totalAmount = baseAmount * getRecurrenceMultiplier(recurrenceRule, (int) finalTotalMonths);
+            BigDecimal baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount() : BigDecimal.ZERO;
+            BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(recurrenceRule, (int) finalTotalMonths));
+            BigDecimal totalAmount = baseAmount.multiply(multiplier);
 
             assignment.setTotalAmount(totalAmount);
             assignment.setAssignedDate(LocalDate.now());
@@ -226,8 +228,8 @@ public class StudentFeeAssignmentService {
         studentFeeAssignmentRepository.flush();
 
         // Calculate Total assigned AFTER saving so it includes newly saved records
-        Double totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId(), organizationId);
-        if (totalAssigned == null) totalAssigned = 0.0;
+        BigDecimal totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId(), organizationId);
+        if (totalAssigned == null) totalAssigned = BigDecimal.ZERO;
 
         // Handle Discount update
         if (dto.getDiscountComponentId() != null) {
@@ -243,7 +245,7 @@ public class StudentFeeAssignmentService {
             discountRequest.setAcademicYearId(dto.getAcademicYearId());
             discountRequest.setCampusId(dto.getCampusId());
             discountRequest.setDiscountRateId(discountRate.getId());
-            discountRequest.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
+            discountRequest.setTotalAssignedFee(totalAssigned);
             studentDiscountAssignmentService.updateDiscount(discountRequest);
         } else {
             log.info("[Service:StudentFeeAssignmentService] No discount provided, removing existing discount for studentId: {}", studentId);
@@ -293,7 +295,7 @@ public class StudentFeeAssignmentService {
         return responseDTO;
     }
 
-    public Double getTotalFeeAssigned(Long academicYearId) {
+    public BigDecimal getTotalFeeAssigned(Long academicYearId) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
             throw new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
@@ -373,9 +375,9 @@ public class StudentFeeAssignmentService {
             stats.put("overdueAssignments", studentFeeAssignmentRepository.countOverdueAssignments(organizationId));
             stats.put("overdueAmount", studentFeeAssignmentRepository.getOverdueAmount(academicYearId, organizationId));
         } else {
-            stats.put("totalFeeAmount", 0.0);
+            stats.put("totalFeeAmount", BigDecimal.ZERO);
             stats.put("overdueAssignments", 0L);
-            stats.put("overdueAmount", 0.0);
+            stats.put("overdueAmount", BigDecimal.ZERO);
         }
 
         log.info("[Service:StudentFeeAssignmentService] getStatistics() succeeded");
