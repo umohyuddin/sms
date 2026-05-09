@@ -44,8 +44,8 @@ public class GLAccountEntity extends AuditableEntity {
     @Column(name = "is_group", nullable = false)
     private boolean isGroup = false;
 
-    @Column(name = "level", nullable = false)
-    private int level = 1;
+    @Column(name = "level_no", nullable = false)
+    private int levelNo = 1;
 
     @Column(name = "is_control_account")
     private boolean isControlAccount = false;

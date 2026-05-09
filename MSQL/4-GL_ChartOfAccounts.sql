@@ -1,0 +1,136 @@
+-- ====================================================
+-- GL Chart of Accounts Dataset
+-- ====================================================
+
+INSERT INTO gl_accounts
+(id, organization_id, account_code, account_name, parent_id, account_type,
+ is_group, level_no, normal_balance,
+ is_control_account, is_cash_account, is_bank_account, is_reconcilable)
+VALUES
+(1,1,'1000','Assets',NULL,'ASSET',TRUE,1,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(2,1,'1100','Current Assets',1,'ASSET',TRUE,2,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(3,1,'1110','Cash & Cash Equivalents',2,'ASSET',TRUE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(4,1,'1111','Cash in Hand',3,'ASSET',FALSE,4,'DEBIT',FALSE,TRUE,FALSE,FALSE),
+(5,1,'1112','Petty Cash',3,'ASSET',FALSE,4,'DEBIT',FALSE,TRUE,FALSE,FALSE),
+(6,1,'1113','Bank Main Account',3,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,TRUE,TRUE),
+(7,1,'1114','Bank Campus Collection Account',3,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,TRUE,TRUE),
+(8,1,'1120','Accounts Receivable',2,'ASSET',TRUE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(9,1,'1121','Student Fee Receivable',8,'ASSET',FALSE,4,'DEBIT',TRUE,FALSE,FALSE,FALSE),
+(10,1,'1122','Transport Fee Receivable',8,'ASSET',FALSE,4,'DEBIT',TRUE,FALSE,FALSE,FALSE),
+(11,1,'1123','Hostel Fee Receivable',8,'ASSET',FALSE,4,'DEBIT',TRUE,FALSE,FALSE,FALSE),
+(12,1,'1124','Employee Receivable',8,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(13,1,'1130','Advances & Prepayments',2,'ASSET',TRUE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(14,1,'1131','Advance to Staff',13,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(15,1,'1132','Prepaid Rent',13,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(16,1,'1133','Prepaid Insurance',13,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(17,1,'1134','Security Deposits',13,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(18,1,'1140','Inventory',2,'ASSET',TRUE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(19,1,'1141','Books Inventory',18,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(20,1,'1142','Uniform Inventory',18,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(21,1,'1143','Stationery Inventory',18,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(22,1,'1144','Lab Inventory',18,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(23,1,'1200','Non Current Assets',1,'ASSET',TRUE,2,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(24,1,'1210','Property Plant & Equipment',23,'ASSET',TRUE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(25,1,'1211','Land',24,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(26,1,'1212','Buildings',24,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(27,1,'1213','Furniture & Fixtures',24,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(28,1,'1214','Computers & IT Equipment',24,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(29,1,'1215','Lab Equipment',24,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(30,1,'1216','Vehicles',24,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(31,1,'1220','Accumulated Depreciation',23,'ASSET',TRUE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(32,1,'1221','Accumulated Building Depreciation',31,'ASSET',FALSE,4,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(33,1,'1222','Accumulated Equipment Depreciation',31,'ASSET',FALSE,4,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(34,1,'1223','Accumulated Vehicle Depreciation',31,'ASSET',FALSE,4,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(35,1,'1230','Intangible Assets',23,'ASSET',TRUE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(36,1,'1231','Software Licenses',35,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(37,1,'1232','ERP Development Cost',35,'ASSET',FALSE,4,'DEBIT',FALSE,FALSE,FALSE,FALSE);
+
+INSERT INTO gl_accounts
+(id, organization_id, account_code, account_name, parent_id, account_type,
+ is_group, level_no, normal_balance,
+ is_control_account, is_cash_account, is_bank_account, is_reconcilable)
+VALUES
+(100,1,'2000','Liabilities',NULL,'LIABILITY',TRUE,1,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(101,1,'2100','Current Liabilities',100,'LIABILITY',TRUE,2,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(102,1,'2110','Accounts Payable',101,'LIABILITY',TRUE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(103,1,'2111','Vendor Payables',102,'LIABILITY',FALSE,4,'CREDIT',TRUE,FALSE,FALSE,FALSE),
+(104,1,'2112','Utility Payables',102,'LIABILITY',FALSE,4,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(105,1,'2113','Book Supplier Payables',102,'LIABILITY',FALSE,4,'CREDIT',TRUE,FALSE,FALSE,FALSE),
+(106,1,'2120','Accrued Expenses',101,'LIABILITY',TRUE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(107,1,'2121','Salary Payable',106,'LIABILITY',FALSE,4,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(108,1,'2122','Rent Payable',106,'LIABILITY',FALSE,4,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(109,1,'2123','Tax Payable',106,'LIABILITY',FALSE,4,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(110,1,'2130','Unearned Revenue',101,'LIABILITY',TRUE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(111,1,'2131','Advance Fee Received',110,'LIABILITY',FALSE,4,'CREDIT',TRUE,FALSE,FALSE,FALSE),
+(112,1,'2132','Advance Hostel Fee',110,'LIABILITY',FALSE,4,'CREDIT',TRUE,FALSE,FALSE,FALSE),
+(113,1,'2200','Long Term Liabilities',100,'LIABILITY',TRUE,2,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(114,1,'2210','Loans',113,'LIABILITY',TRUE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(115,1,'2211','Bank Loan',114,'LIABILITY',FALSE,4,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(116,1,'2212','Vehicle Lease Liability',114,'LIABILITY',FALSE,4,'CREDIT',FALSE,FALSE,FALSE,FALSE);
+
+INSERT INTO gl_accounts
+(id, organization_id, account_code, account_name, parent_id, account_type,
+ is_group, level_no, normal_balance,
+ is_control_account, is_cash_account, is_bank_account, is_reconcilable)
+VALUES
+(200,1,'3000','Equity',NULL,'EQUITY',TRUE,1,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(201,1,'3100','Owner Equity',200,'EQUITY',TRUE,2,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(202,1,'3110','Capital Introduced',201,'EQUITY',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(203,1,'3120','Retained Earnings',201,'EQUITY',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(204,1,'3200','Reserves',200,'EQUITY',TRUE,2,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(205,1,'3210','General Reserve',204,'EQUITY',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE);
+
+INSERT INTO gl_accounts
+(id, organization_id, account_code, account_name, parent_id, account_type,
+ is_group, level_no, normal_balance,
+ is_control_account, is_cash_account, is_bank_account, is_reconcilable)
+VALUES
+(300,1,'4000','Income',NULL,'INCOME',TRUE,1,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(301,1,'4100','Academic Revenue',300,'INCOME',TRUE,2,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(302,1,'4110','Tuition Fee',301,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(303,1,'4120','Admission Fee',301,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(304,1,'4130','Examination Fee',301,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(305,1,'4140','Library Fee',301,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(306,1,'4150','Lab Fee',301,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(307,1,'4200','Non Academic Revenue',300,'INCOME',TRUE,2,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(308,1,'4210','Transport Fee',307,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(309,1,'4220','Hostel Fee',307,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(310,1,'4230','Activity Fee',307,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(311,1,'4240','Uniform Sales',307,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(312,1,'4250','Book Sales',307,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(313,1,'4300','Other Income',300,'INCOME',TRUE,2,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(314,1,'4310','Late Fee Fine',313,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(315,1,'4320','Miscellaneous Income',313,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE),
+(316,1,'4330','Interest Income',313,'INCOME',FALSE,3,'CREDIT',FALSE,FALSE,FALSE,FALSE);
+
+INSERT INTO gl_accounts
+(id, organization_id, account_code, account_name, parent_id, account_type,
+ is_group, level_no, normal_balance,
+ is_control_account, is_cash_account, is_bank_account, is_reconcilable)
+VALUES
+(400,1,'5000','Expenses',NULL,'EXPENSE',TRUE,1,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(401,1,'5100','Payroll Expenses',400,'EXPENSE',TRUE,2,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(402,1,'5110','Teacher Salaries',401,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(403,1,'5120','Admin Salaries',401,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(404,1,'5130','Staff Benefits',401,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(405,1,'5200','Operational Expenses',400,'EXPENSE',TRUE,2,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(406,1,'5210','Electricity Expense',405,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(407,1,'5220','Water Expense',405,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(408,1,'5230','Internet Expense',405,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(409,1,'5240','Telephone Expense',405,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(410,1,'5300','Academic Expenses',400,'EXPENSE',TRUE,2,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(411,1,'5310','Books Purchase',410,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(412,1,'5320','Lab Expenses',410,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(413,1,'5330','Sports Expenses',410,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(414,1,'5400','Maintenance Expenses',400,'EXPENSE',TRUE,2,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(415,1,'5410','Building Maintenance',414,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(416,1,'5420','Equipment Repair',414,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(417,1,'5430','Vehicle Maintenance',414,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(418,1,'5500','Administrative Expenses',400,'EXPENSE',TRUE,2,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(419,1,'5510','Office Supplies',418,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(420,1,'5520','Printing & Stationery',418,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(421,1,'5530','Legal & Professional Fee',418,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(422,1,'5600','Depreciation Expenses',400,'EXPENSE',TRUE,2,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(423,1,'5610','Building Depreciation Expense',422,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(424,1,'5620','Equipment Depreciation Expense',422,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE),
+(425,1,'5630','Vehicle Depreciation Expense',422,'EXPENSE',FALSE,3,'DEBIT',FALSE,FALSE,FALSE,FALSE);

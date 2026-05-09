@@ -50,12 +50,14 @@ public class LateFeeScheduledTask {
 
         log.info("[Task:LateFeeScheduledTask] Found {} potentially overdue assignments", overdueAssignments.size());
 
+        java.util.Set<Long> affectedStudentIds = new java.util.HashSet<>();
         for (StudentFeeAssignmentEntity assignment : overdueAssignments) {
             try {
                 Long studentId = assignment.getStudent().getId();
                 Long orgId = assignment.getOrganizationId();
                 if (orgId != null) {
                     summaryService.updateSummary(studentId, currentYear.getId(), orgId);
+                    affectedStudentIds.add(studentId);
                 }
             } catch (Exception e) {
                 log.error("[Task:LateFeeScheduledTask] Error updating summary for studentId {}: {}", assignment.getStudent().getId(), e.getMessage());

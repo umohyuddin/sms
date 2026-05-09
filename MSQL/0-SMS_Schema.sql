@@ -2708,3 +2708,225 @@ CREATE TABLE student_attendance (
         deleted_by BIGINT,
         FOREIGN KEY (system_user_id) REFERENCES system_users(id)
     );
+
+-- =============================
+-- LEVEL 9: GL Module Tables
+-- =============================
+
+DROP TABLE IF EXISTS gl_journal_entry_lines;
+DROP TABLE IF EXISTS gl_journal_entries;
+DROP TABLE IF EXISTS gl_accounts;
+
+-- Chart of Accounts
+CREATE TABLE gl_accounts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    -- Multi-tenant
+    organization_id BIGINT NOT NULL,
+
+    -- Optional campus-specific account
+    campus_id BIGINT NULL,
+
+    -- Account identity
+    account_code VARCHAR(50) NOT NULL,
+    account_name VARCHAR(255) NOT NULL,
+
+    -- Tree hierarchy
+    parent_id BIGINT NULL,
+
+    -- Classification
+    account_type ENUM(
+        'ASSET',
+        'LIABILITY',
+        'EQUITY',
+        'INCOME',
+        'EXPENSE'
+    ) NOT NULL,
+
+    -- Structure
+    is_group BOOLEAN NOT NULL DEFAULT FALSE,
+    level_no INT NOT NULL DEFAULT 1,
+
+    -- ERP Flags
+    is_control_account BOOLEAN DEFAULT FALSE,
+    is_cash_account BOOLEAN DEFAULT FALSE,
+    is_bank_account BOOLEAN DEFAULT FALSE,
+    is_reconcilable BOOLEAN DEFAULT FALSE,
+
+    -- Financial behavior
+    normal_balance ENUM('DEBIT', 'CREDIT') NOT NULL,
+
+    -- Currency
+    currency_code VARCHAR(10) DEFAULT 'PKR',
+
+    -- Status
+    is_active BOOLEAN DEFAULT TRUE,
+    deleted BOOLEAN DEFAULT FALSE,
+    deleted_at DATETIME NULL,
+    deleted_by BIGINT,
+
+    -- Audit
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    CONSTRAINT fk_gl_accounts_parent
+        FOREIGN KEY (parent_id)
+        REFERENCES gl_accounts(id),
+
+    CONSTRAINT uk_gl_accounts_code
+        UNIQUE (organization_id, account_code)
+);
+
+CREATE INDEX idx_gl_accounts_parent ON gl_accounts(parent_id);
+CREATE INDEX idx_gl_accounts_type ON gl_accounts(account_type);
+CREATE INDEX idx_gl_accounts_active ON gl_accounts(is_active);
+CREATE INDEX idx_gl_accounts_deleted ON gl_accounts(deleted);
+CREATE INDEX idx_gl_accounts_org ON gl_accounts(organization_id);
+CREATE INDEX idx_gl_accounts_campus ON gl_accounts(campus_id);
+
+
+-- Journal Entries (Linked to Academic Year)
+CREATE TABLE gl_journal_entries (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    campus_id BIGINT NULL,
+    academic_year_id BIGINT NOT NULL,
+    entry_date DATE NOT NULL,
+    reference_number VARCHAR(100),
+    description TEXT,
+    entry_type VARCHAR(50),
+    status ENUM('DRAFT', 'POSTED', 'CANCELLED') DEFAULT 'DRAFT',
+    deleted BOOLEAN DEFAULT FALSE,
+    deleted_at DATETIME NULL,
+    deleted_by BIGINT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    CONSTRAINT fk_gl_je_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
+);
+
+-- Journal Entry Lines
+CREATE TABLE gl_journal_entry_lines (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    journal_entry_id BIGINT NOT NULL,
+    account_id BIGINT NOT NULL,
+    description VARCHAR(255),
+    debit DECIMAL(18, 4) DEFAULT 0.0000,
+    credit DECIMAL(18, 4) DEFAULT 0.0000,
+    campus_id BIGINT NULL,
+    reference_id BIGINT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_je_line_entry FOREIGN KEY (journal_entry_id) REFERENCES gl_journal_entries(id),
+    CONSTRAINT fk_je_line_account FOREIGN KEY (account_id) REFERENCES gl_accounts(id)
+);
+
+-- GL Transaction Types
+CREATE TABLE gl_transaction_types (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(50) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(500),
+    is_active BOOLEAN DEFAULT TRUE,
+    deleted BOOLEAN DEFAULT FALSE,
+    deleted_at DATETIME NULL,
+    deleted_by BIGINT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    CONSTRAINT uk_gl_transaction_types_code UNIQUE (organization_id, code)
+);
+
+-- GL Business Keys (Configuration for automated postings)
+CREATE TABLE gl_business_keys (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(50) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    module VARCHAR(100),  -- Fee, HR, Inventory, etc.
+    description VARCHAR(500),
+    is_active BOOLEAN DEFAULT TRUE,
+    deleted BOOLEAN DEFAULT FALSE,
+    deleted_at DATETIME NULL,
+    deleted_by BIGINT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    CONSTRAINT uk_gl_business_keys_code UNIQUE (organization_id, code)
+);
+
+-- GL Posting Keys (Debit/Credit indicators)
+CREATE TABLE gl_posting_keys (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(50) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    account_side ENUM('DEBIT', 'CREDIT') NOT NULL,
+    description VARCHAR(500),
+    is_active BOOLEAN DEFAULT TRUE,
+    deleted BOOLEAN DEFAULT FALSE,
+    deleted_at DATETIME NULL,
+    deleted_by BIGINT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    CONSTRAINT uk_gl_posting_keys_code UNIQUE (organization_id, code)
+);
+
+-- GL Accounting Modules (Fee, HR, Inventory, etc.)
+CREATE TABLE gl_accounting_modules (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    code VARCHAR(50) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    deleted BOOLEAN DEFAULT FALSE,
+    deleted_at DATETIME NULL,
+    deleted_by BIGINT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    CONSTRAINT uk_gl_accounting_modules_code UNIQUE (organization_id, code)
+);
+
+-- GL Account Mappings (Automated Posting Rules)
+CREATE TABLE gl_account_mappings (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    campus_id BIGINT NULL,
+
+    accounting_module_id BIGINT NOT NULL,
+    transaction_type_id BIGINT NOT NULL,
+    business_key_id BIGINT NOT NULL,
+    posting_key_id BIGINT NOT NULL,
+    gl_account_id BIGINT NOT NULL,
+
+    priority_order INT DEFAULT 1,
+    is_active BOOLEAN DEFAULT TRUE,
+    
+    deleted BOOLEAN DEFAULT FALSE,
+    deleted_at DATETIME NULL,
+    deleted_by BIGINT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    CONSTRAINT fk_gl_map_module FOREIGN KEY (accounting_module_id) REFERENCES gl_accounting_modules(id),
+    CONSTRAINT fk_gl_map_trans FOREIGN KEY (transaction_type_id) REFERENCES gl_transaction_types(id),
+    CONSTRAINT fk_gl_map_bkey FOREIGN KEY (business_key_id) REFERENCES gl_business_keys(id),
+    CONSTRAINT fk_gl_map_pkey FOREIGN KEY (posting_key_id) REFERENCES gl_posting_keys(id),
+    CONSTRAINT fk_gl_map_account FOREIGN KEY (gl_account_id) REFERENCES gl_accounts(id)
+);
+
+
+
+

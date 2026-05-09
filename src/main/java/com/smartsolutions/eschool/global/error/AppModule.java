@@ -10,6 +10,7 @@ public enum AppModule {
     SCHOOL("SCH"),
     LOOKUP("LKP"),
     EMPLOYEE("EMP"),
+    FINANCE("FIN"),
     COMMON("COM");
 
     private final String code;

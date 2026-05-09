@@ -56,7 +56,7 @@ public class COASeedService {
         account.setAccountType(type);
         account.setGroup(isGroup);
         account.setNormalBalance(balance);
-        account.setLevel(parent == null ? 1 : parent.getLevel() + 1);
+        account.setLevelNo(parent == null ? 1 : parent.getLevelNo() + 1);
         account.setActive(true);
         
         return glAccountRepository.save(account);

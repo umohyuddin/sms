@@ -11,6 +11,7 @@ import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeeSummary.responseDto.StudentFeeSummaryResponseDto;
 import com.smartsolutions.eschool.student.mapper.StudentFeeSummaryMapper;
 import com.smartsolutions.eschool.student.model.StudentEntity;
+import com.smartsolutions.eschool.student.model.StudentFeeAssignmentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeSummaryEntity;
 import com.smartsolutions.eschool.student.repository.*;
 import com.smartsolutions.eschool.institute.repository.CampusFinancialSettingsRepository;
@@ -116,8 +117,6 @@ public class StudentFeeSummaryService {
                 .orElseGet(() -> {
                     log.info("[Service:StudentFeeSummaryService] Creating new summary entity");
                     StudentFeeSummaryEntity newSummary = new StudentFeeSummaryEntity();
-                    StudentEntity student = studentRepository.findById(studentId)
-                            .orElseThrow(() -> new ResourceNotFoundException("Student not found: " + studentId));
                     AcademicYearEntity academicYear = academicYearRepository.findById(academicYearId)
                             .orElseThrow(() -> new ResourceNotFoundException("Academic Year not found: " + academicYearId));
                     newSummary.setStudent(student);

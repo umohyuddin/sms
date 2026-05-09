@@ -1,5 +1,9 @@
 package com.smartsolutions.eschool.student.service;
 
+import com.smartsolutions.eschool.gl.model.JournalEntryEntity;
+import com.smartsolutions.eschool.gl.model.JournalEntryLineEntity;
+import com.smartsolutions.eschool.gl.service.GLAccountService;
+import com.smartsolutions.eschool.gl.service.JournalEntryService;
 import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
@@ -11,6 +15,7 @@ import com.smartsolutions.eschool.student.dtos.studentFeePayment.responseDto.Stu
 import com.smartsolutions.eschool.student.error.StudentFeeAssignmentErrors;
 import com.smartsolutions.eschool.student.model.*;
 import com.smartsolutions.eschool.student.repository.*;
+import com.smartsolutions.eschool.student.enums.PaymentMode;
 import com.smartsolutions.eschool.institute.enums.LateFeeFrequency;
 import com.smartsolutions.eschool.institute.enums.LateFeeType;
 import com.smartsolutions.eschool.institute.repository.CampusFinancialSettingsRepository;
@@ -391,7 +396,7 @@ public class StudentFeePaymentsService {
         // DEBIT: Cash or Bank
         JournalEntryLineEntity debitLine = new JournalEntryLineEntity();
         String cashAccountCode = "1111"; // Default Cash in Hand
-        if ("Bank".equalsIgnoreCase(payment.getPaymentMode()) || "Online".equalsIgnoreCase(payment.getPaymentMode())) {
+        if (PaymentMode.BANK_TRANSFER.equals(payment.getPaymentMode()) || PaymentMode.ONLINE.equals(payment.getPaymentMode())) {
             cashAccountCode = "1113"; // Bank Account
         }
         debitLine.setAccount(glAccountService.getAccountByCode(payment.getOrganizationId(), cashAccountCode));
