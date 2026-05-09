@@ -51,6 +51,7 @@ public class CampusFinancialSettingsMapper {
         entity.setInvoiceMandatory(dto.getInvoiceMandatory() != null ? dto.getInvoiceMandatory() : false);
         entity.setReceiptMandatory(dto.getReceiptMandatory() != null ? dto.getReceiptMandatory() : true);
         entity.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
+        entity.setFeeRecurrenceRuleId(dto.getFeeRecurrenceRuleId());
         entity.setDeleted(false);
 
         return entity;
@@ -90,6 +91,7 @@ public class CampusFinancialSettingsMapper {
         dto.setInvoiceMandatory(entity.getInvoiceMandatory());
         dto.setReceiptMandatory(entity.getReceiptMandatory());
         dto.setIsActive(entity.getIsActive());
+        dto.setFeeRecurrenceRuleId(entity.getFeeRecurrenceRuleId());
         // dto.setOrganizationId(entity.getOrganizationId());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
@@ -128,6 +130,7 @@ public class CampusFinancialSettingsMapper {
         entity.setInvoiceMandatory(dto.getInvoiceMandatory() != null ? dto.getInvoiceMandatory() : false);
         entity.setReceiptMandatory(dto.getReceiptMandatory() != null ? dto.getReceiptMandatory() : true);
         entity.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
+        entity.setFeeRecurrenceRuleId(dto.getFeeRecurrenceRuleId());
     }
 
     private static void validateDTO(CampusFinancialSettingsRequestDTO dto) {

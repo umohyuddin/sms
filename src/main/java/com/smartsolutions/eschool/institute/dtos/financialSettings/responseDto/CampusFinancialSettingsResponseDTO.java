@@ -60,6 +60,8 @@ public class CampusFinancialSettingsResponseDTO {
     private Boolean receiptMandatory;
     private Boolean isActive;
     private Long organizationId;
+    private Long feeRecurrenceRuleId;
+    private String feeRecurrenceRuleName;
     private java.time.LocalDateTime createdAt;
     private java.time.LocalDateTime updatedAt;
 }

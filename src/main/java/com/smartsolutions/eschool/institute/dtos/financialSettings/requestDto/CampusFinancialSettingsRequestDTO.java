@@ -75,4 +75,6 @@ public class CampusFinancialSettingsRequestDTO {
     private Boolean invoiceMandatory;
     private Boolean receiptMandatory;
     private Boolean isActive;
+
+    private Long feeRecurrenceRuleId;
 }

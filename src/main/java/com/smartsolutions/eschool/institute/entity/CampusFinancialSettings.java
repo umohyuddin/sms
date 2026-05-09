@@ -121,4 +121,7 @@ public class CampusFinancialSettings extends ScopeAuditableEntity {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
+
+    @Column(name = "fee_recurrence_rule_id")
+    private Long feeRecurrenceRuleId;
 }

@@ -1076,6 +1076,7 @@ CREATE TABLE board_member_roles (
         invoice_mandatory BOOLEAN DEFAULT TRUE,
         receipt_mandatory BOOLEAN DEFAULT TRUE,
         is_active BOOLEAN DEFAULT TRUE,
+        fee_recurrence_rule_id BIGINT,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -1088,6 +1089,7 @@ CREATE TABLE board_member_roles (
         FOREIGN KEY (currency_id) REFERENCES currencies(id),
         FOREIGN KEY (tax_type_id) REFERENCES tax_types(id),
         FOREIGN KEY (campus_id) REFERENCES campuses(id),
+        FOREIGN KEY (fee_recurrence_rule_id) REFERENCES fee_recurrence_rules(id),
         UNIQUE (campus_id, academic_year_id)
     );
     CREATE INDEX idx_campus_financial_settings_institute ON campus_financial_settings (institute_id);

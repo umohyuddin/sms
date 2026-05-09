@@ -21,6 +21,7 @@ import com.smartsolutions.eschool.lookups.repository.TaxTypeRepository;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
+import com.smartsolutions.eschool.lookups.repository.FeeRecurrenceRuleRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
     private final CurrencyRepository currencyRepository;
     private final LanguageRepository languageRepository;
     private final TaxTypeRepository taxTypeRepository;
+    private final FeeRecurrenceRuleRepository feeRecurrenceRuleRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -158,6 +160,10 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
         if (dto.getTaxTypeName() == null && dto.getTaxTypeId() != null) {
             taxTypeRepository.findById(dto.getTaxTypeId())
                     .ifPresent(t -> dto.setTaxTypeName(t.getName()));
+        }
+        if (dto.getFeeRecurrenceRuleId() != null) {
+            feeRecurrenceRuleRepository.findById(dto.getFeeRecurrenceRuleId())
+                    .ifPresent(fr -> dto.setFeeRecurrenceRuleName(fr.getName()));
         }
 
         return dto;
