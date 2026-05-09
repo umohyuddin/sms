@@ -395,15 +395,15 @@ VALUES
  NULL, NULL, 'STUDENT', TRUE, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
-INSERT INTO fee_recurrence_rules(code, name, description, is_active, deleted, created_at, created_by, updated_at)
+INSERT INTO fee_recurrence_rules(code, name, occurrence_interval, description, is_active, deleted, created_at, created_by, updated_at)
 VALUES
-('ONE_TIME', 'One Time', 'Fee charged only once (e.g., admission or registration fee)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
-('MONTHLY', 'Monthly', 'Fee charged every month (common for tuition fees)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
-('QUARTERLY', 'Quarterly', 'Fee charged every three months', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
-('HALF_YEARLY', 'HALF YEARLY', 'Fee charged twice in an academic year',TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
-('ANNUAL', 'Annual', 'Fee charged once per academic year',TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
-('PER_TERM', 'Per Term', 'Fee charged per academic term or semester', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
-('ON_DEMAND', 'On Demand', 'Fee charged when a service is used (transport, lab, activity)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP);
+('ONE_TIME', 'One Time', 0, 'Fee charged only once (e.g., admission or registration fee)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
+('MONTHLY', 'Monthly', 1, 'Fee charged every month (common for tuition fees)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
+('QUARTERLY', 'Quarterly', 3, 'Fee charged every three months', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
+('HALF_YEARLY', 'HALF YEARLY', 6, 'Fee charged twice in an academic year',TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
+('ANNUAL', 'Annual', 12, 'Fee charged once per academic year',TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
+('PER_TERM', 'Per Term', 4, 'Fee charged per academic term or semester', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
+('ON_DEMAND', 'On Demand', 0, 'Fee charged when a service is used (transport, lab, activity)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP);
 
 
 

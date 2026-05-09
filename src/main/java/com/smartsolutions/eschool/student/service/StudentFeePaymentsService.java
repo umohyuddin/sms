@@ -131,7 +131,7 @@ public class StudentFeePaymentsService {
         
         // Check Campus Settings first (more specific)
         var campusSettings = campusFinancialSettingsRepository
-                .findByCampusIdAndAcademicYearIdAndDeletedFalse(student.getCampus().getId(), currentYear.getId());
+                .findByCampusIdAndAcademicYearId(student.getCampus().getId(), currentYear.getId());
         
         if (campusSettings.isPresent()) {
             var settings = campusSettings.get();

@@ -82,7 +82,7 @@ public class StudentFeeSummaryService {
         // Late Fee Calculation
         BigDecimal totalLateFee = BigDecimal.ZERO;
         var campusSettings = campusFinancialSettingsRepository
-                .findByCampusIdAndAcademicYearIdAndDeletedFalse(student.getCampus().getId(), academicYearId);
+                .findByCampusIdAndAcademicYearId(student.getCampus().getId(), academicYearId);
         
         if (campusSettings.isPresent()) {
             List<StudentFeeAssignmentEntity> assignments = studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, academicYearId, organizationId);

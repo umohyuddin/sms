@@ -35,4 +35,7 @@ public class FeeRecurrenceRuleEntity extends ScopeAuditableEntity {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
+
+    @Column(name = "occurrence_interval")
+    private Integer occurrenceInterval;
 }

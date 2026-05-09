@@ -39,7 +39,7 @@ public class PaymentReminderScheduledTask {
                 today.plusDays(7), reminderWindowStart);
 
         for (StudentFeeAssignmentEntity assignment : upcomingAssignments) {
-            var settings = campusSettingsRepository.findByCampusIdAndAcademicYearIdAndDeletedFalse(
+            var settings = campusSettingsRepository.findByCampusIdAndAcademicYearId(
                     assignment.getStudent().getCampus().getId(),
                     assignment.getAcademicYear().getId());
 

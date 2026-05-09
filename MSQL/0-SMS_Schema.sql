@@ -798,6 +798,7 @@ CREATE TABLE board_member_roles (
         code VARCHAR(30) UNIQUE NOT NULL,
         name VARCHAR(100) NOT NULL,
         description VARCHAR(255),
+        occurrence_interval INT,
         is_active BOOLEAN NOT NULL DEFAULT TRUE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         created_by BIGINT,

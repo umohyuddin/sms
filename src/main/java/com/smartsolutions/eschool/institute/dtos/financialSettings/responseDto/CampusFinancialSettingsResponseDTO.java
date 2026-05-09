@@ -62,6 +62,8 @@ public class CampusFinancialSettingsResponseDTO {
     private Long organizationId;
     private Long feeRecurrenceRuleId;
     private String feeRecurrenceRuleName;
+    private Integer invoiceGenerationDay;
+    private Integer invoiceDueDay;
     private java.time.LocalDateTime createdAt;
     private java.time.LocalDateTime updatedAt;
 }

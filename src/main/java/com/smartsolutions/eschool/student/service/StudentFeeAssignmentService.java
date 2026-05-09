@@ -18,6 +18,10 @@ import com.smartsolutions.eschool.student.model.FeeRateEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeAssignmentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeSummaryEntity;
+import com.smartsolutions.eschool.institute.entity.CampusFinancialSettings;
+import com.smartsolutions.eschool.institute.repository.CampusFinancialSettingsRepository;
+import com.smartsolutions.eschool.lookups.model.FeeRecurrenceRuleEntity;
+import com.smartsolutions.eschool.lookups.repository.FeeRecurrenceRuleRepository;
 import com.smartsolutions.eschool.student.repository.*;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.transaction.Transactional;
@@ -45,6 +49,8 @@ public class StudentFeeAssignmentService {
     private final InstituteRepository instituteRepository;
     private final DiscountRateRepository discountRateRepository;
     private final StudentDiscountAssignmentService studentDiscountAssignmentService;
+    private final CampusFinancialSettingsRepository campusFinancialSettingsRepository;
+    private final FeeRecurrenceRuleRepository feeRecurrenceRuleRepository;
 
     public StudentFeeAssignmentService(StudentRepository studentRepository, 
             FeeRateRepository feeRateRepository, 
@@ -53,7 +59,9 @@ public class StudentFeeAssignmentService {
             AcademicYearRepository academicYearRepository,
             InstituteRepository instituteRepository,
             DiscountRateRepository discountRateRepository,
-            StudentDiscountAssignmentService studentDiscountAssignmentService) {
+            StudentDiscountAssignmentService studentDiscountAssignmentService,
+            CampusFinancialSettingsRepository campusFinancialSettingsRepository,
+            FeeRecurrenceRuleRepository feeRecurrenceRuleRepository) {
         this.studentRepository = studentRepository;
         this.feeRateRepository = feeRateRepository;
         this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
@@ -62,6 +70,8 @@ public class StudentFeeAssignmentService {
         this.instituteRepository = instituteRepository;
         this.discountRateRepository = discountRateRepository;
         this.studentDiscountAssignmentService = studentDiscountAssignmentService;
+        this.campusFinancialSettingsRepository = campusFinancialSettingsRepository;
+        this.feeRecurrenceRuleRepository = feeRecurrenceRuleRepository;
     }
 
     public boolean isFeeAssigned(Long studentId, Long academicYearId) {
@@ -111,6 +121,16 @@ public class StudentFeeAssignmentService {
                 .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN));
 
         long finalTotalMonths = totalMonths;
+        Integer campusInterval = campusFinancialSettingsRepository
+                .findByCampusIdAndAcademicYearId(dto.getCampusId(), dto.getAcademicYearId())
+                .flatMap(settings -> {
+                    if (settings.getFeeRecurrenceRuleId() != null) {
+                        return feeRecurrenceRuleRepository.findById(settings.getFeeRecurrenceRuleId())
+                                .map(FeeRecurrenceRuleEntity::getOccurrenceInterval);
+                    }
+                    return java.util.Optional.empty();
+                }).orElse(null);
+
         List<StudentFeeAssignmentEntity> assignments = feeRates.stream().map(feeRate -> {
             StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
             assignment.setStudent(student);
@@ -118,11 +138,10 @@ public class StudentFeeAssignmentService {
             assignment.setOrganizationId(organizationId);
             assignment.setAcademicYear(academicYear);
 
-            String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
-                    ? feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getName() : "ONE_TIME";
+            Integer interval = campusInterval != null ? campusInterval : getCatalogRecurrenceInterval(feeRate);
             
             BigDecimal baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount() : BigDecimal.ZERO;
-            BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(recurrenceRule, (int) finalTotalMonths));
+            BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(interval, (int) finalTotalMonths));
             BigDecimal totalAmount = baseAmount.multiply(multiplier);
 
             assignment.setTotalAmount(totalAmount);
@@ -204,6 +223,16 @@ public class StudentFeeAssignmentService {
                 .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN));
 
         long finalTotalMonths = totalMonths;
+        Integer campusInterval = campusFinancialSettingsRepository
+                .findByCampusIdAndAcademicYearId(dto.getCampusId(), dto.getAcademicYearId())
+                .flatMap(settings -> {
+                    if (settings.getFeeRecurrenceRuleId() != null) {
+                        return feeRecurrenceRuleRepository.findById(settings.getFeeRecurrenceRuleId())
+                                .map(FeeRecurrenceRuleEntity::getOccurrenceInterval);
+                    }
+                    return java.util.Optional.empty();
+                }).orElse(null);
+
         List<StudentFeeAssignmentEntity> updatedAssignments = feeRates.stream().map(feeRate -> {
             StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
             assignment.setStudent(student);
@@ -211,11 +240,10 @@ public class StudentFeeAssignmentService {
             assignment.setOrganizationId(organizationId);
             assignment.setAcademicYear(academicYear);
 
-            String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
-                    ? feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getName() : "ONE_TIME";
+            Integer interval = campusInterval != null ? campusInterval : getCatalogRecurrenceInterval(feeRate);
             
             BigDecimal baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount() : BigDecimal.ZERO;
-            BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(recurrenceRule, (int) finalTotalMonths));
+            BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(interval, (int) finalTotalMonths));
             BigDecimal totalAmount = baseAmount.multiply(multiplier);
 
             assignment.setTotalAmount(totalAmount);
@@ -399,25 +427,18 @@ public class StudentFeeAssignmentService {
         log.info("[Service:StudentFeeAssignmentService] deleteAssignment() succeeded");
     }
 
-    private int getRecurrenceMultiplier(String rule, int totalMonths) {
-        if (rule == null)
-            return 1;
-
-        switch (rule.toUpperCase()) {
-            case "ONE_TIME":
-                return 1;
-            case "MONTHLY":
-                return totalMonths;
-            case "BI_MONTHLY":
-                return totalMonths / 2;
-            case "QUARTERLY":
-                return totalMonths / 3;
-            case "HALF_YEARLY":
-                return totalMonths / 6;
-            case "YEARLY":
-                return 1;
-            default:
-                return 1;
+    private Integer getCatalogRecurrenceInterval(FeeRateEntity feeRate) {
+        if (feeRate.getFeeComponent() != null && 
+            feeRate.getFeeComponent().getFeeCatalog() != null && 
+            feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) {
+            return feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getOccurrenceInterval();
         }
+        return 0;
+    }
+
+    private int getRecurrenceMultiplier(Integer interval, int totalMonths) {
+        if (interval == null || interval <= 0)
+            return 1;
+        return totalMonths / interval;
     }
 }

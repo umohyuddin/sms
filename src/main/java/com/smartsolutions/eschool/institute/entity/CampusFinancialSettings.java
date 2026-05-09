@@ -124,4 +124,10 @@ public class CampusFinancialSettings extends ScopeAuditableEntity {
 
     @Column(name = "fee_recurrence_rule_id")
     private Long feeRecurrenceRuleId;
+
+    @Column(name = "invoice_generation_day")
+    private Integer invoiceGenerationDay = 1;
+
+    @Column(name = "invoice_due_day")
+    private Integer invoiceDueDay = 10;
 }

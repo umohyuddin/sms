@@ -52,6 +52,8 @@ public class CampusFinancialSettingsMapper {
         entity.setReceiptMandatory(dto.getReceiptMandatory() != null ? dto.getReceiptMandatory() : true);
         entity.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
         entity.setFeeRecurrenceRuleId(dto.getFeeRecurrenceRuleId());
+        entity.setInvoiceGenerationDay(dto.getInvoiceGenerationDay());
+        entity.setInvoiceDueDay(dto.getInvoiceDueDay());
         entity.setDeleted(false);
 
         return entity;
@@ -92,6 +94,8 @@ public class CampusFinancialSettingsMapper {
         dto.setReceiptMandatory(entity.getReceiptMandatory());
         dto.setIsActive(entity.getIsActive());
         dto.setFeeRecurrenceRuleId(entity.getFeeRecurrenceRuleId());
+        dto.setInvoiceGenerationDay(entity.getInvoiceGenerationDay());
+        dto.setInvoiceDueDay(entity.getInvoiceDueDay());
         // dto.setOrganizationId(entity.getOrganizationId());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
@@ -131,6 +135,8 @@ public class CampusFinancialSettingsMapper {
         entity.setReceiptMandatory(dto.getReceiptMandatory() != null ? dto.getReceiptMandatory() : true);
         entity.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
         entity.setFeeRecurrenceRuleId(dto.getFeeRecurrenceRuleId());
+        entity.setInvoiceGenerationDay(dto.getInvoiceGenerationDay());
+        entity.setInvoiceDueDay(dto.getInvoiceDueDay());
     }
 
     private static void validateDTO(CampusFinancialSettingsRequestDTO dto) {

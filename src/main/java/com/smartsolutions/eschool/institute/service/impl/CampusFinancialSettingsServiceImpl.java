@@ -44,7 +44,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
                 campusId, academicYearId);
 
         CampusFinancialSettings settings = repository
-                .findByCampusIdAndAcademicYearIdJpql(campusId, academicYearId)
+                .findByCampusIdAndAcademicYearId(campusId, academicYearId)
                 .orElseThrow(() -> new ApiException(
                         CampusFinancialSettingsErrors.CAMPUS_FINANCIAL_SETTINGS_NOT_FOUND, HttpStatus.NOT_FOUND));
 
@@ -68,7 +68,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
         }
 
         // Check if settings already exist for this campus and academic year
-        repository.findByCampusIdAndAcademicYearIdJpql(requestDTO.getCampusId(), requestDTO.getAcademicYearId())
+        repository.findByCampusIdAndAcademicYearId(requestDTO.getCampusId(), requestDTO.getAcademicYearId())
                 .ifPresent(existing -> {
                     throw new ApiException(CampusFinancialSettingsErrors.CAMPUS_FINANCIAL_SETTINGS_ALREADY_EXISTS,
                             HttpStatus.CONFLICT);
@@ -91,7 +91,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
         log.info("[Service:CampusFinancialSettingsServiceImpl] update() called - ID: {}, context: {}", id,
                 contextInstituteId);
 
-        CampusFinancialSettings existing = repository.findByIdAndInstituteIdJpql(id, contextInstituteId)
+        CampusFinancialSettings existing = repository.findByIdAndInstituteId(id, contextInstituteId)
                 .orElseThrow(() -> new ApiException(
                         CampusFinancialSettingsErrors.CAMPUS_FINANCIAL_SETTINGS_NOT_FOUND, HttpStatus.NOT_FOUND));
 
@@ -112,7 +112,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
         log.info("[Service:CampusFinancialSettingsServiceImpl] softDeleteById() called - ID: {}, context: {}", id,
                 contextInstituteId);
 
-        CampusFinancialSettings settings = repository.findByIdAndInstituteIdJpql(id, contextInstituteId)
+        CampusFinancialSettings settings = repository.findByIdAndInstituteId(id, contextInstituteId)
                 .orElseThrow(() -> new ApiException(
                         CampusFinancialSettingsErrors.CAMPUS_FINANCIAL_SETTINGS_NOT_FOUND, HttpStatus.NOT_FOUND));
 

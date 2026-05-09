@@ -41,6 +41,7 @@ public class StudentFeeInvoiceService {
     private final StudentRepository studentRepository;
     private final StudentFeeAssignmentRepository assignmentRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final com.smartsolutions.eschool.institute.repository.CampusFinancialSettingsRepository campusFinancialSettingsRepository;
     private final com.smartsolutions.eschool.gl.service.JournalEntryService journalEntryService;
     private final com.smartsolutions.eschool.gl.service.GLAccountService glAccountService;
 
@@ -49,12 +50,14 @@ public class StudentFeeInvoiceService {
             StudentRepository studentRepository,
             StudentFeeAssignmentRepository assignmentRepository,
             AcademicYearRepository academicYearRepository,
+            com.smartsolutions.eschool.institute.repository.CampusFinancialSettingsRepository campusFinancialSettingsRepository,
             com.smartsolutions.eschool.gl.service.JournalEntryService journalEntryService,
             com.smartsolutions.eschool.gl.service.GLAccountService glAccountService) {
         this.invoiceRepository = invoiceRepository;
         this.studentRepository = studentRepository;
         this.assignmentRepository = assignmentRepository;
         this.academicYearRepository = academicYearRepository;
+        this.campusFinancialSettingsRepository = campusFinancialSettingsRepository;
         this.journalEntryService = journalEntryService;
         this.glAccountService = glAccountService;
     }
@@ -178,8 +181,39 @@ public class StudentFeeInvoiceService {
         invoice.setDiscountAmount(BigDecimal.ZERO);
         invoice.setPaidAmount(BigDecimal.ZERO);
         invoice.setBalance(totalInvoiceAmount);
-        invoice.setDueDate(dueDate != null ? dueDate : LocalDate.now().plusDays(15)); // Default 15 days
-        invoice.setInvoiceDate(LocalDate.now());
+
+        // Calculate dynamic Dates from Campus Settings
+        var settings = campusFinancialSettingsRepository
+                .findByCampusIdAndAcademicYearId(student.getCampus().getId(), academicYearId)
+                .orElse(null);
+
+        LocalDate issueDate = LocalDate.now();
+        if (settings != null && settings.getInvoiceGenerationDay() != null) {
+            try {
+                issueDate = LocalDate.of(year, targetMonth, Math.min(settings.getInvoiceGenerationDay(), targetMonth.length(YearMonth.of(year, targetMonth).isLeapYear())));
+            } catch (Exception e) {
+                log.warn("Invalid generation day {} for {} {}, using now", settings.getInvoiceGenerationDay(), month, year);
+            }
+        }
+
+        LocalDate finalDueDate = dueDate;
+        if (finalDueDate == null) {
+            if (settings != null && settings.getInvoiceDueDay() != null) {
+                try {
+                    finalDueDate = LocalDate.of(year, targetMonth, Math.min(settings.getInvoiceDueDay(), targetMonth.length(YearMonth.of(year, targetMonth).isLeapYear())));
+                    if (finalDueDate.isBefore(issueDate)) {
+                        finalDueDate = finalDueDate.plusMonths(1);
+                    }
+                } catch (Exception e) {
+                    finalDueDate = issueDate.plusDays(15);
+                }
+            } else {
+                finalDueDate = issueDate.plusDays(15);
+            }
+        }
+
+        invoice.setDueDate(finalDueDate);
+        invoice.setInvoiceDate(issueDate);
         invoice.setStatus(StudentFeeInvoiceEntity.InvoiceStatus.UNPAID);
         invoice.setOrganizationId(organizationId);
 
