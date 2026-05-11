@@ -3,7 +3,7 @@
 
 
 INSERT INTO education_boards
-(code, name, country_id, description, is_active, is_deleted)
+(code, name, country_id, description, is_active, deleted)
 VALUES
 -- Federal
 ('FBISE', 'Federal Board of Intermediate and Secondary Education', 98,
@@ -101,32 +101,6 @@ VALUES
 ('BISE_GB', 'Board of Intermediate and Secondary Education Gilgit Baltistan', 98,
  'Examination board for Gilgit-Baltistan region.', TRUE, FALSE);
 
--- ============================================
--- Provinces Table Insertions
--- Purpose: Populate the 'provinces' table with administrative regions for each country.
--- Used for address selection in institute, student, and employee forms.
--- ============================================
-
--- Pakistan Provinces
--- ============================================
--- Update Pakistan Provinces
--- ============================================
-
-INSERT INTO provinces (country_id, name, code, is_active, created_by, updated_by)
-VALUES
-(98, 'Punjab', 'PB', TRUE, 1, 1),
-(98, 'Sindh', 'SD', TRUE, 1, 1),
-(98, 'Khyber Pakhtunkhwa', 'KP', TRUE, 1, 1),
-(98, 'Balochistan', 'BL', TRUE, 1, 1),
-(98, 'Islamabad Capital Territory', 'ICT', TRUE, 1, 1),
-(98, 'Gilgit-Baltistan', 'GB', TRUE, 1, 1),
-(98, 'Azad Jammu & Kashmir', 'AJK', TRUE, 1, 1)
-ON DUPLICATE KEY UPDATE
-name = VALUES(name),
-code = VALUES(code),
-is_active = VALUES(is_active),
-updated_by = VALUES(updated_by);
-
 
 -- ============================================================
 -- Sample Data: Admission Types
@@ -138,7 +112,7 @@ updated_by = VALUES(updated_by);
 -- student registration, class assignment, scholarship
 -- management, and special programs.
 -- ============================================================
-INSERT INTO institute_social_links(institute_id, platform, url, is_deleted, created_by)VALUES
+INSERT INTO institute_social_links(institute_id, platform, url, deleted, created_by)VALUES
 (1, 'Facebook',  'https://www.facebook.com/institute1', FALSE, 1),
 (1, 'Instagram', 'https://www.instagram.com/institute1', FALSE, 1),
 (1, 'LinkedIn',  'https://www.linkedin.com/company/institute1', FALSE, 1),
@@ -151,613 +125,49 @@ INSERT INTO institute_social_links(institute_id, platform, url, is_deleted, crea
 -- ============================================================
 -- Lookup Data: Education Levels
 -- ============================================================
-INSERT INTO education_levels (code, name, is_active, is_deleted, created_at, created_by) VALUES
-('PS', 'Early Childhood / Pre-Primary Education', TRUE, FALSE, NOW(), 1),
-('P', 'Primary / Elementary Education', TRUE, FALSE, NOW(), 1),
-('M', 'Lower Secondary / Middle Education', TRUE, FALSE, NOW(), 1),
-('S', 'Upper Secondary / High School', TRUE, FALSE, NOW(), 1),
-('HS', 'Post-Secondary Non-Tertiary', TRUE, FALSE, NOW(), 1),
-('UG', 'Short-Cycle Tertiary / Undergraduate', TRUE, FALSE, NOW(), 1),
-('PG', 'Bachelor / First Tertiary Degree', TRUE, FALSE, NOW(), 1),
-('PG2', 'Master / Second Tertiary Degree', TRUE, FALSE, NOW(), 1),
-('PH', 'Doctoral / Third Tertiary Degree', TRUE, FALSE, NOW(), 1),
-('VT', 'Vocational / Technical Education', TRUE, FALSE, NOW(), 1),
-('AE', 'Adult / Continuing Education', TRUE, FALSE, NOW(), 1);
-
-
-
--- ============================================================
--- Sample Data: Campuses
--- This dataset seeds the 'campuses' table for Smart Solutions
--- School institutes. Each campus is associated with a province
--- and city. These records support student enrollment, fee
--- assignments, timetable, and staff allocation.
--- ============================================================
-
-
-INSERT INTO campuses (organization_id, institute_id, province_id, city_id,
-                      campus_name, contact, email, website, address,
-                      logo, deleted,
-                      created_at, created_by, updated_at, updated_by,
-                      deleted_at, deleted_by)
-VALUES
--- Punjab → Lahore (1)
-(1, 1, 1, 1, 'Downtown Campus', '+92-300-1234567', 'downtown@smarteschool.com',
- 'https://downtown.smarteschool.com', '123 Main Street', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-
--- Punjab → Lahore (1)
-(1, 1, 1, 1, 'Uptown Campus', '+92-300-7654321', 'uptown@smarteschool.com',
- 'https://uptown.smarteschool.com', '456 Park Avenue', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-
--- Sindh → Karachi (5)
-(1, 1, 2, 5, 'Riverside Campus', '+92-301-1112223', 'riverside@smarteschool.com',
- 'https://riverside.smarteschool.com', '789 River Road', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-
--- KPK → Peshawar (9)
-(1, 1, 3, 9, 'Hilltop Campus', '+92-301-3334445', 'hilltop@smarteschool.com',
- 'https://hilltop.smarteschool.com', '101 Hill Street', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-
--- Punjab → Faisalabad (2)
-(1, 1, 1, 2, 'Greenfield Campus', '+92-302-5556667', 'greenfield@smarteschool.com',
- 'https://greenfield.smarteschool.com', '202 Green Road', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-
--- Sindh → Karachi (5)
-(1, 1, 2, 5, 'Seaside Campus', '+92-302-7778889', 'seaside@smarteschool.com',
- 'https://seaside.smarteschool.com', '303 Beach Avenue', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-
--- Punjab → Multan (4)
-(1, 1, 1, 4, 'Central Campus', '+92-303-9990001', 'central@smarteschool.com',
- 'https://central.smarteschool.com', '404 Central Street', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-
--- Sindh → Hyderabad (6)
-(1, 1, 2, 6, 'Lakeside Campus', '+92-303-2223334', 'lakeside@smarteschool.com',
- 'https://lakeside.smarteschool.com', '505 Lake Road', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-
--- Punjab → Rawalpindi (3)
-(1, 1, 1, 3, 'Sunrise Campus', '+92-304-4445556', 'sunrise@smarteschool.com',
- 'https://sunrise.smarteschool.com', '606 Sunrise Blvd', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL),
-
--- Balochistan → Quetta (13)
-(1, 1, 4, 13, 'Maple Campus', '+92-304-6667778', 'maple@smarteschool.com',
- 'https://maple.smarteschool.com', '707 Maple Street', NULL, FALSE,
- NOW(), 1, NOW(), 1, NULL, NULL);
-
-
--- ============================================================
--- Sample Data: Standards / Grades
--- Each campus has 1st Grade → 5th Grade. These standards
--- are used to assign students, teachers, timetables, exams,
--- and fees. The 'deleted' column is FALSE (0) for active records.
--- ============================================================
-
--- Sample standards for 10 campuses
-INSERT INTO standards (organization_id, campus_id, standard_name, created_at, updated_at)
-VALUES
--- Downtown Campus (campus_id = 1)
-(1, 1, '1st Grade', NOW(), NOW()),
-(1, 1, '2nd Grade', NOW(), NOW()),
-(1, 1, '3rd Grade', NOW(), NOW()),
-(1, 1, '4th Grade', NOW(), NOW()),
-(1, 1, '5th Grade', NOW(), NOW()),
-
--- Uptown Campus (campus_id = 2)
-(1, 2, '1st Grade', NOW(), NOW()),
-(1, 2, '2nd Grade', NOW(), NOW()),
-(1, 2, '3rd Grade', NOW(), NOW()),
-(1, 2, '4th Grade', NOW(), NOW()),
-(1, 2, '5th Grade', NOW(), NOW()),
-
--- Riverside Campus (campus_id = 3)
-(1, 3, '1st Grade', NOW(), NOW()),
-(1, 3, '2nd Grade', NOW(), NOW()),
-(1, 3, '3rd Grade', NOW(), NOW()),
-(1, 3, '4th Grade', NOW(), NOW()),
-(1, 3, '5th Grade', NOW(), NOW()),
-
--- Hilltop Campus (campus_id = 4)
-(1, 4, '1st Grade', NOW(), NOW()),
-(1, 4, '2nd Grade', NOW(), NOW()),
-(1, 4, '3rd Grade', NOW(), NOW()),
-(1, 4, '4th Grade', NOW(), NOW()),
-(1, 4, '5th Grade', NOW(), NOW()),
-
--- Greenfield Campus (campus_id = 5)
-(1, 5, '1st Grade', NOW(), NOW()),
-(1, 5, '2nd Grade', NOW(), NOW()),
-(1, 5, '3rd Grade', NOW(), NOW()),
-(1, 5, '4th Grade', NOW(), NOW()),
-(1, 5, '5th Grade', NOW(), NOW()),
-
--- Seaside Campus (campus_id = 6)
-(1, 6, '1st Grade', NOW(), NOW()),
-(1, 6, '2nd Grade', NOW(), NOW()),
-(1, 6, '3rd Grade', NOW(), NOW()),
-(1, 6, '4th Grade', NOW(), NOW()),
-(1, 6, '5th Grade', NOW(), NOW()),
-
--- Central Campus (campus_id = 7)
-(1, 7, '1st Grade', NOW(), NOW()),
-(1, 7, '2nd Grade', NOW(), NOW()),
-(1, 7, '3rd Grade', NOW(), NOW()),
-(1, 7, '4th Grade', NOW(), NOW()),
-(1, 7, '5th Grade', NOW(), NOW()),
-
--- Lakeside Campus (campus_id = 8)
-(1, 8, '1st Grade', NOW(), NOW()),
-(1, 8, '2nd Grade', NOW(), NOW()),
-(1, 8, '3rd Grade', NOW(), NOW()),
-(1, 8, '4th Grade', NOW(), NOW()),
-(1, 8, '5th Grade', NOW(), NOW()),
-
--- Sunrise Campus (campus_id = 9)
-(1, 9, '1st Grade', NOW(), NOW()),
-(1, 9, '2nd Grade', NOW(), NOW()),
-(1, 9, '3rd Grade', NOW(), NOW()),
-(1, 9, '4th Grade', NOW(), NOW()),
-(1, 9, '5th Grade', NOW(), NOW()),
-
--- Maple Campus (campus_id = 10)
-(1, 10, '1st Grade', NOW(), NOW()),
-(1, 10, '2nd Grade', NOW(), NOW()),
-(1, 10, '3rd Grade', NOW(), NOW()),
-(1, 10, '4th Grade', NOW(), NOW()),
-(1, 10, '5th Grade', NOW(), NOW());
-
-
--- ============================================================
--- Sample Data: Sections
--- Each standard (grade) is divided into sections (A/B/C).
--- Sections are used to manage class divisions, student
--- assignments, timetables, and teacher allocation.
--- 'deleted' = 0 indicates active section, 1 indicates soft-deleted.
--- ============================================================
-
-
-INSERT INTO sections (organization_id, standard_id, section_name, created_at, updated_at, deleted, deleted_at)
-VALUES
-    -- Standard 1
-    (1, 1, 'A', NOW(), NOW(), 1, NULL),
-    (1, 1, 'B', NOW(), NOW(), 0, NULL),
-    (1, 1, 'C', NOW(), NOW(), 0, NULL),
-    -- Standard 2
-    (1, 2, 'A', NOW(), NOW(), 0, NULL),
-    (1, 2, 'B', NOW(), NOW(), 0, NULL),
-    (1, 2, 'C', NOW(), NOW(), 0, NULL),
-    -- Standard 3
-    (1, 3, 'A', NOW(), NOW(), 0, NULL),
-    (1, 3, 'B', NOW(), NOW(), 0, NULL),
-    (1, 3, 'C', NOW(), NOW(), 0, NULL),
-    -- Standard 4
-    (1, 4, 'A', NOW(), NOW(), 0, NULL),
-    (1, 4, 'B', NOW(), NOW(), 0, NULL),
-    (1, 4, 'C', NOW(), NOW(), 0, NULL),
-    -- Standard 5
-    (1, 5, 'A', NOW(), NOW(), 0, NULL),
-    (1, 5, 'B', NOW(), NOW(), 0, NULL),
-    (1, 5, 'C', NOW(), NOW(), 0, NULL),
-    -- Standard 6
-    (1, 6, 'A', NOW(), NOW(), 0, NULL),
-    (1, 6, 'B', NOW(), NOW(), 0, NULL),
-    (1, 6, 'C', NOW(), NOW(), 0, NULL),
-    -- Standard 7
-    (1, 7, 'A', NOW(), NOW(), 0, NULL),
-    (1, 7, 'B', NOW(), NOW(), 0, NULL),
-    (1, 7, 'C', NOW(), NOW(), 0, NULL),
-    -- Standard 8
-    (1, 8, 'A', NOW(), NOW(), 0, NULL),
-    (1, 8, 'B', NOW(), NOW(), 0, NULL),
-    (1, 8, 'C', NOW(), NOW(), 0, NULL),
-    -- Standard 9
-    (1, 9, 'A', NOW(), NOW(), 0, NULL),
-    (1, 9, 'B', NOW(), NOW(), 0, NULL),
-    (1, 9, 'C', NOW(), NOW(), 0, NULL),
-    -- Standard 10
-    (1, 10, 'A', NOW(), NOW(), 0, NULL),
-    (1, 10, 'B', NOW(), NOW(), 0, NULL),
-    (1, 10, 'C', NOW(), NOW(), 0, NULL);
-
-
-
--- ============================================================
--- Sample Data: Students
--- Each student is linked to a campus, standard (grade), and
--- section. This data includes basic personal information,
--- contact info, enrollment details, and active status.
--- ============================================================
-
-
-INSERT INTO students
-(organization_id, first_name, full_name, last_name, student_code, date_of_birth, gender, email, phone, address, cnic, passport_number,
- religion, nationality, blood_group, is_active, status, enrollment_date, deleted, campus_id, standard_id, section_id,
- admission_type_id, academic_year_id)
-VALUES (1, 'Ali', 'Ali Khan', 'Khan', 'STU001', '2008-05-15', 'MALE', 'ali.khan1@example.com', '03001234501',
-        'Gulshan-e-Iqbal, Karachi', '42101-1234501-1', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-01-02', 0,
-        1, 1, 1, 1, 3),
-       (1, 'Ayesha', 'Ayesha Malik', 'Malik', 'STU002', '2009-03-21', 'FEMALE', 'ayesha.malik2@example.com', '03001234502',
-        'Model Town, Lahore', '42201-2345602-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-01-04', 0, 1, 1,
-        2, 2, 3),
-       (1, 'Hassan', 'Hassan Ali', 'Ali', 'STU003', '2007-10-11', 'MALE', 'hassan.ali3@example.com', '03001234503',
-        'Cantt Road, Rawalpindi', '42301-3456703-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-01-06', 0,
-        1, 2, 3, 1, 3),
-       (1, 'Fatima', 'Fatima Shah', 'Shah', 'STU004', '2008-12-01', 'FEMALE', 'fatima.shah4@example.com', '03001234504',
-        'North Nazimabad, Karachi', '42401-4567804-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-01-08',
-        0, 2, 2, 4, 3, 3),
-       (1, 'Saad', 'Saad Ahmed', 'Ahmed', 'STU005', '2010-06-18', 'MALE', 'saad.ahmed5@example.com', '03001234505',
-        'F-8 Sector, Islamabad', '42501-5678905-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-01-10', 0, 2,
-        3, 5, 4, 3),
-       (1, 'Zainab', 'Zainab Raza', 'Raza', 'STU006', '2011-01-09', 'FEMALE', 'zainab.raza6@example.com', '03001234506',
-        'Johar Town, Lahore', '42601-6789016-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-01-12', 0, 1, 3,
-        6, 1, 3),
-       (1, 'Ahmed', 'Ahmed Farooq', 'Farooq', 'STU007', '2009-07-19', 'MALE', 'ahmed.farooq7@example.com', '03001234507',
-        'Garden West, Karachi', '42701-7890127-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2025-01-14', 0, 1,
-        4, 7, 2, 3),
-       (1, 'Maryam', 'Maryam Iqbal', 'Iqbal', 'STU008', '2010-11-25', 'FEMALE', 'maryam.iqbal8@example.com', '03001234508',
-        'Bahria Town, Lahore', '42801-8901238-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2025-01-16', 0, 2,
-        4, 8, 3, 3),
-       (1, 'Usman', 'Usman Tariq', 'Tariq', 'STU009', '2008-09-02', 'MALE', 'usman.tariq9@example.com', '03001234509',
-        'Satellite Town, Rawalpindi', '42901-9012349-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-01-18',
-        0, 1, 5, 9, 4, 3),
-    (1, 'Hiba', 'Hiba Rehman', 'Rehman', 'STU010', '2011-02-14', 'FEMALE', 'hiba.rehman10@example.com', '03001234510',
-        'Defence Phase 2, Karachi', '43001-0123420-0', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-01-20', 0,
-        2, 5, 10, 1, 3),
-    (1, 'Bilal', 'Bilal Ahmed', 'Ahmed', 'STU011', '2009-08-05', 'MALE', 'bilal.ahmed11@example.com', '03001234511',
-        'Gulberg, Lahore', '43101-1234511-1', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-01-22', 0, 1, 1, 1,
-        1, 3),
-    (1, 'Sana', 'Sana Tariq', 'Tariq', 'STU012', '2010-03-12', 'FEMALE', 'sana.tariq12@example.com', '03001234512',
-        'Model Town, Lahore', '43201-2345612-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-01-24', 0, 1, 1,
-        2, 2, 3),
-    (1, 'Omar', 'Omar Farooq', 'Farooq', 'STU013', '2008-07-19', 'MALE', 'omar.farooq13@example.com', '03001234513',
-        'Cantt Road, Rawalpindi', '43301-3456713-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-01-26', 0,
-        1, 2, 3, 1, 3),
-    (1, 'Areeba', 'Areeba Shah', 'Shah', 'STU014', '2011-12-25', 'FEMALE', 'areeba.shah14@example.com', '03001234514',
-        'North Nazimabad, Karachi', '43401-4567814-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-01-28',
-        0, 2, 2, 4, 3, 3),
-    (1, 'Hamza', 'Hamza Ali', 'Ali', 'STU015', '2009-05-21', 'MALE', 'hamza.ali15@example.com', '03001234515',
-        'F-8 Sector, Islamabad', '43501-5678915-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-01-30', 0, 2,
-        3, 5, 4, 3),
-    (1, 'Sadia', 'Sadia Raza', 'Raza', 'STU016', '2010-09-14', 'FEMALE', 'sadia.raza16@example.com', '03001234516',
-        'Johar Town, Lahore', '43601-6789016-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-02-01', 0, 1, 3,
-        6, 1, 3),
-    (1, 'Imran', 'Imran Farooq', 'Farooq', 'STU017', '2008-11-11', 'MALE', 'imran.farooq17@example.com', '03001234517',
-        'Garden West, Karachi', '43701-7890117-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2025-02-03', 0, 1,
-        4, 7, 2, 3),
-    (1, 'Huma', 'Huma Iqbal', 'Iqbal', 'STU018', '2010-06-23', 'FEMALE', 'huma.iqbal18@example.com', '03001234518',
-        'Bahria Town, Lahore', '43801-8901218-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2025-02-05', 0, 2,
-        4, 8, 3, 3),
-    (1, 'Naveed', 'Naveed Tariq', 'Tariq', 'STU019', '2009-09-17', 'MALE', 'naveed.tariq19@example.com', '03001234519',
-        'Satellite Town, Rawalpindi', '43901-9012319-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-02-07',
-        0, 1, 5, 9, 4, 3),
-    (1, 'Iram', 'Iram Rehman', 'Rehman', 'STU020', '2011-02-10', 'FEMALE', 'iram.rehman20@example.com', '03001234520',
-        'Defence Phase 2, Karachi', '44001-0123420-0', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-02-09', 0,
-        2, 5, 10, 1, 3),
-    (1, 'Ali', 'Ali Raza', 'Raza', 'STU021', '2008-04-12', 'MALE', 'ali.raza21@example.com', '03001234521',
-        'Gulshan-e-Iqbal, Karachi', '44101-1234521-1', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-02-11', 0,
-        1, 1, 1, 1, 3),
-    (1, 'Sara', 'Sara Ahmed', 'Ahmed', 'STU022', '2009-05-09', 'FEMALE', 'sara.ahmed22@example.com', '03001234522',
-        'Model Town, Lahore', '44201-2345622-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-02-13', 0, 1, 1,
-        2, 2, 3),
-    (1, 'Bilal', 'Bilal Khan', 'Khan', 'STU023', '2007-08-17', 'MALE', 'bilal.khan23@example.com', '03001234523',
-        'Cantt Road, Rawalpindi', '44301-3456723-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-02-15', 0,
-        1, 2, 3, 1, 3),
-    (1, 'Fiza', 'Fiza Shah', 'Shah', 'STU024', '2010-11-20', 'FEMALE', 'fiza.shah24@example.com', '03001234524',
-        'North Nazimabad, Karachi', '44401-4567824-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-02-17',
-        0, 2, 2, 4, 3, 3),
-    (1, 'Owais', 'Owais Farooq', 'Farooq', 'STU025', '2009-02-14', 'MALE', 'owais.farooq25@example.com', '03001234525',
-        'F-8 Sector, Islamabad', '44501-5678925-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-02-19', 0, 2,
-        3, 5, 4, 3),
-    (1, 'Zoya', 'Zoya Iqbal', 'Iqbal', 'STU026', '2011-01-11', 'FEMALE', 'zoya.iqbal26@example.com', '03001234526',
-        'Johar Town, Lahore', '44601-6789026-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-02-21', 0, 1, 3,
-        6, 1, 3),
-    (1, 'Hamza', 'Hamza Tariq', 'Tariq', 'STU027', '2008-03-25', 'MALE', 'hamza.tariq27@example.com', '03001234527',
-        'Garden West, Karachi', '44701-7890127-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2025-02-23', 0, 1,
-        4, 7, 2, 3),
-    (1, 'Aimen', 'Aimen Rehman', 'Rehman', 'STU028', '2010-08-17', 'FEMALE', 'aimen.rehman28@example.com',
-        '03001234528', 'Bahria Town, Lahore', '44801-8901228-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled',
-        '2025-02-25', 0, 2, 4, 8, 3, 3),
-    (1, 'Shahid', 'Shahid Ali', 'Ali', 'STU029', '2009-09-10', 'MALE', 'shahid.ali29@example.com', '03001234529',
-        'Satellite Town, Rawalpindi', '44901-9012329-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-02-27',
-        0, 1, 5, 9, 4, 3),
-    (1, 'Saba', 'Saba Tariq', 'Tariq', 'STU032', '2009-07-12', 'FEMALE', 'saba.tariq32@example.com', '03001234532',
-        'Model Town, Lahore', '45201-2345632-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-03-04', 0, 1, 1,
-        2, 2, 3),
-    (1, 'Rehan', 'Rehan Khan', 'Khan', 'STU033', '2007-08-25', 'MALE', 'rehan.khan33@example.com', '03001234533',
-        'Cantt Road, Rawalpindi', '45301-3456733-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-03-06', 0,
-        1, 2, 3, 1, 3),
-    (1, 'Nida', 'Nida Shah', 'Shah', 'STU034', '2010-12-18', 'FEMALE', 'nida.shah34@example.com', '03001234534',
-        'North Nazimabad, Karachi', '45401-4567834-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-03-08',
-        0, 2, 2, 4, 3, 3),
-    (1, 'Danish', 'Danish Ahmed', 'Ahmed', 'STU035', '2009-06-05', 'MALE', 'danish.ahmed35@example.com', '03001234535',
-        'F-8 Sector, Islamabad', '45501-5678935-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-03-10', 0, 2,
-        3, 5, 4, 3),
-    (1, 'Maryam', 'Maryam Raza', 'Raza', 'STU036', '2011-04-12', 'FEMALE', 'maryam.raza36@example.com', '03001234536',
-        'Johar Town, Lahore', '45601-6789036-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-03-12', 0, 1, 3,
-        6, 1, 3),
-    (1, 'Farhan', 'Farhan Farooq', 'Farooq', 'STU037', '2008-11-11', 'MALE', 'farhan.farooq37@example.com',
-        '03001234537', 'Garden West, Karachi', '45701-7890137-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled',
-        '2025-03-14', 0, 1, 4, 7, 2, 3),
-    (1, 'Sofia', 'Sofia Iqbal', 'Iqbal', 'STU038', '2010-02-14', 'FEMALE', 'sofia.iqbal38@example.com', '03001234538',
-        'Bahria Town, Lahore', '45801-8901238-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2025-03-16', 0, 2,
-        4, 8, 3, 3),
-    (1, 'Asad', 'Asad Tariq', 'Tariq', 'STU039', '2009-09-19', 'MALE', 'asad.tariq39@example.com', '03001234539',
-        'Satellite Town, Rawalpindi', '45901-9012339-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-03-18',
-        0, 1, 5, 9, 4, 3),
-    (1, 'Hina', 'Hina Rehman', 'Rehman', 'STU040', '2011-06-22', 'FEMALE', 'hina.rehman40@example.com', '03001234540',
-        'Defence Phase 2, Karachi', '46001-0123440-0', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-03-20', 0,
-        2, 5, 10, 1, 3),
-    (1, 'Omar', 'Omar Raza', 'Raza', 'STU041', '2008-04-05', 'MALE', 'omar.raza41@example.com', '03001234541',
-        'Gulshan-e-Iqbal, Karachi', '46101-1234541-1', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-03-22', 0,
-        1, 1, 1, 1, 3),
-    (1, 'Ayesha', 'Ayesha Farooq', 'Farooq', 'STU042', '2009-08-14', 'FEMALE', 'ayesha.farooq42@example.com',
-        '03001234542', 'Model Town, Lahore', '46201-2345642-2', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled',
-        '2025-03-24', 0, 1, 1, 2, 2, 3),
-    (1, 'Ali', 'Ali Shah', 'Shah', 'STU043', '2007-09-23', 'MALE', 'ali.shah43@example.com', '03001234543',
-        'Cantt Road, Rawalpindi', '46301-3456743-3', NULL, 'Islam', 'Pakistani', 'O+', 1, 'Enrolled', '2025-03-26', 0,
-        1, 2, 3, 1, 3),
-    (1, 'Sadia', 'Sadia Ahmed', 'Ahmed', 'STU044', '2010-12-05', 'FEMALE', 'sadia.ahmed44@example.com', '03001234544',
-        'North Nazimabad, Karachi', '46401-4567844-4', NULL, 'Islam', 'Pakistani', 'AB+', 1, 'Enrolled', '2025-03-28',
-        0, 2, 2, 4, 3, 3),
-    (1, 'Saad', 'Saad Farooq', 'Farooq', 'STU045', '2009-05-11', 'MALE', 'saad.farooq45@example.com', '03001234545',
-        'F-8 Sector, Islamabad', '46501-5678945-5', NULL, 'Islam', 'Pakistani', 'A-', 1, 'Enrolled', '2025-03-30', 0, 2,
-        3, 5, 4, 3),
-    (1, 'Zoya', 'Zoya Khan', 'Khan', 'STU046', '2011-01-17', 'FEMALE', 'zoya.khan46@example.com', '03001234546',
-        'Johar Town, Lahore', '46601-6789046-6', NULL, 'Islam', 'Pakistani', 'B-', 1, 'Enrolled', '2025-04-01', 0, 1, 3,
-        6, 1, 3),
-    (1, 'Bilal', 'Bilal Tariq', 'Tariq', 'STU047', '2008-03-20', 'MALE', 'bilal.tariq47@example.com', '03001234547',
-        'Garden West, Karachi', '46701-7890147-7', NULL, 'Islam', 'Pakistani', 'O-', 1, 'Enrolled', '2025-04-03', 0, 1,
-        4, 7, 2, 3),
-    (1, 'Hina', 'Hina Iqbal', 'Iqbal', 'STU048', '2010-07-22', 'FEMALE', 'hina.iqbal48@example.com', '03001234548',
-        'Bahria Town, Lahore', '46801-8901248-8', NULL, 'Islam', 'Pakistani', 'AB-', 1, 'Enrolled', '2025-04-05', 0, 2,
-        4, 8, 3, 3),
-    (1, 'Owais', 'Owais Rehman', 'Rehman', 'STU049', '2009-09-14', 'MALE', 'owais.rehman49@example.com', '03001234549',
-        'Satellite Town, Rawalpindi', '46901-9012349-9', NULL, 'Islam', 'Pakistani', 'A+', 1, 'Enrolled', '2025-04-07',
-        0, 1, 5, 9, 4, 3),
-    (1, 'Iram', 'Iram Shah', 'Shah', 'STU050', '2011-02-18', 'FEMALE', 'iram.shah50@example.com', '03001234550',
-        'Defence Phase 2, Karachi', '47001-0123450-0', NULL, 'Islam', 'Pakistani', 'B+', 1, 'Enrolled', '2025-04-09', 0,
-        2, 5, 10, 1, 3);
-
--- ============================================================
-
--- Table: discount_type
--- Fields:
---   code          : Unique identifier for the discount type
---   name          : Descriptive name of the discount category
---   description   : Explains when/how the discount applies
---   is_active     : TRUE if currently applicable
---   priority      : Higher number → higher precedence when multiple discounts apply
---   display_order : Order in which discount types are shown in UI
---   created_by    : User ID who created the record
--- ============================================================
-
-BEGIN;
-
--- ============================================================
--- 1️⃣ discount_type
--- ============================================================
-
-INSERT INTO discount_type
-(organization_id, code, name, description, charge_type, recurrence_rule, active, priority, display_order, created_by)
-VALUES (1, 'MERIT', 'Merit Based Discount',
-        'Academic excellence and result-based scholarships',
-    'PERCENTAGE', 'TERM_WISE', TRUE, 100, 1, 1),
-
-       (1, 'FAMILY', 'Family & Sibling Discount',
-        'Sibling, staff child, alumni-based discounts',
-    'PERCENTAGE', 'MONTHLY', TRUE, 90, 2, 1),
-
-       (1, 'FINANCIAL', 'Financial Assistance',
-        'Need-based and hardship financial support',
-    'FIXED', 'MONTHLY', TRUE, 95, 3, 1),
-
-       (1, 'PERFORMANCE', 'Sports & Co-Curricular',
-        'Sports, leadership, and cultural achievements',
-    'PERCENTAGE', 'TERM_WISE', TRUE, 80, 4, 1),
-
-       (1, 'ATTENDANCE', 'Attendance & Discipline',
-        'Attendance and behavior rewards',
-    'PERCENTAGE', 'MONTHLY', TRUE, 70, 5, 1),
-
-       (1, 'SPECIAL', 'Special Case / Waiver',
-        'Medical, emergency and administrative cases',
-        'FIXED', 'ONE_TIME', TRUE, 60, 6, 1);
-
--- ============================================================
--- 2️⃣ discount_sub_type
--- ============================================================
-
-INSERT INTO discount_sub_type
-(organization_id, code, name, description, discount_type_id, is_active, display_order, created_by)
-VALUES
--- MERIT
-(1, 'MERIT_TOPPER', 'Class Topper', 'Top position holder in class', 1, TRUE, 1, 1),
-(1, 'MERIT_POSITION', 'Board Position', 'Board or grade position holder', 1, TRUE, 2, 1),
-(1, 'MERIT_SUBJECT', 'Subject Excellence', 'Outstanding subject performance', 1, TRUE, 3, 1),
-
--- FAMILY
-(1, 'FAMILY_SIBLING', 'Sibling Discount', 'More than one sibling enrolled', 2, TRUE, 1, 1),
-(1, 'FAMILY_STAFF', 'Staff Child', 'Child of school employee', 2, TRUE, 2, 1),
-
--- FINANCIAL
-(1, 'FINANCIAL_NEED', 'Need Based Support', 'Low income household support', 3, TRUE, 1, 1),
-(1, 'FINANCIAL_ORPHAN', 'Orphan Support', 'Orphan or single guardian case', 3, TRUE, 2, 1),
-
--- PERFORMANCE
-(1, 'SPORTS', 'Sports Achievement', 'District or national sports player', 4, TRUE, 1, 1),
-(1, 'LEADERSHIP', 'Leadership Role', 'Head boy / Head girl / prefect', 4, TRUE, 2, 1),
-
--- ATTENDANCE
-(1, 'ATTEND_100', '100% Attendance', 'Perfect attendance', 5, TRUE, 1, 1),
-(1, 'GOOD_BEHAVIOR', 'Good Behavior', 'Excellent discipline record', 5, TRUE, 2, 1),
-
--- SPECIAL
-(1, 'MEDICAL', 'Medical Emergency', 'Serious medical case', 6, TRUE, 1, 1),
-(1, 'FULL_WAIVER', 'Full Fee Waiver', 'Approved full fee waiver', 6, TRUE, 2, 1);
-
--- ============================================================
--- 3️⃣ discount_rate (REALISTIC % & FIXED VALUES)
--- Academic Year: 2024–2025 (id = 1)
--- Campuses: NULL = global, 1 = Main, 2 = City
--- ============================================================
-INSERT INTO discount_rate
-(organization_id, value, is_percentage, effective_from, effective_to,
- is_active, deleted,
- discount_sub_type_id,
- campus_id, academic_year_id,
- created_by)
-VALUES
-
--- ====================================================
--- MERIT (Term-wise %)
--- ====================================================
-(1, 30, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 1, 1, 3, 1),
-(1, 40, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 2, 1, 3, 1),
-(1, 20, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 1, 1, 3, 1),
-(1, 60, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 2, 1, 3, 1),
-(1, 80, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 3, 1, 3, 1),
-
--- ====================================================
--- FAMILY (Monthly %)
--- ====================================================
-(1, 10, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 4, 1, 3, 1),
-(1, 15, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 4, 1, 3, 1),
-(1, 20, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 5, 1, 3, 1),
-
--- ====================================================
--- FINANCIAL (Monthly FIXED)
--- ====================================================
-(1, 2000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 6, 1, 3, 1),
-(1, 3000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 6, 1, 3, 1),
-(1, 5000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 7, 1, 3, 1),
-
--- ====================================================
--- PERFORMANCE (Term-wise %)
--- ====================================================
-(1, 25, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 8, 1, 3, 1),
-(1, 30, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 9, 1, 3, 1),
-
--- ====================================================
--- ATTENDANCE (Monthly %)
--- ====================================================
-(1, 5, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 10, 1, 3, 1),
-(1, 10, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 10, 1, 3, 1),
-(1, 15, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 11, 1, 3, 1),
-
--- ====================================================
--- SPECIAL (One-time + Full Waiver)
--- ====================================================
-(1, 4000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 12, 1, 3, 1),
-(1, 8000, FALSE, '2024-08-01', '2025-05-31', TRUE, FALSE, 12, 1, 3, 1),
-(1, 100, TRUE, '2024-08-01', '2025-05-31', TRUE, FALSE, 13, 1, 3, 1);
-
-COMMIT;
-
-
-
-INSERT INTO student_fee_assignments
-    (organization_id, student_id, fee_rate_id, total_amount, due_date, assigned_date)
-VALUES
--- Ali (STU001)
-(1, 1, 1, 5000.00, '2025-01-10', '2025-01-02'),
-(1, 1, 4, 20000.00, '2025-01-15', '2025-01-02'),
-(1, 1, 7, 8000.00, '2025-01-20', '2025-01-02'),
-
--- Ayesha (STU002)
-(1, 2, 1, 5000.00, '2025-01-10', '2025-01-04'),
-(1, 2, 4, 20000.00, '2025-01-15', '2025-01-04'),
-
--- Hassan (STU003)
-(1, 3, 1, 5000.00, '2025-01-10', '2025-01-06'),
-(1, 3, 4, 20000.00, '2025-01-15', '2025-01-06'),
-
--- Fatima (STU004)
-(1, 4, 1, 5000.00, '2025-01-10', '2025-01-08'),
-(1, 4, 4, 20000.00, '2025-01-15', '2025-01-08'),
-
--- Saad (STU005)
-(1, 5, 1, 5000.00, '2025-01-10', '2025-01-10'),
-(1, 5, 4, 20000.00, '2025-01-15', '2025-01-10');
-
-
-
-INSERT INTO student_fee_payments
-(organization_id, academic_year_id, student_id, payment_date, amount_paid, payment_month, payment_year, payment_mode)
-VALUES
--- Ali
-(1, 3, 1, '2025-01-12', 5000.00, 'January', 2025, 'Cash'),
-(1, 3, 1, '2025-01-18', 20000.00, 'January', 2025, 'Bank Transfer'),
-
--- Ayesha
-(1, 3, 2, '2025-01-12', 5000.00, 'January', 2025, 'Cash'),
-
--- Hassan
-(1, 3, 3, '2025-01-14', 5000.00, 'January', 2025, 'Cheque'),
-
--- Fatima
-(1, 3, 4, '2025-01-15', 5000.00, 'January', 2025, 'Cash'),
-
--- Saad
-(1, 3, 5, '2025-01-16', 2500.00, 'January', 2025, 'Bank Transfer');
-
-
-
-INSERT INTO student_fee_summary
-    (organization_id, student_id, academic_year_id, total_assigned_fee, total_paid, balance)
-VALUES
--- Ali: Assigned 5000+20000+8000 = 33000, Paid 25000, Balance 8000
-(1, 1, 3, 33000.00, 25000.00, 8000.00),
-
--- Ayesha: Assigned 5000+20000 = 25000, Paid 5000, Balance 20000
-(1, 2, 3, 25000.00, 5000.00, 20000.00),
-
--- Hassan: Assigned 5000+20000 = 25000, Paid 5000, Balance 20000
-(1, 3, 3, 25000.00, 5000.00, 20000.00),
-
--- Fatima: Assigned 5000+20000 = 25000, Paid 5000, Balance 20000
-(1, 4, 3, 25000.00, 5000.00, 20000.00),
-
--- Saad: Assigned 5000+20000 = 25000, Paid 2500, Balance 22500
-(1, 5, 3, 25000.00, 2500.00, 22500.00);
-
-
+INSERT INTO education_levels (code, name, is_active, deleted, created_at, created_by) VALUES
+('PS', 'Early Childhood / Pre-Primary Education', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('P', 'Primary / Elementary Education', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('M', 'Lower Secondary / Middle Education', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('S', 'Upper Secondary / High School', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('HS', 'Post-Secondary Non-Tertiary', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('UG', 'Short-Cycle Tertiary / Undergraduate', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('PG', 'Bachelor / First Tertiary Degree', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('PG2', 'Master / Second Tertiary Degree', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('PH', 'Doctoral / Third Tertiary Degree', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('VT', 'Vocational / Technical Education', TRUE, FALSE, CURRENT_TIMESTAMP, 1),
+('AE', 'Adult / Continuing Education', TRUE, FALSE, CURRENT_TIMESTAMP, 1);
 
 
 INSERT INTO employee_type
 (organization_id, name, description, active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
 VALUES
-(1, 'Teacher', 'General teaching staff', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Head of Department', 'Leads a specific academic department', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Principal', 'Overall in charge of school administration', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Vice Principal', 'Assists the principal in administration', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Lab Instructor', 'Handles lab sessions and practical classes', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Special Education Teacher', 'Works with students requiring special education', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Sports Coach', 'Manages sports and physical activities', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Music Teacher', 'Handles music and arts subjects', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Art Teacher', 'Handles art-related subjects', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Librarian', 'Manages library operations', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Administrator', 'Handles general administration', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Accountant', 'Manages accounts, fees, and payroll', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Receptionist', 'First point of contact for visitors and parents', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'HR Officer', 'Handles recruitment, payroll, and employee welfare', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Clerk', 'General office work', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'IT Support', 'Maintains school IT infrastructure', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Counselor', 'Provides student counseling services', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Nurse', 'Handles student health needs', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Security Guard', 'Maintains school security', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Driver', 'For school transport vehicles', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Janitor', 'Handles cleaning and maintenance', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Cafeteria Staff', 'Manages school cafeteria operations', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Bus Attendant', 'Assists in student transport', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'School Board Member', 'Part of the school board or governing body', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'School Coordinator', 'Coordinates programs and school events', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
-(1, 'Project Manager', 'Handles special projects and development activities', TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL);
+(1, 'Teacher', 'General teaching staff', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Head of Department', 'Leads a specific academic department', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Principal', 'Overall in charge of school administration', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Vice Principal', 'Assists the principal in administration', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Lab Instructor', 'Handles lab sessions and practical classes', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Special Education Teacher', 'Works with students requiring special education', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Sports Coach', 'Manages sports and physical activities', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Music Teacher', 'Handles music and arts subjects', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Art Teacher', 'Handles art-related subjects', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Librarian', 'Manages library operations', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Administrator', 'Handles general administration', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Accountant', 'Manages accounts, fees, and payroll', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Receptionist', 'First point of contact for visitors and parents', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'HR Officer', 'Handles recruitment, payroll, and employee welfare', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Clerk', 'General office work', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'IT Support', 'Maintains school IT infrastructure', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Counselor', 'Provides student counseling services', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Nurse', 'Handles student health needs', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Security Guard', 'Maintains school security', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Driver', 'For school transport vehicles', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Janitor', 'Handles cleaning and maintenance', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Cafeteria Staff', 'Manages school cafeteria operations', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Bus Attendant', 'Assists in student transport', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'School Board Member', 'Part of the school board or governing body', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'School Coordinator', 'Coordinates programs and school events', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL),
+(1, 'Project Manager', 'Handles special projects and development activities', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, NULL, NULL, NULL);
 
 
 INSERT INTO employee_master
@@ -767,106 +177,106 @@ INSERT INTO employee_master
 VALUES
 (1, 'EMP001', 'Uzair', 'Anwar', 'Uzair Anwar', 'MALE', '1990-05-12', 'SINGLE', '2022-01-10', '2022-07-10',
  '03001234567', '03007654321', '0421234567', 'uzair.jpg', 'Software Engineer', 'uzair.anwar@example.com', TRUE,
- 1, NOW(), 1, NOW(), 11),
+ 1, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 11),
 
 (1, 'EMP002', 'Ayesha', 'Khan', 'Ayesha Khan', 'FEMALE', '1988-11-25', 'MARRIED', '2021-06-15', '2021-12-15',
  '03009876543', '03001239876', '0429876543', 'ayesha.jpg', 'HR Manager', 'ayesha.khan@example.com', TRUE, 1,
- NOW(), 1, NOW(), 14),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 14),
 
 (1, 'EMP003', 'Ali', 'Raza', 'Ali Raza', 'MALE', '1992-03-30', 'SINGLE', '2023-03-01', '2023-09-01',
- '03004567890', NULL, '0424567890', 'ali.jpg', 'Accountant', 'ali.raza@example.com', TRUE, 1, NOW(), 1, NOW(), 12),
+ '03004567890', NULL, '0424567890', 'ali.jpg', 'Accountant', 'ali.raza@example.com', TRUE, 1, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 12),
 
 (1, 'EMP004', 'Sana', 'Javed', 'Sana Javed', 'FEMALE', '1995-08-18', 'SINGLE', '2022-09-20', '2023-03-20',
  '03006789012', '03009871234', '0425678901', 'sana.jpg', 'Marketing Executive', 'sana.javed@example.com', TRUE,
- 1, NOW(), 1, NOW(), 11),
+ 1, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 11),
 
 (1, 'EMP005', 'Hamza', 'Shah', 'Hamza Shah', 'MALE', '1985-12-10', 'MARRIED', '2020-05-05', '2020-11-05',
  '03003456789', '03007654321', '0426789012', 'hamza.jpg', 'Finance Manager', 'hamza.shah@example.com', TRUE, 1,
- NOW(), 1, NOW(), 12),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 12),
 
 (1, 'EMP006', 'Sara', 'Malik', 'Sara Malik', 'FEMALE', '1991-07-22', 'SINGLE', '2021-02-15', '2021-08-15',
  '03001112233', '03004445566', '0421122334', 'sara.jpg', 'Software Tester', 'sara.malik@example.com', TRUE, 1,
- NOW(), 1, NOW(), 1),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1),
 
 (1, 'EMP007', 'Bilal', 'Ahmed', 'Bilal Ahmed', 'MALE', '1989-09-09', 'MARRIED', '2020-03-10', '2020-09-10',
  '03002223344', '03005556677', '0422233445', 'bilal.jpg', 'Project Manager', 'bilal.ahmed@example.com', TRUE, 1,
- NOW(), 1, NOW(), 26),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 26),
 
 (1, 'EMP008', 'Hina', 'Saeed', 'Hina Saeed', 'FEMALE', '1993-04-14', 'SINGLE', '2022-05-05', '2022-11-05',
  '03003334455', '03006667788', '0423344556', 'hina.jpg', 'Business Analyst', 'hina.saeed@example.com', TRUE, 1,
- NOW(), 1, NOW(), 11),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 11),
 
 (1, 'EMP009', 'Omar', 'Farooq', 'Omar Farooq', 'MALE', '1990-12-01', 'MARRIED', '2021-01-20', '2021-07-20',
  '03004445566', '03007778899', '0424455667', 'omar.jpg', 'UI/UX Designer', 'omar.farooq@example.com', TRUE, 1,
- NOW(), 1, NOW(), 11),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 11),
 
 (1, 'EMP010', 'Maria', 'Bashir', 'Maria Bashir', 'FEMALE', '1994-06-30', 'SINGLE', '2022-03-15', '2022-09-15',
  '03005556677', '03008889900', '0425566778', 'maria.jpg', 'Content Writer', 'maria.bashir@example.com', TRUE, 1,
- NOW(), 1, NOW(), 11),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 11),
 
 (1, 'EMP011', 'Zain', 'Iqbal', 'Zain Iqbal', 'MALE', '1987-11-11', 'MARRIED', '2020-08-01', '2021-02-01',
  '03006667788', '03009990011', '0426677889', 'zain.jpg', 'Operations Manager', 'zain.iqbal@example.com', TRUE, 1,
- NOW(), 1, NOW(), 11),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 11),
 
 (1, 'EMP012', 'Amina', 'Khalid', 'Amina Khalid', 'FEMALE', '1992-01-25', 'SINGLE', '2021-12-05', '2022-06-05',
  '03007778899', '03001110022', '0427788990', 'amina.jpg', 'Graphic Designer', 'amina.khalid@example.com', TRUE, 1,
- NOW(), 1, NOW(), 11),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 11),
 
 (1, 'EMP013', 'Naveed', 'Hussain', 'Naveed Hussain', 'MALE', '1986-05-18', 'MARRIED', '2019-09-15', '2020-03-15',
  '03008889900', '03002220033', '0428899001', 'naveed.jpg', 'Database Admin', 'naveed.hussain@example.com', TRUE, 1,
- NOW(), 1, NOW(), 12),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 12),
 
 (1, 'EMP014', 'Fatima', 'Rashid', 'Fatima Rashid', 'FEMALE', '1995-10-12', 'SINGLE', '2022-11-10', '2023-05-10',
  '03009990011', '03003331122', '0429900112', 'fatima.jpg', 'Digital Marketer', 'fatima.rashid@example.com', TRUE, 1,
- NOW(), 1, NOW(), 11),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 11),
 
 (1, 'EMP015', 'Adnan', 'Qureshi', 'Adnan Qureshi', 'MALE', '1988-02-28', 'MARRIED', '2020-06-20', '2020-12-20',
  '03001112234', '03004445567', '0421011123', 'adnan.jpg', 'DevOps Engineer', 'adnan.qureshi@example.com', TRUE, 1,
- NOW(), 1, NOW(), 1),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1),
 
 (1, 'EMP016', 'Iqra', 'Naz', 'Iqra Naz', 'FEMALE', '1993-09-19', 'SINGLE', '2021-07-25', '2022-01-25',
  '03002223345', '03005556678', '0422122234', 'iqra.jpg', 'SEO Specialist', 'iqra.naz@example.com', TRUE, 1,
- NOW(), 1, NOW(), 11),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 11),
 
 (1, 'EMP017', 'Fahad', 'Jamil', 'Fahad Jamil', 'MALE', '1990-08-08', 'SINGLE', '2022-02-10', '2022-08-10',
  '03003334456', '03006667789', '0423233345', 'fahad.jpg', 'Network Engineer', 'fahad.jamil@example.com', TRUE, 1,
- NOW(), 1, NOW(), 16),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 16),
 
 (1, 'EMP018', 'Noor', 'Aziz', 'Noor Aziz', 'FEMALE', '1991-03-05', 'SINGLE', '2021-09-15', '2022-03-15',
  '03004445567', '03007778890', '0424344456', 'noor.jpg', 'Customer Support', 'noor.aziz@example.com', TRUE, 1,
- NOW(), 1, NOW(), 16),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 16),
 
 (1, 'EMP019', 'Tariq', 'Shafiq', 'Tariq Shafiq', 'MALE', '1989-12-22', 'MARRIED', '2020-11-01', '2021-05-01',
  '03005556678', '03008889901', '0425455567', 'tariq.jpg', 'IT Support', 'tariq.shafiq@example.com', TRUE, 1,
- NOW(), 1, NOW(), 16),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 16),
 
 (1, 'EMP020', 'Zoya', 'Irfan', 'Zoya Irfan', 'FEMALE', '1994-07-17', 'SINGLE', '2022-04-01', '2022-10-01',
  '03006667789', '03009990012', '0426566678', 'zoya.jpg', 'Front-end Developer', 'zoya.irfan@example.com', TRUE, 1,
- NOW(), 1, NOW(), 1),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1),
 
 (1, 'EMP021', 'Usman', 'Fahim', 'Usman Fahim', 'MALE', '1987-10-30', 'MARRIED', '2019-08-10', '2020-02-10',
  '03007778890', '03001110023', '0427677789', 'usman.jpg', 'Back-end Developer', 'usman.fahim@example.com', TRUE, 1,
- NOW(), 1, NOW(), 1),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1),
 
 (1, 'EMP022', 'Mahnoor', 'Aslam', 'Mahnoor Aslam', 'FEMALE', '1992-05-27', 'SINGLE', '2021-05-20', '2021-11-20',
  '03008889901', '03002220034', '0428788990', 'mahnoor.jpg', 'QA Analyst', 'mahnoor.aslam@example.com', TRUE, 1,
- NOW(), 1, NOW(), 1),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1),
 
 (1, 'EMP023', 'Rashid', 'Babar', 'Rashid Babar', 'MALE', '1985-09-14', 'MARRIED', '2019-12-15', '2020-06-15',
  '03009990012', '03003331123', '0429899001', 'rashid.jpg', 'Security Officer', 'rashid.babar@example.com', TRUE, 1,
- NOW(), 1, NOW(), 19),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 19),
 
 (1, 'EMP024', 'Hira', 'Shamim', 'Hira Shamim', 'FEMALE', '1993-01-10', 'SINGLE', '2021-10-05', '2022-04-05',
  '03001110024', '03004445568', '0421011124', 'hira.jpg', 'Receptionist', 'hira.shamim@example.com', TRUE, 1,
- NOW(), 1, NOW(), 13),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 13),
 
 (1, 'EMP025', 'Kamran', 'Latif', 'Kamran Latif', 'MALE', '1988-06-06', 'MARRIED', '2020-02-10', '2020-08-10',
  '03002220035', '03005556679', '0422122235', 'kamran.jpg', 'HR Executive', 'kamran.latif@example.com', TRUE, 1,
- NOW(), 1, NOW(), 14),
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 14),
 
 (1, 'EMP026', 'Sadia', 'Naeem', 'Sadia Naeem', 'FEMALE', '1995-11-20', 'SINGLE', '2022-06-10', '2022-12-10',
  '03003331125', '03006667790', '0423233346', 'sadia.jpg', 'Software Developer', 'sadia.naeem@example.com', TRUE, 1,
- NOW(), 1, NOW(), 1);
+ CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1);
 
 INSERT INTO departments (organization_id, department_code, department_name, description, parent_id, head_employee_id, active)
 VALUES
@@ -894,30 +304,30 @@ VALUES
 
 
 INSERT INTO designations
-(organization_id, designation_code, designation_name, description, department_id, employee_type_id, active)
+(organization_id, designation_code, designation_name, description, active)
 VALUES
 -- School level roles (Management)
-(1, 'DES001', 'Principal', 'Head of the school', NULL, 3, TRUE),
-(1, 'DES002', 'Vice Principal', 'Assistant head of school', NULL, 3, TRUE),
-(1, 'DES003', 'School Accountant', 'Handles school financials', 3, 2, TRUE),
+(1, 'DES001', 'Principal', 'Head of the school', TRUE),
+(1, 'DES002', 'Vice Principal', 'Assistant head of school', TRUE),
+(1, 'DES003', 'School Accountant', 'Handles school financials', TRUE),
 
 -- Science Faculty roles (Teachers)
-(1, 'DES004', 'Senior Physics Teacher', 'Experienced physics teacher', 4, 1, TRUE),
-(1, 'DES005', 'Junior Physics Teacher', 'Junior-level physics teacher', 4, 1, TRUE),
-(1, 'DES006', 'Senior Chemistry Teacher', 'Experienced chemistry teacher', 5, 1, TRUE),
-(1, 'DES007', 'Junior Chemistry Teacher', 'Junior-level chemistry teacher', 5, 1, TRUE),
-(1, 'DES008', 'Senior Biology Teacher', 'Experienced biology teacher', 6, 1, TRUE),
-(1, 'DES009', 'Junior Biology Teacher', 'Junior-level biology teacher', 6, 1, TRUE),
+(1, 'DES004', 'Senior Physics Teacher', 'Experienced physics teacher', TRUE),
+(1, 'DES005', 'Junior Physics Teacher', 'Junior-level physics teacher', TRUE),
+(1, 'DES006', 'Senior Chemistry Teacher', 'Experienced chemistry teacher', TRUE),
+(1, 'DES007', 'Junior Chemistry Teacher', 'Junior-level chemistry teacher', TRUE),
+(1, 'DES008', 'Senior Biology Teacher', 'Experienced biology teacher', TRUE),
+(1, 'DES009', 'Junior Biology Teacher', 'Junior-level biology teacher', TRUE),
 
 -- Arts Faculty roles (Teachers)
-(1, 'DES010', 'History Teacher', 'Teaches history', 2, 1, TRUE),
-(1, 'DES011', 'Literature Teacher', 'Teaches literature', 2, 1, TRUE),
-(1, 'DES012', 'Fine Arts Teacher', 'Teaches arts', 2, 1, TRUE),
+(1, 'DES010', 'History Teacher', 'Teaches history', TRUE),
+(1, 'DES011', 'Literature Teacher', 'Teaches literature', TRUE),
+(1, 'DES012', 'Fine Arts Teacher', 'Teaches arts', TRUE),
 
 -- Commerce Faculty roles (Teachers)
-(1, 'DES013', 'Accounting Teacher', 'Teaches accounting', 3, 1, TRUE),
-(1, 'DES014', 'Business Administration Teacher', 'Teaches business administration', 3, 1, TRUE),
-(1, 'DES015', 'Economics Teacher', 'Teaches economics', 3, 1, TRUE);
+(1, 'DES013', 'Accounting Teacher', 'Teaches accounting', TRUE),
+(1, 'DES014', 'Business Administration Teacher', 'Teaches business administration', TRUE),
+(1, 'DES015', 'Economics Teacher', 'Teaches economics', TRUE);
 
 
 -- =====================================
@@ -926,32 +336,32 @@ VALUES
 INSERT INTO salary_structure
 (organization_id, employee_type_id, base_salary, effective_from, effective_to, deleted, created_at, created_by)
 VALUES
-(1, 1, 50000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Teacher
-(1, 2, 70000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Head of Department
-(1, 3, 120000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Principal
-(1, 4, 100000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Vice Principal
-(1, 5, 40000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Lab Instructor
-(1, 6, 55000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Special Education Teacher
-(1, 7, 45000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Sports Coach
-(1, 8, 45000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Music Teacher
-(1, 9, 45000, '2025-01-01', NULL, FALSE, NOW(), 101),   -- Art Teacher
-(1, 10, 50000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Librarian
-(1, 11, 60000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Administrator
-(1, 12, 70000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Accountant
-(1, 13, 35000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Receptionist
-(1, 14, 65000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- HR Officer
-(1, 15, 30000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Clerk
-(1, 16, 60000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- IT Support
-(1, 17, 50000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Counselor
-(1, 18, 40000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Nurse
-(1, 19, 30000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Security Guard
-(1, 20, 25000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Driver
-(1, 21, 25000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Janitor
-(1, 22, 30000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Cafeteria Staff
-(1, 23, 25000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- Bus Attendant
-(1, 24, 150000, '2025-01-01', NULL, FALSE, NOW(), 101), -- School Board Member
-(1, 25, 70000, '2025-01-01', NULL, FALSE, NOW(), 101),  -- School Coordinator
-(1, 26, 80000, '2025-01-01', NULL, FALSE, NOW(), 101);  -- Project Manager
+(1, 1, 50000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),   -- Teacher
+(1, 2, 70000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),   -- Head of Department
+(1, 3, 120000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Principal
+(1, 4, 100000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Vice Principal
+(1, 5, 40000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),   -- Lab Instructor
+(1, 6, 55000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),   -- Special Education Teacher
+(1, 7, 45000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),   -- Sports Coach
+(1, 8, 45000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),   -- Music Teacher
+(1, 9, 45000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),   -- Art Teacher
+(1, 10, 50000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Librarian
+(1, 11, 60000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Administrator
+(1, 12, 70000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Accountant
+(1, 13, 35000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Receptionist
+(1, 14, 65000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- HR Officer
+(1, 15, 30000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Clerk
+(1, 16, 60000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- IT Support
+(1, 17, 50000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Counselor
+(1, 18, 40000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Nurse
+(1, 19, 30000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Security Guard
+(1, 20, 25000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Driver
+(1, 21, 25000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Janitor
+(1, 22, 30000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Cafeteria Staff
+(1, 23, 25000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- Bus Attendant
+(1, 24, 150000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101), -- School Board Member
+(1, 25, 70000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101),  -- School Coordinator
+(1, 26, 80000, '2025-01-01', NULL, FALSE, CURRENT_TIMESTAMP, 101);  -- Project Manager
 
 -- =====================================
 -- 2️⃣ Salary Components
@@ -994,109 +404,109 @@ INSERT INTO salary_component (organization_id, name, type, is_percentage) VALUES
 INSERT INTO salary_structure_component
 (organization_id, salary_structure_id, component_id, value, created_at, created_by)
 VALUES
-(1, 1, 1, 20, NOW(), 101),    -- HRA 20%
-(1, 1, 2, 10, NOW(), 101),    -- DA 10%
-(1, 1, 3, 5000, NOW(), 101),  -- Conveyance fixed
-(1, 1, 4, 3000, NOW(), 101),  -- Medical fixed
-(1, 1, 14, 5, NOW(), 101),    -- Project Bonus 5%
-(1, 1, 15, 10, NOW(), 101),   -- PF deduction 10%
-(1, 1, 16, 5, NOW(), 101);    -- Tax deduction 5%
+(1, 1, 1, 20, CURRENT_TIMESTAMP, 101),    -- HRA 20%
+(1, 1, 2, 10, CURRENT_TIMESTAMP, 101),    -- DA 10%
+(1, 1, 3, 5000, CURRENT_TIMESTAMP, 101),  -- Conveyance fixed
+(1, 1, 4, 3000, CURRENT_TIMESTAMP, 101),  -- Medical fixed
+(1, 1, 14, 5, CURRENT_TIMESTAMP, 101),    -- Project Bonus 5%
+(1, 1, 15, 10, CURRENT_TIMESTAMP, 101),   -- PF deduction 10%
+(1, 1, 16, 5, CURRENT_TIMESTAMP, 101);    -- Tax deduction 5%
 
 -- For Head of Department (salary_structure_id = 2)
 INSERT INTO salary_structure_component
 (organization_id, salary_structure_id, component_id, value, created_at, created_by)
 VALUES
-(1, 2, 1, 25, NOW(), 101),    -- HRA 25%
-(1, 2, 2, 12, NOW(), 101),    -- DA 12%
-(1, 2, 3, 6000, NOW(), 101),  -- Conveyance fixed
-(1, 2, 4, 4000, NOW(), 101),  -- Medical fixed
-(1, 2, 5, 7, NOW(), 101),     -- Special Allowance 7%
-(1, 2, 15, 10, NOW(), 101),   -- PF deduction 10%
-(1, 2, 16, 5, NOW(), 101);    -- Tax deduction 5%
+(1, 2, 1, 25, CURRENT_TIMESTAMP, 101),    -- HRA 25%
+(1, 2, 2, 12, CURRENT_TIMESTAMP, 101),    -- DA 12%
+(1, 2, 3, 6000, CURRENT_TIMESTAMP, 101),  -- Conveyance fixed
+(1, 2, 4, 4000, CURRENT_TIMESTAMP, 101),  -- Medical fixed
+(1, 2, 5, 7, CURRENT_TIMESTAMP, 101),     -- Special Allowance 7%
+(1, 2, 15, 10, CURRENT_TIMESTAMP, 101),   -- PF deduction 10%
+(1, 2, 16, 5, CURRENT_TIMESTAMP, 101);    -- Tax deduction 5%
 
 -- For Principal (salary_structure_id = 3)
 INSERT INTO salary_structure_component
 (organization_id, salary_structure_id, component_id, value, created_at, created_by)
 VALUES
-(1, 3, 1, 30, NOW(), 101),    -- HRA 30%
-(1, 3, 2, 15, NOW(), 101),    -- DA 15%
-(1, 3, 3, 7000, NOW(), 101),  -- Conveyance fixed
-(1, 3, 4, 5000, NOW(), 101),  -- Medical fixed
-(1, 3, 5, 10, NOW(), 101),    -- Special Allowance 10%
-(1, 3, 15, 12, NOW(), 101),   -- PF deduction 12%
-(1, 3, 16, 8, NOW(), 101);    -- Tax deduction 8%
+(1, 3, 1, 30, CURRENT_TIMESTAMP, 101),    -- HRA 30%
+(1, 3, 2, 15, CURRENT_TIMESTAMP, 101),    -- DA 15%
+(1, 3, 3, 7000, CURRENT_TIMESTAMP, 101),  -- Conveyance fixed
+(1, 3, 4, 5000, CURRENT_TIMESTAMP, 101),  -- Medical fixed
+(1, 3, 5, 10, CURRENT_TIMESTAMP, 101),    -- Special Allowance 10%
+(1, 3, 15, 12, CURRENT_TIMESTAMP, 101),   -- PF deduction 12%
+(1, 3, 16, 8, CURRENT_TIMESTAMP, 101);    -- Tax deduction 8%
 
 -- For Vice Principal (salary_structure_id = 4)
 INSERT INTO salary_structure_component
 (organization_id, salary_structure_id, component_id, value, created_at, created_by)
 VALUES
-(1, 4, 1, 28, NOW(), 101),
-(1, 4, 2, 13, NOW(), 101),
-(1, 4, 3, 6500, NOW(), 101),
-(1, 4, 4, 4500, NOW(), 101),
-(1, 4, 5, 8, NOW(), 101),
-(1, 4, 15, 11, NOW(), 101),
-(1, 4, 16, 6, NOW(), 101);
+(1, 4, 1, 28, CURRENT_TIMESTAMP, 101),
+(1, 4, 2, 13, CURRENT_TIMESTAMP, 101),
+(1, 4, 3, 6500, CURRENT_TIMESTAMP, 101),
+(1, 4, 4, 4500, CURRENT_TIMESTAMP, 101),
+(1, 4, 5, 8, CURRENT_TIMESTAMP, 101),
+(1, 4, 15, 11, CURRENT_TIMESTAMP, 101),
+(1, 4, 16, 6, CURRENT_TIMESTAMP, 101);
 
 
 -- =====================================
 -- 4️⃣ Employee Salary (calculated realistically)
 -- =====================================
 INSERT INTO employee_salary (organization_id, employee_id, salary_structure_id, gross_salary, total_deductions, net_salary, effective_date, deleted, created_at, created_by) VALUES
-(1, 1, 1, 71000, 13100, 57900, '2025-12-01', FALSE, NOW(), 101),
-(1, 2, 2, 106500, 19050, 87450, '2025-12-01', FALSE, NOW(), 101),
-(1, 3, 3, 194000, 33800, 160200, '2025-12-01', FALSE, NOW(), 101),
-(1, 4, 4, 148500, 24000, 124500, '2025-12-01', FALSE, NOW(), 101),
-(1, 5, 5, 48000, 9000, 39000, '2025-12-01', FALSE, NOW(), 101),
-(1, 6, 6, 68000, 12000, 56000, '2025-12-01', FALSE, NOW(), 101),
-(1, 7, 7, 51000, 8500, 42500, '2025-12-01', FALSE, NOW(), 101),
-(1, 8, 8, 53000, 8800, 44200, '2025-12-01', FALSE, NOW(), 101),
-(1, 9, 9, 52000, 8600, 43400, '2025-12-01', FALSE, NOW(), 101),
-(1, 10, 10, 70500, 13000, 57500, '2025-12-01', FALSE, NOW(), 101),
-(1, 11, 11, 90000, 17500, 72500, '2025-12-01', FALSE, NOW(), 101),
-(1, 12, 12, 105000, 20000, 85000, '2025-12-01', FALSE, NOW(), 101),
-(1, 13, 13, 42000, 7500, 34500, '2025-12-01', FALSE, NOW(), 101),
-(1, 14, 14, 86000, 16000, 70000, '2025-12-01', FALSE, NOW(), 101),
-(1, 15, 15, 35000, 6000, 29000, '2025-12-01', FALSE, NOW(), 101),
-(1, 16, 16, 88000, 17000, 71000, '2025-12-01', FALSE, NOW(), 101),
-(1, 17, 17, 71000, 13500, 57500, '2025-12-01', FALSE, NOW(), 101),
-(1, 18, 18, 52000, 10000, 42000, '2025-12-01', FALSE, NOW(), 101),
-(1, 19, 19, 36000, 6500, 29500, '2025-12-01', FALSE, NOW(), 101),
-(1, 20, 20, 30000, 5000, 25000, '2025-12-01', FALSE, NOW(), 101),
-(1, 21, 21, 30000, 5000, 25000, '2025-12-01', FALSE, NOW(), 101),
-(1, 22, 22, 36000, 7000, 29000, '2025-12-01', FALSE, NOW(), 101),
-(1, 23, 23, 30000, 5000, 25000, '2025-12-01', FALSE, NOW(), 101),
-(1, 24, 24, 210000, 40000, 170000, '2025-12-01', FALSE, NOW(), 101),
-(1, 25, 25, 105000, 20000, 85000, '2025-12-01', FALSE, NOW(), 101),
-(1, 26, 26, 120000, 25000, 95000, '2025-12-01', FALSE, NOW(), 101);
+(1, 1, 1, 71000, 13100, 57900, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 2, 2, 106500, 19050, 87450, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 3, 3, 194000, 33800, 160200, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 4, 4, 148500, 24000, 124500, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 5, 5, 48000, 9000, 39000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 6, 6, 68000, 12000, 56000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 7, 7, 51000, 8500, 42500, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 8, 8, 53000, 8800, 44200, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 9, 9, 52000, 8600, 43400, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 10, 10, 70500, 13000, 57500, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 11, 11, 90000, 17500, 72500, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 12, 12, 105000, 20000, 85000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 13, 13, 42000, 7500, 34500, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 14, 14, 86000, 16000, 70000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 15, 15, 35000, 6000, 29000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 16, 16, 88000, 17000, 71000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 17, 17, 71000, 13500, 57500, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 18, 18, 52000, 10000, 42000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 19, 19, 36000, 6500, 29500, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 20, 20, 30000, 5000, 25000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 21, 21, 30000, 5000, 25000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 22, 22, 36000, 7000, 29000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 23, 23, 30000, 5000, 25000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 24, 24, 210000, 40000, 170000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 25, 25, 105000, 20000, 85000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 26, 26, 120000, 25000, 95000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101);
 
 -- =====================================
 -- 5️⃣ Employee Deductions
 -- =====================================
 INSERT INTO employee_deduction (organization_id, employee_id, deduction_type, amount, month, deleted, created_at, created_by) VALUES
-(1, 1, 'PF', 6000, '2025-12-01', FALSE, NOW(), 101),
-(1, 1, 'Tax', 7100, '2025-12-01', FALSE, NOW(), 101),
-(1, 2, 'PF', 8400, '2025-12-01', FALSE, NOW(), 101),
-(1, 2, 'Tax', 10650, '2025-12-01', FALSE, NOW(), 101),
-(1, 3, 'PF', 14400, '2025-12-01', FALSE, NOW(), 101),
-(1, 3, 'Tax', 19400, '2025-12-01', FALSE, NOW(), 101),
-(1, 4, 'PF', 12000, '2025-12-01', FALSE, NOW(), 101),
-(1, 4, 'Tax', 12000, '2025-12-01', FALSE, NOW(), 101),
+(1, 1, 'PF', 6000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 1, 'Tax', 7100, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 2, 'PF', 8400, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 2, 'Tax', 10650, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 3, 'PF', 14400, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 3, 'Tax', 19400, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 4, 'PF', 12000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 4, 'Tax', 12000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
 -- ...continue for all employees 5-26 similarly...
-(1, 26, 'PF', 24000, '2025-12-01', FALSE, NOW(), 101),
-(1, 26, 'Tax', 1000, '2025-12-01', FALSE, NOW(), 101);
+(1, 26, 'PF', 24000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101),
+(1, 26, 'Tax', 1000, '2025-12-01', FALSE, CURRENT_TIMESTAMP, 101);
 
 -- =====================================
 -- 6️⃣ Salary Payments
 -- =====================================
 INSERT INTO salary_payment (organization_id, employee_salary_id, payment_date, payment_mode, transaction_reference, amount_paid, remarks, deleted, created_at)
 VALUES
-(1, 1, '2025-12-31', 'BANK_TRANSFER', 'TXN1001', 57900, 'December salary', FALSE, NOW()),
-(1, 2, '2025-12-31', 'CHEQUE', 'CHQ1002', 87450, 'December salary', FALSE, NOW()),
-(1, 3, '2025-12-31', 'BANK_TRANSFER', 'TXN1003', 160200, 'December salary', FALSE, NOW()),
-(1, 4, '2025-12-31', 'BANK_TRANSFER', 'TXN1004', 124500, 'December salary', FALSE, NOW()),
+(1, 1, '2025-12-31', 'BANK_TRANSFER', 'TXN1001', 57900, 'December salary', FALSE, CURRENT_TIMESTAMP),
+(1, 2, '2025-12-31', 'CHEQUE', 'CHQ1002', 87450, 'December salary', FALSE, CURRENT_TIMESTAMP),
+(1, 3, '2025-12-31', 'BANK_TRANSFER', 'TXN1003', 160200, 'December salary', FALSE, CURRENT_TIMESTAMP),
+(1, 4, '2025-12-31', 'BANK_TRANSFER', 'TXN1004', 124500, 'December salary', FALSE, CURRENT_TIMESTAMP),
 -- ... continue for all employees ...
-(1, 26, '2025-12-31', 'BANK_TRANSFER', 'TXN1026', 95000, 'December salary', FALSE, NOW());
+(1, 26, '2025-12-31', 'BANK_TRANSFER', 'TXN1026', 95000, 'December salary', FALSE, CURRENT_TIMESTAMP);
 
 
 INSERT INTO employee_department_history
@@ -1128,49 +538,49 @@ INSERT INTO employee_designation_history
 (organization_id, employee_id, designation_id, department_id, start_date, end_date, is_current, created_at, created_by)
 VALUES
 -- Employee 1 – Teacher → Senior Biology Teacher
-(1, 1, 9, 6, '2022-01-10 09:00:00', '2023-06-30 18:00:00', FALSE, NOW(), 1),
-(1, 1, 8, 6, '2023-07-01 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 1, 9, 6, '2022-01-10 09:00:00', '2023-06-30 18:00:00', FALSE, CURRENT_TIMESTAMP, 1),
+(1, 1, 8, 6, '2023-07-01 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 2 – Vice Principal
-(1, 2, 2, NULL, '2021-06-15 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 2, 2, NULL, '2021-06-15 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 3 – Accountant
-(1, 3, 3, 3, '2023-03-01 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 3, 3, 3, '2023-03-01 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 4 – Junior → Senior Physics Teacher
-(1, 4, 5, 4, '2022-09-20 09:00:00', '2024-01-31 18:00:00', FALSE, NOW(), 1),
-(1, 4, 4, 4, '2024-02-01 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 4, 5, 4, '2022-09-20 09:00:00', '2024-01-31 18:00:00', FALSE, CURRENT_TIMESTAMP, 1),
+(1, 4, 4, 4, '2024-02-01 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 5 – Senior Chemistry Teacher
-(1, 5, 6, 5, '2020-05-05 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 5, 6, 5, '2020-05-05 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 6 – Junior Biology Teacher
-(1, 6, 9, 6, '2021-02-15 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 6, 9, 6, '2021-02-15 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 7 – Project Manager (School Level)
-(1, 7, 1, NULL, '2020-03-10 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 7, 1, NULL, '2020-03-10 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 8 – Business Administration Teacher
-(1, 8, 14, 3, '2022-05-05 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 8, 14, 3, '2022-05-05 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 9 – Economics Teacher
-(1, 9, 15, 3, '2021-01-20 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 9, 15, 3, '2021-01-20 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 10 – Literature Teacher
-(1, 10, 11, 2, '2022-03-15 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 10, 11, 2, '2022-03-15 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 11 – Principal
-(1, 11, 1, NULL, '2020-08-01 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 11, 1, NULL, '2020-08-01 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 12 – Fine Arts Teacher
-(1, 12, 12, 2, '2021-12-05 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 12, 12, 2, '2021-12-05 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 13 – Accounting Teacher
-(1, 13, 13, 3, '2019-09-15 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 13, 13, 3, '2019-09-15 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 14 – History Teacher
-(1, 14, 10, 2, '2022-11-10 09:00:00', NULL, TRUE, NOW(), 1),
+(1, 14, 10, 2, '2022-11-10 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1),
 
 -- Employee 15 – Junior → Senior Chemistry Teacher
-(1, 15, 7, 5, '2020-06-20 09:00:00', '2022-12-31 18:00:00', FALSE, NOW(), 1),
-(1, 15, 6, 5, '2023-01-01 09:00:00', NULL, TRUE, NOW(), 1);
+(1, 15, 7, 5, '2020-06-20 09:00:00', '2022-12-31 18:00:00', FALSE, CURRENT_TIMESTAMP, 1),
+(1, 15, 6, 5, '2023-01-01 09:00:00', NULL, TRUE, CURRENT_TIMESTAMP, 1);

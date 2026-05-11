@@ -40,6 +40,7 @@ public class FeeRecurrenceRuleMapper {
         entity.setName(dto.getName().trim());
         entity.setDescription(dto.getDescription());
         entity.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
+        entity.setOccurrenceInterval(dto.getOccurrenceInterval());
         entity.setDeleted(false);
         return entity;
     }
@@ -55,6 +56,7 @@ public class FeeRecurrenceRuleMapper {
         dto.setName(entity.getName());
         dto.setDescription(entity.getDescription());
         dto.setIsActive(entity.getIsActive());
+        dto.setOccurrenceInterval(entity.getOccurrenceInterval());
 
         // Audit fields
         dto.setCreatedAt(entity.getCreatedAt());
@@ -99,6 +101,10 @@ public class FeeRecurrenceRuleMapper {
 
         if (dto.getIsActive() != null) {
             entity.setIsActive(dto.getIsActive());
+        }
+
+        if (dto.getOccurrenceInterval() != null) {
+            entity.setOccurrenceInterval(dto.getOccurrenceInterval());
         }
     }
 }

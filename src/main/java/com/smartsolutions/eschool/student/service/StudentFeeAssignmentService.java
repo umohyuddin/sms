@@ -18,6 +18,10 @@ import com.smartsolutions.eschool.student.model.FeeRateEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeAssignmentEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeSummaryEntity;
+import com.smartsolutions.eschool.institute.entity.CampusFinancialSettings;
+import com.smartsolutions.eschool.institute.repository.CampusFinancialSettingsRepository;
+import com.smartsolutions.eschool.lookups.model.FeeRecurrenceRuleEntity;
+import com.smartsolutions.eschool.lookups.repository.FeeRecurrenceRuleRepository;
 import com.smartsolutions.eschool.student.repository.*;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.transaction.Transactional;
@@ -45,6 +49,8 @@ public class StudentFeeAssignmentService {
     private final InstituteRepository instituteRepository;
     private final DiscountRateRepository discountRateRepository;
     private final StudentDiscountAssignmentService studentDiscountAssignmentService;
+    private final CampusFinancialSettingsRepository campusFinancialSettingsRepository;
+    private final FeeRecurrenceRuleRepository feeRecurrenceRuleRepository;
 
     public StudentFeeAssignmentService(StudentRepository studentRepository, 
             FeeRateRepository feeRateRepository, 
@@ -53,7 +59,9 @@ public class StudentFeeAssignmentService {
             AcademicYearRepository academicYearRepository,
             InstituteRepository instituteRepository,
             DiscountRateRepository discountRateRepository,
-            StudentDiscountAssignmentService studentDiscountAssignmentService) {
+            StudentDiscountAssignmentService studentDiscountAssignmentService,
+            CampusFinancialSettingsRepository campusFinancialSettingsRepository,
+            FeeRecurrenceRuleRepository feeRecurrenceRuleRepository) {
         this.studentRepository = studentRepository;
         this.feeRateRepository = feeRateRepository;
         this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
@@ -62,6 +70,8 @@ public class StudentFeeAssignmentService {
         this.instituteRepository = instituteRepository;
         this.discountRateRepository = discountRateRepository;
         this.studentDiscountAssignmentService = studentDiscountAssignmentService;
+        this.campusFinancialSettingsRepository = campusFinancialSettingsRepository;
+        this.feeRecurrenceRuleRepository = feeRecurrenceRuleRepository;
     }
 
     public boolean isFeeAssigned(Long studentId, Long academicYearId) {
@@ -111,22 +121,31 @@ public class StudentFeeAssignmentService {
                 .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN));
 
         long finalTotalMonths = totalMonths;
+        Integer campusInterval = campusFinancialSettingsRepository
+                .findByCampusIdAndAcademicYearId(dto.getCampusId(), dto.getAcademicYearId())
+                .flatMap(settings -> {
+                    if (settings.getFeeRecurrenceRuleId() != null) {
+                        return feeRecurrenceRuleRepository.findById(settings.getFeeRecurrenceRuleId())
+                                .map(FeeRecurrenceRuleEntity::getOccurrenceInterval);
+                    }
+                    return java.util.Optional.empty();
+                }).orElse(null);
+
         List<StudentFeeAssignmentEntity> assignments = feeRates.stream().map(feeRate -> {
             StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
             assignment.setStudent(student);
             assignment.setFeeRate(feeRate);
-            assignment.setInstitute(institute);
+            assignment.setOrganizationId(organizationId);
             assignment.setAcademicYear(academicYear);
 
-            String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
-                    ? feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getName() : "ONE_TIME";
+            Integer interval = campusInterval != null ? campusInterval : getCatalogRecurrenceInterval(feeRate);
             
-            double baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount().doubleValue() : 0.0;
-            double totalAmount = baseAmount * getRecurrenceMultiplier(recurrenceRule, (int) finalTotalMonths);
+            BigDecimal baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount() : BigDecimal.ZERO;
+            BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(interval, (int) finalTotalMonths));
+            BigDecimal totalAmount = baseAmount.multiply(multiplier);
 
             assignment.setTotalAmount(totalAmount);
             assignment.setAssignedDate(LocalDate.now());
-            assignment.setDueDate(dto.getDueDate());
             return assignment;
         }).collect(Collectors.toList());
 
@@ -135,8 +154,8 @@ public class StudentFeeAssignmentService {
         log.info("[Service:StudentFeeAssignmentService] Saved {} fee assignments", savedAssignments.size());
 
         // Total assigned fee
-        Double totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId(), organizationId);
-        if (totalAssigned == null) totalAssigned = 0.0;
+        BigDecimal totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId(), organizationId);
+        if (totalAssigned == null) totalAssigned = BigDecimal.ZERO;
 
         // Handle Discount if provided
         if (dto.getDiscountComponentId() != null) {
@@ -152,7 +171,7 @@ public class StudentFeeAssignmentService {
             discountRequest.setAcademicYearId(dto.getAcademicYearId());
             discountRequest.setCampusId(dto.getCampusId());
             discountRequest.setDiscountRateId(discountRate.getId());
-            discountRequest.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
+            discountRequest.setTotalAssignedFee(totalAssigned);
             studentDiscountAssignmentService.assignDiscount(discountRequest);
         }
 
@@ -161,7 +180,7 @@ public class StudentFeeAssignmentService {
     }
 
     private StudentFeeSummaryDTO updateSummary(StudentEntity student, AcademicYearEntity academicYear, 
-            InstituteEntity institute, Double totalAssigned) {
+            InstituteEntity institute, BigDecimal totalAssigned) {
         return studentFeeSummaryService.updateSummary(student.getId(), academicYear.getId(), institute.getId());
     }
 
@@ -203,22 +222,31 @@ public class StudentFeeAssignmentService {
                 .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN));
 
         long finalTotalMonths = totalMonths;
+        Integer campusInterval = campusFinancialSettingsRepository
+                .findByCampusIdAndAcademicYearId(dto.getCampusId(), dto.getAcademicYearId())
+                .flatMap(settings -> {
+                    if (settings.getFeeRecurrenceRuleId() != null) {
+                        return feeRecurrenceRuleRepository.findById(settings.getFeeRecurrenceRuleId())
+                                .map(FeeRecurrenceRuleEntity::getOccurrenceInterval);
+                    }
+                    return java.util.Optional.empty();
+                }).orElse(null);
+
         List<StudentFeeAssignmentEntity> updatedAssignments = feeRates.stream().map(feeRate -> {
             StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
             assignment.setStudent(student);
             assignment.setFeeRate(feeRate);
-            assignment.setInstitute(institute);
+            assignment.setOrganizationId(organizationId);
             assignment.setAcademicYear(academicYear);
 
-            String recurrenceRule = (feeRate.getFeeComponent() != null && feeRate.getFeeComponent().getFeeCatalog() != null && feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) 
-                    ? feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getName() : "ONE_TIME";
+            Integer interval = campusInterval != null ? campusInterval : getCatalogRecurrenceInterval(feeRate);
             
-            double baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount().doubleValue() : 0.0;
-            double totalAmount = baseAmount * getRecurrenceMultiplier(recurrenceRule, (int) finalTotalMonths);
+            BigDecimal baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount() : BigDecimal.ZERO;
+            BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(interval, (int) finalTotalMonths));
+            BigDecimal totalAmount = baseAmount.multiply(multiplier);
 
             assignment.setTotalAmount(totalAmount);
             assignment.setAssignedDate(LocalDate.now());
-            assignment.setDueDate(dto.getDueDate());
             return assignment;
         }).collect(Collectors.toList());
 
@@ -226,8 +254,8 @@ public class StudentFeeAssignmentService {
         studentFeeAssignmentRepository.flush();
 
         // Calculate Total assigned AFTER saving so it includes newly saved records
-        Double totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId(), organizationId);
-        if (totalAssigned == null) totalAssigned = 0.0;
+        BigDecimal totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, dto.getAcademicYearId(), organizationId);
+        if (totalAssigned == null) totalAssigned = BigDecimal.ZERO;
 
         // Handle Discount update
         if (dto.getDiscountComponentId() != null) {
@@ -243,7 +271,7 @@ public class StudentFeeAssignmentService {
             discountRequest.setAcademicYearId(dto.getAcademicYearId());
             discountRequest.setCampusId(dto.getCampusId());
             discountRequest.setDiscountRateId(discountRate.getId());
-            discountRequest.setTotalAssignedFee(BigDecimal.valueOf(totalAssigned));
+            discountRequest.setTotalAssignedFee(totalAssigned);
             studentDiscountAssignmentService.updateDiscount(discountRequest);
         } else {
             log.info("[Service:StudentFeeAssignmentService] No discount provided, removing existing discount for studentId: {}", studentId);
@@ -278,7 +306,6 @@ public class StudentFeeAssignmentService {
             }
             adto.setAmount(a.getTotalAmount());
             adto.setAssignedDate(a.getAssignedDate());
-            adto.setDueDate(a.getDueDate());
             return adto;
         }).collect(Collectors.toList());
 
@@ -293,7 +320,7 @@ public class StudentFeeAssignmentService {
         return responseDTO;
     }
 
-    public Double getTotalFeeAssigned(Long academicYearId) {
+    public BigDecimal getTotalFeeAssigned(Long academicYearId) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
             throw new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
@@ -373,9 +400,9 @@ public class StudentFeeAssignmentService {
             stats.put("overdueAssignments", studentFeeAssignmentRepository.countOverdueAssignments(organizationId));
             stats.put("overdueAmount", studentFeeAssignmentRepository.getOverdueAmount(academicYearId, organizationId));
         } else {
-            stats.put("totalFeeAmount", 0.0);
+            stats.put("totalFeeAmount", BigDecimal.ZERO);
             stats.put("overdueAssignments", 0L);
-            stats.put("overdueAmount", 0.0);
+            stats.put("overdueAmount", BigDecimal.ZERO);
         }
 
         log.info("[Service:StudentFeeAssignmentService] getStatistics() succeeded");
@@ -397,25 +424,18 @@ public class StudentFeeAssignmentService {
         log.info("[Service:StudentFeeAssignmentService] deleteAssignment() succeeded");
     }
 
-    private int getRecurrenceMultiplier(String rule, int totalMonths) {
-        if (rule == null)
-            return 1;
-
-        switch (rule.toUpperCase()) {
-            case "ONE_TIME":
-                return 1;
-            case "MONTHLY":
-                return totalMonths;
-            case "BI_MONTHLY":
-                return totalMonths / 2;
-            case "QUARTERLY":
-                return totalMonths / 3;
-            case "HALF_YEARLY":
-                return totalMonths / 6;
-            case "YEARLY":
-                return 1;
-            default:
-                return 1;
+    private Integer getCatalogRecurrenceInterval(FeeRateEntity feeRate) {
+        if (feeRate.getFeeComponent() != null && 
+            feeRate.getFeeComponent().getFeeCatalog() != null && 
+            feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule() != null) {
+            return feeRate.getFeeComponent().getFeeCatalog().getRecurrenceRule().getOccurrenceInterval();
         }
+        return 0;
+    }
+
+    private int getRecurrenceMultiplier(Integer interval, int totalMonths) {
+        if (interval == null || interval <= 0)
+            return 1;
+        return totalMonths / interval;
     }
 }

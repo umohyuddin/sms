@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.sclass.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +13,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@SQLDelete(sql = "UPDATE results SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "results")
 @Data
 @AllArgsConstructor

@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.student.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,6 +14,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@SQLDelete(sql = "UPDATE feeparticular SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "feeparticular")
 @Data
 @AllArgsConstructor

@@ -45,15 +45,9 @@ public class LoginResponseDTO {
     @Schema(description = "Type of the user (e.g., ADMIN, TEACHER, STUDENT)")
     private SystemUserEntity.UserType userType;
 
-    @Schema(description = "Employee ID if the user is an employee", example = "50")
-    private Long employeeId;
+    @Schema(description = "Employee details if the user is an employee")
+    private EmployeeDetailsDTO employee;
 
-    @Schema(description = "Student ID if the user is a student", example = "500")
-    private Long studentId;
-
-    @Schema(description = "Employee code", example = "EMP001")
-    private String employeeCode;
-
-    @Schema(description = "Student code", example = "STU001")
-    private String studentCode;
+    @Schema(description = "Student details if the user is a student")
+    private StudentDetailsDTO student;
 }

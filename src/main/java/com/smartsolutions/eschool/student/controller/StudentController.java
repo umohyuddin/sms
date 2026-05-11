@@ -7,6 +7,10 @@ import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequest
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentDashboardDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentSearchRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentLoginActivationRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentLoginDeactivationRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentLoginResponseDTO;
 import com.smartsolutions.eschool.student.facade.StudentFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -184,7 +188,7 @@ public class StudentController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Search students", description = "Filter students by campus, standard, section, or keyword.")
+    @Operation(summary = "Search students (Generic)", description = "Filter students by campus, standard, section, academic year, status (active/inactive), or keyword.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved search results",
                     content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = StudentDTO.class)))),
@@ -193,15 +197,9 @@ public class StudentController {
     })
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<StudentDTO>> searchStudents(
-            @Parameter(description = "ID of the campus", example = "1") @RequestParam(required = false) Long campusId,
-            @Parameter(description = "ID of the academic standard", example = "5") @RequestParam(required = false) Long standardId,
-            @Parameter(description = "ID of the section", example = "1") @RequestParam(required = false) Long sectionId,
-            @Parameter(description = "Direct ID search", example = "10") @RequestParam(required = false) Long studentId,
-            @Parameter(description = "ID of the academic year", example = "2024") @RequestParam(required = false) Long academicYearId,
-            @Parameter(description = "Keyword search (name/code)", example = "Arslan") @RequestParam(required = false) String keyword) {
-        log.info("[Controller:StudentController] GET /api/institute/students/search - Searching with keyword: {}", keyword);
-        String kw = (keyword != null && !keyword.isBlank()) ? keyword.trim() : null;
-        List<StudentDTO> students = studentFacade.searchStudents(campusId, standardId, sectionId, studentId, academicYearId, kw);
+            @org.springdoc.core.annotations.ParameterObject StudentSearchRequestDTO searchRequest) {
+        log.info("[Controller:StudentController] GET /api/institute/students/search - Params: {}", searchRequest);
+        List<StudentDTO> students = studentFacade.searchStudents(searchRequest);
         return ResponseEntity.ok(students);
     }
 
@@ -226,6 +224,9 @@ public class StudentController {
         return ResponseEntity.ok(resources);
     }
 
+
+
+    //no need of this
     @Operation(summary = "Get dashboard statistics", description = "Retrieve high-level statistics for students based on filters.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved dashboard data",
@@ -301,5 +302,39 @@ public class StudentController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getFilename() + "\"")
                 .body(document);
+    }
+
+    @Operation(summary = "Activate student login", description = "Create a system user account for the student and enable login access.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login activated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentLoginResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid data or missing email",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Student not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping(value = "/{id}/login/activate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StudentLoginResponseDTO> activateLogin(
+            @Parameter(description = "ID of the student", example = "5001") @PathVariable Long id,
+            @Valid @RequestBody StudentLoginActivationRequestDTO requestDTO) {
+        log.info("[Controller:StudentController] POST /api/institute/students/{}/login/activate - Activating login", id);
+        StudentLoginResponseDTO response = studentFacade.activateStudentLogin(id, requestDTO);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Deactivate student login", description = "Disable student login access and log the deactivation reason.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login deactivated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentLoginResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Student login not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping(value = "/{id}/login/deactivate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StudentLoginResponseDTO> deactivateLogin(
+            @Parameter(description = "ID of the student", example = "5001") @PathVariable Long id,
+            @Valid @RequestBody StudentLoginDeactivationRequestDTO requestDTO) {
+        log.info("[Controller:StudentController] POST /api/institute/students/{}/login/deactivate - Deactivating login", id);
+        StudentLoginResponseDTO response = studentFacade.deactivateStudentLogin(id, requestDTO);
+        return ResponseEntity.ok(response);
     }
 }

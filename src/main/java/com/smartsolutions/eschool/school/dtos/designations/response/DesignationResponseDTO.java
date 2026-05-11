@@ -26,7 +26,7 @@ public class DesignationResponseDTO {
                 .designationName(entity.getDesignationName())
                 .description(entity.getDescription())
                 .active(entity.getActive())
-                .deleted(entity.getDeleted())
+                .deleted(entity.isDeleted())
                 .build();
     }
 }

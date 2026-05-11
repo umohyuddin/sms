@@ -84,7 +84,7 @@ public interface InstituteContactRepository extends JpaRepository<InstituteConta
     @Query("""
     SELECT COUNT(c) FROM InstituteContactEntity c
     WHERE c.institute.id = :instituteId
-      AND c.isDeleted = false
+      AND c.deleted = false
 """)
     Long countByInstitute(@Param("instituteId") Long instituteId);
 
@@ -93,7 +93,7 @@ public interface InstituteContactRepository extends JpaRepository<InstituteConta
     FROM InstituteContactEntity c
     WHERE c.institute.id = :instituteId
       AND LOWER(c.email) = LOWER(:email)
-      AND c.isDeleted = false
+      AND c.deleted = false
 """)
     Boolean existsByEmail(@Param("instituteId") Long instituteId, @Param("email") String email);
 
@@ -126,7 +126,7 @@ public interface InstituteContactRepository extends JpaRepository<InstituteConta
     JOIN FETCH c.institute
     JOIN FETCH c.role
     WHERE c.institute.id = :instituteId
-      AND c.isDeleted = true
+      AND c.deleted = true
 """)
     List<InstituteContactEntity> findDeletedContacts(@Param("instituteId") Long instituteId);
 

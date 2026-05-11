@@ -3,10 +3,13 @@ package com.smartsolutions.eschool.student.service;
 import com.smartsolutions.eschool.student.model.FeeEntity;
 import com.smartsolutions.eschool.student.repository.FeeDao;
 import com.smartsolutions.eschool.student.repository.StudentFeeAssignmentRepository;
+import com.smartsolutions.eschool.student.repository.StudentFeeInvoiceRepository;
 import com.smartsolutions.eschool.student.repository.StudentFeePaymentsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,13 +20,16 @@ public class FeeService {
     private final FeeDao feeDao;
     private final StudentFeePaymentsRepository paymentsRepository;
     private final StudentFeeAssignmentRepository assignmentRepository;
+    private final StudentFeeInvoiceRepository invoiceRepository;
 
     public FeeService(FeeDao pFeeDao, 
                       StudentFeePaymentsRepository paymentsRepository, 
-                      StudentFeeAssignmentRepository assignmentRepository) {
+                      StudentFeeAssignmentRepository assignmentRepository,
+                      StudentFeeInvoiceRepository invoiceRepository) {
         this.feeDao = pFeeDao;
         this.paymentsRepository = paymentsRepository;
         this.assignmentRepository = assignmentRepository;
+        this.invoiceRepository = invoiceRepository;
     }
 
     private Long getOrgId() {
@@ -31,28 +37,30 @@ public class FeeService {
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public Double getTotalCollection(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+    public BigDecimal getTotalCollection(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getTotalCollection() called - orgId: {}", orgId);
-        Double total = paymentsRepository.sumCollectionByFilters(
+        BigDecimal total = paymentsRepository.sumCollectionByFilters(
                 filter.getCampusIds(), 
                 filter.getAcademicYearId(), 
                 filter.getFromDate(), 
                 filter.getToDate(), 
                 orgId
         );
+        if (total == null) total = BigDecimal.ZERO;
         log.info("[Service:FeeService] getTotalCollection() succeeded - total: {}", total);
         return total;
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public Double getPendingDues(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+    public BigDecimal getPendingDues(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getPendingDues() called - orgId: {}", orgId);
-        Double dues = assignmentRepository.sumPendingDuesByFilters(
+        BigDecimal dues = invoiceRepository.sumPendingDuesByFilters(
                 filter.getCampusIds(), 
                 filter.getAcademicYearId(), 
                 filter.getToDate(), 
                 orgId
         );
+        if (dues == null) dues = BigDecimal.ZERO;
         log.info("[Service:FeeService] getPendingDues() succeeded - dues: {}", dues);
         return dues;
     }
@@ -60,46 +68,46 @@ public class FeeService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Double getCollectionEfficiency(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getCollectionEfficiency() called - orgId: {}", orgId);
-        Double collection = getTotalCollection(filter, orgId);
-        Double pending = getPendingDues(filter, orgId);
+        BigDecimal collection = getTotalCollection(filter, orgId);
+        BigDecimal pending = getPendingDues(filter, orgId);
         
-        if (collection == null) collection = 0.0;
-        if (pending == null) pending = 0.0;
+        BigDecimal totalExpected = collection.add(pending);
+        if (totalExpected.compareTo(BigDecimal.ZERO) == 0) return 100.0;
         
-        double totalExpected = collection + pending;
-        if (totalExpected == 0) return 100.0;
+        double efficiency = collection.multiply(BigDecimal.valueOf(100))
+                .divide(totalExpected, 2, RoundingMode.HALF_UP)
+                .doubleValue();
         
-        double efficiency = (collection / totalExpected) * 100.0;
         log.info("[Service:FeeService] getCollectionEfficiency() succeeded - efficiency: {}%", efficiency);
         return efficiency;
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public java.util.Map<String, Double> getCollectionByFeeType(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+    public java.util.Map<String, BigDecimal> getCollectionByFeeType(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getCollectionByFeeType() called - orgId: {}", orgId);
         java.util.List<Object[]> results = paymentsRepository.collectionByFeeTypeDistribution(
                 filter.getCampusIds(), 
                 filter.getFromDate(),
                 filter.getToDate(),
                 orgId);
-        java.util.Map<String, Double> distribution = new java.util.HashMap<>();
+        java.util.Map<String, BigDecimal> distribution = new java.util.HashMap<>();
         for (Object[] row : results) {
-            distribution.put(row[0] != null ? row[0].toString() : "Other", (Double) row[1]);
+            distribution.put(row[0] != null ? row[0].toString() : "Other", (BigDecimal) row[1]);
         }
         log.info("[Service:FeeService] getCollectionByFeeType() succeeded - found types: {}", distribution.size());
         return distribution;
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public java.util.Map<String, Double> getPendingByStandard(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+    public java.util.Map<String, BigDecimal> getPendingByStandard(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getPendingByStandard() called - orgId: {}", orgId);
-        java.util.List<Object[]> results = assignmentRepository.pendingDuesByStandardDistribution(
+        java.util.List<Object[]> results = invoiceRepository.pendingDuesByStandardDistribution(
                 filter.getCampusIds(), 
                 filter.getToDate(),
                 orgId);
-        java.util.Map<String, Double> distribution = new java.util.HashMap<>();
+        java.util.Map<String, BigDecimal> distribution = new java.util.HashMap<>();
         for (Object[] row : results) {
-            distribution.put(row[0] != null ? row[0].toString() : "N/A", (Double) row[1]);
+            distribution.put(row[0] != null ? row[0].toString() : "N/A", (BigDecimal) row[1]);
         }
         log.info("[Service:FeeService] getPendingByStandard() succeeded - found entries: {}", distribution.size());
         return distribution;
@@ -142,7 +150,7 @@ public class FeeService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public java.util.List<Object[]> getFeeStatusDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getFeeStatusDistribution() called - orgId: {}", orgId);
-        java.util.List<Object[]> results = assignmentRepository.getFeeStatusDistribution(
+        java.util.List<Object[]> results = invoiceRepository.getFeeStatusDistribution(
                 filter.getCampusIds(), 
                 filter.getToDate(),
                 orgId);

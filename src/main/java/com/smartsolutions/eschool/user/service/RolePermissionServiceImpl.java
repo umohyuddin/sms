@@ -72,7 +72,7 @@ public class RolePermissionServiceImpl implements RolePermissionService {
             dto.setCode(entity.getCode());
             dto.setDescription(entity.getDescription());
             dto.setActive(entity.getActive());
-            dto.setDeleted(entity.getDeleted());
+            dto.setDeleted(entity.isDeleted());
             dto.setCreatedAt(entity.getCreatedAt());
             dto.setCreatedBy(entity.getCreatedBy());
             dto.setUpdatedAt(entity.getUpdatedAt());

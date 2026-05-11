@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.academic.entity.mapping;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
@@ -6,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@SQLDelete(sql = "UPDATE student_exam_attendance SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "student_exam_attendance")
 @Getter
 @Setter
@@ -33,10 +38,6 @@ public class StudentExamAttendanceEntity extends AuditableEntity {
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
-
-    @Builder.Default
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 
     public enum AttendanceStatus {
         PRESENT, ABSENT, UFM

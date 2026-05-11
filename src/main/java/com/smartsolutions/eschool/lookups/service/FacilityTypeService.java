@@ -27,7 +27,7 @@ public class FacilityTypeService {
 
     public List<FacilityTypeResponseDTO> getAll() {
         log.info("[Service:FacilityTypeService] getAll() called - Fetching all facility types");
-        List<FacilityTypeEntity> result = facilityTypeRepository.findAllNotDeleted();
+        List<FacilityTypeEntity> result = facilityTypeRepository.findAll();
         List<FacilityTypeResponseDTO> responseDTOs = FacilityTypeMapper.toResponseDTOList(result);
         log.info("[Service:FacilityTypeService] getAll() succeeded - Found {} facility types", responseDTOs.size());
         return responseDTOs;
@@ -43,7 +43,7 @@ public class FacilityTypeService {
 
     public FacilityTypeResponseDTO getById(Long id) {
         log.info("[Service:FacilityTypeService] getById() called - id: {}", id);
-        FacilityTypeEntity entity = facilityTypeRepository.findByIdAndDeletedFalse(id)
+        FacilityTypeEntity entity = facilityTypeRepository.findById(id)
                 .orElseThrow(() -> new ApiException(FacilityTypeErrors.FACILITY_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         FacilityTypeResponseDTO responseDTO = FacilityTypeMapper.toResponseDTO(entity);
@@ -91,7 +91,7 @@ public class FacilityTypeService {
     public FacilityTypeResponseDTO update(Long id, FacilityTypeRequestDTO requestDTO) {
         log.info("[Service:FacilityTypeService] update() called - id: {}", id);
 
-        FacilityTypeEntity existing = facilityTypeRepository.findByIdAndDeletedFalse(id)
+        FacilityTypeEntity existing = facilityTypeRepository.findById(id)
                 .orElseThrow(() -> new ApiException(FacilityTypeErrors.FACILITY_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (requestDTO.getCode() != null && !requestDTO.getCode().trim().equals(existing.getCode())) {
@@ -111,7 +111,7 @@ public class FacilityTypeService {
         log.info("[Service:FacilityTypeService] getStatistics() called");
 
         Map<String, Long> stats = new HashMap<>();
-        stats.put("totalFacilityTypes", facilityTypeRepository.countAllNotDeleted());
+        stats.put("totalFacilityTypes", facilityTypeRepository.count());
         stats.put("activeFacilityTypes", facilityTypeRepository.countByIsActiveTrue());
         stats.put("inactiveFacilityTypes", facilityTypeRepository.countByIsActiveFalse());
 

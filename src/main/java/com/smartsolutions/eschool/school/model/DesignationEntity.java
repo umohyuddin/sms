@@ -9,9 +9,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "designations")
 @SQLDelete(sql = "UPDATE designations SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Table(name = "designations")
 @Getter
 @Setter
 public class DesignationEntity extends AuditableEntity {
@@ -30,7 +30,4 @@ public class DesignationEntity extends AuditableEntity {
 
     @Column(name = "active", nullable = false)
     private Boolean active = true;
-
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
 }

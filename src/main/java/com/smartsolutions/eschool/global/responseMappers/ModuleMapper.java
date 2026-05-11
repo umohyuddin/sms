@@ -27,7 +27,7 @@ public class ModuleMapper {
         dto.setDisplayOrder(entity.getDisplayOrder());
         dto.setSystemModule(entity.getSystemModule());
         dto.setActive(entity.getActive());
-        //dto.setDeleted(entity.getDeleted());
+        //dto.setDeleted(entity.isDeleted());
 
         dto.setCreatedAt(entity.getCreatedAt());
         //dto.setCreatedBy(entity.getCreatedBy());

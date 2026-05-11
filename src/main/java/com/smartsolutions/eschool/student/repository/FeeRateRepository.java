@@ -14,7 +14,6 @@ import java.util.Optional;
 @Transactional
 @Repository
 public interface FeeRateRepository extends JpaRepository<FeeRateEntity, Long> {
-
   @Query("""
           SELECT fr FROM FeeRateEntity fr
           LEFT JOIN FETCH fr.campus c
@@ -115,6 +114,20 @@ public interface FeeRateRepository extends JpaRepository<FeeRateEntity, Long> {
       @Param("academicYearId") Long academicYearId);
 
   @Query("""
+          SELECT f FROM FeeRateEntity f
+          WHERE f.campus.id = :campusId
+            AND f.standard.id = :standardId
+            AND f.academicYear.id = :academicYearId
+            AND (:feeComponentId IS NULL AND f.feeComponent IS NULL OR f.feeComponent.id = :feeComponentId)
+            AND f.deleted = false
+      """)
+  List<FeeRateEntity> findActiveFeeRatesByComponent(
+      @Param("campusId") Long campusId,
+      @Param("standardId") Long standardId,
+      @Param("academicYearId") Long academicYearId,
+      @Param("feeComponentId") Long feeComponentId);
+
+  @Query("""
           SELECT fr FROM FeeRateEntity fr
           LEFT JOIN FETCH fr.feeComponent fc
           LEFT JOIN FETCH fc.feeCatalog fcat
@@ -143,4 +156,80 @@ public interface FeeRateRepository extends JpaRepository<FeeRateEntity, Long> {
       @Param("feeComponentId") Long feeComponentId,
       @Param("keyword") String keyword);
 
+  @Query("""
+          SELECT fr FROM FeeRateEntity fr
+          LEFT JOIN FETCH fr.campus c
+          LEFT JOIN FETCH fr.standard s
+          LEFT JOIN FETCH fr.chargeType ct
+          LEFT JOIN FETCH fr.percentageOfComponent pc
+          LEFT JOIN FETCH fr.slabGroup sg
+          LEFT JOIN FETCH fr.feeComponent fc
+          LEFT JOIN FETCH fc.feeCatalog fcat
+          LEFT JOIN FETCH fcat.chargeType fcatct
+          LEFT JOIN FETCH fcat.recurrenceRule fcatrr
+          LEFT JOIN FETCH fr.academicYear ay
+          WHERE fr.deleted = false AND fr.organizationId = :organizationId
+      """)
+  List<FeeRateEntity> findByOrganizationIdAndDeletedFalse(@Param("organizationId") Long organizationId);
+
+  @Query("""
+          SELECT fr FROM FeeRateEntity fr
+          LEFT JOIN FETCH fr.campus c
+          LEFT JOIN FETCH fr.standard s
+          LEFT JOIN FETCH fr.chargeType ct
+          LEFT JOIN FETCH fr.percentageOfComponent pc
+          LEFT JOIN FETCH fr.slabGroup sg
+          LEFT JOIN FETCH fr.feeComponent fc
+          LEFT JOIN FETCH fc.feeCatalog fcat
+          LEFT JOIN FETCH fcat.chargeType fcatct
+          LEFT JOIN FETCH fcat.recurrenceRule fcatrr
+          LEFT JOIN FETCH fr.academicYear ay
+          WHERE fr.deleted = false AND fr.id = :id AND fr.organizationId = :organizationId
+      """)
+  Optional<FeeRateEntity> findByIdAndOrganizationIdAndDeletedFalse(@Param("id") Long id, @Param("organizationId") Long organizationId);
+
+  @org.springframework.data.jpa.repository.Modifying
+  @Transactional
+  @Query("UPDATE FeeRateEntity fr SET fr.deleted = true, fr.deletedAt = CURRENT_TIMESTAMP WHERE fr.id = :id AND fr.organizationId = :organizationId")
+  int softDeleteByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
+
+  @Query("SELECT COUNT(fr) FROM FeeRateEntity fr WHERE fr.organizationId = :organizationId AND fr.deleted = false")
+  Long countByOrganizationId(@Param("organizationId") Long organizationId);
+
+  @Query("SELECT COUNT(fr) FROM FeeRateEntity fr WHERE fr.organizationId = :organizationId AND fr.deleted = false AND fr.active = true")
+  Long countByOrganizationIdAndActiveTrue(@Param("organizationId") Long organizationId);
+
+  @Query("SELECT COUNT(fr) FROM FeeRateEntity fr WHERE fr.organizationId = :organizationId AND fr.deleted = false AND fr.active = false")
+  Long countByOrganizationIdAndActiveFalse(@Param("organizationId") Long organizationId);
+
+  @Query("""
+          SELECT fr FROM FeeRateEntity fr
+          LEFT JOIN FETCH fr.campus c
+          LEFT JOIN FETCH fr.standard s
+          LEFT JOIN FETCH fr.chargeType ct
+          LEFT JOIN FETCH fr.percentageOfComponent pc
+          LEFT JOIN FETCH fr.slabGroup sg
+          LEFT JOIN FETCH fr.feeComponent fc
+          LEFT JOIN FETCH fc.feeCatalog fcat
+          LEFT JOIN FETCH fcat.chargeType fcatct
+          LEFT JOIN FETCH fcat.recurrenceRule fcatrr
+          LEFT JOIN FETCH fr.academicYear ay
+          WHERE fr.deleted = false
+            AND fr.organizationId = :organizationId
+            AND (:feeCatalogId IS NULL OR fcat.id = :feeCatalogId)
+            AND (:feeComponentId IS NULL OR fc.id = :feeComponentId)
+            AND (
+                  :keyword IS NULL OR
+                  LOWER(fc.componentName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                  LOWER(fcat.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                  LOWER(c.campusName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                  LOWER(s.standardName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                  CAST(fr.fixedAmount AS string) LIKE CONCAT('%', :keyword, '%')
+                )
+      """)
+  List<FeeRateEntity> searchFeeRatesByOrganization(
+      @Param("feeCatalogId") Long feeCatalogId,
+      @Param("feeComponentId") Long feeComponentId,
+      @Param("keyword") String keyword,
+      @Param("organizationId") Long organizationId);
 }

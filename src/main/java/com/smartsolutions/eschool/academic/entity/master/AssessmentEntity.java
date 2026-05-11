@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.academic.entity.master;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
@@ -10,6 +13,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@SQLDelete(sql = "UPDATE assessments SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "assessments")
 @Getter
 @Setter
@@ -59,8 +64,4 @@ public class AssessmentEntity extends AuditableEntity {
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
-
-    @Builder.Default
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 }

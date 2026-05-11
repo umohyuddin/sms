@@ -59,8 +59,7 @@ public class StudentFeeAssignmentMapper {
 
         builder.assignmentId(assignment.getId())
                 .totalAmount(assignment.getTotalAmount())
-                .assignedDate(assignment.getAssignedDate())
-                .dueDate(assignment.getDueDate());
+                .assignedDate(assignment.getAssignedDate());
 
         if (feeRate != null) {
             builder.feeRateId(feeRate.getId())
@@ -112,6 +111,7 @@ public class StudentFeeAssignmentMapper {
         dto.setTotalAssignedFee(entity.getTotalAssignedFee());
         dto.setTotalDiscount(entity.getTotalDiscount());
         dto.setTotalPaid(entity.getTotalPaid());
+        dto.setTotalLateFee(entity.getTotalLateFee());
         dto.setBalance(entity.getBalance());
         
         if (entity.getStudent() != null) {

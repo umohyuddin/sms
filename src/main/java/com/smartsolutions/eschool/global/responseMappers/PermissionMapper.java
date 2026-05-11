@@ -28,7 +28,7 @@ public class PermissionMapper {
         dto.setDescription(entity.getDescription());
         //dto.setSystemPermission(entity.getSystemPermission());
         dto.setActive(entity.getActive());
-        dto.setDeleted(entity.getDeleted());
+        dto.setDeleted(entity.isDeleted());
 
         if (entity.getModule() != null) {
             dto.setModule(ModuleMapper.toResponseDTO(entity.getModule()));

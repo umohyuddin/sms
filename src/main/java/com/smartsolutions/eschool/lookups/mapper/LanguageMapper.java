@@ -30,6 +30,7 @@ public class LanguageMapper {
         dto.setIsoCode(entity.getIsoCode());
         dto.setName(entity.getName());
         dto.setIsActive(entity.getIsActive());
+        dto.setDeleted(entity.isDeleted());
 
         // Audit fields
         dto.setCreatedAt(entity.getCreatedAt());

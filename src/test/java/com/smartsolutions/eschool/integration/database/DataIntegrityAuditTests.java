@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Integration tests for data integrity and audit trail
  * Tests:
  * - Audit trail fields (created_at, created_by, updated_at, updated_by)
- * - Soft delete functionality (is_deleted, deleted_at, deleted_by)
+ * - Soft delete functionality (deleted, deleted_at, deleted_by)
  * - Organization-based multi-tenancy (organization_id)
  * - Timestamp management (created_at defaults to CURRENT_TIMESTAMP)
  */
@@ -53,19 +53,19 @@ class DataIntegrityAuditTests {
     }
 
     @Test
-    @DisplayName("Should support soft delete with is_deleted flag")
+    @DisplayName("Should support soft delete with deleted flag")
     void testSoftDeleteFlag() {
-        String insertSql = "INSERT INTO languages (name, is_deleted) VALUES (?, ?)";
+        String insertSql = "INSERT INTO languages (name, deleted) VALUES (?, ?)";
         jdbcTemplate.update(insertSql, "Urdu", false);
 
-        String updateSql = "UPDATE languages SET is_deleted = true, deleted_at = NOW(), deleted_by = ? " +
+        String updateSql = "UPDATE languages SET deleted = true, deleted_at = NOW(), deleted_by = ? " +
                 "WHERE name = 'Urdu'";
         jdbcTemplate.update(updateSql, 102L);
 
-        String selectSql = "SELECT is_deleted, deleted_by FROM languages WHERE name = 'Urdu'";
+        String selectSql = "SELECT deleted, deleted_by FROM languages WHERE name = 'Urdu'";
         var result = jdbcTemplate.queryForMap(selectSql);
 
-        assertTrue((Boolean) result.get("is_deleted"), "is_deleted should be true");
+        assertTrue((Boolean) result.get("deleted"), "deleted should be true");
         assertEquals(102L, result.get("deleted_by"), "deleted_by should be set");
     }
 
@@ -75,7 +75,7 @@ class DataIntegrityAuditTests {
         String insertSql = "INSERT INTO currencies (iso_code, name) VALUES (?, ?)";
         jdbcTemplate.update(insertSql, "USD", "US Dollar");
 
-        String updateSql = "UPDATE currencies SET is_deleted = true, deleted_at = NOW() " +
+        String updateSql = "UPDATE currencies SET deleted = true, deleted_at = NOW() " +
                 "WHERE iso_code = 'USD'";
         jdbcTemplate.update(updateSql);
 
@@ -179,12 +179,12 @@ class DataIntegrityAuditTests {
     @Test
     @DisplayName("Should support soft delete queries filtering out deleted records")
     void testSoftDeleteQueryFiltering() {
-        String insertSql = "INSERT INTO languages (name, is_deleted) VALUES (?, ?)";
+        String insertSql = "INSERT INTO languages (name, deleted) VALUES (?, ?)";
         jdbcTemplate.update(insertSql, "Spanish", false);
         jdbcTemplate.update(insertSql, "French", true);
 
         String selectActiveSql = "SELECT COUNT(*) FROM languages WHERE name IN ('Spanish', 'French') " +
-                "AND is_deleted = false";
+                "AND deleted = false";
         Integer activeCount = jdbcTemplate.queryForObject(selectActiveSql, Integer.class);
 
         String selectAllSql = "SELECT COUNT(*) FROM languages WHERE name IN ('Spanish', 'French')";

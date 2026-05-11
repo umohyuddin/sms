@@ -60,7 +60,7 @@ public class RoleMapper {
         dto.setDescription(entity.getDescription());
         dto.setSystemRole(entity.getSystemRole());
         dto.setActive(entity.getActive());
-        dto.setDeleted(entity.getDeleted());
+        dto.setDeleted(entity.isDeleted());
 
         if (entity.getPermissions() != null) {
             dto.setPermissions(entity.getPermissions().stream()

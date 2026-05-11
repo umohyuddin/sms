@@ -54,7 +54,7 @@ Tests for referential integrity across all dependency levels:
 Tests for data integrity and audit trail mechanisms:
 - ✅ created_at automatic timestamps
 - ✅ created_by audit tracking
-- ✅ Soft delete functionality (is_deleted, deleted_at, deleted_by)
+- ✅ Soft delete functionality (deleted, deleted_at, deleted_by)
 - ✅ updated_at and updated_by tracking
 - ✅ Organization-based multi-tenancy (organization_id)
 - ✅ Optional audit field handling

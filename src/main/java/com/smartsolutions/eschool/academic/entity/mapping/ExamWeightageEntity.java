@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.academic.entity.mapping;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
@@ -9,6 +12,8 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
+@SQLDelete(sql = "UPDATE exam_weightage SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "exam_weightage")
 @Getter
 @Setter
@@ -39,8 +44,4 @@ public class ExamWeightageEntity extends AuditableEntity {
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
-
-    @Builder.Default
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 }

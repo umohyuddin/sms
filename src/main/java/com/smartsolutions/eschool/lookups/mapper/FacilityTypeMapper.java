@@ -27,6 +27,7 @@ public class FacilityTypeMapper {
         dto.setName(entity.getName());
         dto.setDescription(entity.getDescription());
         dto.setIsActive(entity.getIsActive());
+        dto.setDeleted(entity.isDeleted());
 
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());

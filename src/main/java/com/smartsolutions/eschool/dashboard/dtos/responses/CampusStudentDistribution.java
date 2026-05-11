@@ -14,6 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 @Schema(description = "Student distribution grouped by campus")
 public class CampusStudentDistribution {
+    @Schema(description = "ID of the campus", example = "1")
+    private Long campusId;
+
     @Schema(description = "Name of the campus", example = "Main Campus")
     private String campus;
     

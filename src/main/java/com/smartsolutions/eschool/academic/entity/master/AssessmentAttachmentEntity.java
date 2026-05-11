@@ -1,10 +1,15 @@
 package com.smartsolutions.eschool.academic.entity.master;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@SQLDelete(sql = "UPDATE assessment_attachments SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "assessment_attachments")
 @Getter
 @Setter
@@ -29,7 +34,4 @@ public class AssessmentAttachmentEntity extends AuditableEntity {
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
-
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 }

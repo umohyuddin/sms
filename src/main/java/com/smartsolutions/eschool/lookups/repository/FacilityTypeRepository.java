@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface FacilityTypeRepository extends JpaRepository<FacilityTypeEntity, Long> {
@@ -17,16 +16,7 @@ public interface FacilityTypeRepository extends JpaRepository<FacilityTypeEntity
     @Query("""
             SELECT f
             FROM FacilityTypeEntity f
-            WHERE f.id = :id
-              AND f.deleted = false
-            """)
-    Optional<FacilityTypeEntity> findByIdAndDeletedFalse(@Param("id") Long id);
-
-    @Query("""
-            SELECT f
-            FROM FacilityTypeEntity f
             WHERE f.isActive = true
-              AND f.deleted = false
             ORDER BY f.name ASC
             """)
     List<FacilityTypeEntity> findAllActive();
@@ -34,17 +24,8 @@ public interface FacilityTypeRepository extends JpaRepository<FacilityTypeEntity
     @Query("""
             SELECT f
             FROM FacilityTypeEntity f
-            WHERE f.deleted = false
-            ORDER BY f.name ASC
-            """)
-    List<FacilityTypeEntity> findAllNotDeleted();
-
-    @Query("""
-            SELECT f
-            FROM FacilityTypeEntity f
             WHERE (LOWER(f.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
                OR LOWER(f.code) LIKE LOWER(CONCAT('%', :keyword, '%')))
-              AND f.deleted = false
             ORDER BY f.name ASC
             """)
     List<FacilityTypeEntity> searchByKeyword(@Param("keyword") String keyword);
@@ -59,18 +40,16 @@ public interface FacilityTypeRepository extends JpaRepository<FacilityTypeEntity
             """)
     int softDeleteById(@Param("id") Long id);
 
-    @Query("SELECT COUNT(f) FROM FacilityTypeEntity f WHERE f.deleted = false")
-    Long countAllNotDeleted();
-
-    @Query("SELECT COUNT(f) FROM FacilityTypeEntity f WHERE f.isActive = true AND f.deleted = false")
+    @Query("SELECT COUNT(f) FROM FacilityTypeEntity f WHERE f.isActive = true")
     Long countByIsActiveTrue();
 
-    @Query("SELECT COUNT(f) FROM FacilityTypeEntity f WHERE f.isActive = false AND f.deleted = false")
+    @Query("SELECT COUNT(f) FROM FacilityTypeEntity f WHERE f.isActive = false")
     Long countByIsActiveFalse();
 
-    @Query("SELECT (COUNT(f) > 0) FROM FacilityTypeEntity f WHERE f.code = :code AND f.deleted = false")
+    @Query("SELECT (COUNT(f) > 0) FROM FacilityTypeEntity f WHERE f.code = :code")
     boolean existsByCode(@Param("code") String code);
 
-    @Query("SELECT (COUNT(f) > 0) FROM FacilityTypeEntity f WHERE f.code = :code AND f.id <> :id AND f.deleted = false")
+    @Query("SELECT (COUNT(f) > 0) FROM FacilityTypeEntity f WHERE f.code = :code AND f.id <> :id")
     boolean existsByCodeAndIdNot(@Param("code") String code, @Param("id") Long id);
 }
+

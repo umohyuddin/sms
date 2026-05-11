@@ -27,45 +27,39 @@ public class ChargeTypeService {
 
     @Transactional(readOnly = true)
     public List<ChargeTypeResponseDTO> getAllChargeTypes() {
-        Long orgId = SecurityUtils.getCurrentOrganizationId();
-        log.info("[Service:ChargeTypeService] getAllChargeTypes() called - OrgId: {}", orgId);
-        List<ChargeTypeEntity> entities = chargeTypeRepository.findAllByOrganizationId(orgId);
+        log.info("[Service:ChargeTypeService] getAllChargeTypes() called");
+        List<ChargeTypeEntity> entities = chargeTypeRepository.findAllChargeTypes();
         return ChargeTypeMapper.toResponseDTOList(entities);
     }
 
     @Transactional(readOnly = true)
     public List<ChargeTypeResponseDTO> getAllActiveChargeTypes() {
-        Long orgId = SecurityUtils.getCurrentOrganizationId();
-        log.info("[Service:ChargeTypeService] getAllActiveChargeTypes() called - OrgId: {}", orgId);
-        List<ChargeTypeEntity> entities = chargeTypeRepository.findAllActiveByOrganizationId(orgId);
+        log.info("[Service:ChargeTypeService] getAllActiveChargeTypes() called");
+        List<ChargeTypeEntity> entities = chargeTypeRepository.findAllActiveChargeTypes();
         return ChargeTypeMapper.toResponseDTOList(entities);
     }
 
     @Transactional(readOnly = true)
     public ChargeTypeResponseDTO getChargeTypeById(Long id) {
-        Long orgId = SecurityUtils.getCurrentOrganizationId();
-        log.info("[Service:ChargeTypeService] getChargeTypeById() called - id: {}, OrgId: {}", id, orgId);
-        ChargeTypeEntity entity = chargeTypeRepository.findByIdAndOrganizationId(id, orgId)
+        log.info("[Service:ChargeTypeService] getChargeTypeById() called - id: {}", id);
+        ChargeTypeEntity entity = chargeTypeRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ChargeTypeErrors.CHARGE_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
         return ChargeTypeMapper.toResponseDTO(entity);
     }
 
     @Transactional
     public ChargeTypeResponseDTO createChargeType(ChargeTypeRequestDTO requestDTO) {
-        Long orgId = SecurityUtils.getCurrentOrganizationId();
-        log.info("[Service:ChargeTypeService] createChargeType() called - code: {}, OrgId: {}", requestDTO.getCode(),
-                orgId);
+        log.info("[Service:ChargeTypeService] createChargeType() called - code: {}", requestDTO.getCode());
 
-        if (chargeTypeRepository.existsByOrganizationIdAndCode(orgId, requestDTO.getCode())) {
+        if (chargeTypeRepository.existsByCode(requestDTO.getCode())) {
             throw new ApiException(ChargeTypeErrors.DUPLICATE_CHARGE_TYPE_CODE, HttpStatus.CONFLICT);
         }
 
-        if (chargeTypeRepository.existsByOrganizationIdAndName(orgId, requestDTO.getName())) {
+        if (chargeTypeRepository.existsByName(requestDTO.getName())) {
             throw new ApiException(ChargeTypeErrors.DUPLICATE_CHARGE_TYPE_NAME, HttpStatus.CONFLICT);
         }
 
         ChargeTypeEntity entity = ChargeTypeMapper.toEntity(requestDTO);
-        entity.setOrganizationId(orgId);
         ChargeTypeEntity saved = chargeTypeRepository.save(entity);
 
         log.info("[Service:ChargeTypeService] createChargeType() succeeded - id: {}", saved.getId());
@@ -74,17 +68,16 @@ public class ChargeTypeService {
 
     @Transactional
     public ChargeTypeResponseDTO updateChargeType(Long id, ChargeTypeRequestDTO requestDTO) {
-        Long orgId = SecurityUtils.getCurrentOrganizationId();
-        log.info("[Service:ChargeTypeService] updateChargeType() called - id: {}, OrgId: {}", id, orgId);
+        log.info("[Service:ChargeTypeService] updateChargeType() called - id: {}", id);
 
-        ChargeTypeEntity entity = chargeTypeRepository.findByIdAndOrganizationId(id, orgId)
+        ChargeTypeEntity entity = chargeTypeRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ChargeTypeErrors.CHARGE_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        if (chargeTypeRepository.existsByOrganizationIdAndCodeAndIdNot(orgId, requestDTO.getCode(), id)) {
+        if (chargeTypeRepository.existsByCodeAndIdNot(requestDTO.getCode(), id)) {
             throw new ApiException(ChargeTypeErrors.DUPLICATE_CHARGE_TYPE_CODE, HttpStatus.CONFLICT);
         }
 
-        if (chargeTypeRepository.existsByOrganizationIdAndNameAndIdNot(orgId, requestDTO.getName(), id)) {
+        if (chargeTypeRepository.existsByNameAndIdNot(requestDTO.getName(), id)) {
             throw new ApiException(ChargeTypeErrors.DUPLICATE_CHARGE_TYPE_NAME, HttpStatus.CONFLICT);
         }
 
@@ -97,9 +90,8 @@ public class ChargeTypeService {
 
     @Transactional
     public void deleteChargeType(Long id) {
-        Long orgId = SecurityUtils.getCurrentOrganizationId();
-        log.info("[Service:ChargeTypeService] deleteChargeType() called - id: {}, OrgId: {}", id, orgId);
-        ChargeTypeEntity entity = chargeTypeRepository.findByIdAndOrganizationId(id, orgId)
+        log.info("[Service:ChargeTypeService] deleteChargeType() called - id: {}", id);
+        ChargeTypeEntity entity = chargeTypeRepository.findById(id)
                 .orElseThrow(() -> new ApiException(ChargeTypeErrors.CHARGE_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
         chargeTypeRepository.delete(entity);
         log.info("[Service:ChargeTypeService] deleteChargeType() succeeded - id: {}", id);
@@ -107,20 +99,18 @@ public class ChargeTypeService {
 
     @Transactional(readOnly = true)
     public List<ChargeTypeResponseDTO> searchChargeTypes(String keyword) {
-        Long orgId = SecurityUtils.getCurrentOrganizationId();
-        log.info("[Service:ChargeTypeService] searchChargeTypes() called - keyword: {}, OrgId: {}", keyword, orgId);
-        List<ChargeTypeEntity> result = chargeTypeRepository.searchByKeyword(orgId, keyword);
+        log.info("[Service:ChargeTypeService] searchChargeTypes() called - keyword: {}", keyword);
+        List<ChargeTypeEntity> result = chargeTypeRepository.searchByKeyword(keyword);
         return ChargeTypeMapper.toResponseDTOList(result);
     }
 
     public java.util.Map<String, Long> getStatistics() {
-        Long orgId = SecurityUtils.getCurrentOrganizationId();
-        log.info("[Service:ChargeTypeService] getStatistics() called - OrgId: {}", orgId);
+        log.info("[Service:ChargeTypeService] getStatistics() called");
 
         java.util.Map<String, Long> stats = new java.util.HashMap<>();
-        stats.put("totalChargeTypes", chargeTypeRepository.countByOrganizationId(orgId));
-        stats.put("activeChargeTypes", chargeTypeRepository.countByOrganizationIdAndActiveTrue(orgId));
-        stats.put("inactiveChargeTypes", chargeTypeRepository.countByOrganizationIdAndActiveFalse(orgId));
+        stats.put("totalChargeTypes", chargeTypeRepository.countAllChargeTypes());
+        stats.put("activeChargeTypes", chargeTypeRepository.countByActiveTrue());
+        stats.put("inactiveChargeTypes", chargeTypeRepository.countByActiveFalse());
 
         log.info("[Service:ChargeTypeService] getStatistics() succeeded - Stats: {}", stats);
         return stats;

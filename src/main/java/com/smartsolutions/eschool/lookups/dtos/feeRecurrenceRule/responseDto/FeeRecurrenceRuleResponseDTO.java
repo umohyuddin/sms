@@ -19,6 +19,7 @@ public class FeeRecurrenceRuleResponseDTO {
     private String name;
     private String description;
     private Boolean isActive;
+    private Integer occurrenceInterval;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -12,13 +12,13 @@ import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
 
 @Entity
+@SQLDelete(sql = "UPDATE fee_slabs SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "fee_slabs")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE fee_slabs SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-@SQLRestriction("deleted = false")
 public class FeeSlabEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +42,4 @@ public class FeeSlabEntity extends AuditableEntity {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 }

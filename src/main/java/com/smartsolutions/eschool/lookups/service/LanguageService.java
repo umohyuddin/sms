@@ -27,7 +27,7 @@ public class LanguageService {
 
     public List<LanguageResponseDTO> getAll() {
         log.info("[Service:LanguageService] getAll() called - Fetching all languages");
-        List<LanguageEntity> result = languageRepository.findAllNotDeleted();
+        List<LanguageEntity> result = languageRepository.findAll();
         List<LanguageResponseDTO> responseDTOs = LanguageMapper.toResponseDTOList(result);
         log.info("[Service:LanguageService] getAll() succeeded - Found {} languages", responseDTOs.size());
         return responseDTOs;
@@ -43,7 +43,7 @@ public class LanguageService {
 
     public LanguageResponseDTO getById(Long id) {
         log.info("[Service:LanguageService] getById() called - id: {}", id);
-        LanguageEntity entity = languageRepository.findByIdAndDeletedFalse(id)
+        LanguageEntity entity = languageRepository.findById(id)
                 .orElseThrow(() -> new ApiException(LanguageErrors.LANGUAGE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         LanguageResponseDTO responseDTO = LanguageMapper.toResponseDTO(entity);
@@ -91,7 +91,7 @@ public class LanguageService {
     public LanguageResponseDTO updateLanguage(Long id, LanguageRequestDTO requestDTO) {
         log.info("[Service:LanguageService] updateLanguage() called - id: {}", id);
 
-        LanguageEntity existing = languageRepository.findByIdAndDeletedFalse(id)
+        LanguageEntity existing = languageRepository.findById(id)
                 .orElseThrow(() -> new ApiException(LanguageErrors.LANGUAGE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (requestDTO.getIsoCode() != null && !requestDTO.getIsoCode().trim().equals(existing.getIsoCode())) {
@@ -111,7 +111,7 @@ public class LanguageService {
         log.info("[Service:LanguageService] getStatistics() called");
 
         Map<String, Long> stats = new HashMap<>();
-        stats.put("totalLanguages", languageRepository.countAllNotDeleted());
+        stats.put("totalLanguages", languageRepository.count());
         stats.put("activeLanguages", languageRepository.countByIsActiveTrue());
         stats.put("inactiveLanguages", languageRepository.countByIsActiveFalse());
 

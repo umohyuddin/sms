@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.user.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -8,6 +11,8 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 
 @Entity
+@SQLDelete(sql = "UPDATE theme SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "theme")
 @Data
 @AllArgsConstructor

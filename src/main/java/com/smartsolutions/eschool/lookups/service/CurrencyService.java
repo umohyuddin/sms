@@ -27,7 +27,7 @@ public class CurrencyService {
 
     public List<CurrencyResponseDTO> getAll() {
         log.info("[Service:CurrencyService] getAll() called - Fetching all currencies");
-        List<CurrencyEntity> result = currencyRepository.findAllNotDeleted();
+        List<CurrencyEntity> result = currencyRepository.findAll();
         List<CurrencyResponseDTO> responseDTOs = CurrencyMapper.toResponseDTOList(result);
         log.info("[Service:CurrencyService] getAll() succeeded - Found {} currencies", responseDTOs.size());
         return responseDTOs;
@@ -43,7 +43,7 @@ public class CurrencyService {
 
     public CurrencyResponseDTO getById(Integer id) {
         log.info("[Service:CurrencyService] getById() called - id: {}", id);
-        CurrencyEntity entity = currencyRepository.findByIdAndDeletedFalse(id)
+        CurrencyEntity entity = currencyRepository.findById(id)
                 .orElseThrow(() -> new ApiException(CurrencyErrors.CURRENCY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         CurrencyResponseDTO responseDTO = CurrencyMapper.toResponseDTO(entity);
@@ -91,7 +91,7 @@ public class CurrencyService {
     public CurrencyResponseDTO updateCurrency(Integer id, CurrencyRequestDTO requestDTO) {
         log.info("[Service:CurrencyService] updateCurrency() called - id: {}", id);
 
-        CurrencyEntity existing = currencyRepository.findByIdAndDeletedFalse(id)
+        CurrencyEntity existing = currencyRepository.findById(id)
                 .orElseThrow(() -> new ApiException(CurrencyErrors.CURRENCY_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (requestDTO.getIsoCode() != null && !requestDTO.getIsoCode().trim().equals(existing.getIsoCode())) {
@@ -111,7 +111,7 @@ public class CurrencyService {
         log.info("[Service:CurrencyService] getStatistics() called");
 
         Map<String, Long> stats = new HashMap<>();
-        stats.put("totalCurrencies", currencyRepository.countAllNotDeleted());
+        stats.put("totalCurrencies", currencyRepository.count());
         stats.put("activeCurrencies", currencyRepository.countByIsActiveTrue());
         stats.put("inactiveCurrencies", currencyRepository.countByIsActiveFalse());
 

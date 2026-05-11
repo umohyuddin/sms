@@ -1,5 +1,9 @@
 package com.smartsolutions.eschool.student.model;
+import org.hibernate.annotations.SQLRestriction;
 
+import org.hibernate.annotations.SQLDelete;
+
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,24 +11,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@SQLDelete(sql = "UPDATE student_fee_payments SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "student_fee_payments")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class StudentFeePaymentEntity {
+public class StudentFeePaymentEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
- 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organization_id", nullable = false)
-    private com.smartsolutions.eschool.school.model.InstituteEntity institute;
+    
+    @Column(name = "receipt_number", unique = true, length = 50)
+    private String receiptNumber;
+
+    // organization_id is inherited from AuditableEntity
 
     // --- Foreign Keys ---
 
@@ -32,17 +40,19 @@ public class StudentFeePaymentEntity {
     @JoinColumn(name = "student_id", nullable = false)
     private StudentEntity student;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "assignment_id", nullable = false)
-//    private StudentFeeAssignmentEntity assignment;
-
     // --- Fields ---
 
     @Column(name = "payment_date")
     private LocalDate paymentDate;
 
-    @Column(name = "amount_paid", nullable = false)
-    private Double amountPaid;
+    @Column(name = "amount_paid", nullable = false, precision = 12, scale = 2)
+    private BigDecimal amountPaid;
+
+    @Column(name = "late_fee_paid", precision = 12, scale = 2)
+    private BigDecimal lateFeePaid = BigDecimal.ZERO;
+
+    @Column(name = "tax_paid", precision = 12, scale = 2)
+    private BigDecimal taxPaid = BigDecimal.ZERO;
 
     @Column(name = "payment_month", nullable = false, length = 20)
     private String paymentMonth;
@@ -50,11 +60,9 @@ public class StudentFeePaymentEntity {
     @Column(name = "payment_year", nullable = false)
     private Integer paymentYear;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_mode", length = 50)
-    private String paymentMode;
-
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private com.smartsolutions.eschool.student.enums.PaymentMode paymentMode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_year_id", nullable = false)

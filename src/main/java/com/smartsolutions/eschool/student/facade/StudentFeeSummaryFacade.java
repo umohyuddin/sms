@@ -6,6 +6,7 @@ import com.smartsolutions.eschool.student.dtos.studentFeePayment.responseDto.Stu
 import com.smartsolutions.eschool.student.dtos.studentFeeSummary.responseDto.StudentFeeSummaryResponseDto;
 import com.smartsolutions.eschool.student.service.StudentFeePaymentsService;
 import com.smartsolutions.eschool.student.service.StudentFeeSummaryService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @Component
 @Scope("prototype")
+@Slf4j
 public class StudentFeeSummaryFacade {
 
     private final StudentFeeSummaryService studentFeeSummaryService;
@@ -29,26 +31,38 @@ public class StudentFeeSummaryFacade {
     }
 
     public StudentFeeSummaryDTO getByStudentId(Long id) {
+        log.info("[Facade:StudentFeeSummaryFacade] getByStudentId() called - id: {}", id);
         return studentFeeSummaryService.getByStudentId(id);
     }
 
     public List<StudentFeeSummaryDTO> getAll() {
+        log.info("[Facade:StudentFeeSummaryFacade] getAll() called");
         return studentFeeSummaryService.getAll();
     }
 
+    public List<StudentFeeSummaryDTO> searchByKeyword(String keyword) {
+        log.info("[Facade:StudentFeeSummaryFacade] searchByKeyword() called - keyword: {}", keyword);
+        return studentFeeSummaryService.searchByKeyword(keyword);
+    }
+
     public StudentFeeSummaryResponseDto getByStudentFeeSummaryAcademicYear(Long studentId, Long academicYearId) {
-        // Fetch all student payments for this academic year
-        List<StudentFeePaymentResponseDTO> responseDTOS = studentFeePaymentsService
+        log.info("[Facade:StudentFeeSummaryFacade] getByStudentFeeSummaryAcademicYear() called - studentId: {}, academicYearId: {}", 
+                studentId, academicYearId);
+
+        // Fetch all student payments for this academic year for detailed list
+        List<StudentFeePaymentResponseDTO> payments = studentFeePaymentsService
                 .getStudentPaymentsByAcademicYear(studentId, academicYearId);
 
-        // Fetch all student payments for this academic year
+        // Fetch base summary
         StudentFeeSummaryResponseDto studentFeeSummaryDTO = studentFeeSummaryService
-                .getByStudentFeeSummaryAcademicYear(studentId, academicYearId);
+                .getDetailedSummary(studentId, academicYearId);
 
         // Calculate monthly fee
         BigDecimal totalAssigned = studentFeeSummaryDTO.getTotalAssignedFee();
         BigDecimal months = BigDecimal.valueOf(studentFeeSummaryDTO.getAcademicTotalMonths());
-        BigDecimal monthlyFeeDecimal = totalAssigned.divide(months, RoundingMode.HALF_UP);
+        BigDecimal monthlyFeeDecimal = (months.compareTo(BigDecimal.ZERO) > 0) 
+                ? totalAssigned.divide(months, RoundingMode.HALF_UP) 
+                : BigDecimal.ZERO;
 
         // Generate month names
         List<String> academicMonths = SmsUtil.getAcademicMonths(studentFeeSummaryDTO.getAcademicStartDate(),
@@ -58,13 +72,13 @@ public class StudentFeeSummaryFacade {
         // Initialize monthly payments map
         Map<String, StudentFeeSummaryResponseDto.MonthlyPaymentDTO> monthMap = new HashMap<>();
         for (String month : academicMonths) {
-            StudentFeeSummaryResponseDto.MonthlyPaymentDTO dto = new StudentFeeSummaryResponseDto.MonthlyPaymentDTO(
-                    month);
+            StudentFeeSummaryResponseDto.MonthlyPaymentDTO dto = new StudentFeeSummaryResponseDto.MonthlyPaymentDTO(month);
             studentFeeSummaryDTO.getMonthlyPayments().add(dto);
             monthMap.put(month, dto);
         }
+
         // Map each payment to its month
-        for (StudentFeePaymentResponseDTO payment : studentFeeSummaryDTO.getStudentFeePaymentsList()) {
+        for (StudentFeePaymentResponseDTO payment : payments) {
             StudentFeeSummaryResponseDto.MonthlyPaymentDTO dto = monthMap.get(payment.getPaymentMonth());
             if (dto != null) {
                 dto.addPartialPayment(new StudentFeeSummaryResponseDto.PartialPaymentDTO(payment));
@@ -96,7 +110,10 @@ public class StudentFeeSummaryFacade {
         }
 
         studentFeeSummaryDTO.setMonthlyFeeDecimal(monthlyFeeDecimal);
-        studentFeeSummaryDTO.setStudentFeePaymentsList(responseDTOS);
+        studentFeeSummaryDTO.setStudentFeePaymentsList(payments);
+        
+        log.info("[Facade:StudentFeeSummaryFacade] getByStudentFeeSummaryAcademicYear() succeeded");
         return studentFeeSummaryDTO;
     }
 }
+

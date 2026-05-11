@@ -8,9 +8,14 @@ import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDate;
 
 @Entity
+@SQLDelete(sql = "UPDATE exams SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "exams")
 @Getter
 @Setter
@@ -72,9 +77,6 @@ public class ExamEntity extends AuditableEntity {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
-    @Builder.Default
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 
     public enum ExamStatus {
         DRAFT, SCHEDULED, IN_PROGRESS, LOCKED, PUBLISHED, CANCELLED

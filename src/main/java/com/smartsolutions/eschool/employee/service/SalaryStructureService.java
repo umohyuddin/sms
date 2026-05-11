@@ -258,13 +258,13 @@ public class SalaryStructureService {
         dto.setEffectiveFrom(entity.getEffectiveFrom());
         dto.setEffectiveTo(entity.getEffectiveTo());
         dto.setIsCurrent(entity.getIsCurrent());
-        dto.setDeleted(entity.getDeleted());
+        dto.setDeleted(entity.isDeleted());
         return dto;
     }
 
     private SalaryStructureDetailDTO toDetailDto(SalaryStructureEntity ss) {
         List<SalaryStructureComponentResponseDTO> componentDTOs = ss.getComponents().stream()
-                .filter(c -> !c.getDeleted())
+                .filter(c -> !c.isDeleted())
                 .map(c -> SalaryStructureComponentResponseDTO.builder()
                         .id(c.getComponent().getId())
                         .salaryStructureId(ss.getId())

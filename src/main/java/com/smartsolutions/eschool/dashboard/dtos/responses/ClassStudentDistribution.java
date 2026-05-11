@@ -6,12 +6,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Distribution of students for a specific class")
 public class ClassStudentDistribution {
+    @Schema(description = "ID of the class/standard", example = "10")
+    private Long classId;
+
     @Schema(description = "Name of the class/standard", example = "Class 1")
     private String className;
     
@@ -29,4 +34,7 @@ public class ClassStudentDistribution {
     
     @Schema(description = "Number of students with other or unassigned gender", example = "5")
     private Long other;
+
+    @Schema(description = "Breakdown of students by section within this class")
+    private List<SectionStudentDistribution> sections;
 }

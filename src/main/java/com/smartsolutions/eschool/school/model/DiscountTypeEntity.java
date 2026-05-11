@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.lookups.model.FeeRecurrenceRuleEntity;
@@ -6,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@SQLDelete(sql = "UPDATE discount_type SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "discount_type")
 @Getter
 @Setter
@@ -42,8 +47,5 @@ public class DiscountTypeEntity extends AuditableEntity {
 
     @Column(name = "display_order")
     private Integer displayOrder = 0;
-
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
 
 }

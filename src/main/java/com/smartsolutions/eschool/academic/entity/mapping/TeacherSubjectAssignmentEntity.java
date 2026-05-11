@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.academic.entity.mapping;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.employee.model.EmployeeMasterEntity;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
@@ -13,6 +16,8 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
+@SQLDelete(sql = "UPDATE teacher_subject_assignment SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "teacher_subject_assignment")
 @Getter
 @Setter
@@ -58,8 +63,4 @@ public class TeacherSubjectAssignmentEntity extends AuditableEntity {
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
-
-    @Builder.Default
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 }

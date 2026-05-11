@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,6 +18,9 @@ import java.util.List;
 public class StudentFeePaymentResponseDTO {
     @Schema(description = "Unique ID of the payment record", example = "1001")
     private Long id;
+    
+    @Schema(description = "Unique receipt number", example = "RCP-2024-0001")
+    private String receiptNumber;
 
     @Schema(description = "ID of the student", example = "5001")
     private Long studentId;
@@ -28,7 +32,7 @@ public class StudentFeePaymentResponseDTO {
     private LocalDate paymentDate;
 
     @Schema(description = "Amount paid", example = "5000.00")
-    private Double amountPaid;
+    private BigDecimal amountPaid;
 
     @Schema(description = "Month for which fee was paid", example = "April")
     private String paymentMonth;
@@ -37,7 +41,7 @@ public class StudentFeePaymentResponseDTO {
     private Integer paymentYear;
 
     @Schema(description = "Mode of payment", example = "CASH")
-    private String paymentMode;
+    private com.smartsolutions.eschool.student.enums.PaymentMode paymentMode;
 
     @Schema(description = "System recording timestamp", example = "2024-04-01T10:00:00")
     private LocalDateTime createdAt;
@@ -61,9 +65,9 @@ public class StudentFeePaymentResponseDTO {
         @Schema(description = "Date of payment", example = "2024-04-01")
         private LocalDate paymentDate;
         @Schema(description = "Amount paid", example = "2500.00")
-        private Double amountPaid;
+        private BigDecimal amountPaid;
         @Schema(description = "Mode of payment", example = "CASH")
-        private String paymentMode;
+        private com.smartsolutions.eschool.student.enums.PaymentMode paymentMode;
 
         // Constructor from original DTO
         public PartialPaymentDTO(StudentFeePaymentResponseDTO p) {
@@ -85,7 +89,7 @@ public class StudentFeePaymentResponseDTO {
         @Schema(description = "Month name", example = "April")
         private String month;
         @Schema(description = "Total paid in this month", example = "5000.00")
-        private Double totalPaid = 0.0;
+        private BigDecimal totalPaid = BigDecimal.ZERO;
         @Schema(description = "List of installments for this month")
         private List<PartialPaymentDTO> partialPayments = new ArrayList<>();
 
@@ -94,7 +98,9 @@ public class StudentFeePaymentResponseDTO {
         }
 
         public void addPartialPayment(PartialPaymentDTO payment) {
-            this.totalPaid += payment.getAmountPaid();
+            if (payment.getAmountPaid() != null) {
+                this.totalPaid = this.totalPaid.add(payment.getAmountPaid());
+            }
             this.partialPayments.add(payment);
         }
     }

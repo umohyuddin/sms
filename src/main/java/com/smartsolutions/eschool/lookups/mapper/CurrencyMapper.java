@@ -27,6 +27,7 @@ public class CurrencyMapper {
         dto.setName(entity.getName());
         dto.setSymbol(entity.getSymbol());
         dto.setIsActive(entity.getIsActive());
+        dto.setDeleted(entity.isDeleted());
 
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());

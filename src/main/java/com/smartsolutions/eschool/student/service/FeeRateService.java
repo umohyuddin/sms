@@ -1,6 +1,6 @@
 package com.smartsolutions.eschool.student.service;
 
-import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.global.error.ApiException;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
@@ -11,6 +11,7 @@ import com.smartsolutions.eschool.school.model.ChargeTypeEntity;
 import com.smartsolutions.eschool.school.repository.ChargeTypeRepository;
 import com.smartsolutions.eschool.student.dtos.feeRates.requestDto.FeeRateCreateRequestDTO;
 import com.smartsolutions.eschool.student.dtos.feeRates.responseDto.FeeRatesResponseDTO;
+import com.smartsolutions.eschool.student.error.FeeRateErrors;
 import com.smartsolutions.eschool.student.mapper.FeeRateMapper;
 import com.smartsolutions.eschool.student.model.FeeComponentEntity;
 import com.smartsolutions.eschool.student.model.FeeRateEntity;
@@ -18,16 +19,17 @@ import com.smartsolutions.eschool.student.model.FeeSlabGroupEntity;
 import com.smartsolutions.eschool.student.repository.FeeComponentRepository;
 import com.smartsolutions.eschool.student.repository.FeeRateRepository;
 import com.smartsolutions.eschool.student.repository.FeeSlabGroupRepository;
-import jakarta.transaction.Transactional;
+import com.smartsolutions.eschool.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.MappingException;
-import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -54,278 +56,232 @@ public class FeeRateService {
         this.feeSlabGroupRepository = feeSlabGroupRepository;
     }
 
-    public List<FeeRatesResponseDTO> searchFeeRates(Long feeCatalogId, Long feeComponentId, String keyword) {
-        try {
-            log.info("Searching FeeRates with filters → feeCatalogId={}, feeComponentId={}, keyword={}", feeCatalogId,
-                    feeComponentId, keyword);
-            String searchKeyword = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
-            List<FeeRateEntity> results = feeRateRepository.searchFeeRates(feeCatalogId, feeComponentId, searchKeyword);
-            log.info("Search returned {} FeeRates", results.size());
-            return FeeRateMapper.toResponseDTOList(results);
-        } catch (DataAccessException dae) {
-            log.error("Database error while searching FeeRates", dae);
-        } catch (MappingException me) {
-            log.error("Error mapping FeeRateEntity to FeeRatesResponseDTO", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while searching FeeRates", e);
+    public List<FeeRatesResponseDTO> getAll() {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeRateErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-
-        return Collections.emptyList();
+        log.info("[Service:FeeRateService] getAll() called - Fetching for organization: {}", organizationId);
+        List<FeeRateEntity> result = feeRateRepository.findByOrganizationIdAndDeletedFalse(organizationId);
+        List<FeeRatesResponseDTO> responseDTOs = FeeRateMapper.toResponseDTOList(result);
+        log.info("[Service:FeeRateService] getAll() succeeded - Found {} fee rates", responseDTOs.size());
+        return responseDTOs;
     }
 
     public FeeRatesResponseDTO getById(Long id) {
-        log.info("Fetching FeeRate with id: {}", id);
-        FeeRateEntity feeRateEntity = feeRateRepository.findByIdAndDeletedFalse(id).orElseThrow(() -> {
-            log.info("Fetching FeeRate with id: {}", id);
-            return new ResourceNotFoundException("FeeRate not found with id: " + id);
-        });
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeRateErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:FeeRateService] getById() called - id: {}, organization: {}", id, organizationId);
+        FeeRateEntity entity = feeRateRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId)
+                .orElseThrow(() -> new ApiException(FeeRateErrors.FEE_RATE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        FeeRatesResponseDTO feeRateDTO = FeeRateMapper.toResponseDTO(feeRateEntity);
-        log.info("Successfully fetched FeeRate: id={}", feeRateDTO.getId());
-        return feeRateDTO;
+        FeeRatesResponseDTO responseDTO = FeeRateMapper.toResponseDTO(entity);
+        log.info("[Service:FeeRateService] getById() succeeded - Found fee rate: {}", id);
+        return responseDTO;
     }
 
-    public List<FeeRatesResponseDTO> getAll() {
-        try {
-            log.info("Fetching all FeeRates from database");
-            List<FeeRateEntity> result = feeRateRepository.findByDeletedFalse();
-            log.info("Successfully fetched {} FeeRates", result.size());
-            List<FeeRatesResponseDTO> feeRateDTOS = FeeRateMapper.toResponseDTOList(result);
-            log.info("Successfully fetched FeeRates");
-            return feeRateDTOS;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching FeeRates", dae);
-            // throw new CustomServiceException("Unable to fetch students from database",
-            // dae);
-        } catch (MappingException me) {
-            log.error("Error mapping StudentEntity to FeeRates", me);
-            // throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching FeeRates", e);
-            // throw new ("Unexpected error occurred", e);
+    public List<FeeRatesResponseDTO> getByFeeComponentId(Long componentId) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeRateErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        return Collections.emptyList();
-    }
-
-    public List<FeeRatesResponseDTO> getByFeeComponentId(Long id) {
-        try {
-            log.info("Fetching all Fee Rates by fee component from database");
-            List<FeeRateEntity> result = feeRateRepository.findByFeeComponentId(id);
-            log.info("Successfully fetched {} FeeRates by fee component", result.size());
-            List<FeeRatesResponseDTO> FeeComponentDTOList = FeeRateMapper.toResponseDTOList(result);
-            log.info("Successfully fetched FeeRates by fee component");
-            return FeeComponentDTOList;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching FeeRates by fee component", dae);
-            // throw new CustomServiceException("Unable to fetch students from database",
-            // dae);
-        } catch (MappingException me) {
-            log.error("Error mapping FeeRateEntity to FeeRates by fee component", me);
-            // throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching FeeRates by fee component", e);
-            // throw new ("Unexpected error occurred", e);
-        }
-        return Collections.emptyList();
+        log.info("[Service:FeeRateService] getByFeeComponentId() called - component: {}, organization: {}", componentId, organizationId);
+        List<FeeRateEntity> result = feeRateRepository.findByFeeComponentId(componentId);
+        // Filtering by organization as findByFeeComponentId is not yet organization-aware
+        List<FeeRateEntity> filtered = result.stream()
+                .filter(fr -> organizationId.equals(fr.getOrganizationId()))
+                .toList();
+        return FeeRateMapper.toResponseDTOList(filtered);
     }
 
     public List<FeeRatesResponseDTO> findActiveFeeRates(Long campusId, Long standardId, Long academicYearId) {
-        try {
-            log.info("Fetching all Fee Rates by fee component from database");
-            List<FeeRateEntity> result = feeRateRepository.findActiveFeeRates(campusId, standardId, academicYearId);
-            log.info("Successfully fetched {} FeeRates by fee component", result.size());
-            List<FeeRatesResponseDTO> FeeComponentDTOList = FeeRateMapper.toResponseDTOList(result);
-            log.info("Successfully fetched FeeRates by fee component");
-            return FeeComponentDTOList;
-        } catch (DataAccessException dae) {
-            log.error("Database error while fetching FeeRates by fee component", dae);
-            // throw new CustomServiceException("Unable to fetch students from database",
-            // dae);
-        } catch (MappingException me) {
-            log.error("Error mapping FeeRateEntity to FeeRates by fee component", me);
-            // throw new CustomServiceException("Error converting student data", me);
-        } catch (Exception e) {
-            log.error("Unexpected error while fetching FeeRates by fee component", e);
-            // throw new ("Unexpected error occurred", e);
+        log.info("[Service:FeeRateService] findActiveFeeRates() called - campus: {}, standard: {}, year: {}", campusId, standardId, academicYearId);
+        List<FeeRateEntity> result = feeRateRepository.findActiveFeeRates(campusId, standardId, academicYearId);
+        return FeeRateMapper.toResponseDTOList(result);
+    }
+
+    @Transactional
+    public void softDeleteById(Long id) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeRateErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        return Collections.emptyList();
+        log.info("[Service:FeeRateService] softDeleteById() called - id: {}, organization: {}", id, organizationId);
+
+        int result = feeRateRepository.softDeleteByIdAndOrganizationId(id, organizationId);
+        if (result == 0) {
+            throw new ApiException(FeeRateErrors.FEE_RATE_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        log.info("[Service:FeeRateService] softDeleteById() succeeded - id: {}", id);
     }
 
     @Transactional
     public FeeRatesResponseDTO createFeeRate(FeeRateCreateRequestDTO dto) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeRateErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:FeeRateService] createFeeRate() called - Creating for organization: {}", organizationId);
+
         // Fetch related entities
         CampusEntity campus = campusRepository.findById(dto.getCampusId())
-                .orElseThrow(() -> new IllegalArgumentException("Campus not found with id: " + dto.getCampusId()));
+                .orElseThrow(() -> new ApiException(FeeRateErrors.CAMPUS_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         StandardEntity standard = standardRepository.findById(dto.getStandardId())
-                .orElseThrow(() -> new IllegalArgumentException("Standard not found with id: " + dto.getStandardId()));
+                .orElseThrow(() -> new ApiException(FeeRateErrors.STANDARD_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId()).orElseThrow(
-                () -> new IllegalArgumentException("Academic Year not found with id: " + dto.getAcademicYearId()));
+        AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
+                .orElseThrow(() -> new ApiException(FeeRateErrors.ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         FeeComponentEntity feeComponent = null;
         if (dto.getFeeComponentId() != null) {
-            feeComponent = feeComponentRepository.findById(dto.getFeeComponentId()).orElseThrow(
-                    () -> new IllegalArgumentException("Fee Component not found with id: " + dto.getFeeComponentId()));
-        }
-
-        // Validate effective dates
-        LocalDate from = dto.getEffectiveFrom();
-        LocalDate to = dto.getEffectiveTo();
-
-        if (to != null && to.isBefore(from)) {
-            throw new IllegalArgumentException("Effective To date cannot be before Effective From date");
-        }
-
-        // Check for overlapping FeeRates
-        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRates(campus.getId(), standard.getId(),
-                academicYear.getId());
-
-        if (!CollectionUtils.isEmpty(overlapping)) {
-            for (FeeRateEntity fr : overlapping) {
-                LocalDate existingFrom = fr.getEffectiveFrom();
-                LocalDate existingTo = fr.getEffectiveTo() != null ? fr.getEffectiveTo() : LocalDate.MAX;
-                LocalDate newFrom = from;
-                LocalDate newTo = to != null ? to : LocalDate.MAX;
-
-                boolean isOverlapping = !(newTo.isBefore(existingFrom) || newFrom.isAfter(existingTo));
-                if (isOverlapping) {
-                    throw new IllegalArgumentException(
-                            "Overlapping FeeRate exists for this Campus, Standard, and Academic Year");
-                }
-            }
+            feeComponent = feeComponentRepository.findById(dto.getFeeComponentId())
+                    .orElseThrow(() -> new ApiException(FeeRateErrors.FEE_COMPONENT_NOT_FOUND, HttpStatus.NOT_FOUND));
         }
 
         ChargeTypeEntity chargeType = chargeTypeRepository.findById(dto.getChargeTypeId())
-                .orElseThrow(() -> new IllegalArgumentException("Charge Type not found"));
-
-        FeeComponentEntity percComponent = null;
-        if (dto.getPercentageOfComponentId() != null) {
-            percComponent = feeComponentRepository.findById(dto.getPercentageOfComponentId())
-                    .orElseThrow(() -> new IllegalArgumentException("Percentage Fee Component not found"));
-        }
+                .orElseThrow(() -> new ApiException(FeeRateErrors.CHARGE_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         FeeSlabGroupEntity slabGroup = null;
         if (dto.getSlabGroupId() != null) {
             slabGroup = feeSlabGroupRepository.findById(dto.getSlabGroupId())
-                    .orElseThrow(() -> new IllegalArgumentException("Slab Group not found"));
+                    .orElseThrow(() -> new ApiException(FeeRateErrors.SLAB_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND));
         }
 
-        // Create new FeeRate entity
-        FeeRateEntity feeRate = new FeeRateEntity();
-        feeRate.setCampus(campus);
-        feeRate.setStandard(standard);
-        feeRate.setAcademicYear(academicYear);
-        feeRate.setFeeComponent(feeComponent);
+        FeeComponentEntity percComponent = null;
+        if (dto.getPercentageOfComponentId() != null) {
+            percComponent = feeComponentRepository.findById(dto.getPercentageOfComponentId())
+                    .orElseThrow(() -> new ApiException(FeeRateErrors.FEE_COMPONENT_NOT_FOUND, "Percentage base component not found", HttpStatus.NOT_FOUND));
+        }
 
-        feeRate.setChargeType(chargeType);
-        feeRate.setFixedAmount(dto.getFixedAmount());
-        feeRate.setPercentageValue(dto.getPercentageValue());
-        feeRate.setPercentageOfComponent(percComponent);
-        feeRate.setUnitPrice(dto.getUnitPrice());
-        feeRate.setSlabGroup(slabGroup);
-        feeRate.setPriority(dto.getPriority() != null ? dto.getPriority() : 0);
+        // Validate dates
+        validateDates(dto.getEffectiveFrom(), dto.getEffectiveTo());
+        checkOverlaps(campus.getId(), standard.getId(), academicYear, feeComponent, dto.getEffectiveFrom(), dto.getEffectiveTo(), null);
 
-        feeRate.setCurrency(dto.getCurrency());
-        feeRate.setEffectiveFrom(from);
-        feeRate.setEffectiveTo(to);
-        feeRate.setActive(dto.isActive());
-        feeRate.setDeleted(false);
+        // Create entity
+        FeeRateEntity entity = FeeRateMapper.toEntity(dto);
+        entity.setCampus(campus);
+        entity.setStandard(standard);
+        entity.setAcademicYear(academicYear);
+        entity.setFeeComponent(feeComponent);
+        entity.setChargeType(chargeType);
+        entity.setSlabGroup(slabGroup);
+        entity.setPercentageOfComponent(percComponent);
 
-        // Save entity
-        FeeRateEntity savedFeeRate = feeRateRepository.save(feeRate);
-
-        // Map to response DTO
-        return FeeRateMapper.toResponseDTO(savedFeeRate);
+        FeeRateEntity saved = feeRateRepository.save(entity);
+        log.info("[Service:FeeRateService] createFeeRate() succeeded - id: {}", saved.getId());
+        return FeeRateMapper.toResponseDTO(saved);
     }
 
     @Transactional
-    public FeeRatesResponseDTO updateFeeRate(Long feeRateId, FeeRateCreateRequestDTO dto) {
-        // Fetch existing FeeRate
-        FeeRateEntity existingFeeRate = feeRateRepository.findById(feeRateId)
-                .orElseThrow(() -> new IllegalArgumentException("FeeRate not found with id: " + feeRateId));
-
-        // Fetch related entities
-        CampusEntity campus = campusRepository.findById(dto.getCampusId())
-                .orElseThrow(() -> new IllegalArgumentException("Campus not found with id: " + dto.getCampusId()));
-
-        var standard = standardRepository.findById(dto.getStandardId())
-                .orElseThrow(() -> new IllegalArgumentException("Standard not found with id: " + dto.getStandardId()));
-
-        var academicYear = academicYearRepository.findById(dto.getAcademicYearId()).orElseThrow(
-                () -> new IllegalArgumentException("Academic Year not found with id: " + dto.getAcademicYearId()));
-
-        var feeComponent = dto.getFeeComponentId() != null ? feeComponentRepository.findById(dto.getFeeComponentId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Fee Component not found with id: " + dto.getFeeComponentId()))
-                : null;
-
-        // Validate effective dates
-        LocalDate from = dto.getEffectiveFrom();
-        LocalDate to = dto.getEffectiveTo();
-
-        if (to != null && to.isBefore(from)) {
-            throw new IllegalArgumentException("Effective To date cannot be before Effective From date");
+    public FeeRatesResponseDTO updateFeeRate(Long id, FeeRateCreateRequestDTO dto) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeRateErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+        log.info("[Service:FeeRateService] updateFeeRate() called - id: {}, organization: {}", id, organizationId);
 
-        // Check for overlapping FeeRates (excluding the current record)
-        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRates(campus.getId(), standard.getId(),
-                academicYear.getId());
+        FeeRateEntity existing = feeRateRepository.findByIdAndOrganizationIdAndDeletedFalse(id, organizationId)
+                .orElseThrow(() -> new ApiException(FeeRateErrors.FEE_RATE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        if (!CollectionUtils.isEmpty(overlapping)) {
-            for (FeeRateEntity fr : overlapping) {
-                if (fr.getId().equals(feeRateId))
-                    continue; // skip current fee rate
-
-                LocalDate existingFrom = fr.getEffectiveFrom();
-                LocalDate existingTo = fr.getEffectiveTo() != null ? fr.getEffectiveTo() : LocalDate.MAX;
-                LocalDate newFrom = from;
-                LocalDate newTo = to != null ? to : LocalDate.MAX;
-
-                boolean isOverlapping = !(newTo.isBefore(existingFrom) || newFrom.isAfter(existingTo));
-                if (isOverlapping) {
-                    throw new IllegalArgumentException(
-                            "Overlapping FeeRate exists for this Campus, Standard, and Academic Year");
-                }
-            }
+        // Fetch related entities if changed (or just refresh them)
+        CampusEntity campus = campusRepository.findById(dto.getCampusId())
+                .orElseThrow(() -> new ApiException(FeeRateErrors.CAMPUS_NOT_FOUND, HttpStatus.NOT_FOUND));
+        StandardEntity standard = standardRepository.findById(dto.getStandardId())
+                .orElseThrow(() -> new ApiException(FeeRateErrors.STANDARD_NOT_FOUND, HttpStatus.NOT_FOUND));
+        AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
+                .orElseThrow(() -> new ApiException(FeeRateErrors.ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND));
+        
+        FeeComponentEntity feeComponent = null;
+        if (dto.getFeeComponentId() != null) {
+            feeComponent = feeComponentRepository.findById(dto.getFeeComponentId())
+                    .orElseThrow(() -> new ApiException(FeeRateErrors.FEE_COMPONENT_NOT_FOUND, HttpStatus.NOT_FOUND));
         }
 
         ChargeTypeEntity chargeType = chargeTypeRepository.findById(dto.getChargeTypeId())
-                .orElseThrow(() -> new IllegalArgumentException("Charge Type not found"));
-
-        FeeComponentEntity percComponent = null;
-        if (dto.getPercentageOfComponentId() != null) {
-            percComponent = feeComponentRepository.findById(dto.getPercentageOfComponentId())
-                    .orElseThrow(() -> new IllegalArgumentException("Percentage Fee Component not found"));
-        }
+                .orElseThrow(() -> new ApiException(FeeRateErrors.CHARGE_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         FeeSlabGroupEntity slabGroup = null;
         if (dto.getSlabGroupId() != null) {
             slabGroup = feeSlabGroupRepository.findById(dto.getSlabGroupId())
-                    .orElseThrow(() -> new IllegalArgumentException("Slab Group not found"));
+                    .orElseThrow(() -> new ApiException(FeeRateErrors.SLAB_GROUP_NOT_FOUND, HttpStatus.NOT_FOUND));
         }
 
-        // Update fields
-        existingFeeRate.setCampus(campus);
-        existingFeeRate.setStandard(standard);
-        existingFeeRate.setAcademicYear(academicYear);
-        existingFeeRate.setFeeComponent(feeComponent);
+        FeeComponentEntity percComponent = null;
+        if (dto.getPercentageOfComponentId() != null) {
+            percComponent = feeComponentRepository.findById(dto.getPercentageOfComponentId())
+                    .orElseThrow(() -> new ApiException(FeeRateErrors.FEE_COMPONENT_NOT_FOUND, "Percentage base component not found", HttpStatus.NOT_FOUND));
+        }
 
-        existingFeeRate.setChargeType(chargeType);
-        existingFeeRate.setFixedAmount(dto.getFixedAmount());
-        existingFeeRate.setPercentageValue(dto.getPercentageValue());
-        existingFeeRate.setPercentageOfComponent(percComponent);
-        existingFeeRate.setUnitPrice(dto.getUnitPrice());
-        existingFeeRate.setSlabGroup(slabGroup);
-        existingFeeRate.setPriority(dto.getPriority() != null ? dto.getPriority() : 0);
+        // Validate
+        validateDates(dto.getEffectiveFrom(), dto.getEffectiveTo());
+        checkOverlaps(campus.getId(), standard.getId(), academicYear, feeComponent, dto.getEffectiveFrom(), dto.getEffectiveTo(), id);
 
-        existingFeeRate.setCurrency(dto.getCurrency());
-        existingFeeRate.setEffectiveFrom(from);
-        existingFeeRate.setEffectiveTo(to);
-        existingFeeRate.setActive(dto.isActive());
+        // Update
+        FeeRateMapper.updateEntityFromDTO(existing, dto);
+        existing.setCampus(campus);
+        existing.setStandard(standard);
+        existing.setAcademicYear(academicYear);
+        existing.setFeeComponent(feeComponent);
+        existing.setChargeType(chargeType);
+        existing.setSlabGroup(slabGroup);
+        existing.setPercentageOfComponent(percComponent);
 
-        // Save updated FeeRate
-        FeeRateEntity feeRateEntity = feeRateRepository.save(existingFeeRate);
-        return FeeRateMapper.toResponseDTO(feeRateEntity);
+        FeeRateEntity updated = feeRateRepository.save(existing);
+        log.info("[Service:FeeRateService] updateFeeRate() succeeded - id: {}", id);
+        return FeeRateMapper.toResponseDTO(updated);
+    }
+
+    public List<FeeRatesResponseDTO> searchFeeRates(Long feeCatalogId, Long feeComponentId, String keyword) {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeRateErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:FeeRateService] searchFeeRates() called - keyword: {}, organization: {}", keyword, organizationId);
+        List<FeeRateEntity> result = feeRateRepository.searchFeeRatesByOrganization(feeCatalogId, feeComponentId, keyword, organizationId);
+        return FeeRateMapper.toResponseDTOList(result);
+    }
+
+    public Map<String, Long> getStatistics() {
+        Long organizationId = SecurityUtils.getCurrentOrganizationId();
+        if (organizationId == null) {
+            throw new ApiException(FeeRateErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
+        }
+        log.info("[Service:FeeRateService] getStatistics() called - organization: {}", organizationId);
+
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("totalRates", feeRateRepository.countByOrganizationId(organizationId));
+        stats.put("activeRates", feeRateRepository.countByOrganizationIdAndActiveTrue(organizationId));
+        stats.put("inactiveRates", feeRateRepository.countByOrganizationIdAndActiveFalse(organizationId));
+
+        log.info("[Service:FeeRateService] getStatistics() succeeded - Stats: {}", stats);
+        return stats;
+    }
+
+    private void validateDates(LocalDate from, LocalDate to) {
+        if (to != null && to.isBefore(from)) {
+            throw new ApiException(FeeRateErrors.INVALID_FEE_RATE_DATA, "Effective To date cannot be before Effective From date", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private void checkOverlaps(Long campusId, Long standardId, AcademicYearEntity academicYear, FeeComponentEntity component, LocalDate from, LocalDate to, Long existingId) {
+        List<FeeRateEntity> overlapping = feeRateRepository.findActiveFeeRatesByComponent(campusId, standardId, academicYear.getId(), component != null ? component.getId() : null);
+
+        if (!CollectionUtils.isEmpty(overlapping)) {
+            for (FeeRateEntity fr : overlapping) {
+                if (existingId != null && fr.getId().equals(existingId)) continue;
+
+                LocalDate existingFrom = fr.getEffectiveFrom();
+                LocalDate existingTo = fr.getEffectiveTo() != null ? fr.getEffectiveTo() : academicYear.getEndDate();
+                LocalDate newFrom = from;
+                LocalDate newTo = to != null ? to : academicYear.getEndDate();
+
+                if (!(newTo.isBefore(existingFrom) || newFrom.isAfter(existingTo))) {
+                    throw new ApiException(FeeRateErrors.OVERLAPPING_FEE_RATE, HttpStatus.CONFLICT);
+                }
+            }
+        }
     }
 }

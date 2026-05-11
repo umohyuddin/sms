@@ -1,10 +1,15 @@
 package com.smartsolutions.eschool.lookups.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@SQLDelete(sql = "UPDATE curricula SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "curricula")
 @Getter
 @Setter
@@ -25,7 +30,4 @@ public class CurriculumEntity extends ScopeAuditableEntity {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
-
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
 }

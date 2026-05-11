@@ -191,11 +191,11 @@ public class SalaryStructureComponentService {
             existingMappings.stream().filter(e -> !incomingComponentIds.contains(e.getComponent().getId())).forEach(e -> e.setDeleted(true));
 
             List<SalaryStructureComponentEntity> resultEntities = componentRepository.saveAll(
-                    Stream.concat(entitiesToSave.stream(), existingMappings.stream().filter(SalaryStructureComponentEntity::getDeleted)).toList()
+                    Stream.concat(entitiesToSave.stream(), existingMappings.stream().filter(SalaryStructureComponentEntity::isDeleted)).toList()
             );
 
             log.info("Successfully updated salary structure components for employeeTypeId={}", employeeTypeId);
-            return resultEntities.stream().filter(e -> !e.getDeleted()).map(this::toDto).toList();
+            return resultEntities.stream().filter(e -> !e.isDeleted()).map(this::toDto).toList();
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Exception e) {

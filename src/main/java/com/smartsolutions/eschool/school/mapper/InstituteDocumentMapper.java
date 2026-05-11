@@ -68,7 +68,7 @@ public class InstituteDocumentMapper {
         entity.setFileName(requestDTO.getFileName());
         entity.setFileUrl(requestDTO.getFileUrl());
         entity.setExpiryDate(requestDTO.getExpiryDate());
-        entity.setIsDeleted(false);
+        entity.setDeleted(false);
 
         return entity;
     }

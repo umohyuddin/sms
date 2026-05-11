@@ -51,7 +51,7 @@ public class StudentAttendanceService {
         if (campusId != null && standardId != null && sectionId != null && date != null && (keyword == null || keyword.trim().isEmpty())) {
             log.info("[Service:StudentAttendanceService] search() - No records found. Loading Roll Call for section: {}", sectionId);
             List<com.smartsolutions.eschool.student.model.StudentEntity> students = studentRepository.searchStudentsWithFilters(
-                    campusId, standardId, sectionId, null, null, null, organizationId);
+                    campusId, standardId, sectionId, null, null, null, null, organizationId);
             
             return students.stream()
                     .map(s -> StudentAttendanceMapper.mapToProtoResponse(s, date, organizationId))

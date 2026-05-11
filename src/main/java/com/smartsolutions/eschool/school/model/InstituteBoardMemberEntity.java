@@ -9,9 +9,9 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "institute_board_members")
 @SQLDelete(sql = "UPDATE institute_board_members SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Table(name = "institute_board_members")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -46,7 +46,4 @@ public class InstituteBoardMemberEntity extends AuditableEntity {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 }

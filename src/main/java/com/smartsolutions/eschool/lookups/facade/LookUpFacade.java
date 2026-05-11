@@ -14,6 +14,8 @@ import jakarta.validation.Valid;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.HashMap;
@@ -51,26 +53,36 @@ public class LookUpFacade {
     public DashboardFinancialDTO DashboardFinancialCounts() {
         AcademicYearResponseDTO currentYear = academicYearFacade.getCurrentAcademicYear();
 
-        Double totalAssigned = studentFeeAssignmentFacade.getTotalFeeAssigned(null);
-        Double totalCollected = studentFeePaymentsFacade.getTotalFeeCollected(null);
-        double outstanding = totalAssigned - totalCollected;
+        BigDecimal totalAssigned = studentFeeAssignmentFacade.getTotalFeeAssigned(null);
+        if (totalAssigned == null) totalAssigned = BigDecimal.ZERO;
 
-        Double totalCollectedMonthly = studentFeePaymentsFacade.getCollectedUpToCurrentMonth();
+        BigDecimal totalCollected = studentFeePaymentsFacade.getTotalFeeCollected(null);
+        if (totalCollected == null) totalCollected = BigDecimal.ZERO;
 
-        double expectedMonthlyCollection = totalAssigned / currentYear.getTotalMonths();
+        BigDecimal outstanding = totalAssigned.subtract(totalCollected);
+
+        BigDecimal totalCollectedMonthly = studentFeePaymentsFacade.getCollectedUpToCurrentMonth();
+        if (totalCollectedMonthly == null) totalCollectedMonthly = BigDecimal.ZERO;
+
+        long totalMonths = currentYear.getTotalMonths();
+        if (totalMonths <= 0) totalMonths = 12;
+
+        BigDecimal expectedMonthlyCollection = totalAssigned.divide(BigDecimal.valueOf(totalMonths), 2, RoundingMode.HALF_UP);
+        
         // Monthly outstanding = expected - collected
-        double monthlyOutstanding = expectedMonthlyCollection - totalCollectedMonthly;
+        BigDecimal monthlyOutstanding = expectedMonthlyCollection.subtract(totalCollectedMonthly);
+        
         LocalDate today = LocalDate.now();
         String monthName = today.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-        System.out.println("Current month: " + monthName); // e.g., "December"
+        
         return DashboardFinancialDTO.builder()
                 .academicYearName(currentYear.getName())
                 .collectedYearlyFee(totalCollected)
                 .outstandingYearlyFee(outstanding)
-                .assignedYearlyFee(totalAssigned).
-                collectedMonthlyFee(totalCollectedMonthly).
-                assignedMonthlyFee(expectedMonthlyCollection).
-                outstandingMonthlyFee(monthlyOutstanding)
+                .assignedYearlyFee(totalAssigned)
+                .collectedMonthlyFee(totalCollectedMonthly)
+                .assignedMonthlyFee(expectedMonthlyCollection)
+                .outstandingMonthlyFee(monthlyOutstanding)
                 .monthName(monthName)
                 .build();
     }

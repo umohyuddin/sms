@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -22,7 +23,7 @@ public class FeeAssignmentDTO {
     private String componentName;
 
     @Schema(description = "Assigned amount", example = "5000.00")
-    private Double amount;
+    private BigDecimal amount;
 
     @Schema(description = "Date assigned", example = "2024-04-01")
     private LocalDate assignedDate;

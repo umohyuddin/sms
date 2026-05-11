@@ -1,4 +1,5 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import com.smartsolutions.eschool.user.model.RoleEntity;
@@ -8,15 +9,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+
 
 @Entity
+@SQLDelete(sql = "UPDATE institute_contacts SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "institute_contacts")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Where(clause = "is_deleted = false")
 public class InstituteContactEntity extends ScopeAuditableEntity {
 
     @Id
@@ -42,7 +44,4 @@ public class InstituteContactEntity extends ScopeAuditableEntity {
 
     @Column(name = "is_primary")
     private Boolean isPrimary = false;
-
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
 }

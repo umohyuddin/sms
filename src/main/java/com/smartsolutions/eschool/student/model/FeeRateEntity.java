@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.student.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
@@ -17,6 +20,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE fee_rates SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "fee_rates", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "fee_component_id", "campus_id", "standard_id", "academic_year_id" }) })
 @Getter
@@ -72,9 +77,6 @@ public class FeeRateEntity extends AuditableEntity {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 
     @OneToMany(mappedBy = "feeRate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

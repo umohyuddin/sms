@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.student.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
@@ -17,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE students SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "students")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -81,9 +86,6 @@ public class StudentEntity extends AuditableEntity {
 
     @Column(name = "enrollment_date", nullable = false)
     private LocalDate enrollmentDate;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 
     // --- RELATIONSHIPS --- //
 

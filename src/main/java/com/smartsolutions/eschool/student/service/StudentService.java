@@ -13,6 +13,7 @@ import com.smartsolutions.eschool.sclass.repository.StandardRepository;
 import com.smartsolutions.eschool.student.dtos.StudentDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentBasicInfoUpdateDTO;
 import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentSearchRequestDTO;
 import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentDocuments.response.StudentDocumentResponseDto;
 import com.smartsolutions.eschool.student.error.StudentErrors;
@@ -23,8 +24,24 @@ import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.repository.AdmissionTypeRepository;
 import com.smartsolutions.eschool.student.repository.StudentDocumentRepository;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
+import com.smartsolutions.eschool.user.mapper.SystemUserMapper;
+import com.smartsolutions.eschool.user.model.SystemUserEntity;
+import com.smartsolutions.eschool.user.model.UserAccountDeactivationLogEntity;
+import com.smartsolutions.eschool.user.model.UserAccountInfoEntity;
+import com.smartsolutions.eschool.user.model.UserRolesEntity;
+import com.smartsolutions.eschool.user.model.UserRoleId;
+import com.smartsolutions.eschool.user.repository.RoleRepository;
+import com.smartsolutions.eschool.user.repository.SystemUserRepository;
+import com.smartsolutions.eschool.user.repository.UserAccountDeactivationLogRepository;
+import com.smartsolutions.eschool.user.repository.UserAccountInfoRepository;
+import com.smartsolutions.eschool.user.repository.UserRolesRepository;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentLoginActivationRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.requestDto.StudentLoginDeactivationRequestDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentLoginResponseDTO;
 import com.smartsolutions.eschool.util.MapperUtil;
 import com.smartsolutions.eschool.util.SecurityUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import java.time.LocalDateTime;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +77,12 @@ public class StudentService {
     private final AcademicYearRepository academicYearRepository;
     private final AdmissionTypeRepository admissionTypeRepository;
     private final StudentDocumentRepository studentDocumentRepository;
+    private final SystemUserRepository systemUserRepository;
+    private final RoleRepository roleRepository;
+    private final UserRolesRepository userRolesRepository;
+    private final UserAccountInfoRepository userAccountInfoRepository;
+    private final UserAccountDeactivationLogRepository userAccountDeactivationLogRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private Long getOrgId() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
@@ -249,11 +272,32 @@ public class StudentService {
         }
     }
 
-    public List<StudentDTO> searchStudents(Long campusId, Long standardId, Long sectionId, Long studentId, Long academicYearId, String kw) {
+    public List<StudentDTO> searchStudents(StudentSearchRequestDTO searchRequest) {
         Long orgId = getOrgId();
-        log.info("[Service:StudentService] searchStudents() called for org: {}", orgId);
+        log.info("[Service:StudentService] searchStudents() called for org: {} - Params: {}", orgId, searchRequest);
         try {
-            List<StudentEntity> result = studentRepository.searchStudentsWithFilters(campusId, standardId, sectionId, studentId, academicYearId, kw, orgId);
+            String kw = (searchRequest.getKeyword() != null && !searchRequest.getKeyword().isBlank()) ? searchRequest.getKeyword().trim() : null;
+            
+            Long academicYearId = searchRequest.getAcademicYearId();
+            if (academicYearId == null) {
+                academicYearId = academicYearRepository.findByIsCurrentTrue()
+                        .map(AcademicYearEntity::getId)
+                        .orElse(null);
+                log.info("[Service:StudentService] No academicYearId provided, defaulting to current year: {}", academicYearId);
+            }
+
+            List<StudentEntity> result = studentRepository.searchStudentsWithFilters(
+                    searchRequest.getCampusId(), 
+                    searchRequest.getStandardId(), 
+                    searchRequest.getSectionId(), 
+                    searchRequest.getStudentId(), 
+                    academicYearId, 
+                    searchRequest.getIsActive(), 
+                    kw, 
+                    orgId);
+            
+            // Calculate fee assignment status for each student to match getAll() response
+            result.forEach(StudentEntity::calculateFeeAssigned);
             return StudentMapper.toDTOList(result);
         } catch (Exception e) {
             log.error("[Service:StudentService] Error searching students", e);
@@ -434,29 +478,65 @@ public class StudentService {
                     .orElse(null);
         }
 
-        List<Object[]> results = studentRepository.getCampusClassDistribution(
+        List<Object[]> results = studentRepository.getCampusClassSectionDistribution(
                 filter.getCampusIds(), academicYearId, filter.getFromDate(), filter.getToDate(), orgId);
 
-        // Group by campusName
-        Map<String, List<Object[]>> byCampus = results.stream()
-                .collect(Collectors.groupingBy(row -> row[0] != null ? row[0].toString() : "Unknown Campus"));
+        // Group by Campus ID
+        Map<Long, List<Object[]>> byCampus = results.stream()
+                .collect(Collectors.groupingBy(row -> row[0] != null ? (Long) row[0] : -1L));
 
         List<com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution> response = new ArrayList<>();
-        for (Map.Entry<String, List<Object[]>> entry : byCampus.entrySet()) {
-            List<com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution> classes = entry.getValue().stream().map(row -> {
-                return com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution.builder()
-                        .className(row[1] != null ? row[1].toString() : "N/A")
-                        .total(((Number) row[2]).longValue())
-                        .active(row[3] != null ? ((Number) row[3]).longValue() : 0L)
-                        .male(row[4] != null ? ((Number) row[4]).longValue() : 0L)
-                        .female(row[5] != null ? ((Number) row[5]).longValue() : 0L)
-                        .other(row[6] != null ? ((Number) row[6]).longValue() : 0L)
-                        .build();
-            }).collect(Collectors.toList());
+
+        for (Map.Entry<Long, List<Object[]>> campusEntry : byCampus.entrySet()) {
+            List<Object[]> campusRows = campusEntry.getValue();
+            String campusName = campusRows.isEmpty() ? "Unknown Campus" : (campusRows.get(0)[1] != null ? campusRows.get(0)[1].toString() : "Unknown Campus");
+
+            // Group by Class ID within the campus
+            Map<Long, List<Object[]>> byClass = campusRows.stream()
+                    .collect(Collectors.groupingBy(row -> row[2] != null ? (Long) row[2] : -1L));
+
+            List<com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution> classDistributions = new ArrayList<>();
+
+            for (Map.Entry<Long, List<Object[]>> classEntry : byClass.entrySet()) {
+                List<Object[]> classRows = classEntry.getValue();
+                String className = classRows.isEmpty() ? "N/A" : (classRows.get(0)[3] != null ? classRows.get(0)[3].toString() : "N/A");
+
+                // Map rows to Sections
+                List<com.smartsolutions.eschool.dashboard.dtos.responses.SectionStudentDistribution> sectionDistributions = classRows.stream()
+                        .map(row -> com.smartsolutions.eschool.dashboard.dtos.responses.SectionStudentDistribution.builder()
+                                .sectionId(row[4] != null ? (Long) row[4] : null)
+                                .sectionName(row[5] != null ? row[5].toString() : "Unassigned")
+                                .total(((Number) row[6]).longValue())
+                                .active(row[7] != null ? ((Number) row[7]).longValue() : 0L)
+                                .male(row[8] != null ? ((Number) row[8]).longValue() : 0L)
+                                .female(row[9] != null ? ((Number) row[9]).longValue() : 0L)
+                                .other(row[10] != null ? ((Number) row[10]).longValue() : 0L)
+                                .build())
+                        .collect(Collectors.toList());
+
+                // Calculate totals for the Class (sum of its sections)
+                long classTotal = sectionDistributions.stream().mapToLong(s -> s.getTotal()).sum();
+                long classActive = sectionDistributions.stream().mapToLong(s -> s.getActive()).sum();
+                long classMale = sectionDistributions.stream().mapToLong(s -> s.getMale()).sum();
+                long classFemale = sectionDistributions.stream().mapToLong(s -> s.getFemale()).sum();
+                long classOther = sectionDistributions.stream().mapToLong(s -> s.getOther()).sum();
+
+                classDistributions.add(com.smartsolutions.eschool.dashboard.dtos.responses.ClassStudentDistribution.builder()
+                        .classId(classEntry.getKey() == -1L ? null : classEntry.getKey())
+                        .className(className)
+                        .total(classTotal)
+                        .active(classActive)
+                        .male(classMale)
+                        .female(classFemale)
+                        .other(classOther)
+                        .sections(sectionDistributions)
+                        .build());
+            }
 
             response.add(com.smartsolutions.eschool.dashboard.dtos.responses.CampusStudentDistribution.builder()
-                    .campus(entry.getKey())
-                    .classes(classes)
+                    .campusId(campusEntry.getKey() == -1L ? null : campusEntry.getKey())
+                    .campus(campusName)
+                    .classes(classDistributions)
                     .build());
         }
 
@@ -488,5 +568,86 @@ public class StudentService {
         List<Object[]> results = studentRepository.getStudentStrengthByStandard(filter.getCampusIds(), filter.getToDate(), orgId);
         log.info("[Service:StudentService] getClassStrengthChart() succeeded");
         return results;
+    }
+
+    @Transactional
+    public StudentLoginResponseDTO activateStudentLogin(Long studentId, StudentLoginActivationRequestDTO req) {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] activateStudentLogin() called for student: {} org: {}", studentId, orgId);
+
+        StudentEntity student = studentRepository.findByIdAndOrganizationId(studentId, orgId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found", HttpStatus.NOT_FOUND));
+
+        if (systemUserRepository.existsByStudentId(studentId)) {
+            throw new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Student login already activated", HttpStatus.CONFLICT);
+        }
+
+        if (student.getEmail() == null || student.getEmail().isBlank()) {
+            throw new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Student email is required for login activation", HttpStatus.BAD_REQUEST);
+        }
+
+        // Create System User
+        String encodedPassword = passwordEncoder.encode(req.getPassword());
+        SystemUserEntity user = SystemUserMapper.toEntity(student, encodedPassword, orgId);
+        SystemUserEntity savedUser = systemUserRepository.save(user);
+
+        // Assign Default Student Role
+//        roleRepository.findByCodeAndOrganizationId("STUDENT", orgId)
+//                .ifPresent(role -> {
+//                    UserRolesEntity userRole = new UserRolesEntity();
+//                    userRole.setUser(savedUser);
+//                    userRole.setRole(role);
+//                    userRole.setId(new UserRoleId(savedUser.getId(), role.getId()));
+//                    userRole.setOrganizationId(orgId);
+//                    userRolesRepository.save(userRole);
+//                });
+
+        // Create Account Info
+        UserAccountInfoEntity accountInfo = UserAccountInfoEntity.builder()
+                .organizationId(orgId)
+                .systemUser(savedUser)
+                .requiresPasswordChange(true)
+                .build();
+        userAccountInfoRepository.save(accountInfo);
+
+        log.info("[Service:StudentService] Successfully activated login for student: {}", studentId);
+        return StudentLoginResponseDTO.builder()
+                .studentId(studentId)
+                .systemUserId(savedUser.getId())
+                .username(savedUser.getUsername())
+                .status("ACTIVATED")
+                .message("Student login has been successfully activated.")
+                .build();
+    }
+
+    @Transactional
+    public StudentLoginResponseDTO deactivateStudentLogin(Long studentId, StudentLoginDeactivationRequestDTO req) {
+        Long orgId = getOrgId();
+        log.info("[Service:StudentService] deactivateStudentLogin() called for student: {} org: {}", studentId, orgId);
+
+        SystemUserEntity user = systemUserRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student login account not found", HttpStatus.NOT_FOUND));
+
+        user.setIsActive(false);
+        systemUserRepository.save(user);
+
+        // Log Deactivation
+        UserAccountDeactivationLogEntity logEntry = UserAccountDeactivationLogEntity.builder()
+                .organizationId(orgId)
+                .systemUser(user)
+                .reason(req.getReason())
+                .deactivatedAt(LocalDateTime.now())
+                .deactivatedBy(SecurityUtils.getCurrentUserId())
+                .build();
+        userAccountDeactivationLogRepository.save(logEntry);
+
+        log.info("[Service:StudentService] Successfully deactivated login for student: {}", studentId);
+        return StudentLoginResponseDTO.builder()
+                .studentId(studentId)
+                .systemUserId(user.getId())
+                .username(user.getUsername())
+                .status("DEACTIVATED")
+                .message("Student login has been successfully deactivated.")
+                .build();
     }
 }

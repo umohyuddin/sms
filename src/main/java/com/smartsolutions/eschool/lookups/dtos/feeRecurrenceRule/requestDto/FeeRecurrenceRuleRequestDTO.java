@@ -20,4 +20,5 @@ public class FeeRecurrenceRuleRequestDTO {
     
     private String description;
     private Boolean isActive;
+    private Integer occurrenceInterval;
 }

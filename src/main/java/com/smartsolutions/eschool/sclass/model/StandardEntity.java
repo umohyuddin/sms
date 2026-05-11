@@ -13,9 +13,9 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 @Entity
-@Table(name = "standards")
 @SQLDelete(sql = "UPDATE standards SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Table(name = "standards")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -35,9 +35,6 @@ public class StandardEntity extends AuditableEntity {
 
     @Column(name = "description")
     private String description;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 
     @OneToMany(mappedBy = "standard", cascade = CascadeType.ALL)
     private List<SectionEntity> sections;

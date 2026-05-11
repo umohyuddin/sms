@@ -122,21 +122,25 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
       "campus",
       "standard",
       "section",
-      "academicYear"
+      "academicYear",
+      "feeAssignments"
   })
   @Query("""
-          SELECT s FROM StudentEntity s
+          SELECT DISTINCT s FROM StudentEntity s
+          LEFT JOIN s.feeAssignments fa
           WHERE s.deleted = false AND s.organizationId = :organizationId
             AND (:campusId IS NULL OR s.campus.id = :campusId)
             AND (:standardId IS NULL OR s.standard.id = :standardId)
             AND (:sectionId IS NULL OR s.section.id = :sectionId)
             AND (:studentId IS NULL OR s.id = :studentId)
             AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
+            AND (:isActive IS NULL OR s.isActive = :isActive)
             AND (
                   :keyword IS NULL
                   OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                   OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                   OR LOWER(s.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                  OR LOWER(s.studentCode) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 )
       """)
   List<StudentEntity> searchStudentsWithFilters(
@@ -145,6 +149,7 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
       @Param("sectionId") Long sectionId,
       @Param("studentId") Long studentId,
       @Param("academicYearId") Long academicYearId,
+      @Param("isActive") Boolean isActive,
       @Param("keyword") String keyword,
       @Param("organizationId") Long organizationId);
 
@@ -305,7 +310,9 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
 
     @Query("""
         SELECT 
+            s.campus.id,
             s.campus.campusName, 
+            s.standard.id,
             s.standard.standardName, 
             COUNT(s),
             SUM(CASE WHEN s.isActive = true THEN 1 ELSE 0 END),
@@ -318,10 +325,42 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
           AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
           AND (:fromDate IS NULL OR s.enrollmentDate >= :fromDate)
           AND (:toDate IS NULL OR s.enrollmentDate <= :toDate)
-        GROUP BY s.campus.campusName, s.standard.standardName
+        GROUP BY s.campus.id, s.campus.campusName, s.standard.id, s.standard.standardName
         ORDER BY s.campus.campusName, s.standard.standardName
     """)
     List<Object[]> getCampusClassDistribution(
+        @Param("campusIds") List<Long> campusIds,
+        @Param("academicYearId") Long academicYearId,
+        @Param("fromDate") java.time.LocalDate fromDate,
+        @Param("toDate") java.time.LocalDate toDate, 
+        @Param("organizationId") Long organizationId);
+
+    @Query("""
+        SELECT 
+            c.id,
+            c.campusName, 
+            st.id,
+            st.standardName, 
+            sec.id,
+            sec.sectionName,
+            COUNT(s),
+            SUM(CASE WHEN s.isActive = true THEN 1 ELSE 0 END),
+            SUM(CASE WHEN UPPER(s.gender) = 'MALE' THEN 1 ELSE 0 END),
+            SUM(CASE WHEN UPPER(s.gender) = 'FEMALE' THEN 1 ELSE 0 END),
+            SUM(CASE WHEN UPPER(s.gender) = 'OTHER' THEN 1 ELSE 0 END)
+        FROM StudentEntity s
+        LEFT JOIN s.campus c
+        LEFT JOIN s.standard st
+        LEFT JOIN s.section sec
+        WHERE s.organizationId = :organizationId AND s.deleted = false
+          AND (:campusIds IS NULL OR c.id IN :campusIds)
+          AND (:academicYearId IS NULL OR s.academicYear.id = :academicYearId)
+          AND (:fromDate IS NULL OR s.enrollmentDate >= :fromDate)
+          AND (:toDate IS NULL OR s.enrollmentDate <= :toDate)
+        GROUP BY c.id, c.campusName, st.id, st.standardName, sec.id, sec.sectionName
+        ORDER BY c.campusName, st.standardName, sec.sectionName
+    """)
+    List<Object[]> getCampusClassSectionDistribution(
         @Param("campusIds") List<Long> campusIds,
         @Param("academicYearId") Long academicYearId,
         @Param("fromDate") java.time.LocalDate fromDate,

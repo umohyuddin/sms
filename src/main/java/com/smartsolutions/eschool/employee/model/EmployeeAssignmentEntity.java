@@ -12,23 +12,19 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.Date;
 
 @Entity
+@SQLDelete(sql = "UPDATE employee_assignments SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "employee_assignments")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE employee_assignments SET deleted = true WHERE id = ?")
-@SQLRestriction("deleted = false")
 public class EmployeeAssignmentEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Builder.Default
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id", nullable = false, foreignKey = @ForeignKey(name = "fk_assign_employee"))

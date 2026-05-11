@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.user.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -8,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@SQLDelete(sql = "UPDATE PermissionEntity SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(
         name = "permissions",
         uniqueConstraints = {
@@ -50,9 +55,6 @@ public class PermissionEntity extends AuditableEntity {
 
     @Column(name = "active")
     private Boolean active = true;
-
-    @Column(name = "deleted")
-    private Boolean deleted = false;
 
     @PrePersist
     @PreUpdate

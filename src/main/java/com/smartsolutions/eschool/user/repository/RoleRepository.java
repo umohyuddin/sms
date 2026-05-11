@@ -62,6 +62,10 @@ public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
     boolean existsByOrganizationIdAndCode(@Param("organizationId") Long organizationId,
             @Param("code") String code);
 
+    @Query("SELECT r FROM RoleEntity r WHERE r.organizationId = :organizationId AND r.code = :code AND r.deleted = false")
+    Optional<RoleEntity> findByCodeAndOrganizationId(@Param("code") String code,
+            @Param("organizationId") Long organizationId);
+
     @Query("SELECT (COUNT(r) > 0) FROM RoleEntity r WHERE r.organizationId = :organizationId AND r.code = :code AND r.id <> :id AND r.deleted = false")
     boolean existsByOrganizationIdAndCodeAndIdNot(@Param("organizationId") Long organizationId,
             @Param("code") String code, @Param("id") Long id);

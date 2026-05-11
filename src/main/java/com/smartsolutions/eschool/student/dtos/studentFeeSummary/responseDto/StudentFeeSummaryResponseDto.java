@@ -26,6 +26,12 @@ public class StudentFeeSummaryResponseDto {
     @Schema(description = "Total fees paid to date", example = "20000.00")
     private BigDecimal totalPaid;
 
+    @Schema(description = "Total late fees applied to date", example = "500.00")
+    private BigDecimal totalLateFee;
+
+    @Schema(description = "Total tax applied to date", example = "250.00")
+    private BigDecimal totalTax;
+
     @Schema(description = "Current outstanding balance", example = "40000.00")
     private BigDecimal balance;
 
@@ -81,12 +87,12 @@ public class StudentFeeSummaryResponseDto {
         @Schema(description = "Amount paid in this installment", example = "2500.00")
         private BigDecimal amountPaid;
         @Schema(description = "Mode of payment", example = "CASH")
-        private String paymentMode;
+        private com.smartsolutions.eschool.student.enums.PaymentMode paymentMode;
 
         public PartialPaymentDTO(StudentFeePaymentResponseDTO p) {
             this.id = p.getId();
             this.paymentDate = p.getPaymentDate();
-            this.amountPaid = BigDecimal.valueOf(p.getAmountPaid());
+            this.amountPaid = p.getAmountPaid();
             this.paymentMode = p.getPaymentMode();
         }
     }
