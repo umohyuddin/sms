@@ -50,21 +50,6 @@ public class StudentFeeAssignmentEntity extends AuditableEntity {
     @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
-    @Column(name = "due_date")
-    private LocalDate dueDate;
-
-    @Column(name = "late_fee_amount", precision = 12, scale = 2)
-    private BigDecimal lateFeeAmount = BigDecimal.ZERO;
-
-    @Column(name = "waived_amount", precision = 12, scale = 2)
-    private BigDecimal waivedAmount = BigDecimal.ZERO;
-
-    @Column(name = "waived_reason")
-    private String waivedReason;
-
-    @Column(name = "last_reminder_sent_at")
-    private LocalDateTime lastReminderSentAt;
-
     @Column(name = "assigned_date")
     private LocalDate assignedDate;
 }

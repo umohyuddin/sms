@@ -16,9 +16,9 @@ import java.time.temporal.ChronoUnit;
 @Slf4j
 public class LateFeeCalculationService {
 
-    public BigDecimal calculateLateFee(StudentFeeAssignmentEntity assignment, CampusFinancialSettings settings) {
-        if (assignment == null) return BigDecimal.ZERO;
-        return calculateLateFee(assignment.getTotalAmount(), assignment.getDueDate(), LocalDate.now(), settings);
+    public BigDecimal calculateLateFee(com.smartsolutions.eschool.student.model.StudentFeeInvoiceEntity invoice, CampusFinancialSettings settings) {
+        if (invoice == null) return BigDecimal.ZERO;
+        return calculateLateFee(invoice.getTotalAmount(), invoice.getDueDate(), LocalDate.now(), settings);
     }
 
     public BigDecimal calculateLateFee(BigDecimal baseAmount, LocalDate dueDate, LocalDate calculationDate, CampusFinancialSettings settings) {

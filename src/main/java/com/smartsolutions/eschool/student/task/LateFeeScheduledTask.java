@@ -2,8 +2,8 @@ package com.smartsolutions.eschool.student.task;
 
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
 import com.smartsolutions.eschool.school.repository.AcademicYearRepository;
-import com.smartsolutions.eschool.student.model.StudentFeeAssignmentEntity;
-import com.smartsolutions.eschool.student.repository.StudentFeeAssignmentRepository;
+import com.smartsolutions.eschool.student.model.StudentFeeInvoiceEntity;
+import com.smartsolutions.eschool.student.repository.StudentFeeInvoiceRepository;
 import com.smartsolutions.eschool.student.service.StudentFeeSummaryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,27 +11,25 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class LateFeeScheduledTask {
 
-    private final StudentFeeAssignmentRepository assignmentRepository;
+    private final StudentFeeInvoiceRepository invoiceRepository;
     private final StudentFeeSummaryService summaryService;
     private final AcademicYearRepository academicYearRepository;
 
-    public LateFeeScheduledTask(StudentFeeAssignmentRepository assignmentRepository,
+    public LateFeeScheduledTask(StudentFeeInvoiceRepository invoiceRepository,
                                 StudentFeeSummaryService summaryService,
                                 AcademicYearRepository academicYearRepository) {
-        this.assignmentRepository = assignmentRepository;
+        this.invoiceRepository = invoiceRepository;
         this.summaryService = summaryService;
         this.academicYearRepository = academicYearRepository;
     }
 
     /**
-     * Runs every day at 1:00 AM to update late fees for all overdue assignments.
+     * Runs every day at 1:00 AM to update late fees for all overdue invoices.
      */
     @Scheduled(cron = "0 0 1 * * ?")
     public void updateOverdueLateFees() {
@@ -43,24 +41,23 @@ public class LateFeeScheduledTask {
             return;
         }
 
-        // Find all assignments that are past their due date
-        List<StudentFeeAssignmentEntity> overdueAssignments = assignmentRepository.findAll().stream()
-                .filter(a -> a.getDueDate() != null && a.getDueDate().isBefore(LocalDate.now()))
-                .collect(Collectors.toList());
+        // Find all invoices that are past their due date
+        List<StudentFeeInvoiceEntity> overdueInvoices = invoiceRepository.findAllOverdueInvoices();
 
-        log.info("[Task:LateFeeScheduledTask] Found {} potentially overdue assignments", overdueAssignments.size());
+        log.info("[Task:LateFeeScheduledTask] Found {} overdue invoices", overdueInvoices.size());
 
         java.util.Set<Long> affectedStudentIds = new java.util.HashSet<>();
-        for (StudentFeeAssignmentEntity assignment : overdueAssignments) {
+        for (StudentFeeInvoiceEntity invoice : overdueInvoices) {
             try {
-                Long studentId = assignment.getStudent().getId();
-                Long orgId = assignment.getOrganizationId();
+                Long studentId = invoice.getStudent().getId();
+                Long orgId = invoice.getOrganizationId();
                 if (orgId != null) {
+                    // This will trigger LateFeeCalculationService via StudentFeeSummaryService
                     summaryService.updateSummary(studentId, currentYear.getId(), orgId);
                     affectedStudentIds.add(studentId);
                 }
             } catch (Exception e) {
-                log.error("[Task:LateFeeScheduledTask] Error updating summary for studentId {}: {}", assignment.getStudent().getId(), e.getMessage());
+                log.error("[Task:LateFeeScheduledTask] Error updating summary for studentId {}: {}", invoice.getStudent().getId(), e.getMessage());
             }
         }
 

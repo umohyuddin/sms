@@ -60,10 +60,10 @@ private final StudentFeePaymentsFacade studentFeePaymentsFacade;
                 .body(pdfContent);
     }
 
-    @Operation(summary = "Waive late fee", description = "Administratively waive a portion or all of a late fee for a specific assignment.")
+    @Operation(summary = "Waive late fee", description = "Administratively waive a portion or all of a late fee for a specific invoice.")
     @PostMapping(value = "/fee/assignments/waive-late-fee")
     public ResponseEntity<?> waiveLateFee(@RequestBody @Valid LateFeeWaiverRequestDTO requestDTO) {
-        log.info("Request to waive late fee for assignment Id: {}", requestDTO.getAssignmentId());
+        log.info("Request to waive late fee for invoice Id: {}", requestDTO.getInvoiceId());
         studentFeePaymentsFacade.waiveLateFee(requestDTO);
         return ResponseEntity.ok().body("Late fee waived successfully");
     }

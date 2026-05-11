@@ -39,6 +39,7 @@ public class StudentFeeSummaryService {
     private final CampusFinancialSettingsRepository campusFinancialSettingsRepository;
     private final TaxTypeRepository taxTypeRepository;
     private final LateFeeCalculationService lateFeeCalculationService;
+    private final StudentFeeInvoiceRepository studentFeeInvoiceRepository;
     public StudentFeeSummaryService(StudentFeeSummaryRepository studentFeeSummaryRepository,
             StudentFeeAssignmentRepository studentFeeAssignmentRepository,
             StudentDiscountAssignmentRepository studentDiscountAssignmentRepository,
@@ -48,7 +49,8 @@ public class StudentFeeSummaryService {
             InstituteRepository instituteRepository,
             CampusFinancialSettingsRepository campusFinancialSettingsRepository,
             com.smartsolutions.eschool.lookups.repository.TaxTypeRepository taxTypeRepository,
-            LateFeeCalculationService lateFeeCalculationService) {
+            LateFeeCalculationService lateFeeCalculationService,
+            StudentFeeInvoiceRepository studentFeeInvoiceRepository) {
         this.studentFeeSummaryRepository = studentFeeSummaryRepository;
         this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
         this.studentDiscountAssignmentRepository = studentDiscountAssignmentRepository;
@@ -59,6 +61,7 @@ public class StudentFeeSummaryService {
         this.campusFinancialSettingsRepository = campusFinancialSettingsRepository;
         this.taxTypeRepository = taxTypeRepository;
         this.lateFeeCalculationService = lateFeeCalculationService;
+        this.studentFeeInvoiceRepository = studentFeeInvoiceRepository;
     }
 
     @Transactional
@@ -79,24 +82,18 @@ public class StudentFeeSummaryService {
         StudentEntity student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found: " + studentId));
 
-        // Late Fee Calculation
-        BigDecimal totalLateFee = BigDecimal.ZERO;
+        // Late Fee Calculation (Aggregated from Invoices)
+        BigDecimal totalLateFeeAmount = studentFeeInvoiceRepository.sumTotalLateFee(studentId, academicYearId);
+        if (totalLateFeeAmount == null) totalLateFeeAmount = BigDecimal.ZERO;
+
+        BigDecimal totalWaivedAmount = studentFeeInvoiceRepository.sumTotalWaivedAmount(studentId, academicYearId);
+        if (totalWaivedAmount == null) totalWaivedAmount = BigDecimal.ZERO;
+
+        BigDecimal totalLateFee = totalLateFeeAmount.subtract(totalWaivedAmount);
+        if (totalLateFee.compareTo(BigDecimal.ZERO) < 0) totalLateFee = BigDecimal.ZERO;
+        
         var campusSettings = campusFinancialSettingsRepository
                 .findByCampusIdAndAcademicYearId(student.getCampus().getId(), academicYearId);
-        
-        if (campusSettings.isPresent()) {
-            List<StudentFeeAssignmentEntity> assignments = studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, academicYearId, organizationId);
-            for (StudentFeeAssignmentEntity assignment : assignments) {
-                BigDecimal lateFee = lateFeeCalculationService.calculateLateFee(assignment, campusSettings.get());
-                if (lateFee.compareTo(BigDecimal.ZERO) > 0) {
-                    assignment.setLateFeeAmount(lateFee);
-                    studentFeeAssignmentRepository.save(assignment);
-                }
-                BigDecimal effectiveLateFee = assignment.getLateFeeAmount().subtract(assignment.getWaivedAmount() != null ? assignment.getWaivedAmount() : BigDecimal.ZERO);
-                if (effectiveLateFee.compareTo(BigDecimal.ZERO) < 0) effectiveLateFee = BigDecimal.ZERO;
-                totalLateFee = totalLateFee.add(effectiveLateFee);
-            }
-        }
         
         // Tax Calculation
         BigDecimal totalTax = BigDecimal.ZERO;

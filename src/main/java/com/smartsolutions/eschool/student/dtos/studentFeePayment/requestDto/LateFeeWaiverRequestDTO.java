@@ -12,9 +12,9 @@ import java.math.BigDecimal;
 @Schema(description = "Request object to waive a student's late fee")
 public class LateFeeWaiverRequestDTO {
 
-    @NotNull(message = "Assignment ID is required")
-    @Schema(description = "ID of the student fee assignment", example = "50001")
-    private Long assignmentId;
+    @NotNull(message = "Invoice ID is required")
+    @Schema(description = "ID of the student fee invoice", example = "50001")
+    private Long invoiceId;
 
     @NotNull(message = "Waived amount is required")
     @DecimalMin(value = "0.0", message = "Waived amount cannot be negative")

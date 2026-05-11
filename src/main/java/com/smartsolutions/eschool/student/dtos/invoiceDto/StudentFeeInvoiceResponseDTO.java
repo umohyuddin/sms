@@ -31,6 +31,9 @@ public class StudentFeeInvoiceResponseDTO {
     private LocalDate dueDate;
     private LocalDate invoiceDate;
     private String status;
+    private BigDecimal waivedAmount;
+    private String waivedReason;
+    private java.time.LocalDateTime lastReminderSentAt;
     private List<InvoiceDetailDTO> details;
 
     @Data

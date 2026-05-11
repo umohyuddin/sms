@@ -2,9 +2,9 @@ package com.smartsolutions.eschool.student.task;
 
 import com.smartsolutions.eschool.global.notification.NotificationService;
 import com.smartsolutions.eschool.institute.repository.CampusFinancialSettingsRepository;
-import com.smartsolutions.eschool.student.model.StudentFeeAssignmentEntity;
+import com.smartsolutions.eschool.student.model.StudentFeeInvoiceEntity;
 import com.smartsolutions.eschool.student.model.StudentFeeSummaryEntity;
-import com.smartsolutions.eschool.student.repository.StudentFeeAssignmentRepository;
+import com.smartsolutions.eschool.student.repository.StudentFeeInvoiceRepository;
 import com.smartsolutions.eschool.student.repository.StudentFeeSummaryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaymentReminderScheduledTask {
 
-    private final StudentFeeAssignmentRepository assignmentRepository;
+    private final StudentFeeInvoiceRepository invoiceRepository;
     private final StudentFeeSummaryRepository summaryRepository;
     private final CampusFinancialSettingsRepository campusSettingsRepository;
     private final NotificationService notificationService;
@@ -34,27 +34,27 @@ public class PaymentReminderScheduledTask {
         LocalDate today = LocalDate.now();
         LocalDateTime reminderWindowStart = today.atStartOfDay().minusDays(1); // Don't resend if sent today
 
-        // We check assignments due within the next 7 days (broad window, specific checks inside)
-        List<StudentFeeAssignmentEntity> upcomingAssignments = assignmentRepository.findUpcomingAssignmentsForReminder(
+        // We check invoices due within the next 7 days
+        List<StudentFeeInvoiceEntity> upcomingInvoices = invoiceRepository.findUpcomingInvoicesForReminder(
                 today.plusDays(7), reminderWindowStart);
 
-        for (StudentFeeAssignmentEntity assignment : upcomingAssignments) {
+        for (StudentFeeInvoiceEntity invoice : upcomingInvoices) {
             var settings = campusSettingsRepository.findByCampusIdAndAcademicYearId(
-                    assignment.getStudent().getCampus().getId(),
-                    assignment.getAcademicYear().getId());
+                    invoice.getStudent().getCampus().getId(),
+                    invoice.getAcademicYear().getId());
 
             if (settings.isPresent() && Boolean.TRUE.equals(settings.get().getSendPaymentReminder())) {
                 int reminderDays = settings.get().getReminderDaysBeforeDue() != null ? settings.get().getReminderDaysBeforeDue() : 3;
-                LocalDate reminderDate = assignment.getDueDate().minusDays(reminderDays);
+                LocalDate reminderDate = invoice.getDueDate().minusDays(reminderDays);
 
                 if (!today.isBefore(reminderDate)) {
                     // Check if there is still a balance
                     summaryRepository.findByStudentIdAndAcademicYearId(
-                            assignment.getStudent().getId(), 
-                            assignment.getAcademicYear().getId()
+                            invoice.getStudent().getId(), 
+                            invoice.getAcademicYear().getId()
                     ).ifPresent(summary -> {
                         if (summary.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-                            sendReminder(assignment, summary);
+                            sendReminder(invoice, summary);
                         }
                     });
                 }
@@ -64,31 +64,30 @@ public class PaymentReminderScheduledTask {
         log.info("[Task:PaymentReminderScheduledTask] Finished daily payment reminders scan.");
     }
 
-    private void sendReminder(StudentFeeAssignmentEntity assignment, StudentFeeSummaryEntity summary) {
-        String studentName = assignment.getStudent().getFullName();
-        String dueDate = assignment.getDueDate().toString();
+    private void sendReminder(StudentFeeInvoiceEntity invoice, StudentFeeSummaryEntity summary) {
+        String studentName = invoice.getStudent().getFullName();
+        String dueDate = invoice.getDueDate().toString();
         BigDecimal balance = summary.getBalance();
         
-        String subject = "Payment Reminder: School Fees Due Soon";
+        String subject = "Payment Reminder: School Fee Voucher Due Soon";
         String message = String.format(
-                "Dear Parent, this is a reminder that the school fee for %s is due on %s. Current outstanding balance: %s. Please ensure timely payment to avoid late fees.",
-                studentName, dueDate, balance.toString()
+                "Dear Parent, this is a reminder that the school fee voucher for %s (%s) is due on %s. Current outstanding balance: %s. Please ensure timely payment to avoid late fees.",
+                studentName, invoice.getMonth(), dueDate, balance.toString()
         );
-
-        // Mock recipient (in a real system, we'd get parent's email/phone from StudentEntity)
-        String recipient = "parent_" + assignment.getStudent().getStudentCode() + "@example.com";
+ 
+        String recipient = "parent_" + invoice.getStudent().getStudentCode() + "@example.com";
         
         try {
             notificationService.sendNotification(recipient, subject, message);
             
-            assignment.setLastReminderSentAt(LocalDateTime.now());
-            assignmentRepository.save(assignment);
+            invoice.setLastReminderSentAt(LocalDateTime.now());
+            invoiceRepository.save(invoice);
             
-            log.info("[Task:PaymentReminderScheduledTask] Reminder sent for studentId={} | assignmentId={}", 
-                    assignment.getStudent().getId(), assignment.getId());
+            log.info("[Task:PaymentReminderScheduledTask] Reminder sent for studentId={} | invoiceId={}", 
+                    invoice.getStudent().getId(), invoice.getId());
         } catch (Exception e) {
             log.error("[Task:PaymentReminderScheduledTask] Failed to send reminder for studentId={}", 
-                    assignment.getStudent().getId(), e);
+                    invoice.getStudent().getId(), e);
         }
     }
 }

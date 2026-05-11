@@ -3,6 +3,7 @@ package com.smartsolutions.eschool.student.service;
 import com.smartsolutions.eschool.student.model.FeeEntity;
 import com.smartsolutions.eschool.student.repository.FeeDao;
 import com.smartsolutions.eschool.student.repository.StudentFeeAssignmentRepository;
+import com.smartsolutions.eschool.student.repository.StudentFeeInvoiceRepository;
 import com.smartsolutions.eschool.student.repository.StudentFeePaymentsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,13 +20,16 @@ public class FeeService {
     private final FeeDao feeDao;
     private final StudentFeePaymentsRepository paymentsRepository;
     private final StudentFeeAssignmentRepository assignmentRepository;
+    private final StudentFeeInvoiceRepository invoiceRepository;
 
     public FeeService(FeeDao pFeeDao, 
                       StudentFeePaymentsRepository paymentsRepository, 
-                      StudentFeeAssignmentRepository assignmentRepository) {
+                      StudentFeeAssignmentRepository assignmentRepository,
+                      StudentFeeInvoiceRepository invoiceRepository) {
         this.feeDao = pFeeDao;
         this.paymentsRepository = paymentsRepository;
         this.assignmentRepository = assignmentRepository;
+        this.invoiceRepository = invoiceRepository;
     }
 
     private Long getOrgId() {
@@ -50,7 +54,7 @@ public class FeeService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public BigDecimal getPendingDues(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getPendingDues() called - orgId: {}", orgId);
-        BigDecimal dues = assignmentRepository.sumPendingDuesByFilters(
+        BigDecimal dues = invoiceRepository.sumPendingDuesByFilters(
                 filter.getCampusIds(), 
                 filter.getAcademicYearId(), 
                 filter.getToDate(), 
@@ -97,7 +101,7 @@ public class FeeService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public java.util.Map<String, BigDecimal> getPendingByStandard(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getPendingByStandard() called - orgId: {}", orgId);
-        java.util.List<Object[]> results = assignmentRepository.pendingDuesByStandardDistribution(
+        java.util.List<Object[]> results = invoiceRepository.pendingDuesByStandardDistribution(
                 filter.getCampusIds(), 
                 filter.getToDate(),
                 orgId);
@@ -146,7 +150,7 @@ public class FeeService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public java.util.List<Object[]> getFeeStatusDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
         log.info("[Service:FeeService] getFeeStatusDistribution() called - orgId: {}", orgId);
-        java.util.List<Object[]> results = assignmentRepository.getFeeStatusDistribution(
+        java.util.List<Object[]> results = invoiceRepository.getFeeStatusDistribution(
                 filter.getCampusIds(), 
                 filter.getToDate(),
                 orgId);

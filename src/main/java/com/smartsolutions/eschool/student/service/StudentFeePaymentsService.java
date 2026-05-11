@@ -200,17 +200,15 @@ public class StudentFeePaymentsService {
                     studentFeeInvoiceRepository.save(invoice);
                 }
             } else {
-                // Assignment-level late fee calculation (backup if no invoice exists)
+                // Assignment-level late fee calculation removed - all late fees are now per-invoice
+                /*
                 if (campusSettings.isPresent()) {
                     for (StudentFeeAssignmentEntity assignment : assignments) {
                         BigDecimal lateFee = lateFeeCalculationService.calculateLateFee(assignment, campusSettings.get());
-                        if (lateFee.compareTo(BigDecimal.ZERO) > 0) {
-                            assignment.setLateFeeAmount(lateFee);
-                            studentFeeAssignmentRepository.save(assignment);
-                            calculatedLateFee = calculatedLateFee.add(lateFee);
-                        }
+                        // No longer saving to assignment
                     }
                 }
+                */
             }
             
             if (calculatedLateFee.compareTo(BigDecimal.ZERO) > 0) {
@@ -362,23 +360,28 @@ public class StudentFeePaymentsService {
 
     @Transactional
     public void waiveLateFee(LateFeeWaiverRequestDTO requestDTO) {
-        log.info("[Service:StudentFeePaymentsService] waiveLateFee() called for assignmentId={}", requestDTO.getAssignmentId());
+        log.info("[Service:StudentFeePaymentsService] waiveLateFee() called for invoiceId={}", requestDTO.getInvoiceId());
         
-        StudentFeeAssignmentEntity assignment = studentFeeAssignmentRepository.findById(requestDTO.getAssignmentId())
-                .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Assignment not found", HttpStatus.NOT_FOUND));
+        StudentFeeInvoiceEntity invoice = studentFeeInvoiceRepository.findById(requestDTO.getInvoiceId())
+                .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Invoice not found", HttpStatus.NOT_FOUND));
         
-        if (requestDTO.getWaivedAmount().compareTo(assignment.getLateFeeAmount()) > 0) {
+        if (requestDTO.getWaivedAmount().compareTo(invoice.getLateFeeAmount()) > 0) {
             throw new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Waived amount cannot exceed current late fee", HttpStatus.BAD_REQUEST);
         }
         
-        assignment.setWaivedAmount(requestDTO.getWaivedAmount());
-        assignment.setWaivedReason(requestDTO.getReason());
-        studentFeeAssignmentRepository.save(assignment);
+        invoice.setWaivedAmount(requestDTO.getWaivedAmount());
+        invoice.setWaivedReason(requestDTO.getReason());
+        
+        // Recalculate balance
+        BigDecimal netLateFee = invoice.getLateFeeAmount().subtract(requestDTO.getWaivedAmount());
+        invoice.setBalance(invoice.getTotalAmount().add(netLateFee).subtract(invoice.getPaidAmount()).subtract(invoice.getDiscountAmount()));
+        
+        studentFeeInvoiceRepository.save(invoice);
         
         // Update summary to reflect the change
-        studentFeeSummaryService.updateSummary(assignment.getStudent().getId(), assignment.getAcademicYear().getId(), assignment.getOrganizationId());
+        studentFeeSummaryService.updateSummary(invoice.getStudent().getId(), invoice.getAcademicYear().getId(), invoice.getOrganizationId());
         
-        log.info("[Service:StudentFeePaymentsService] Late fee waived successfully | assignmentId={}", assignment.getId());
+        log.info("[Service:StudentFeePaymentsService] Late fee waived successfully | invoiceId={}", invoice.getId());
     }
 
     private void postFeePaymentToGL(StudentFeePaymentEntity payment, AcademicYearEntity academicYear) {

@@ -146,7 +146,6 @@ public class StudentFeeAssignmentService {
 
             assignment.setTotalAmount(totalAmount);
             assignment.setAssignedDate(LocalDate.now());
-            assignment.setDueDate(dto.getDueDate());
             return assignment;
         }).collect(Collectors.toList());
 
@@ -248,7 +247,6 @@ public class StudentFeeAssignmentService {
 
             assignment.setTotalAmount(totalAmount);
             assignment.setAssignedDate(LocalDate.now());
-            assignment.setDueDate(dto.getDueDate());
             return assignment;
         }).collect(Collectors.toList());
 
@@ -308,7 +306,6 @@ public class StudentFeeAssignmentService {
             }
             adto.setAmount(a.getTotalAmount());
             adto.setAssignedDate(a.getAssignedDate());
-            adto.setDueDate(a.getDueDate());
             return adto;
         }).collect(Collectors.toList());
 

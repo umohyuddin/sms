@@ -179,12 +179,10 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
         WHERE a.organizationId = :instituteId
           AND (:campusIds IS NULL OR a.student.campus.id IN :campusIds)
           AND (:academicYearId IS NULL OR a.academicYear.id = :academicYearId)
-          AND (:toDate IS NULL OR a.dueDate <= :toDate)
     """)
     BigDecimal sumPendingDuesByFilters(
             @Param("campusIds") java.util.List<Long> campusIds,
             @Param("academicYearId") Long academicYearId,
-            @Param("toDate") java.time.LocalDate toDate,
             @Param("instituteId") Long instituteId
     );
 
@@ -193,12 +191,10 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
         FROM StudentFeeAssignmentEntity a
         WHERE a.organizationId = :instituteId
           AND (:campusIds IS NULL OR a.student.campus.id IN :campusIds)
-          AND (:toDate IS NULL OR a.dueDate <= :toDate)
         GROUP BY a.student.standard.standardName
     """)
     java.util.List<Object[]> pendingDuesByStandardDistribution(
             @Param("campusIds") java.util.List<Long> campusIds,
-            @Param("toDate") java.time.LocalDate toDate,
             @Param("instituteId") Long instituteId
     );
 
@@ -209,29 +205,9 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
         FROM StudentFeeAssignmentEntity a
         WHERE a.organizationId = :instituteId
           AND (:campusIds IS NULL OR a.student.campus.id IN :campusIds)
-          AND (:toDate IS NULL OR a.dueDate <= :toDate)
     """)
     java.util.List<Object[]> getFeeStatusDistribution(
             @Param("campusIds") java.util.List<Long> campusIds,
-            @Param("toDate") java.time.LocalDate toDate,
             @Param("instituteId") Long instituteId
-    );
-
-    @Query("""
-        SELECT a FROM StudentFeeAssignmentEntity a
-        JOIN FETCH a.student s
-        JOIN FETCH s.campus c
-        JOIN FETCH a.academicYear ay
-        WHERE a.dueDate <= :targetDate
-          AND a.dueDate >= CURRENT_DATE
-          AND a.deleted = false
-          AND (a.lastReminderSentAt IS NULL OR a.lastReminderSentAt < :reminderWindowStart)
-    """)
-    List<StudentFeeAssignmentEntity> findUpcomingAssignmentsForReminder(
-            @Param("targetDate") java.time.LocalDate targetDate,
-            @Param("reminderWindowStart") java.time.LocalDateTime reminderWindowStart
-    );
-}
-
-
+    );}
 

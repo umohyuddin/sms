@@ -401,6 +401,9 @@ public class StudentFeeInvoiceService {
                 .dueDate(invoice.getDueDate())
                 .invoiceDate(invoice.getInvoiceDate())
                 .status(invoice.getStatus().name())
+                .waivedAmount(invoice.getWaivedAmount())
+                .waivedReason(invoice.getWaivedReason())
+                .lastReminderSentAt(invoice.getLastReminderSentAt())
                 .details(detailDTOs)
                 .build();
     }

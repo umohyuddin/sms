@@ -59,9 +59,7 @@ public class StudentFeeAssignmentMapper {
 
         builder.assignmentId(assignment.getId())
                 .totalAmount(assignment.getTotalAmount())
-                .assignedDate(assignment.getAssignedDate())
-                .lateFeeAmount(assignment.getLateFeeAmount())
-                .dueDate(assignment.getDueDate());
+                .assignedDate(assignment.getAssignedDate());
 
         if (feeRate != null) {
             builder.feeRateId(feeRate.getId())

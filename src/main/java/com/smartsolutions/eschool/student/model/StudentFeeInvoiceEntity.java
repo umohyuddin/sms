@@ -67,6 +67,15 @@ public class StudentFeeInvoiceEntity extends AuditableEntity {
     @Column(name = "status", length = 20)
     private InvoiceStatus status = InvoiceStatus.UNPAID;
 
+    @Column(name = "waived_amount", precision = 12, scale = 2)
+    private BigDecimal waivedAmount = BigDecimal.ZERO;
+
+    @Column(name = "waived_reason")
+    private String waivedReason;
+
+    @Column(name = "last_reminder_sent_at")
+    private java.time.LocalDateTime lastReminderSentAt;
+
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentFeeInvoiceDetailEntity> details;
 
