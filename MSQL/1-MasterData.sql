@@ -402,8 +402,6 @@ VALUES
 ('QUARTERLY', 'Quarterly', 3, 'Fee charged every three months', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('HALF_YEARLY', 'HALF YEARLY', 6, 'Fee charged twice in an academic year',TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('ANNUAL', 'Annual', 12, 'Fee charged once per academic year',TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
-('PER_TERM', 'Per Term', 4, 'Fee charged per academic term or semester', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
-('ON_DEMAND', 'On Demand', 0, 'Fee charged when a service is used (transport, lab, activity)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP);
 
 
 

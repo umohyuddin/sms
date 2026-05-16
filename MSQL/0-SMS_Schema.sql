@@ -2797,42 +2797,6 @@ CREATE INDEX idx_gl_accounts_org ON gl_accounts(organization_id);
 CREATE INDEX idx_gl_accounts_campus ON gl_accounts(campus_id);
 
 
--- Journal Entries (Linked to Academic Year)
-CREATE TABLE gl_journal_entries (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    organization_id BIGINT NOT NULL,
-    campus_id BIGINT NULL,
-    academic_year_id BIGINT NOT NULL,
-    entry_date DATE NOT NULL,
-    reference_number VARCHAR(100),
-    description TEXT,
-    entry_type VARCHAR(50),
-    status ENUM('DRAFT', 'POSTED', 'CANCELLED') DEFAULT 'DRAFT',
-    deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    deleted_at DATETIME,
-    deleted_by BIGINT,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-    CONSTRAINT fk_gl_je_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years(id)
-);
-
--- Journal Entry Lines
-CREATE TABLE gl_journal_entry_lines (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    journal_entry_id BIGINT NOT NULL,
-    account_id BIGINT NOT NULL,
-    description VARCHAR(255),
-    debit DECIMAL(18, 4) DEFAULT 0.0000,
-    credit DECIMAL(18, 4) DEFAULT 0.0000,
-    campus_id BIGINT NULL,
-    reference_id BIGINT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_je_line_entry FOREIGN KEY (journal_entry_id) REFERENCES gl_journal_entries(id),
-    CONSTRAINT fk_je_line_account FOREIGN KEY (account_id) REFERENCES gl_accounts(id)
-);
-
 -- GL Transaction Types
 CREATE TABLE gl_transaction_types (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -2935,4 +2899,66 @@ CREATE TABLE `gl_account_mappings` (
 
 
 
+CREATE TABLE gl_journal_entries (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    organization_id BIGINT NOT NULL,
+    campus_id BIGINT NULL,
+    academic_year_id BIGINT NOT NULL,
+
+    -- Aligning with your config tables
+    accounting_module_id BIGINT NOT NULL,    -- FK to gl_accounting_modules
+    transaction_type_id BIGINT NOT NULL,     -- FK to gl_transaction_types
+
+    entry_date DATE NOT NULL,
+    voucher_number VARCHAR(100) NOT NULL,   -- Unique auto-gen number (e.g., JV-2024-001)
+    reference_number VARCHAR(100),          -- External ref (e.g., Invoice #)
+    description TEXT,
+
+    -- Flags for automation
+    is_auto_generated BOOLEAN DEFAULT FALSE, -- TRUE if created by Fee/HR module
+    status ENUM('DRAFT', 'POSTED', 'CANCELLED') DEFAULT 'DRAFT',
+
+    -- Detailed Audit for posting
+    posted_at DATETIME NULL,
+    posted_by BIGINT NULL,
+
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at DATETIME,
+    deleted_by BIGINT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    CONSTRAINT fk_gl_je_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
+    CONSTRAINT fk_gl_je_module FOREIGN KEY (accounting_module_id) REFERENCES gl_accounting_modules(id),
+    CONSTRAINT fk_gl_je_trans_type FOREIGN KEY (transaction_type_id) REFERENCES gl_transaction_types(id),
+    CONSTRAINT uk_gl_je_voucher UNIQUE (organization_id, voucher_number)
+);
+
+
+CREATE TABLE gl_journal_entry_lines (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    journal_entry_id BIGINT NOT NULL,
+    account_id BIGINT NOT NULL,              -- FK to gl_accounts
+
+    -- Traceability back to Business Rules
+    business_key_id BIGINT NULL,             -- FK to gl_business_keys (e.g., "Tuition Fee")
+    mapping_id BIGINT NULL,                  -- Optional: FK to gl_account_mappings (the rule used)
+
+    description VARCHAR(255),
+    debit DECIMAL(18, 4) DEFAULT 0.0000,
+    credit DECIMAL(18, 4) DEFAULT 0.0000,
+
+    -- Source Identification
+    reference_id BIGINT NULL,                -- The specific ID (e.g., Invoice ID 502)
+    reference_type VARCHAR(50) NULL,         -- Type of source (e.g., 'INVOICE', 'PAYMENT')
+
+    campus_id BIGINT NULL,                   -- Cost Center tracking
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_je_line_entry FOREIGN KEY (journal_entry_id) REFERENCES gl_journal_entries(id),
+    CONSTRAINT fk_je_line_account FOREIGN KEY (account_id) REFERENCES gl_accounts(id),
+    CONSTRAINT fk_je_line_bkey FOREIGN KEY (business_key_id) REFERENCES gl_business_keys(id)
+);
 
