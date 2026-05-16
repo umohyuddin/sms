@@ -91,14 +91,6 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             """)
     BigDecimal getTotalFeeAssigned(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
 
-    @Query("""
-            SELECT COALESCE(SUM(a.totalAmount), 0)
-            FROM StudentFeeAssignmentEntity a
-            WHERE a.dueDate < CURRENT_DATE
-              AND a.academicYear.id = :academicYearId
-              AND a.organizationId = :instituteId
-            """)
-    BigDecimal getOverdueAmount(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT sfa FROM StudentFeeAssignmentEntity sfa
@@ -150,12 +142,6 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             """)
     Long countByAcademicYear(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
 
-    @Query("""
-            SELECT COUNT(sfa) FROM StudentFeeAssignmentEntity sfa
-            WHERE sfa.dueDate < CURRENT_DATE
-              AND sfa.organizationId = :instituteId
-            """)
-    Long countOverdueAssignments(@Param("instituteId") Long instituteId);
 
     @Query("""
             SELECT sfa FROM StudentFeeAssignmentEntity sfa

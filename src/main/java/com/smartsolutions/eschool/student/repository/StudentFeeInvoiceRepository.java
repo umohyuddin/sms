@@ -103,4 +103,19 @@ public interface StudentFeeInvoiceRepository extends JpaRepository<StudentFeeInv
            "AND i.deleted = false " +
            "AND (i.status = 'UNPAID' OR i.status = 'PARTIAL')")
     List<StudentFeeInvoiceEntity> findAllOverdueInvoices();
+
+    @Query("SELECT COUNT(i) FROM StudentFeeInvoiceEntity i " +
+           "WHERE i.dueDate < CURRENT_DATE " +
+           "AND i.deleted = false " +
+           "AND i.organizationId = :instituteId " +
+           "AND (i.status = 'UNPAID' OR i.status = 'PARTIAL')")
+    Long countOverdueInvoices(@Param("instituteId") Long instituteId);
+
+    @Query("SELECT COALESCE(SUM(i.balance), 0) FROM StudentFeeInvoiceEntity i " +
+           "WHERE i.dueDate < CURRENT_DATE " +
+           "AND i.deleted = false " +
+           "AND i.academicYear.id = :academicYearId " +
+           "AND i.organizationId = :instituteId " +
+           "AND (i.status = 'UNPAID' OR i.status = 'PARTIAL')")
+    java.math.BigDecimal sumOverdueAmount(@Param("academicYearId") Long academicYearId, @Param("instituteId") Long instituteId);
 }

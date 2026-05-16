@@ -51,6 +51,7 @@ public class StudentFeeAssignmentService {
     private final StudentDiscountAssignmentService studentDiscountAssignmentService;
     private final CampusFinancialSettingsRepository campusFinancialSettingsRepository;
     private final FeeRecurrenceRuleRepository feeRecurrenceRuleRepository;
+    private final StudentFeeInvoiceRepository studentFeeInvoiceRepository;
 
     public StudentFeeAssignmentService(StudentRepository studentRepository, 
             FeeRateRepository feeRateRepository, 
@@ -61,7 +62,8 @@ public class StudentFeeAssignmentService {
             DiscountRateRepository discountRateRepository,
             StudentDiscountAssignmentService studentDiscountAssignmentService,
             CampusFinancialSettingsRepository campusFinancialSettingsRepository,
-            FeeRecurrenceRuleRepository feeRecurrenceRuleRepository) {
+            FeeRecurrenceRuleRepository feeRecurrenceRuleRepository,
+            StudentFeeInvoiceRepository studentFeeInvoiceRepository) {
         this.studentRepository = studentRepository;
         this.feeRateRepository = feeRateRepository;
         this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
@@ -72,6 +74,7 @@ public class StudentFeeAssignmentService {
         this.studentDiscountAssignmentService = studentDiscountAssignmentService;
         this.campusFinancialSettingsRepository = campusFinancialSettingsRepository;
         this.feeRecurrenceRuleRepository = feeRecurrenceRuleRepository;
+        this.studentFeeInvoiceRepository = studentFeeInvoiceRepository;
     }
 
     public boolean isFeeAssigned(Long studentId, Long academicYearId) {
@@ -397,8 +400,8 @@ public class StudentFeeAssignmentService {
         
         if (academicYearId != null) {
             stats.put("totalFeeAmount", studentFeeAssignmentRepository.getTotalFeeAssigned(academicYearId, organizationId));
-            stats.put("overdueAssignments", studentFeeAssignmentRepository.countOverdueAssignments(organizationId));
-            stats.put("overdueAmount", studentFeeAssignmentRepository.getOverdueAmount(academicYearId, organizationId));
+            stats.put("overdueAssignments", studentFeeInvoiceRepository.countOverdueInvoices(organizationId));
+            stats.put("overdueAmount", studentFeeInvoiceRepository.sumOverdueAmount(academicYearId, organizationId));
         } else {
             stats.put("totalFeeAmount", BigDecimal.ZERO);
             stats.put("overdueAssignments", 0L);
