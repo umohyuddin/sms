@@ -124,16 +124,6 @@ public class StudentFeeAssignmentService {
                 .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN));
 
         long finalTotalMonths = totalMonths;
-        Integer campusInterval = campusFinancialSettingsRepository
-                .findByCampusIdAndAcademicYearId(dto.getCampusId(), dto.getAcademicYearId())
-                .flatMap(settings -> {
-                    if (settings.getFeeRecurrenceRuleId() != null) {
-                        return feeRecurrenceRuleRepository.findById(settings.getFeeRecurrenceRuleId())
-                                .map(FeeRecurrenceRuleEntity::getOccurrenceInterval);
-                    }
-                    return java.util.Optional.empty();
-                }).orElse(null);
-
         List<StudentFeeAssignmentEntity> assignments = feeRates.stream().map(feeRate -> {
             StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
             assignment.setStudent(student);
@@ -141,7 +131,7 @@ public class StudentFeeAssignmentService {
             assignment.setOrganizationId(organizationId);
             assignment.setAcademicYear(academicYear);
 
-            Integer interval = campusInterval != null ? campusInterval : getCatalogRecurrenceInterval(feeRate);
+            Integer interval = getCatalogRecurrenceInterval(feeRate);
             
             BigDecimal baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount() : BigDecimal.ZERO;
             BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(interval, (int) finalTotalMonths));
@@ -225,16 +215,6 @@ public class StudentFeeAssignmentService {
                 .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN));
 
         long finalTotalMonths = totalMonths;
-        Integer campusInterval = campusFinancialSettingsRepository
-                .findByCampusIdAndAcademicYearId(dto.getCampusId(), dto.getAcademicYearId())
-                .flatMap(settings -> {
-                    if (settings.getFeeRecurrenceRuleId() != null) {
-                        return feeRecurrenceRuleRepository.findById(settings.getFeeRecurrenceRuleId())
-                                .map(FeeRecurrenceRuleEntity::getOccurrenceInterval);
-                    }
-                    return java.util.Optional.empty();
-                }).orElse(null);
-
         List<StudentFeeAssignmentEntity> updatedAssignments = feeRates.stream().map(feeRate -> {
             StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
             assignment.setStudent(student);
@@ -242,7 +222,7 @@ public class StudentFeeAssignmentService {
             assignment.setOrganizationId(organizationId);
             assignment.setAcademicYear(academicYear);
 
-            Integer interval = campusInterval != null ? campusInterval : getCatalogRecurrenceInterval(feeRate);
+            Integer interval = getCatalogRecurrenceInterval(feeRate);
             
             BigDecimal baseAmount = feeRate.getFixedAmount() != null ? feeRate.getFixedAmount() : BigDecimal.ZERO;
             BigDecimal multiplier = BigDecimal.valueOf(getRecurrenceMultiplier(interval, (int) finalTotalMonths));
