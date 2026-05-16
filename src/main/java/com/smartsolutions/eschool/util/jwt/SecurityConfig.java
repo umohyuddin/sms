@@ -35,7 +35,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults()) // use CorsConfigurationSource bean
                 .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // allow
                                                                                                            // preflight
-                        .requestMatchers("sms/auth/**").permitAll() // public auth endpoints
+                        .requestMatchers("/sms/auth/**").permitAll() // public auth endpoints
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // OpenAPI/Swagger
                         .requestMatchers("/uploads/**").permitAll() // public uploads
                         .anyRequest().authenticated() // all other endpoints need auth
@@ -60,7 +60,12 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Allowed origins
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200", "http://192.168.100.50:4200"));
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:4200", 
+            "http://192.168.100.50:4200",
+            "https://sms-ui-production-f41e.up.railway.app",
+            "https://*.up.railway.app"
+        ));
 
         // Allow all HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

@@ -43,6 +43,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             handleCoRelationMDC(request);
+
+            // Bypass JWT filter for OPTIONS requests (CORS preflight)
+            if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+                chain.doFilter(request, response);
+                return;
+            }
+
             // Get the authorization header from the request
             String authHeader = request.getHeader(AUTH_HEADER);
 
