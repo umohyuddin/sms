@@ -1,6 +1,6 @@
-    DROP DATABASE IF EXISTS sms;
-    CREATE DATABASE IF NOT EXISTS sms;
-    USE sms;
+    DROP DATABASE IF EXISTS railway;
+    CREATE DATABASE IF NOT EXISTS railway;
+    USE railway;
 
     -- =============================
     -- LEVEL 0: CORE TABLES (No dependencies)
@@ -1034,7 +1034,9 @@ CREATE TABLE board_member_roles (
              CASE WHEN unit_price IS NOT NULL THEN 1 ELSE 0 END +
              CASE WHEN slab_group_id IS NOT NULL THEN 1 ELSE 0 END) = 1
         ),
-        CONSTRAINT uq_fee_rate UNIQUE (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, effective_from)
+        CONSTRAINT uq_fee_rate UNIQUE (organization_id, campus_id, standard_id, fee_component_id, academic_year_id, effective_from),
+        -- Composite key required for composite FK references from child tables
+        CONSTRAINT uq_fee_rates_org_id UNIQUE (organization_id, id)
     );
     CREATE INDEX idx_fee_rates_organization ON fee_rates (organization_id);
     CREATE INDEX idx_fee_rates_campus_id ON fee_rates (campus_id);
@@ -1375,9 +1377,9 @@ CREATE TABLE student_guardians (
         CONSTRAINT fk_sfa_organization FOREIGN KEY (organization_id) REFERENCES institutes (id),
         CONSTRAINT fk_sfa_student FOREIGN KEY (student_id) REFERENCES students (id),
         -- Composite FK: ensures fee_rate belongs to same tenant
-        CONSTRAINT fk_sfa_fee_rate
-            FOREIGN KEY (organization_id, fee_rate_id)
-            REFERENCES fee_rates(organization_id, id),
+        CONSTRAINT `fk_sfa_fee_rate`
+            FOREIGN KEY (`organization_id`, `fee_rate_id`)
+            REFERENCES `fee_rates` (`organization_id`, `id`),
         CONSTRAINT fk_sfa_academic_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id),
         CONSTRAINT chk_student_fee_assign_amount CHECK (total_amount >= 0)
     );
@@ -1469,7 +1471,7 @@ CREATE TABLE student_guardians (
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         created_by VARCHAR(50),
         updated_by VARCHAR(50),
-        deleted BOOLEAN DEFAULT FALSE,
+        deleted BOOLEAN NOT NULL DEFAULT FALSE,
         deleted_at TIMESTAMP,
         deleted_by VARCHAR(50),
         CONSTRAINT fk_invoice_student FOREIGN KEY (student_id) REFERENCES students(id),
@@ -2711,6 +2713,11 @@ CREATE TABLE student_attendance (
 -- LEVEL 9: GL Module Tables
 -- =============================
 
+DROP TABLE IF EXISTS gl_account_mappings;
+DROP TABLE IF EXISTS gl_accounting_modules;
+DROP TABLE IF EXISTS gl_posting_keys;
+DROP TABLE IF EXISTS gl_business_keys;
+DROP TABLE IF EXISTS gl_transaction_types;
 DROP TABLE IF EXISTS gl_journal_entry_lines;
 DROP TABLE IF EXISTS gl_journal_entries;
 DROP TABLE IF EXISTS gl_accounts;
@@ -2759,8 +2766,8 @@ CREATE TABLE gl_accounts (
 
     -- Status
     is_active BOOLEAN DEFAULT TRUE,
-    deleted BOOLEAN DEFAULT FALSE,
-    deleted_at DATETIME NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at DATETIME,
     deleted_by BIGINT,
 
     -- Audit
@@ -2796,8 +2803,8 @@ CREATE TABLE gl_journal_entries (
     description TEXT,
     entry_type VARCHAR(50),
     status ENUM('DRAFT', 'POSTED', 'CANCELLED') DEFAULT 'DRAFT',
-    deleted BOOLEAN DEFAULT FALSE,
-    deleted_at DATETIME NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at DATETIME,
     deleted_by BIGINT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by BIGINT,
@@ -2829,8 +2836,8 @@ CREATE TABLE gl_transaction_types (
     name VARCHAR(255) NOT NULL,
     description VARCHAR(500),
     is_active BOOLEAN DEFAULT TRUE,
-    deleted BOOLEAN DEFAULT FALSE,
-    deleted_at DATETIME NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at DATETIME,
     deleted_by BIGINT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by BIGINT,
@@ -2848,8 +2855,8 @@ CREATE TABLE gl_business_keys (
     module VARCHAR(100),  -- Fee, HR, Inventory, etc.
     description VARCHAR(500),
     is_active BOOLEAN DEFAULT TRUE,
-    deleted BOOLEAN DEFAULT FALSE,
-    deleted_at DATETIME NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at DATETIME,
     deleted_by BIGINT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by BIGINT,
@@ -2867,8 +2874,8 @@ CREATE TABLE gl_posting_keys (
     account_side ENUM('DEBIT', 'CREDIT') NOT NULL,
     description VARCHAR(500),
     is_active BOOLEAN DEFAULT TRUE,
-    deleted BOOLEAN DEFAULT FALSE,
-    deleted_at DATETIME NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at DATETIME,
     deleted_by BIGINT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by BIGINT,
@@ -2885,8 +2892,8 @@ CREATE TABLE gl_accounting_modules (
     name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
-    deleted BOOLEAN DEFAULT FALSE,
-    deleted_at DATETIME NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at DATETIME,
     deleted_by BIGINT,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by BIGINT,
@@ -2896,33 +2903,29 @@ CREATE TABLE gl_accounting_modules (
 );
 
 -- GL Account Mappings (Automated Posting Rules)
-CREATE TABLE gl_account_mappings (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    organization_id BIGINT NOT NULL,
-    campus_id BIGINT NULL,
-
-    accounting_module_id BIGINT NOT NULL,
-    transaction_type_id BIGINT NOT NULL,
-    business_key_id BIGINT NOT NULL,
-    posting_key_id BIGINT NOT NULL,
-    gl_account_id BIGINT NOT NULL,
-
-    priority_order INT DEFAULT 1,
+CREATE TABLE `gl_account_mappings` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `organization_id` BIGINT NOT NULL,
+    `campus_id` BIGINT NULL,
+    `accounting_module_id` BIGINT NOT NULL,
+    `transaction_type_id` BIGINT NOT NULL,
+    `business_key_id` BIGINT NOT NULL,
+    `posting_key_id` BIGINT NOT NULL,
+    `gl_account_id` BIGINT NOT NULL,
+    `priority_order` INT DEFAULT 1,
     is_active BOOLEAN DEFAULT TRUE,
-    
-    deleted BOOLEAN DEFAULT FALSE,
-    deleted_at DATETIME NULL,
-    deleted_by BIGINT,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by BIGINT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updated_by BIGINT,
-
-    CONSTRAINT fk_gl_map_module FOREIGN KEY (accounting_module_id) REFERENCES gl_accounting_modules(id),
-    CONSTRAINT fk_gl_map_trans FOREIGN KEY (transaction_type_id) REFERENCES gl_transaction_types(id),
-    CONSTRAINT fk_gl_map_bkey FOREIGN KEY (business_key_id) REFERENCES gl_business_keys(id),
-    CONSTRAINT fk_gl_map_pkey FOREIGN KEY (posting_key_id) REFERENCES gl_posting_keys(id),
-    CONSTRAINT fk_gl_map_account FOREIGN KEY (gl_account_id) REFERENCES gl_accounts(id)
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    `deleted_at` DATETIME NULL,
+    `deleted_by` BIGINT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT NULL,
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_by` BIGINT NULL,
+    CONSTRAINT `fk_gl_map_module` FOREIGN KEY (`accounting_module_id`) REFERENCES `gl_accounting_modules`(`id`),
+    CONSTRAINT `fk_gl_map_trans` FOREIGN KEY (`transaction_type_id`) REFERENCES `gl_transaction_types`(`id`),
+    CONSTRAINT `fk_gl_map_bkey` FOREIGN KEY (`business_key_id`) REFERENCES `gl_business_keys`(`id`),
+    CONSTRAINT `fk_gl_map_pkey` FOREIGN KEY (`posting_key_id`) REFERENCES `gl_posting_keys`(`id`),
+    CONSTRAINT `fk_gl_map_account` FOREIGN KEY (`gl_account_id`) REFERENCES `gl_accounts`(`id`)
 );
 
 
