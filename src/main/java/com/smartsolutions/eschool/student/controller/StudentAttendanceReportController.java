@@ -36,7 +36,8 @@ public class StudentAttendanceReportController {
     })
     @GetMapping("/daily")
     public ResponseEntity<List<DailyAttendanceReportDTO>> dailyReport(
-            @Parameter(description = "Date for the report", example = "2024-04-19") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @Parameter(description = "Date for the report", example = "2024-04-19")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ResponseEntity.ok(facade.dailyAttendanceReport(date));
     }
 

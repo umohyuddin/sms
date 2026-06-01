@@ -15,6 +15,7 @@ import com.smartsolutions.eschool.academic.mapper.CoreAcademicMapper;
 import com.smartsolutions.eschool.academic.repository.StandardSubjectRepository;
 import com.smartsolutions.eschool.academic.repository.SubjectRepository;
 import com.smartsolutions.eschool.academic.service.StandardSubjectService;
+import com.smartsolutions.eschool.academic.repository.ExamWeightageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,10 @@ public class StandardSubjectServiceImpl implements StandardSubjectService {
         private final SubjectRepository subjectRepository;
         private final StandardRepository standardRepository;
         private final AcademicYearRepository academicYearRepository;
+        private final ExamWeightageRepository examWeightageRepository;
 
-        @Override
+
+    @Override
         @Transactional
         public StandardSubjectResponseDTO assign(StandardSubjectRequestDTO dto) {
                 log.info("Assigning Subject {} to Standard {}", dto.getSubjectId(), dto.getStandardId());
@@ -75,7 +78,7 @@ public class StandardSubjectServiceImpl implements StandardSubjectService {
                 StandardSubjectEntity entity = standardSubjectRepository
                                 .findByStandardSubjectAndYear(standardId, subjectId, academicYearId)
                                 .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
-
+            examWeightageRepository.deleteByStandardSubjectId(entity.getId());
                 standardSubjectRepository.deleteById(entity.getId());
         }
 
@@ -84,7 +87,21 @@ public class StandardSubjectServiceImpl implements StandardSubjectService {
         public void bulkUnassign(Long standardId, List<Long> subjectIds, Long academicYearId) {
                 log.info("Bulk unassigning subjects {} from Standard {} for Academic Year {}", subjectIds, standardId,
                                 academicYearId);
-                standardSubjectRepository.bulkDelete(standardId, subjectIds, academicYearId);
+
+
+            List<StandardSubjectEntity> entities = standardSubjectRepository
+                    .findSubjectsByStandardAndAcademicYear(standardId, academicYearId)
+                    .stream()
+                    .filter(ss -> subjectIds.contains(ss.getSubject().getId()))
+                    .collect(Collectors.toList());
+
+            List<Long> standardSubjectIds = entities.stream()
+                    .map(StandardSubjectEntity::getId)
+                    .collect(Collectors.toList());
+
+            examWeightageRepository.deleteByStandardSubjectIds(standardSubjectIds);
+
+            standardSubjectRepository.bulkDelete(standardId, subjectIds, academicYearId);
         }
 
         @Override

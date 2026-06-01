@@ -42,4 +42,13 @@ public interface ExamWeightageRepository extends JpaRepository<ExamWeightageEnti
         @Modifying
         @Query("UPDATE ExamWeightageEntity ew SET ew.deleted = true, ew.deletedAt = CURRENT_TIMESTAMP WHERE ew.id = :id")
         void softDeleteById(@Param("id") Long id);
+
+    @Modifying
+    @Query("DELETE FROM ExamWeightageEntity ew WHERE ew.standardSubject.id = :standardSubjectId")
+    void deleteByStandardSubjectId(@Param("standardSubjectId") Long standardSubjectId);
+
+    @Modifying
+    @Query("DELETE FROM ExamWeightageEntity ew WHERE ew.standardSubject.id IN :standardSubjectIds")
+    void deleteByStandardSubjectIds(@Param("standardSubjectIds") List<Long> standardSubjectIds);
+
 }
