@@ -20,6 +20,15 @@ public class SystemUserController {
 
     private final SystemUserService systemUserService;
 
+
+    @Operation(summary = "Get assigned roles of a user")
+    @GetMapping("/{userId}/roles")
+    public ResponseEntity<?> getAssignedRoles(@PathVariable Long userId) {
+        log.info("GET /api/v1/users/{}/roles called", userId);
+        Set<Long> roleIds = systemUserService.getAssignedRoles(userId);
+        log.info("GET /api/v1/users/{}/roles succeeded", userId);
+        return ResponseEntity.ok(roleIds);
+    }
     @Operation(summary = "Assign roles to a user")
     @PutMapping("/{userId}/roles")
     public ResponseEntity<?> assignRoles(@PathVariable Long userId, @RequestBody Set<Long> roleIds) {

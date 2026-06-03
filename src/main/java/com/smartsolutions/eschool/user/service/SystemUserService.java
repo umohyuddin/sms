@@ -11,12 +11,13 @@ import com.smartsolutions.eschool.user.model.UserRolesEntity;
 import com.smartsolutions.eschool.user.repository.RoleRepository;
 import com.smartsolutions.eschool.user.repository.SystemUserRepository;
 import com.smartsolutions.eschool.user.repository.UserRolesRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -26,7 +27,7 @@ public class SystemUserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public SystemUserService(SystemUserRepository systemUserRepository, 
+    public SystemUserService(SystemUserRepository systemUserRepository,
                              UserRolesRepository userRolesRepository,
                              RoleRepository roleRepository,
                              PasswordEncoder passwordEncoder) {
@@ -37,7 +38,7 @@ public class SystemUserService {
     }
 
     @jakarta.transaction.Transactional
-    public void assignRoles(Long userId, java.util.Set<Long> roleIds) {
+    public void assignRoles(Long userId, Set<Long> roleIds) {
         log.info("Assigning roles to user ID: {} in database", userId);
         try {
             SystemUserEntity user = systemUserRepository.findById(userId)
@@ -46,27 +47,33 @@ public class SystemUserService {
                         return new UsernameNotFoundException("User not found with id: " + userId);
                     });
 
-            // Remove existing roles
             log.info("Removing existing roles for user ID: {}", userId);
             userRolesRepository.deleteByUserId(userId);
 
             if (roleIds != null && !roleIds.isEmpty()) {
                 log.info("Assigning {} new roles to user ID: {}", roleIds.size(), userId);
-                java.util.List<UserRolesEntity> newRoles = roleIds.stream()
-                        .map(roleId -> {
-                            RoleEntity role = roleRepository.findById(roleId)
-                                    .orElseThrow(() -> {
-                                        log.warn("Role not found with ID: {}", roleId);
-                                        return new RuntimeException("Role not found with id: " + roleId);
-                                    });
-                            UserRolesEntity userRole = new UserRolesEntity();
-                            userRole.setUser(user);
-                            userRole.setRole(role);
-                            userRole.setId(new UserRoleId(userId, roleId));
-                            return userRole;
-                        })
-                        .toList();
-                userRolesRepository.saveAll(newRoles);
+
+                roleIds.forEach(roleId -> {
+                    RoleEntity role = roleRepository.findById(roleId)
+                            .orElseThrow(() -> {
+                                log.warn("Role not found with ID: {}", roleId);
+                                return new RuntimeException("Role not found with id: " + roleId);
+                            });
+
+                    var existing = userRolesRepository.findDeletedByUserIdAndRoleId(userId, roleId);
+
+                    if (existing.isPresent()) {
+                        log.info("Restoring soft deleted role {} for user {}", roleId, userId);
+                        userRolesRepository.restoreRole(userId, roleId);
+                    } else {
+                        log.info("Inserting new role {} for user {}", roleId, userId);
+                        UserRolesEntity userRole = new UserRolesEntity();
+                        userRole.setUser(user);
+                        userRole.setRole(role);
+                        userRole.setId(new UserRoleId(userId, roleId));
+                        userRolesRepository.save(userRole);
+                    }
+                });
             }
             log.info("Successfully assigned roles to user ID: {}", userId);
         } catch (Exception e) {
@@ -75,7 +82,7 @@ public class SystemUserService {
         }
     }
 
-@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public java.util.List<SystemUserEntity> searchByKeyword(String keyword) {
         try {
             String searchKey = keyword == null ? "" : keyword.trim();
@@ -96,15 +103,14 @@ public class SystemUserService {
                     log.warn("User not found with email: {}", loginRequestDTO.getEmail());
                     return new UsernameNotFoundException("User not found");
                 });
-        
+
         LoginResponseDTO responseDTO = new LoginResponseDTO();
         responseDTO.setEmail(result.getEmail());
         responseDTO.setUsername(result.getUsername());
         responseDTO.setOrganizationId(result.getOrganizationId());
         responseDTO.setUserId(result.getId().toString());
         responseDTO.setUserType(result.getUserType());
-        
-        // Set employee or student information
+
         if (result.getEmployee() != null) {
             EmployeeDetailsDTO employeeDTO = new EmployeeDetailsDTO();
             employeeDTO.setEmployeeId(result.getEmployee().getId());
@@ -120,8 +126,13 @@ public class SystemUserService {
             studentDTO.setStudentCode(result.getStudent().getStudentCode());
             responseDTO.setStudent(studentDTO);
         }
-        
+
         log.info("Successfully fetched user data for email: {}", loginRequestDTO.getEmail());
         return responseDTO;
+    }
+
+    public Set<Long> getAssignedRoles(Long userId) {
+        log.info("Fetching assigned roles for user ID: {}", userId);
+        return userRolesRepository.findRoleIdsByUserId(userId);
     }
 }
