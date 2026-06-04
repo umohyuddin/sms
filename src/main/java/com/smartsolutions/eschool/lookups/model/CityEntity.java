@@ -1,15 +1,21 @@
 package com.smartsolutions.eschool.lookups.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@SQLDelete(sql = "UPDATE cities SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "cities")
 @Getter
 @Setter
-public class CityEntity extends AuditableEntity {
+public class CityEntity extends ScopeAuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +33,4 @@ public class CityEntity extends AuditableEntity {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
-
-    @Column(name = "deleted")
-    private Boolean deleted = false;
 }

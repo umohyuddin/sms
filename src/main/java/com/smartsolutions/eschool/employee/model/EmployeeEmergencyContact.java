@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.employee.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
@@ -9,6 +12,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@SQLDelete(sql = "UPDATE employee_emergency_contact SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "employee_emergency_contact")
 @Data
 @NoArgsConstructor

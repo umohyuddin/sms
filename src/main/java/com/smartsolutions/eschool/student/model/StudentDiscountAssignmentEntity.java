@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.student.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.school.model.AcademicYearEntity;
@@ -13,6 +16,8 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
+@SQLDelete(sql = "UPDATE student_discount_assignment SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "student_discount_assignment")
 @Getter
 @Setter

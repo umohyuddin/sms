@@ -10,6 +10,7 @@ import org.slf4j.MDC;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             handleCoRelationMDC(request);
+
+            // Bypass JWT filter for OPTIONS requests (CORS preflight)
+            if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+                chain.doFilter(request, response);
+                return;
+            }
+
             // Get the authorization header from the request
             String authHeader = request.getHeader(AUTH_HEADER);
 
@@ -67,7 +75,7 @@ public class JwtFilter extends OncePerRequestFilter {
             log.info("Request Receive at filter \n authHeader - [{}],\n requestURL - [{}],\n requestURI - [{}],\n requestMethod - [{}],\n scheme - [{}],\n serverName - [{}],\n serverPort - [{}],\n contextPath - [{}],\n baseFQDN - [{}]", authHeader, requestURL, requestURI, requestMethod, scheme, serverName, serverPort, contextPath, baseFQDN);
             String path = request.getRequestURI();
             // skip public APIs
-            if (path.equals("/api/auth/generateToken") || path.startsWith("/swagger-ui") || path.startsWith("/api/institute/employees/profile-photos")|| path.contains("/profile-photos/")) {
+            if (path.equals("/api/auth/generateToken") || path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.startsWith("/api/institute/employees/profile-photos")|| path.contains("/profile-photos/")) {
                 chain.doFilter(request, response);
                 return;
             }
@@ -90,7 +98,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             if (jwtUtil.validateJwtToken(jwtToken, response)) {
                 // Get the user details from the token
-                String userName = jwtUtil.extractClaims(jwtToken).get("userName", String.class);
+                String userName = jwtUtil.extractClaims(jwtToken).get("email", String.class);
                 //Claims claims = jwtUtils.extractClaims(jwtToken);
                 //List<Map<String, Object>> roleMaps = (List<Map<String, Object>>) claims.get("userRoles");
 
@@ -139,10 +147,7 @@ public class JwtFilter extends OncePerRequestFilter {
 //                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 //                }
                 handleUserNameMDC(userName);
-                UserDetailsImp userDetails = new UserDetailsImp();
-                userDetails.setUsername("Testing");
-                userDetails.setPassword("password");
-                userDetails.setEmail("uzairanwar2299@gmail.com");
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
 
 
                 // Set the authentication object in the security context
@@ -189,17 +194,9 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private boolean isLoginRequest(String requestURL, String requestURI) {
-        logger.info(String.format("Entering AuthTokenFilter.isLoginRequest() - requestURL: [%s], requestURI: [%s]", requestURL, requestURI));
-        // Check the request URL or URI for login-specific patterns
-        // You can customize this method based on your application's login URL patterns
-        //For example, if the URL of the current request is https://www.example.com/products?id=123, then:
-        //getRequestURL() would return: https://www.example.com/products
-        //getRequestURI() would return: /products
-        //It's important to note that the URL represents the complete address of a resource, while the URI represents the path or identifier that can be used to locate a resource.
-        //You can check the HTTP method of the request to identify if it corresponds to a login action. For example, login requests often use the POST method to submit the login
-        // requests often include specific parameters, such as username and password. You can examine the request parameters to identify if they match the parameters typically used for login.
-        //Login requests may include specific headers or header values that indicate they are related to authentication or login. You can inspect the request headers using request.getHeader("headerName") and check for any login-related headers or specific header values.
-        return requestURL.contains("/login") || requestURI.contains("/login") || requestURI.contains("/auth");
+        // Only skip JWT filter for actual public authentication endpoints
+        // Administrative endpoints like /login/activate must still be authenticated
+        return requestURI.contains("/sms/auth") || requestURI.contains("/api/auth/login") || requestURI.contains("/generateToken");
     }
 
     private void clearMDC() {

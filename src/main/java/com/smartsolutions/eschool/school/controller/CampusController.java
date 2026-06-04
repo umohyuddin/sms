@@ -1,111 +1,171 @@
 package com.smartsolutions.eschool.school.controller;
 
 import com.smartsolutions.eschool.school.dtos.campuses.metaData.CampusMetaData;
-import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.dtos.campuses.requestDto.CampusCreateRequestDTO;
+import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.facade.CampusFacade;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
-@Transactional
+import com.smartsolutions.eschool.global.error.ErrorResponse;
+
 @RestController
 @RequestMapping("/api/institute/campuses")
 @Slf4j
+@Tag(name = "Campus Management", description = "Endpoints for managing institute campuses, including creation, retrieval, and updates.")
 public class CampusController {
 
-    @Autowired
-    private CampusFacade nCampusFacade;
+    private final CampusFacade nCampusFacade;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll() throws Exception {
-        log.info("GET /api/institute/campus called");
-        List<CampusResponseDTO> resources = nCampusFacade.getAll();
-        log.info("GET /api/institute/campus succeeded, returned {} resources", resources.size());
-        return ResponseEntity.ok().body(resources);
+    public CampusController(CampusFacade nCampusFacade) {
+        this.nCampusFacade = nCampusFacade;
     }
 
+    @Operation(summary = "Get all campuses", description = "Retrieve a list of all campuses registered in the system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CampusResponseDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CampusResponseDTO>> getAll() {
+        log.info("[Controller:CampusController] getAll() called - Request to get all campuses");
+        List<CampusResponseDTO> resources = nCampusFacade.getAll();
+        log.info("[Controller:CampusController] getAll() succeeded - Found {} campuses", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
+    @Operation(summary = "Get campus by ID", description = "Fetch detailed information about a specific campus by its unique ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved campus",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CampusResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Campus not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable Long id) throws Exception {
-        log.info("Received request to fetch campus with id: {}", id);
+    public ResponseEntity<CampusResponseDTO> getById(
+            @Parameter(description = "Unique ID of the campus", example = "1") @PathVariable Long id) {
+        log.info("[Controller:CampusController] getById() called - Request to fetch campus with id: {}", id);
         CampusResponseDTO campus = nCampusFacade.getById(id);
-        log.info("Returning campus: id={}", campus.getId());
+        log.info("[Controller:CampusController] getById() succeeded - Found campus: {}", id);
         return ResponseEntity.ok(campus);
     }
 
-    @GetMapping(value = "search/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getBySearch(@PathVariable String keyword) {
-        log.info("GET /api/school/discounts/types/search by keyword called");
-        List<CampusResponseDTO> sectionDTO = nCampusFacade.searchByKeyword(keyword);
-        log.info("GET /api/school/discounts/types/search by keyword succeeded");
-        return ResponseEntity.ok().body(sectionDTO);
-    }
-
-    @GetMapping(value = "/by-institute/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getByInstituteId(@PathVariable Long id) throws Exception {
-        log.info("Received request to fetch campus by Institute Id: {}", id);
-        List<CampusResponseDTO> campuses = nCampusFacade.findByInstituteId(id);
-        log.info("Returning campuses data");
-        return ResponseEntity.ok(campuses);
-    }
-
-    @GetMapping(value = "/by-name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getByInstituteId(@PathVariable String name) throws Exception {
-        log.info("Received request to fetch campus by Institute name: {}", name);
-        List<CampusResponseDTO> campuses = nCampusFacade.findByCampusNameContaining(name);
-        log.info("Returning campuses  data");
-        return ResponseEntity.ok(campuses);
-    }
-
-    @DeleteMapping("/{campusId}")
-    public ResponseEntity<?> softDeleteById(@PathVariable Long campusId) {
-        log.info("API Request: Soft delete Campus ID: {}", campusId);
-        try {
-            int result = nCampusFacade.softDeleteById(campusId);
-            if (result == 0) {
-                log.warn("delete failed — Campus not found: {}", campusId);
-                return ResponseEntity.notFound().build();
-            }
-            log.info("Section deleted successfully: {}", campusId);
-            return ResponseEntity.ok("Campus deleted successfully");
-        } catch (Exception ex) {
-            log.error("Error deleting Campus ID: {}", campusId, ex);
-            return ResponseEntity.internalServerError().body("Failed to delete Campus");
+    @Operation(summary = "Search campuses", description = "Find campuses by keyword matching name, code, or address.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved matching campuses",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CampusResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid search keyword",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CampusResponseDTO>> search(
+            @Parameter(description = "Search keyword (name, code, etc.)", example = "Main") @RequestParam(name = "keyword") String keyword) {
+        log.info("[Controller:CampusController] search() called - Request to search campuses with keyword: {}",
+                keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
+        List<CampusResponseDTO> responseDTOs = nCampusFacade.searchByKeyword(keyword.trim());
+        log.info("[Controller:CampusController] search() succeeded - Found {} campuses matching keyword: {}",
+                responseDTOs.size(), keyword);
+        return ResponseEntity.ok(responseDTOs);
     }
 
-
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CampusCreateRequestDTO> createCampus(@Valid @RequestBody CampusCreateRequestDTO dto) {
-        log.info("Received request to create new Section: {}", dto.getCampusName());
-        CampusCreateRequestDTO createdCampus = nCampusFacade.createCampus(dto);
-        log.info("Section created successfully with id: {}", createdCampus.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdCampus);
+    @Operation(summary = "Delete campus", description = "Soft delete a campus from the system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Campus deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Campus not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{campusId}")
+    public ResponseEntity<Map<String, String>> delete(
+            @Parameter(description = "ID of the campus to delete", example = "1") @PathVariable Long campusId) {
+        log.info("[Controller:CampusController] delete() called - Request to delete campus: {}", campusId);
+        nCampusFacade.softDeleteById(campusId);
+        log.info("[Controller:CampusController] delete() succeeded - Campus: {} deleted successfully", campusId);
+        return ResponseEntity.ok(Map.of("message", "Campus deleted successfully"));
     }
 
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CampusResponseDTO> updateCampus(@PathVariable Long id, @Valid @RequestBody CampusCreateRequestDTO dto) {
-        log.info("Received request to update Campus with id: {}", id);
-        CampusResponseDTO updatedCampus = nCampusFacade.updateCampus(id, dto);
-        log.info("Returning updated Campus: id={}", updatedCampus.getId());
-        return ResponseEntity.ok(updatedCampus);
+    @Operation(summary = "Create new campus", description = "Register a new campus with the provided details.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Campus created successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CampusResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CampusResponseDTO> create(@Valid @RequestBody CampusCreateRequestDTO requestDTO) {
+        log.info("[Controller:CampusController] create() called - Request to create campus: {}",
+                requestDTO.getCampusName());
+        CampusResponseDTO responseDTO = nCampusFacade.createCampus(requestDTO);
+        log.info("[Controller:CampusController] create() succeeded - Campus created with id: {}", responseDTO.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
-
-    @GetMapping(value = "meta", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCampusMetaData() throws Exception {
-        log.info("GET /api/institute/meta called");
-        CampusMetaData resources = nCampusFacade.getCampusMetaData();
-        log.info("GET /api/institute/meta succeeded");
-        return ResponseEntity.ok().body(resources);
+    @Operation(summary = "Update campus", description = "Update details of an existing campus.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Campus updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CampusResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Campus not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CampusResponseDTO> update(
+            @Parameter(description = "ID of the campus to update", example = "1") @PathVariable Long id,
+            @Valid @RequestBody CampusCreateRequestDTO requestDTO) {
+        log.info("[Controller:CampusController] update() called - Request to update campus: {}", id);
+        CampusResponseDTO responseDTO = nCampusFacade.updateCampus(id, requestDTO);
+        log.info("[Controller:CampusController] update() succeeded - Campus: {} updated successfully", id);
+        return ResponseEntity.ok(responseDTO);
     }
 
+//    @GetMapping(value = "/meta", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<CampusMetaData> getMetaData() {
+//        log.info("[Controller:CampusController] getMetaData() called");
+//        CampusMetaData resources = nCampusFacade.getCampusMetaData();
+//        log.info("[Controller:CampusController] getMetaData() succeeded");
+//        return ResponseEntity.ok(resources);
+//    }
+
+    @Operation(summary = "Get campus statistics", description = "Retrieve statistical data overview for campuses.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved statistics"),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/statistics", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<java.util.Map<String, Long>> getStatistics() {
+        log.info("[Controller:CampusController] getStatistics() called");
+        java.util.Map<String, Long> statistics = nCampusFacade.getStatistics();
+        log.info("[Controller:CampusController] getStatistics() succeeded");
+        return ResponseEntity.ok(statistics);
+    }
 }
-

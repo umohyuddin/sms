@@ -1,0 +1,47 @@
+package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
+import com.smartsolutions.eschool.user.model.RoleEntity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+
+
+@Entity
+@SQLDelete(sql = "UPDATE institute_contacts SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
+@Table(name = "institute_contacts")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class InstituteContactEntity extends ScopeAuditableEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "institute_id", nullable = false)
+    private InstituteEntity institute;
+
+    @Column(name = "contact_person_name", length = 100)
+    private String contactPersonName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = false)
+    private RoleEntity role;
+
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @Column(name = "email", length = 100)
+    private String email;
+
+    @Column(name = "is_primary")
+    private Boolean isPrimary = false;
+}

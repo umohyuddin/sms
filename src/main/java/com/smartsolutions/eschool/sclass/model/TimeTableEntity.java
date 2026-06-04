@@ -1,7 +1,8 @@
 package com.smartsolutions.eschool.sclass.model;
+import org.hibernate.annotations.SQLRestriction;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
+import org.hibernate.annotations.SQLDelete;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +10,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Entity
+@SQLDelete(sql = "UPDATE timetable SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "timetable")
 @Data
 @AllArgsConstructor
@@ -25,6 +27,9 @@ public class TimeTableEntity {
 
     @Column(name = "cls_id")
     private Integer classId;
+
+    @Column(name = "teacher_id")
+    private Long teacherId;
 
     @Column(name = "duration", length = 100)
     private String duration;

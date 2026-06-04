@@ -10,7 +10,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
+import com.smartsolutions.eschool.global.error.ErrorResponse;
 
 import java.util.List;
 
@@ -18,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/school/discounts/student")
 @Slf4j
+@Tag(name = "Student Discount Assignment", description = "Endpoints for assigning and managing student-specific discounts.")
 public class StudentDiscountAssignmentController {
 
     private final StudentDiscountAssignmentFacade studentDiscountFacade;
@@ -29,6 +39,15 @@ public class StudentDiscountAssignmentController {
     // -------------------------------------------------------------------------
     // CREATE
     // -------------------------------------------------------------------------
+    @Operation(summary = "Assign discount to student", description = "Create a new discount assignment for a specific student and academic year.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Discount assigned successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentDiscountAssignmentResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input or business rule violation",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createStudentDiscount(@RequestBody @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
         log.info("Received request to assign discount to student");
@@ -40,6 +59,11 @@ public class StudentDiscountAssignmentController {
     // -------------------------------------------------------------------------
     // GET ALL
     // -------------------------------------------------------------------------
+    @Operation(summary = "Get all assignments", description = "Retrieve a list of all student discount assignments.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List retrieved successfully",
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = StudentDiscountAssignmentResponseDTO.class))))
+    })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll() {
         log.info("GET /api/school/discounts/student called");
@@ -48,8 +72,17 @@ public class StudentDiscountAssignmentController {
         return ResponseEntity.ok(list);
     }
 
+    @Operation(summary = "Get assigned discounts for student", description = "Fetch all active/assigned discounts for a student in a specific academic year.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved assigned discounts",
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = StudentDiscountAssignmentResponseDTO.class)))),
+            @ApiResponse(responseCode = "404", description = "Student or Academic Year not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @GetMapping("/{studentId}/assigned")
-    public ResponseEntity<List<StudentDiscountAssignmentResponseDTO>> getAssignedDiscounts(@PathVariable Long studentId, @RequestParam Long academicYearId) {
+    public ResponseEntity<List<StudentDiscountAssignmentResponseDTO>> getAssignedDiscounts(
+            @Parameter(description = "ID of the student", example = "5001") @PathVariable Long studentId,
+            @Parameter(description = "ID of the academic year", example = "1") @RequestParam Long academicYearId) {
         log.info("GET /api/school/discounts/student/{}/assigned?academicYearId={} called", studentId, academicYearId);
 
         List<StudentDiscountAssignmentResponseDTO> assignedDiscounts = studentDiscountFacade.getAssignedDiscountsForStudent(studentId, academicYearId);
@@ -83,8 +116,17 @@ public class StudentDiscountAssignmentController {
     // -------------------------------------------------------------------------
     // UPDATE ASSIGNMENT
     // -------------------------------------------------------------------------
+    @Operation(summary = "Update assignment", description = "Update details of an existing discount assignment.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Assignment updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = StudentDiscountAssignmentResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Assignment not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PutMapping(value = "/{assignmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateStudentDiscount(@PathVariable Long assignmentId, @RequestBody @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
+    public ResponseEntity<?> updateStudentDiscount(
+            @Parameter(description = "ID of the assignment", example = "1") @PathVariable Long assignmentId,
+            @RequestBody @Valid StudentDiscountAssignmentRequestDTO requestDTO) {
         log.info("PUT /api/school/discounts/student/{} called", assignmentId);
         StudentDiscountAssignmentResponseDTO dto = studentDiscountFacade.updateAssignment(assignmentId, requestDTO);
         log.info("Updated student discount assignment {}", assignmentId);

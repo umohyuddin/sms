@@ -1,10 +1,13 @@
 package com.smartsolutions.eschool.employee.facade;
 
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeCreateRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.request.EmployeeMasterRequestDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeAddressResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeDocumentResponseDto;
 import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeMasterResponseDto;
+import com.smartsolutions.eschool.employee.dtos.employeeMaster.response.EmployeeTypeCountDTO;
 import com.smartsolutions.eschool.employee.service.EmployeeMasterService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -15,104 +18,119 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
 @Component
 @Scope("prototype")
+@Slf4j
 public class EmployeeMasterFacade {
 
-    private final EmployeeMasterService employeeService;
+    private final EmployeeMasterService nEmployeeMasterService;
 
-    public EmployeeMasterFacade(EmployeeMasterService employeeService) {
-        this.employeeService = employeeService;
+    public EmployeeMasterFacade(EmployeeMasterService nEmployeeMasterService) {
+        this.nEmployeeMasterService = nEmployeeMasterService;
     }
 
-    // -------------------------
-    // Basic fetch operations
-    // -------------------------
     public List<EmployeeMasterResponseDto> getAllEmployees() {
-        return employeeService.getAll();
+        log.info("[Facade:EmployeeMasterFacade] getAllEmployees() called");
+        return nEmployeeMasterService.getAll();
     }
 
     public EmployeeMasterResponseDto getEmployeeById(Long id) {
-        return employeeService.getById(id);
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeById() called - id: {}", id);
+        return nEmployeeMasterService.getById(id);
     }
 
     public EmployeeMasterResponseDto getEmployeeByCode(String code) {
-        return employeeService.getByEmployeeCode(code);
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeByCode() called - code: {}", code);
+        return nEmployeeMasterService.getByEmployeeCode(code);
     }
 
-    public List<EmployeeMasterResponseDto> searchEmployeesByName(String name) {
-        return employeeService.searchByName(name);
+    public List<EmployeeMasterResponseDto> searchByKeyword(String keyword) {
+        log.info("[Facade:EmployeeMasterFacade] searchByKeyword() called - keyword: {}", keyword);
+        return nEmployeeMasterService.searchByKeyword(keyword);
     }
 
     public List<EmployeeMasterResponseDto> getEmployeesByGender(String gender) {
-        return employeeService.getByGender(gender);
+        log.info("[Facade:EmployeeMasterFacade] getEmployeesByGender() called - gender: {}", gender);
+        return nEmployeeMasterService.getByGender(gender);
     }
 
     public List<EmployeeMasterResponseDto> getEmployeesByActiveStatus(Boolean status) {
-        return employeeService.getByActiveStatus(status);
+        log.info("[Facade:EmployeeMasterFacade] getEmployeesByActiveStatus() called - status: {}", status);
+        return nEmployeeMasterService.getByActiveStatus(status);
     }
 
     public List<EmployeeMasterResponseDto> getEmployeesWithProbationEndedBefore(Date date) {
-        return employeeService.getProbationEndedBefore(date);
+        log.info("[Facade:EmployeeMasterFacade] getEmployeesWithProbationEndedBefore() called - date: {}", date);
+        return nEmployeeMasterService.getProbationEndedBefore(date);
     }
 
-    // -------------------------
-    // Create / update operations
-    // -------------------------
+    public EmployeeMasterResponseDto createEmployee(EmployeeCreateRequestDto requestDto) {
+        log.info("[Facade:EmployeeMasterFacade] createEmployee(create) called");
+        return nEmployeeMasterService.createEmployee(requestDto);
+    }
+
     public EmployeeMasterResponseDto createEmployee(EmployeeMasterRequestDto requestDto) {
-        return employeeService.createEmployee(requestDto);
+        log.info("[Facade:EmployeeMasterFacade] createEmployee(master) called");
+        return nEmployeeMasterService.createEmployee(requestDto);
     }
 
-    // -------------------------
-    // Metrics / counts
-    // -------------------------
     public long getTotalEmployees() {
-        return employeeService.countAllEmployees();
+        log.info("[Facade:EmployeeMasterFacade] getTotalEmployees() called");
+        return nEmployeeMasterService.countAllEmployees();
     }
 
     public long getTotalActiveEmployees() {
-        return employeeService.countActiveEmployees();
+        log.info("[Facade:EmployeeMasterFacade] getTotalActiveEmployees() called");
+        return nEmployeeMasterService.countActiveEmployees();
     }
 
     public long getTotalInactiveEmployees() {
-        return employeeService.countInactiveEmployees();
+        log.info("[Facade:EmployeeMasterFacade] getTotalInactiveEmployees() called");
+        return nEmployeeMasterService.countInactiveEmployees();
     }
 
     public String updateEmployeeProfile(Long employeeId, String file) {
-        return employeeService.saveProfilePhoto(employeeId, file);
+        log.info("[Facade:EmployeeMasterFacade] updateEmployeeProfile() called - employeeId: {}", employeeId);
+        return nEmployeeMasterService.saveProfilePhoto(employeeId, file);
     }
-
 
     public void saveEmployeeDocument(Long employeeId, String docKey, MultipartFile file) throws IOException {
-        employeeService.saveEmployeeDocument(employeeId, docKey, file);
+        log.info("[Facade:EmployeeMasterFacade] saveEmployeeDocument() called - employeeId: {}", employeeId);
+        nEmployeeMasterService.saveEmployeeDocument(employeeId, docKey, file);
     }
 
-
     public List<EmployeeDocumentResponseDto> getEmployeeDocuments(Long employeeId) {
-        return employeeService.getDocumentsByEmployeeId(employeeId);
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeDocuments() called - employeeId: {}", employeeId);
+        return nEmployeeMasterService.getDocumentsByEmployeeId(employeeId);
     }
 
     public Map<String, List<EmployeeDocumentResponseDto>> getDocumentsByEmployeeId(Long employeeId) {
-        return employeeService.getGroupedDocuments(employeeId);
+        log.info("[Facade:EmployeeMasterFacade] getDocumentsByEmployeeId() called - employeeId: {}", employeeId);
+        return nEmployeeMasterService.getGroupedDocuments(employeeId);
     }
 
     public Resource getDocumentById(Long documentId, Long employeeId) {
-        return employeeService.downloadDocument(documentId, employeeId);
+        log.info("[Facade:EmployeeMasterFacade] getDocumentById() called - documentId: {}, employeeId: {}", documentId, employeeId);
+        return nEmployeeMasterService.downloadDocument(documentId, employeeId);
     }
 
     public EmployeeMasterResponseDto updateEmployee(Long id, EmployeeMasterRequestDto requestDto) {
-        return employeeService.updateEmployee(id, requestDto);
+        log.info("[Facade:EmployeeMasterFacade] updateEmployee() called - id: {}", id);
+        return nEmployeeMasterService.updateEmployee(id, requestDto);
     }
 
-
-    public Long countAll() {
-        return employeeService.countAllEmployees();
+    public void deleteEmployee(Long id) {
+        log.info("[Facade:EmployeeMasterFacade] deleteEmployee() called - id: {}", id);
+        nEmployeeMasterService.delete(id);
     }
 
     public Map<String, Long> getEmployeeCountByGender() {
-        return employeeService.getEmployeeCountByGender();
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeCountByGender() called");
+        return nEmployeeMasterService.getEmployeeCountByGender();
     }
 
+    public List<EmployeeTypeCountDTO> getEmployeeCountByType() {
+        log.info("[Facade:EmployeeMasterFacade] getEmployeeCountByType() called");
+        return nEmployeeMasterService.getEmployeeCountByType();
+    }
 }
-

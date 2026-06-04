@@ -1,5 +1,9 @@
 package com.smartsolutions.eschool.employee.model;
+import org.hibernate.annotations.SQLRestriction;
 
+import org.hibernate.annotations.SQLDelete;
+
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,8 +16,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@SQLDelete(sql = "UPDATE employee_deduction SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "employee_deduction")
-public class EmployeeDeductionEntity {
+public class EmployeeDeductionEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,8 +36,5 @@ public class EmployeeDeductionEntity {
 
     @Column(name = "month", nullable = false)
     private LocalDate month;  // Payroll month
-
-    @Column(name = "deleted")
-    private Boolean deleted = false;
 
 }

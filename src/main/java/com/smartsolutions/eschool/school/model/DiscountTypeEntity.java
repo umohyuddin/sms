@@ -1,17 +1,22 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.lookups.model.FeeRecurrenceRuleEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
+@SQLDelete(sql = "UPDATE discount_type SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "discount_type")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DiscountTypeEntity  extends AuditableEntity {
+public class DiscountTypeEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,20 +34,18 @@ public class DiscountTypeEntity  extends AuditableEntity {
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 
-    @Column(name = "charge_type", nullable = false, length = 50)
-    private String chargeType;
-    // You can convert to ENUM later: FIXED, PERCENTAGE, PER_CREDIT, etc.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "charge_type_id", nullable = false)
+    private ChargeTypeEntity chargeType;
 
-    @Column(name = "recurrence_rule", length = 50)
-    private String recurrenceRule;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recurrence_rule_id")
+    private FeeRecurrenceRuleEntity recurrenceRule;
 
     @Column(name = "priority")
     private Integer priority = 0;
 
     @Column(name = "display_order")
     private Integer displayOrder = 0;
-
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
 
 }

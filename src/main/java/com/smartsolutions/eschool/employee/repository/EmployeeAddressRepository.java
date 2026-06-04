@@ -18,9 +18,9 @@ public interface EmployeeAddressRepository extends JpaRepository<EmployeeAddress
             JOIN FETCH ea.city
             LEFT JOIN FETCH ea.province
             JOIN FETCH ea.country
-            WHERE ea.employee.id = :employeeId
+            WHERE ea.employee.id = :employeeId AND ea.organizationId = :organizationId
             """)
-    List<EmployeeAddressEntity> findEmployeeAddresses(@Param("employeeId") Long employeeId);
+    List<EmployeeAddressEntity> findEmployeeAddressesAndOrganizationId(@Param("employeeId") Long employeeId, @Param("organizationId") Long organizationId);
 
     @Query("""
             SELECT ea
@@ -28,9 +28,9 @@ public interface EmployeeAddressRepository extends JpaRepository<EmployeeAddress
             JOIN FETCH ea.city
             LEFT JOIN FETCH ea.province
             JOIN FETCH ea.country
-            WHERE ea.id = :addressId
+            WHERE ea.id = :addressId AND ea.organizationId = :organizationId
             """)
-    Optional<EmployeeAddressEntity> findByAddressId(@Param("addressId") Long addressId);
+    Optional<EmployeeAddressEntity> findByAddressIdAndOrganizationId(@Param("addressId") Long addressId, @Param("organizationId") Long organizationId);
 
 
 }

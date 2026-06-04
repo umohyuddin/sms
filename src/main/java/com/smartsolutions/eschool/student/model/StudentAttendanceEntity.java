@@ -1,29 +1,53 @@
 package com.smartsolutions.eschool.student.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsolutions.eschool.sclass.model.SubjectEntity;
+import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.school.model.CampusEntity;
+import com.smartsolutions.eschool.school.model.InstituteEntity;
+import com.smartsolutions.eschool.sclass.model.SectionEntity;
+import com.smartsolutions.eschool.sclass.model.StandardEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "attendance")
-@Data
-@AllArgsConstructor
+@SQLDelete(sql = "UPDATE student_attendance SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
+@Table(name = "student_attendance", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"organization_id", "student_id", "attendance_date"})
+})
+@Getter
+@Setter
 @NoArgsConstructor
-public class StudentAttendanceEntity {
+@AllArgsConstructor
+@Builder
+public class StudentAttendanceEntity extends AuditableEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "std_id")
-    private Long studentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", insertable = false, updatable = false)
+    private InstituteEntity organization;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campus_id", nullable = false)
+    private CampusEntity campus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    private StudentEntity student;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "standard_id", nullable = false)
+    private StandardEntity standard;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "section_id", nullable = false)
+    private SectionEntity section;
 
     @Column(name = "attendance_date", nullable = false)
     private LocalDate attendanceDate;
@@ -32,21 +56,16 @@ public class StudentAttendanceEntity {
     @Column(name = "status", nullable = false)
     private AttendanceStatus status;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "marked_by")
+    private Long markedBy;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "remarks", length = 255)
+    private String remarks;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "std_id", referencedColumnName = "id", insertable = false, updatable = false)
-    @JsonIgnore
-    private StudentEntity student;
-
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
 
     public enum AttendanceStatus {
-        P, A, L
+        PRESENT, ABSENT, LEAVE
     }
 }

@@ -2,24 +2,22 @@ package com.smartsolutions.eschool.global.configs;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 @Configuration
 @ConfigurationProperties(prefix = "employee")
-@Component
 public class EmployeeDocumentConfig {
     private Integer probationPeriodMonths;
 
-    private Map<String, String> documentTypes;
-    private Map<String, String> addressTypes;
-    private Map<String, String> emergencyContactRelationships;
-    private Map<String, String> qualificationDegrees;
-    private Map<String, String> qualificationSubjects;
-    private Map<String, String> maritalStatus;
-    private Map<String, String> employmentTypes;
-
+    private Map<String, String> documentTypes = new java.util.HashMap<>();
+    private Map<String, String> addressTypes = new java.util.HashMap<>();
+    private Map<String, String> emergencyContactRelationships = new java.util.HashMap<>();
+    private Map<String, String> qualificationDegrees = new java.util.HashMap<>();
+    private Map<String, String> qualificationSubjects = new java.util.HashMap<>();
+    private Map<String, String> maritalStatus = new java.util.HashMap<>();
+    private Map<String, String> employmentTypes = new java.util.HashMap<>();
 
     public Integer getProbationPeriodMonths() {
         return probationPeriodMonths;
@@ -86,8 +84,6 @@ public class EmployeeDocumentConfig {
     }
 }
 
-
-
 /**
  * ================================================================
  * Employee Configuration Properties Mapping
@@ -96,15 +92,15 @@ public class EmployeeDocumentConfig {
  * application.properties key prefix: employee
  *
  * ---------------------------------------------------------------
- * Property Key Pattern                           Java Field
+ * Property Key Pattern Java Field
  * ---------------------------------------------------------------
- * employee.document-types.*                      documentTypes
- * employee.address-types.*                       addressTypes
- * employee.emergency-contact-relationships.*     emergencyContactRelationships
- * employee.qualification-degrees.*               qualificationDegrees
- * employee.qualification-subjects.*              qualificationSubjects
- * employee.marital-status.*                      maritalStatus
- * employee.probation-period-months               probationPeriodMonths
+ * employee.document-types.* documentTypes
+ * employee.address-types.* addressTypes
+ * employee.emergency-contact-relationships.* emergencyContactRelationships
+ * employee.qualification-degrees.* qualificationDegrees
+ * employee.qualification-subjects.* qualificationSubjects
+ * employee.marital-status.* maritalStatus
+ * employee.probation-period-months probationPeriodMonths
  * ---------------------------------------------------------------
  *
  * Usage:
@@ -117,4 +113,3 @@ public class EmployeeDocumentConfig {
  *
  * ================================================================
  */
-

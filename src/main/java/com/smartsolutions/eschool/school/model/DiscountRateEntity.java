@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -6,13 +9,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.domain.Auditable;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@SQLDelete(sql = "UPDATE discount_rate SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "discount_rate")
 @Getter
 @Setter
@@ -35,7 +38,6 @@ public class DiscountRateEntity extends AuditableEntity {
     private Boolean isActive = true;
 
     private Boolean deleted = false;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "discount_sub_type_id", nullable = false)

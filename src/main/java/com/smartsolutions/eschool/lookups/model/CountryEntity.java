@@ -1,14 +1,26 @@
 package com.smartsolutions.eschool.lookups.model;
+import org.hibernate.annotations.SQLRestriction;
 
+import org.hibernate.annotations.SQLDelete;
+
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "country", uniqueConstraints = @UniqueConstraint(columnNames = {"country_code"}))
+@SQLDelete(sql = "UPDATE country SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
+@Table(name = "country", uniqueConstraints = @UniqueConstraint(columnNames = { "country_code" }))
 @Getter
 @Setter
-public class CountryEntity {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CountryEntity extends ScopeAuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,5 +37,5 @@ public class CountryEntity {
 
     @Column(name = "phone_code", length = 10)
     private String phoneCode;
-}
 
+}

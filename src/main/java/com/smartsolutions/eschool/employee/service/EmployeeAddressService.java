@@ -35,7 +35,8 @@ public class EmployeeAddressService {
     public List<EmployeeAddressResponseDto> getByEmployeeId(Long employeeId) {
         try {
             log.info("Fetching addresses for employeeId={}", employeeId);
-            List<EmployeeAddressEntity> addresses = employeeAddressRepository.findEmployeeAddresses(employeeId);
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            List<EmployeeAddressEntity> addresses = employeeAddressRepository.findEmployeeAddressesAndOrganizationId(employeeId, orgId);
             return MapperUtil.mapList(addresses, EmployeeAddressResponseDto.class);
         } catch (Exception e) {
             log.error("Error fetching addresses for employeeId={}", employeeId, e);
@@ -46,7 +47,9 @@ public class EmployeeAddressService {
     public EmployeeAddressResponseDto getById(Long addressId) {
         try {
             log.info("Fetching address with id={}", addressId);
-            EmployeeAddressEntity address = employeeAddressRepository.findByAddressId(addressId).orElseThrow(() -> new NoSuchElementException("Address not found with id: " + addressId));
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            EmployeeAddressEntity address = employeeAddressRepository.findByAddressIdAndOrganizationId(addressId, orgId)
+                    .orElseThrow(() -> new NoSuchElementException("Address not found with id: " + addressId));
             return MapperUtil.mapObject(address, EmployeeAddressResponseDto.class);
         } catch (Exception e) {
             log.error("Error fetching address with id={}", addressId, e);
@@ -67,7 +70,8 @@ public class EmployeeAddressService {
             entity.setPostalCode(dto.getPostalCode());
 
             // Set relations
-            entity.setEmployee(employeeMasterRepository.findById(dto.getEmployeeId())
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+            entity.setEmployee(employeeMasterRepository.findByIdAndOrganizationId(dto.getEmployeeId(), orgId)
                     .orElseThrow(() -> new NoSuchElementException("Employee not found")));
             entity.setCountry(countryRepository.findById(dto.getCountryId())
                     .orElseThrow(() -> new NoSuchElementException("Country not found")));
@@ -92,8 +96,9 @@ public class EmployeeAddressService {
     public EmployeeAddressResponseDto update(Long addressId, EmployeeAddressRequestDto dto) {
         try {
             log.info("Updating address with id={}", addressId);
+            Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
 
-            EmployeeAddressEntity entity = employeeAddressRepository.findById(addressId)
+            EmployeeAddressEntity entity = employeeAddressRepository.findByAddressIdAndOrganizationId(addressId, orgId)
                     .orElseThrow(() -> new NoSuchElementException("Address not found"));
 
             // Update basic fields

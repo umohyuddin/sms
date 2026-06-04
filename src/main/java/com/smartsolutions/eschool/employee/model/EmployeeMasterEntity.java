@@ -1,16 +1,21 @@
 package com.smartsolutions.eschool.employee.model;
+import org.hibernate.annotations.SQLRestriction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.user.model.SystemUserEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.SQLDelete;
+
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE EmployeeMasterEntity SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(
         name = "employee_master",
         uniqueConstraints = {
@@ -32,6 +37,7 @@ public class EmployeeMasterEntity extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     // =========================
     // Link to User (Login)
@@ -73,8 +79,8 @@ public class EmployeeMasterEntity extends AuditableEntity {
     private String maritalStatus;
 
 
-    @Column(name = "cnic", length = 20)
-    private String cnic;
+    @Column(name = "national_id", length = 20)
+    private String nationalId;
 
     @Column(name = "passport_number", length = 20)
     private String passportNumber;
@@ -82,8 +88,9 @@ public class EmployeeMasterEntity extends AuditableEntity {
     @Column(length = 50)
     private String religion;
 
-    @Column(length = 50)
-    private String nationality;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private com.smartsolutions.eschool.lookups.model.CountryEntity country;
 
     @Column(name = "blood_group", length = 10)
     private String bloodGroup;
@@ -163,6 +170,10 @@ public class EmployeeMasterEntity extends AuditableEntity {
     @JoinColumn(name = "employee_type_id") // FK → employee_type.id
     private EmployeeTypeEntity employeeType;
 
+    // One-to-One relationship with System User
+    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private SystemUserEntity systemUser;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<EmployeeDeductionEntity> deductions;
@@ -175,10 +186,7 @@ public class EmployeeMasterEntity extends AuditableEntity {
     private List<EmployeeMasterSalary> salaries;
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<EmployeeDepartmentHistoryEntity> departmentHistories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<EmployeeDesignationHistoryEntity> designationHistories = new ArrayList<>();
+    private List<EmployeeAssignmentEntity> assignments = new ArrayList<>();
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<EmployeeTypeHistoryEntity> typeHistories = new ArrayList<>();

@@ -4,6 +4,10 @@
 # 🏫 School Management System  
 ## 🚀 SMS Frontend – Docker Deployment Guide
 
+
+
+
+
 ---
 
 ## 🐳 Prerequisites
@@ -93,3 +97,6 @@ docker stop <container_id>
 
 
 
+CampusController
+this is source of truth for you.
+StandardController you need to update this base on the same pattren of logging/ error implementation/ coding style/ existance check/ jpql queries/ 

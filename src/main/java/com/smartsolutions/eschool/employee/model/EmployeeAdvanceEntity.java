@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.employee.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -9,6 +12,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@SQLDelete(sql = "UPDATE employee_advance SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "employee_advance")
 @Getter
 @Setter
@@ -37,8 +42,5 @@ public class EmployeeAdvanceEntity extends AuditableEntity {
 
     @Column(name = "balance", precision = 12, scale = 2)
     private BigDecimal balance;
-
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
 
 }

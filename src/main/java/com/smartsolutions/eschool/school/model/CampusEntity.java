@@ -1,17 +1,21 @@
 package com.smartsolutions.eschool.school.model;
+
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.lookups.model.CityEntity;
+import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
 import com.smartsolutions.eschool.sclass.model.StandardEntity;
-import com.smartsolutions.eschool.student.model.FeeCatalogEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE campuses SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "campuses")
 @Getter
 @Setter
@@ -51,15 +55,13 @@ public class CampusEntity extends AuditableEntity {
     private byte[] logo;
 
 
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "province_id")
+    private ProvinceEntity province;
 
-
-    @Column(name = "province_id")
-    private Long provinceId;
-    @Column(name = "city_id")
-    private Long cityId;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id")
+    private CityEntity city;
 
     // ---- RELATIONSHIPS ---- //
     @OneToMany(mappedBy = "campus", cascade = CascadeType.ALL)

@@ -1,30 +1,20 @@
 package com.smartsolutions.eschool.employee.controller;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.employee.dtos.EmployeeType.request.EmployeeTypeRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.EmployeeType.response.EmployeeTypeResponseDTO;
-import com.smartsolutions.eschool.employee.facade.EmployeeFacade;
 import com.smartsolutions.eschool.employee.facade.EmployeeTypeFacade;
-import com.smartsolutions.eschool.employee.model.EmployeeEntity;
-import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
-import com.smartsolutions.eschool.util.ResourceObject;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/institute/employee-types")
+@RequestMapping("/api/employee/employee-types/v1")
 @Slf4j
 public class EmployeeTypeController {
 
@@ -34,114 +24,70 @@ public class EmployeeTypeController {
         this.employeeTypeFacade = employeeTypeFacade;
     }
 
-    // -------------------------
-// Create Employee Type
-// -------------------------
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeTypeResponseDTO> create(@RequestBody @Valid EmployeeTypeRequestDTO requestDTO) {
-
-        log.info("POST /api/institute/employee-types called");
-        EmployeeTypeResponseDTO response = employeeTypeFacade.create(requestDTO);
-        log.info("EmployeeType created with id={}", response.getId());
-        return ResponseEntity.ok(response);
-    }
-
-    // -------------------------
-// Get all employee types
-// -------------------------
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<EmployeeTypeResponseDTO>> getAll() {
-
-        log.info("GET /api/institute/employee-types called");
-        List<EmployeeTypeResponseDTO> list = employeeTypeFacade.getAll();
-        log.info("Returned {} employee types", list.size());
-        return ResponseEntity.ok(list);
+        log.info("[Controller:EmployeeTypeController] getAll() called - Request to get all employee types");
+        List<EmployeeTypeResponseDTO> resources = employeeTypeFacade.getAll();
+        log.info("[Controller:EmployeeTypeController] getAll() succeeded - Found {} employee types", resources.size());
+        return ResponseEntity.ok(resources);
     }
 
-    // -------------------------
-// Get employee type by ID
-// -------------------------
+    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EmployeeTypeResponseDTO>> getAllActive() {
+        log.info("[Controller:EmployeeTypeController] getAllActive() called - Request to get all active employee types");
+        List<EmployeeTypeResponseDTO> resources = employeeTypeFacade.getAllActive();
+        log.info("[Controller:EmployeeTypeController] getAllActive() succeeded - Found {} active employee types", resources.size());
+        return ResponseEntity.ok(resources);
+    }
+
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EmployeeTypeResponseDTO> getById(@PathVariable Long id) {
-
-        log.info("GET /api/institute/employee-types/{} called", id);
-        EmployeeTypeResponseDTO response = employeeTypeFacade.getById(id);
-        return ResponseEntity.ok(response);
+        log.info("[Controller:EmployeeTypeController] getById() called - Request to fetch employee type with id: {}", id);
+        EmployeeTypeResponseDTO employeeType = employeeTypeFacade.getById(id);
+        log.info("[Controller:EmployeeTypeController] getById() succeeded - Found employee type: {}", id);
+        return ResponseEntity.ok(employeeType);
     }
 
-    // -------------------------
-// Get active employee types
-// -------------------------
-    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EmployeeTypeResponseDTO>> getActive() {
-
-        log.info("GET /api/institute/employee-types/active called");
-        return ResponseEntity.ok(employeeTypeFacade.getAllActive());
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EmployeeTypeResponseDTO>> search(@RequestParam(name = "keyword") String keyword) {
+        log.info("[Controller:EmployeeTypeController] search() called - Request to search employee types with keyword: {}", keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<EmployeeTypeResponseDTO> responseDTOs = employeeTypeFacade.searchByKeyword(keyword.trim());
+        log.info("[Controller:EmployeeTypeController] search() succeeded - Found {} employee types matching keyword: {}", responseDTOs.size(), keyword);
+        return ResponseEntity.ok(responseDTOs);
     }
 
-    // -------------------------
-// Get inactive employee types
-// -------------------------
-    @GetMapping(value = "/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EmployeeTypeResponseDTO>> getInactive() {
-
-        log.info("GET /api/institute/employee-types/inactive called");
-        return ResponseEntity.ok(employeeTypeFacade.getAllInactive());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+        log.info("[Controller:EmployeeTypeController] delete() called - Request to delete employee type: {}", id);
+        employeeTypeFacade.softDeleteById(id);
+        log.info("[Controller:EmployeeTypeController] delete() succeeded - Employee type: {} deleted successfully", id);
+        return ResponseEntity.ok(Map.of("message", "Employee Type deleted successfully"));
     }
 
-    // -------------------------
-// Search employee types
-// -------------------------
-//    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<List<EmployeeTypeResponseDTO>> search(@RequestParam String keyword) {
-//
-//        log.info("GET /api/institute/employee-types/search?keyword={}", keyword);
-//        return ResponseEntity.ok(employeeTypeFacade.searchByKeyword(keyword));
-//    }
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<EmployeeTypeResponseDTO> create(@Valid @RequestBody EmployeeTypeRequestDTO requestDTO) {
+        log.info("[Controller:EmployeeTypeController] create() called - Request to create employee type: {}", requestDTO.getName());
+        EmployeeTypeResponseDTO responseDTO = employeeTypeFacade.create(requestDTO);
+        log.info("[Controller:EmployeeTypeController] create() succeeded - Employee type created with id: {}", responseDTO.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
 
-    // -------------------------
-// Update employee type
-// -------------------------
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeTypeResponseDTO> update(@PathVariable Long id, @RequestBody @Valid EmployeeTypeRequestDTO requestDTO) {
-
-        log.info("PUT /api/institute/employee-types/{} called", id);
-        EmployeeTypeResponseDTO response = employeeTypeFacade.update(id, requestDTO);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<EmployeeTypeResponseDTO> update(@PathVariable Long id, @Valid @RequestBody EmployeeTypeRequestDTO requestDTO) {
+        log.info("[Controller:EmployeeTypeController] update() called - Request to update employee type: {}", id);
+        EmployeeTypeResponseDTO responseDTO = employeeTypeFacade.update(id, requestDTO);
+        log.info("[Controller:EmployeeTypeController] update() succeeded - Employee type: {} updated successfully", id);
+        return ResponseEntity.ok(responseDTO);
     }
 
-    // -------------------------
-// Soft delete employee type
-// -------------------------
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> softDelete(@PathVariable Long id) {
-//
-//        log.info("DELETE /api/institute/employee-types/{} called", id);
-//        int result = employeeTypeFacade.softDelete(id);
-//
-//        if (result == 0) {
-//            log.warn("EmployeeType not found with id={}", id);
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        return ResponseEntity.ok(Map.of("message", "Employee Type deleted successfully"));
-//    }
-
-    // -------------------------
-// Metrics
-// -------------------------
-    @GetMapping(value = "/count/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Long> countAll() {
-        return ResponseEntity.ok(employeeTypeFacade.countAll());
-    }
-
-    @GetMapping(value = "/count/active", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Long> countActive() {
-        return ResponseEntity.ok(employeeTypeFacade.countActive());
-    }
-
-    @GetMapping(value = "/count/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Long> countInactive() {
-        return ResponseEntity.ok(employeeTypeFacade.countInactive());
+    @GetMapping(value = "/statistics", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Long>> getStatistics() {
+        log.info("[Controller:EmployeeTypeController] getStatistics() called");
+        Map<String, Long> statistics = employeeTypeFacade.getStatistics();
+        log.info("[Controller:EmployeeTypeController] getStatistics() succeeded");
+        return ResponseEntity.ok(statistics);
     }
 }

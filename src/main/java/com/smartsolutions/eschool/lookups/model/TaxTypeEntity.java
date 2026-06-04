@@ -1,0 +1,40 @@
+package com.smartsolutions.eschool.lookups.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
+
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@SQLDelete(sql = "UPDATE tax_types SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
+@Table(name = "tax_types")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class TaxTypeEntity extends ScopeAuditableEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "code", unique = true, nullable = false, length = 20)
+    private String code;
+
+    @Column(name = "name", length = 50)
+    private String name;
+
+    @Column(name = "tax_percentage", nullable = false, precision = 5, scale = 2)
+    private java.math.BigDecimal taxPercentage = java.math.BigDecimal.ZERO;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private CountryEntity country;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+}

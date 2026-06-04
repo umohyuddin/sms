@@ -1,4 +1,5 @@
 package com.smartsolutions.eschool.employee.model;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -9,7 +10,12 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+import org.hibernate.annotations.SQLDelete;
+
+
 @Entity
+@SQLDelete(sql = "UPDATE SalaryStructureComponentEntity SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(
         name = "salary_structure_component",
         uniqueConstraints = {
@@ -41,8 +47,5 @@ public class SalaryStructureComponentEntity extends AuditableEntity {
     // Value: % if isPercentage=true, fixed amount otherwise
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal value;
-
-    @Column(nullable = false)
-    private Boolean deleted = false;
 
 }

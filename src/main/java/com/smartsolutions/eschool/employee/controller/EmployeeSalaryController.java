@@ -1,29 +1,16 @@
 package com.smartsolutions.eschool.employee.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.request.EmployeeSalaryRequestDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryFullResponseDTO;
 import com.smartsolutions.eschool.employee.dtos.employeeMasterSalary.response.EmployeeSalaryResponseDTO;
 import com.smartsolutions.eschool.employee.facade.EmployeeMasterSalaryFacade;
-import com.smartsolutions.eschool.employee.facade.EmployeeSalaryFaced;
-import com.smartsolutions.eschool.employee.model.EmployeeSalaryEntity;
-import com.smartsolutions.eschool.global.enums.SalaryStatus;
-import com.smartsolutions.eschool.util.MultiResourceSuccessResponseObject;
-import com.smartsolutions.eschool.util.ResourceObject;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/institute/employee-salaries")

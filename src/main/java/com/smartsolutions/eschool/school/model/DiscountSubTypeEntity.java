@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
@@ -8,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@SQLDelete(sql = "UPDATE discount_sub_type SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "discount_sub_type")
 @Getter
 @Setter
@@ -38,7 +43,7 @@ public class DiscountSubTypeEntity extends AuditableEntity {
     @Column(nullable = false)
     private Integer displayOrder = 0;
 
-    @Column(name = "deleted", nullable = false)
-    private Boolean deleted = false;
+    @Column(nullable = false)
+    private Integer priority = 0;
 }
 

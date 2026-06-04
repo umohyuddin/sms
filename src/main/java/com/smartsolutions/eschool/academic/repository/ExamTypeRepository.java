@@ -1,0 +1,29 @@
+package com.smartsolutions.eschool.academic.repository;
+
+import com.smartsolutions.eschool.academic.entity.master.ExamTypeEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ExamTypeRepository extends JpaRepository<ExamTypeEntity, Long> {
+
+    @Query("SELECT et FROM ExamTypeEntity et WHERE et.id = :id AND et.deleted = false")
+    Optional<ExamTypeEntity> findByIdAndDeletedFalse(@Param("id") Long id);
+
+    @Query("SELECT et FROM ExamTypeEntity et WHERE et.organizationId = :orgId AND et.deleted = false")
+    List<ExamTypeEntity> findAllActiveByOrg(@Param("orgId") Long orgId);
+
+    @Query("SELECT et FROM ExamTypeEntity et WHERE et.organizationId = :orgId AND et.deleted = false " +
+            "AND (LOWER(et.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(et.code) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    List<ExamTypeEntity> searchByKeyword(@Param("keyword") String keyword, @Param("orgId") Long orgId);
+
+    @Modifying
+    @Query("UPDATE ExamTypeEntity et SET et.deleted = true, et.deletedAt = CURRENT_TIMESTAMP WHERE et.id = :id")
+    void softDeleteById(@Param("id") Long id);
+}

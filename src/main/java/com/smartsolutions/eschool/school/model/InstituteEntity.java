@@ -1,29 +1,30 @@
 package com.smartsolutions.eschool.school.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
+import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import com.smartsolutions.eschool.lookups.model.CityEntity;
 import com.smartsolutions.eschool.lookups.model.CountryEntity;
 import com.smartsolutions.eschool.lookups.model.ProvinceEntity;
-import com.smartsolutions.eschool.student.model.StudentEntity;
-import com.smartsolutions.eschool.user.model.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE institutes SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "institutes")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InstituteEntity  extends AuditableEntity {
+public class InstituteEntity  extends ScopeAuditableEntity {
 
     @Id
     @Column(name = "id")

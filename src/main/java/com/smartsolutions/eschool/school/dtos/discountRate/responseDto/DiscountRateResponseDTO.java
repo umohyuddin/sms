@@ -1,5 +1,8 @@
 package com.smartsolutions.eschool.school.dtos.discountRate.responseDto;
 
+
+import com.smartsolutions.eschool.school.dtos.academicYear.responseDto.AcademicYearResponseDTO;
+import com.smartsolutions.eschool.school.dtos.campuses.responseDto.CampusResponseDTO;
 import com.smartsolutions.eschool.school.dtos.discountSubType.responseDto.DiscountSubTypeResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,19 +18,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class DiscountRateResponseDTO {
     private Long id;
-
-    private DiscountSubTypeResponseDTO discountSubType; // nested parent
-
-    private Long campusId;
-    private String campusName; // optional, for display
-
-    private Long academicYearId;
-    private String academicYearName; // optional, for display
     private BigDecimal value;
     private Boolean isPercentage;
 
     private LocalDate effectiveFrom;
     private LocalDate effectiveTo;
-
     private Boolean isActive;
+
+    private DiscountSubTypeResponseDTO discountSubType;
+    private CampusResponseDTO campus;
+    private AcademicYearResponseDTO academicYear;
 }

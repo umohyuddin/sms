@@ -1,4 +1,7 @@
 package com.smartsolutions.eschool.sclass.model;
+import org.hibernate.annotations.SQLRestriction;
+
+import org.hibernate.annotations.SQLDelete;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -12,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE sclass SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "sclass")
 @Data
 @AllArgsConstructor

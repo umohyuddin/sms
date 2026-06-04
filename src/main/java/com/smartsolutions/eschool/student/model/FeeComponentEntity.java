@@ -1,16 +1,20 @@
 package com.smartsolutions.eschool.student.model;
 
+import org.hibernate.annotations.SQLDelete;
+
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE fee_component SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "fee_component", uniqueConstraints = {@UniqueConstraint(columnNames = {"fee_catalog_id", "component_code"})})
 @Getter
 @Setter
@@ -38,9 +42,6 @@ public class FeeComponentEntity extends AuditableEntity {
     @Column(name = "taxable", nullable = false)
     private boolean taxable = false;
 
-    @Column(name = "deleted")
-    private boolean deleted = false;
-
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
@@ -50,4 +51,6 @@ public class FeeComponentEntity extends AuditableEntity {
 
     @OneToMany(mappedBy = "feeComponent", fetch = FetchType.LAZY)
     private List<FeeRateEntity> feeRates;
+    //private String description;
+
 }

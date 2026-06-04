@@ -1,15 +1,21 @@
 package com.smartsolutions.eschool.employee.model;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.hibernate.annotations.SQLDelete;
+
+
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
+@SQLDelete(sql = "UPDATE payroll_period SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
+@SQLRestriction("deleted = false")
 @Table(name = "payroll_period")
 public class PayrollPeriodEntity  extends AuditableEntity {
     @Id
@@ -28,9 +34,6 @@ public class PayrollPeriodEntity  extends AuditableEntity {
 
     @Column(name = "description", length = 255)
     private String description;
-
-    @Column(name = "deleted")
-    private Boolean deleted = false;
 
 
     // Enum for status

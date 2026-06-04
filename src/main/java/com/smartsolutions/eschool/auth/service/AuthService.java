@@ -23,9 +23,14 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public String auth(@Valid LoginRequestDTO requestDTO) {
+    public String auth(@Valid LoginResponseDTO requestDTO) {
+        log.info("Creating JWT token for user ID: {} and organization ID: {}", requestDTO.getUserId(), requestDTO.getOrganizationId());
         Map<String, Object> claims = new HashMap<>();
-         String jwtToken = jwtUtil.createToken(claims);
-        return  jwtToken;
+        claims.put("organizationId", requestDTO.getOrganizationId());
+        claims.put("userId", requestDTO.getUserId());
+        claims.put("email", requestDTO.getEmail());
+        String jwtToken = jwtUtil.createToken(claims);
+        log.info("JWT token created successfully");
+        return jwtToken;
     }
 }
