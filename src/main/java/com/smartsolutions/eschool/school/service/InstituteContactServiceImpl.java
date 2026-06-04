@@ -13,6 +13,7 @@ import com.smartsolutions.eschool.user.dtos.roles.response.RoleResponseDTO;
 import com.smartsolutions.eschool.user.model.RoleEntity;
 import com.smartsolutions.eschool.user.repository.RoleRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
+import com.smartsolutions.eschool.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
@@ -146,7 +147,7 @@ public class InstituteContactServiceImpl implements InstituteContactService {
         // Soft delete
         entity.setDeleted(true);
         entity.setDeletedAt(LocalDateTime.now());
-        entity.setDeletedBy(1L); // TODO: Replace with current user ID from context
+        entity.setDeletedBy(SecurityUtils.getCurrentUserId());
 
         // Save updated entity
         instituteContactRepository.save(entity);

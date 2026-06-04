@@ -21,15 +21,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
 @Repository
-
 public interface StandardRepository extends JpaRepository<StandardEntity, Long> {
-        @Query("SELECT s FROM StandardEntity s JOIN FETCH s.campus c JOIN FETCH c.institute i LEFT JOIN FETCH i.country LEFT JOIN FETCH c.province LEFT JOIN FETCH c.city WHERE s.id = :id AND i.id = :instituteId")
+        @Query("SELECT s FROM StandardEntity s JOIN FETCH s.campus c JOIN FETCH c.institute i LEFT JOIN FETCH i.country LEFT JOIN FETCH c.province LEFT JOIN FETCH c.city WHERE s.id = :id AND i.id = :instituteId AND s.deleted = false")
         Optional<StandardEntity> findByIdAndInstituteIdAndDeletedFalse(@Param("id") Long id,
                         @Param("instituteId") Long instituteId);
 
-        @Query("SELECT s FROM StandardEntity s JOIN FETCH s.campus c JOIN FETCH c.institute i LEFT JOIN FETCH i.country LEFT JOIN FETCH c.province LEFT JOIN FETCH c.city WHERE i.id = :instituteId")
+        @Query("SELECT s FROM StandardEntity s JOIN FETCH s.campus c JOIN FETCH c.institute i LEFT JOIN FETCH i.country LEFT JOIN FETCH c.province LEFT JOIN FETCH c.city WHERE i.id = :instituteId AND s.deleted = false")
         List<StandardEntity> findByInstituteIdAndDeletedFalse(@Param("instituteId") Long instituteId);
 
         @Query("SELECT s FROM StandardEntity s " +
@@ -39,19 +37,20 @@ public interface StandardRepository extends JpaRepository<StandardEntity, Long> 
                         "LEFT JOIN FETCH c.province " +
                         "LEFT JOIN FETCH c.city " +
                         "WHERE c.id = :campusId " +
-                        "AND i.id = :instituteId")
+                        "AND i.id = :instituteId " +
+                        "AND s.deleted = false")
         List<StandardEntity> findByCampusIdAndInstituteId(@Param("campusId") Long campusId,
                         @Param("instituteId") Long instituteId);
 
-        // Search by standardName or standardCode with instituteId
-        @Query("SELECT sec FROM StandardEntity sec " +
-                        "JOIN FETCH sec.campus c " +
+        @Query("SELECT s FROM StandardEntity s " +
+                        "JOIN FETCH s.campus c " +
                         "JOIN FETCH c.institute i " +
                         "LEFT JOIN FETCH i.country " +
                         "LEFT JOIN FETCH c.province " +
                         "LEFT JOIN FETCH c.city " +
-                        "WHERE (sec.standardName LIKE %:keyword% OR sec.standardCode LIKE %:keyword%) " +
-                        "AND i.id = :instituteId")
+                        "WHERE (s.standardName LIKE %:keyword% OR s.standardCode LIKE %:keyword%) " +
+                        "AND i.id = :instituteId " +
+                        "AND s.deleted = false")
         List<StandardEntity> searchByKeywordAndInstituteId(@Param("keyword") String keyword,
                         @Param("instituteId") Long instituteId);
 
@@ -63,6 +62,7 @@ public interface StandardRepository extends JpaRepository<StandardEntity, Long> 
                         "LEFT JOIN FETCH c.city " +
                         "WHERE (:campusId IS NULL OR c.id = :campusId) " +
                         "AND i.id = :instituteId " +
+                        "AND s.deleted = false " +
                         "AND (:search IS NULL OR LOWER(s.standardName) LIKE LOWER(CONCAT('%', :search, '%')) " +
                         "     OR LOWER(s.standardCode) LIKE LOWER(CONCAT('%', :search, '%'))) " +
                         "ORDER BY s.standardName ASC")
@@ -83,19 +83,19 @@ public interface StandardRepository extends JpaRepository<StandardEntity, Long> 
         int softDeleteByCampusIdAndInstituteId(@Param("campusId") Long campusId,
                         @Param("instituteId") Long instituteId);
 
-        @Query("SELECT (COUNT(s) > 0) FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.standardCode = :standardCode")
+        @Query("SELECT (COUNT(s) > 0) FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.standardCode = :standardCode AND s.deleted = false")
         boolean existsByInstituteIdAndStandardCode(@Param("instituteId") Long instituteId,
                         @Param("standardCode") String standardCode);
 
-        @Query("SELECT (COUNT(s) > 0) FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.standardCode = :standardCode AND s.id <> :id")
+        @Query("SELECT (COUNT(s) > 0) FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.standardCode = :standardCode AND s.id <> :id AND s.deleted = false")
         boolean existsByInstituteIdAndStandardCodeAndIdNot(@Param("instituteId") Long instituteId,
                         @Param("standardCode") String standardCode, @Param("id") Long id);
 
-        @Query("SELECT (COUNT(s) > 0) FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.standardName = :standardName")
+        @Query("SELECT (COUNT(s) > 0) FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.standardName = :standardName AND s.deleted = false")
         boolean existsByInstituteIdAndStandardName(@Param("instituteId") Long instituteId,
                         @Param("standardName") String standardName);
 
-        @Query("SELECT (COUNT(s) > 0) FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.standardName = :standardName AND s.id <> :id")
+        @Query("SELECT (COUNT(s) > 0) FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.standardName = :standardName AND s.id <> :id AND s.deleted = false")
         boolean existsByInstituteIdAndStandardNameAndIdNot(@Param("instituteId") Long instituteId,
                         @Param("standardName") String standardName, @Param("id") Long id);
 }

@@ -53,14 +53,28 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
         SubjectEntity subject = subjectRepository.findActiveById(dto.getSubjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
 
-        ExamSubjectEntity entity = ExamAssessmentMapper.toEntity(dto);
+        // ✅ Pehle check karo — exist karta hai ya nahi (soft deleted bhi)
+        ExamSubjectEntity entity = examSubjectRepository
+                .findByExamAndSubject(dto.getExamId(), dto.getSubjectId())
+                .orElse(new ExamSubjectEntity());
+
+        // Fields set karo (insert aur update dono ke liye)
         entity.setExam(exam);
         entity.setSubject(subject);
+        entity.setExamDate(dto.getExamDate());
+        entity.setStartTime(dto.getStartTime());
+        entity.setEndTime(dto.getEndTime());
+        entity.setTotalMarks(dto.getTotalMarks());
+        entity.setPassingMarks(dto.getPassingMarks());
+        entity.setActive(dto.isActive());
+        entity.setDeleted(false); // ✅ Soft deleted tha toh reactivate ho jayega
 
         if (dto.getEvaluatorId() != null) {
             EmployeeMasterEntity evaluator = employeeRepository.findById(dto.getEvaluatorId())
                     .orElseThrow(() -> new ResourceNotFoundException("Evaluator not found"));
             entity.setEvaluator(evaluator);
+        } else {
+            entity.setEvaluator(null);
         }
 
         ExamSubjectEntity saved = examSubjectRepository.save(entity);

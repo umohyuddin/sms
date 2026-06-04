@@ -32,14 +32,14 @@ public class StandardFacade {
         return standardDTO;
     }
 
-    public StandardCreateRequestDTO create(StandardCreateRequestDTO standardDTO) {
+    public StandardDTO create(StandardCreateRequestDTO standardDTO) {
         log.info("[Facade:StandardFacade] create() called");
         return standardService.create(standardDTO);
     }
 
-    public int softDeleteById(Long standardId) {
+    public void softDeleteById(Long standardId) {
         log.info("[Facade:StandardFacade] softDeleteById() called - id: {}", standardId);
-        return standardService.softDeleteById(standardId);
+        standardService.softDeleteById(standardId);
     }
 
     public StandardDTO updateStandard(Long id, StandardCreateRequestDTO dto) {
@@ -59,7 +59,7 @@ public class StandardFacade {
 
     public int softDeleteByCampusId(Long campusId) {
         log.info("[Facade:StandardFacade] softDeleteByCampusId() called - campus id: {}", campusId);
-        return standardService.sofDeleteByCampusId(campusId);
+        return standardService.softDeleteByCampusId(campusId);
     }
 
     public List<StandardDTO> getStandardsByFilter(Long campusId, String keyword) {

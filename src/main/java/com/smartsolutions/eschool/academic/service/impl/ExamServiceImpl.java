@@ -126,6 +126,7 @@ public class ExamServiceImpl implements ExamService {
         }
 
         @Override
+        @Transactional(readOnly = true)
         public ExamResponseDTO getById(Long id) {
                 return examRepository.findByIdAndDeletedFalse(id)
                                 .map(ExamAssessmentMapper::toResponse)

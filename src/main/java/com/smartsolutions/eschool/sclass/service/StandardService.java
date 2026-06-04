@@ -65,6 +65,8 @@ public class StandardService {
         if (id == null) {
             throw new ApiException(StandardErrors.INVALID_STANDARD_DATA, HttpStatus.BAD_REQUEST);
         }
+        campusRepository.findByIdAndInstituteId(id, organizationId)
+                .orElseThrow(() -> new ApiException(CampusErrors.CAMPUS_NOT_FOUND, HttpStatus.NOT_FOUND));
         List<StandardEntity> results = standardRepository.findByCampusIdAndInstituteId(id, organizationId);
         List<StandardDTO> response = StandardMapper.toResponseDTOList(results);
         log.info("[Service:StandardService] findByCampusId() succeeded - Found {} standards", response.size());
@@ -72,12 +74,16 @@ public class StandardService {
     }
 
     @Transactional
-    public StandardCreateRequestDTO create(StandardCreateRequestDTO standardDTO) {
+    public StandardDTO create(StandardCreateRequestDTO standardDTO) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
             throw new ApiException(StandardErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:StandardService] create() called - Creating for institute: {}", organizationId);
+
+        if (standardDTO.getCampusId() == null) {
+            throw new ApiException(StandardErrors.INVALID_STANDARD_DATA, "Campus is required", HttpStatus.BAD_REQUEST);
+        }
 
         if (standardDTO.getStandardCode() != null && !standardDTO.getStandardCode().trim().isEmpty()) {
             if (standardRepository.existsByInstituteIdAndStandardCode(organizationId,
@@ -104,31 +110,24 @@ public class StandardService {
         }
 
         StandardEntity saved = standardRepository.save(entity);
-        StandardCreateRequestDTO responseDTO = new StandardCreateRequestDTO();
-        responseDTO.setId(saved.getId());
-        responseDTO.setStandardName(saved.getStandardName());
-        responseDTO.setStandardCode(saved.getStandardCode());
-        responseDTO.setDescription(saved.getDescription());
-        responseDTO.setCampusId(saved.getCampus() != null ? saved.getCampus().getId() : null);
-
+        StandardDTO responseDTO = StandardMapper.toResponseDTO(saved);
         log.info("[Service:StandardService] create() succeeded - Standard created with id: {}", responseDTO.getId());
         return responseDTO;
     }
 
     @Transactional
-    public int softDeleteById(Long id) {
+    public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
             throw new ApiException(StandardErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:StandardService] softDeleteById() called - id: {}, institute: {}", id, organizationId);
 
-        if (standardRepository.findByIdAndInstituteIdAndDeletedFalse(id, organizationId).isEmpty()) {
+        int result = standardRepository.softDeleteByIdAndInstituteId(id, organizationId);
+        if (result == 0) {
             throw new ApiException(StandardErrors.STANDARD_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
-        int result = standardRepository.softDeleteByIdAndInstituteId(id, organizationId);
         log.info("[Service:StandardService] softDeleteById() succeeded - id: {}", id);
-        return result;
     }
 
     @Transactional
@@ -157,15 +156,7 @@ public class StandardService {
             }
         }
 
-        if (dto.getStandardName() != null && !dto.getStandardName().isBlank()) {
-            entity.setStandardName(dto.getStandardName());
-        }
-        if (dto.getStandardCode() != null) {
-            entity.setStandardCode(dto.getStandardCode());
-        }
-        if (dto.getDescription() != null) {
-            entity.setDescription(dto.getDescription());
-        }
+        StandardMapper.updateEntityFromDTO(entity, dto);
 
         if (dto.getCampusId() != null
                 && (entity.getCampus() == null || !entity.getCampus().getId().equals(dto.getCampusId()))) {
@@ -196,15 +187,17 @@ public class StandardService {
     }
 
     @Transactional
-    public int sofDeleteByCampusId(Long campusId) {
+    public int softDeleteByCampusId(Long campusId) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
             throw new ApiException(StandardErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
-        log.info("[Service:StandardService] sofDeleteByCampusId() called - campus id: {}, institute: {}", campusId,
+        log.info("[Service:StandardService] softDeleteByCampusId() called - campus id: {}, institute: {}", campusId,
                 organizationId);
+        campusRepository.findByIdAndInstituteId(campusId, organizationId)
+                .orElseThrow(() -> new ApiException(CampusErrors.CAMPUS_NOT_FOUND, HttpStatus.NOT_FOUND));
         int rows = standardRepository.softDeleteByCampusIdAndInstituteId(campusId, organizationId);
-        log.info("[Service:StandardService] sofDeleteByCampusId() succeeded - Soft deleted {} standards", rows);
+        log.info("[Service:StandardService] softDeleteByCampusId() succeeded - Soft deleted {} standards", rows);
         return rows;
     }
 

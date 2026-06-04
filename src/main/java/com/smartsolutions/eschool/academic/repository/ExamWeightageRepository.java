@@ -15,8 +15,18 @@ public interface ExamWeightageRepository extends JpaRepository<ExamWeightageEnti
         @Query("SELECT ew FROM ExamWeightageEntity ew WHERE ew.standardSubject.standard.id = :standardId AND ew.deleted = false")
         List<ExamWeightageEntity> findByStandardId(@Param("standardId") Long standardId);
 
-        @Query("SELECT ew FROM ExamWeightageEntity ew WHERE ew.academicYear.id = :academicYearId AND ew.standardSubject.standard.id = :standardId AND ew.deleted = false")
-        List<ExamWeightageEntity> findByAcademicYearIdAndStandardId(@Param("academicYearId") Long academicYearId,
+        @Query("SELECT ew FROM ExamWeightageEntity ew " +
+                        "JOIN FETCH ew.standardSubject ss " +
+                        "JOIN FETCH ss.subject subj " +
+                        "JOIN FETCH ss.standard std " +
+                        "LEFT JOIN FETCH ew.examTerm " +
+                        "LEFT JOIN FETCH ew.academicYear " +
+                        "WHERE ew.academicYear.id = :academicYearId " +
+                        "AND ss.standard.id = :standardId " +
+                        "AND ew.deleted = false " +
+                        "AND ew.active = true")
+        List<ExamWeightageEntity> findByAcademicYearIdAndStandardId(
+                        @Param("academicYearId") Long academicYearId,
                         @Param("standardId") Long standardId);
 
         @Query("SELECT ew FROM ExamWeightageEntity ew " +

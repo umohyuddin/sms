@@ -24,10 +24,9 @@ public interface ExamSubjectRepository extends JpaRepository<ExamSubjectEntity, 
         List<ExamSubjectEntity> findByExamIdAndOrganizationIdAndDeletedFalse(@Param("examId") Long examId,
                         @Param("orgId") Long orgId);
 
-        @Query("SELECT es FROM ExamSubjectEntity es WHERE es.exam.id = :examId AND es.subject.id = :subjectId AND es.deleted = false")
-        Optional<ExamSubjectEntity> findByExamAndSubject(@Param("examId") Long examId,
-                        @Param("subjectId") Long subjectId);
-
+    @Query("SELECT es FROM ExamSubjectEntity es WHERE es.exam.id = :examId AND es.subject.id = :subjectId")
+    Optional<ExamSubjectEntity> findByExamAndSubject(@Param("examId") Long examId,
+                                                     @Param("subjectId") Long subjectId);
         @Modifying
         @Query("UPDATE ExamSubjectEntity es SET es.deleted = true, es.deletedAt = CURRENT_TIMESTAMP WHERE es.id = :id")
         void softDeleteById(@Param("id") Long id);

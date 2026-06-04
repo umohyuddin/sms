@@ -24,7 +24,9 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+
 @Service
+@Transactional
 @Slf4j
 public class AcademicYearService {
     private final AcademicYearRepository academicYearRepository;
