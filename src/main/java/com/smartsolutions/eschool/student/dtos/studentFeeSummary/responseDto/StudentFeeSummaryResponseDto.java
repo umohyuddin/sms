@@ -59,6 +59,33 @@ public class StudentFeeSummaryResponseDto {
     @Schema(description = "Monthly installment amount", example = "5000.00")
     private BigDecimal monthlyFeeDecimal;
 
+    @Schema(description = "Billing cycle name", example = "Quarterly")
+    private String billingCycle;
+
+    @Schema(description = "Is late fee applicable", example = "true")
+    private Boolean lateFeeApplicable;
+
+    @Schema(description = "Late fee calculation type", example = "FIXED")
+    private String lateFeeType;
+
+    @Schema(description = "Late fee fixed amount", example = "100.00")
+    private BigDecimal lateFeeFixedAmount;
+
+    @Schema(description = "Late fee percentage rate", example = "5.00")
+    private BigDecimal lateFeePercentage;
+
+    @Schema(description = "Number of grace days allowed", example = "5")
+    private Integer graceDays;
+
+    @Schema(description = "Frequency of late fee enforcement", example = "PER_DAY")
+    private String lateFeeFrequency;
+
+    @Schema(description = "Maximum late fee cap limit", example = "1000.00")
+    private BigDecimal lateFeeMaxAmount;
+
+    @Schema(description = "Scope of late fee application", example = "OUTSTANDING")
+    private String lateFeeApplyOn;
+
     @Schema(description = "List of months in the session", example = "[\"April\", \"May\", \"June\"]")
     private List<String> monthsNames;
 
@@ -88,12 +115,15 @@ public class StudentFeeSummaryResponseDto {
         private BigDecimal amountPaid;
         @Schema(description = "Mode of payment", example = "CASH")
         private com.smartsolutions.eschool.student.enums.PaymentMode paymentMode;
+        @Schema(description = "Late fee paid in this installment", example = "100.00")
+        private BigDecimal lateFeePaid = BigDecimal.ZERO;
 
         public PartialPaymentDTO(StudentFeePaymentResponseDTO p) {
             this.id = p.getId();
             this.paymentDate = p.getPaymentDate();
             this.amountPaid = p.getAmountPaid();
             this.paymentMode = p.getPaymentMode();
+            this.lateFeePaid = p.getLateFeePaid() != null ? p.getLateFeePaid() : BigDecimal.ZERO;
         }
     }
 
@@ -112,6 +142,12 @@ public class StudentFeeSummaryResponseDto {
         private BigDecimal totalMonthlyFee = BigDecimal.ZERO;
         @Schema(description = "Payment status", example = "PAID")
         private String status; // Paid | Partial | Unpaid
+        @Schema(description = "Total late fee applied for this installment", example = "100.00")
+        private BigDecimal lateFeeAmount = BigDecimal.ZERO;
+        @Schema(description = "Total late fee waived for this installment", example = "50.00")
+        private BigDecimal waivedAmount = BigDecimal.ZERO;
+        @Schema(description = "Total late fee paid for this installment", example = "50.00")
+        private BigDecimal lateFeePaid = BigDecimal.ZERO;
         @Schema(description = "Detailed installments made for this month")
         private List<PartialPaymentDTO> partialPayments = new ArrayList<>();
 
@@ -121,6 +157,7 @@ public class StudentFeeSummaryResponseDto {
 
         public void addPartialPayment(PartialPaymentDTO payment) {
             this.totalPaid = this.totalPaid.add(payment.getAmountPaid());
+            this.lateFeePaid = this.lateFeePaid.add(payment.getLateFeePaid());
             this.partialPayments.add(payment);
         }
     }

@@ -52,6 +52,10 @@ public class StudentFeePaymentResponseDTO {
     @Schema(description = "Name of the academic year", example = "2024-2025")
     private String academicYearName;
 
+    @Schema(description = "Late fee paid in this record", example = "100.00")
+    private BigDecimal lateFeePaid;
+
+
     // -------------------------------------------
     // 2. Partial Payment DTO
     // -------------------------------------------
