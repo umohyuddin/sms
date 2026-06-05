@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.academic.service.impl;
 
+import com.smartsolutions.eschool.academic.dto.response.StudentExamMarksResponseDTO;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import com.smartsolutions.eschool.academic.dto.request.StudentTermResultRequestDTO;
@@ -132,4 +133,6 @@ public class StudentTermResultServiceImpl implements StudentTermResultService {
                 .map(ResultsMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Result not found"));
     }
+
+
 }

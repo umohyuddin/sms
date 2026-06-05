@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +20,19 @@ public class ResultsHistoryController {
 
     private final ResultsHistoryFacade resultsHistoryFacade;
 
+
+
+    @GetMapping(value = "",produces = MediaType.APPLICATION_JSON_VALUE)
+   public ResponseEntity<?> getStudentAll(){
+       return ResponseEntity.ok(resultsHistoryFacade.findStudentAll());
+   }
+
+
     // Student Exam Marks
     @PostMapping("/marks")
     public ResponseEntity<?> recordMarks(@Valid @RequestBody List<StudentExamMarksRequestDTO> dtos) {
         resultsHistoryFacade.recordExamMarks(dtos);
-        return ResponseEntity.ok("Marks recorded successfully");
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
     @GetMapping("/marks/subject/{id}")
@@ -125,5 +134,16 @@ public class ResultsHistoryController {
     public ResponseEntity<?> deleteGradeScale(@PathVariable Long id) {
         resultsHistoryFacade.deleteGradeScale(id);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/marks/search")
+    public ResponseEntity<?> searchMarks(
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId,
+            @RequestParam(required = false) Long sectionId,
+            @RequestParam(required = false) Long examId,
+            @RequestParam(required = false) String keyword) {
+        return ResponseEntity.ok(
+                resultsHistoryFacade.searchMarks(campusId, standardId, sectionId, examId, keyword)
+        );
     }
 }

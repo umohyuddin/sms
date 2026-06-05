@@ -22,6 +22,10 @@ public class ResultsHistoryFacade {
     private final GradeScaleService gradeScaleService;
 
     // Student Exam Marks
+
+      public List<StudentExamMarksResponseDTO> findStudentAll(){
+           return marksService.getStudentExamMarksResponse();
+      }
     public void recordExamMarks(List<StudentExamMarksRequestDTO> dtos) {
         marksService.recordMarks(dtos);
     }
@@ -101,4 +105,10 @@ public class ResultsHistoryFacade {
     public void deleteGradeScale(Long id) {
         gradeScaleService.delete(id);
     }
+
+    public List<StudentExamMarksResponseDTO> searchMarks(
+            Long campusId, Long standardId, Long sectionId, Long examId, String keyword) {
+        return marksService.searchMarks(campusId, standardId, sectionId, examId, keyword);
+    }
 }
+
