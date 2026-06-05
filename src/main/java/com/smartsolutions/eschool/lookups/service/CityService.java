@@ -46,6 +46,7 @@ public class CityService {
         return responseDTOs;
     }
 
+    @Transactional(readOnly = true)
     public List<CityResponseDTO> getByProvinceId(Long provinceId) {
         log.info("[Service:CityService] getByProvinceId() called - provinceId: {}", provinceId);
         List<CityEntity> result = cityRepository.findByProvinceId(provinceId);

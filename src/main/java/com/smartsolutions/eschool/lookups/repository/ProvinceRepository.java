@@ -42,6 +42,7 @@ public interface ProvinceRepository extends JpaRepository<ProvinceEntity, Long> 
         @Query("""
                         SELECT p
                         FROM ProvinceEntity p
+                        JOIN FETCH p.country
                         WHERE p.country.id = :countryId
                           AND p.deletedAt IS NULL
                         ORDER BY p.name ASC

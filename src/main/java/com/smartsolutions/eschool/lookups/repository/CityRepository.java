@@ -42,6 +42,7 @@ public interface CityRepository extends JpaRepository<CityEntity, Long> {
         @Query("""
                         SELECT c
                         FROM CityEntity c
+                        JOIN FETCH c.province
                         WHERE c.province.id = :provinceId
                           AND c.deletedAt IS NULL
                         ORDER BY c.name ASC
