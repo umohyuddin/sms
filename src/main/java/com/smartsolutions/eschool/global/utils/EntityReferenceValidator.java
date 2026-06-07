@@ -5,7 +5,7 @@ import com.smartsolutions.eschool.global.error.AppModule;
 import com.smartsolutions.eschool.global.error.BaseErrorCode;
 import com.smartsolutions.eschool.global.error.ErrorCategory;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -23,8 +23,11 @@ import java.util.List;
 @Component
 public class EntityReferenceValidator {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManagerFactory entityManagerFactory;
+
+    public EntityReferenceValidator(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
+    }
 
     /**
      * Dynamically checks if the given target entity is currently referenced by any other entity
@@ -36,35 +39,47 @@ public class EntityReferenceValidator {
      * @param targetId          The primary key ID of the entity being deleted
      */
     public void ensureNotReferenced(Class<?> targetEntityClass, Object targetId) {
-        Metamodel metamodel = entityManager.getMetamodel();
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        // We create a completely separate, un-enlisted EntityManager here.
+        // This is CRITICAL because if a query fails (e.g. table doesn't exist yet),
+        // we don't want Hibernate to mark the primary Spring transaction as rollback-only!
+        try (EntityManager tempEm = entityManagerFactory.createEntityManager()) {
+            Metamodel metamodel = tempEm.getMetamodel();
+            CriteriaBuilder cb = tempEm.getCriteriaBuilder();
 
-        for (EntityType<?> entityType : metamodel.getEntities()) {
-            for (Attribute<?, ?> attribute : entityType.getAttributes()) {
-                if (attribute.isAssociation() && attribute instanceof SingularAttribute) {
-                    SingularAttribute<?, ?> singularAttribute = (SingularAttribute<?, ?>) attribute;
+            for (EntityType<?> entityType : metamodel.getEntities()) {
+                for (Attribute<?, ?> attribute : entityType.getAttributes()) {
+                    if (attribute.isAssociation() && attribute instanceof SingularAttribute) {
+                        SingularAttribute<?, ?> singularAttribute = (SingularAttribute<?, ?>) attribute;
 
-                    if (targetEntityClass.isAssignableFrom(singularAttribute.getJavaType())) {
+                        if (targetEntityClass.isAssignableFrom(singularAttribute.getJavaType())) {
 
-                        log.debug("Checking references in {} via attribute {}", entityType.getName(), attribute.getName());
+                            log.debug("Checking references in {} via attribute {}", entityType.getName(), attribute.getName());
 
-                        CriteriaQuery<Integer> cq = cb.createQuery(Integer.class);
-                        Root<?> root = cq.from(entityType.getJavaType());
-                        cq.select(cb.literal(1));
-                        cq.where(cb.equal(root.get(singularAttribute.getName()).get("id"), targetId));
+                            CriteriaQuery<Integer> cq = cb.createQuery(Integer.class);
+                            Root<?> root = cq.from(entityType.getJavaType());
+                            cq.select(cb.literal(1));
+                            cq.where(cb.equal(root.get(singularAttribute.getName()).get("id"), targetId));
 
-                        List<Integer> results = entityManager.createQuery(cq)
-                                .setMaxResults(1)
-                                .getResultList();
+                            try {
+                                List<Integer> results = tempEm.createQuery(cq)
+                                        .setMaxResults(1)
+                                        .getResultList();
 
-                        if (!results.isEmpty()) {
-                            String referencingEntity = entityType.getName().replace("Entity", "");
-                            String targetName = targetEntityClass.getSimpleName().replace("Entity", "");
+                                if (!results.isEmpty()) {
+                                    String referencingEntity = entityType.getName().replace("Entity", "");
+                                    String targetName = targetEntityClass.getSimpleName().replace("Entity", "");
 
-                            throw new ApiException(
-                                    buildErrorCode(targetName, referencingEntity),
-                                    HttpStatus.CONFLICT
-                            );
+                                    throw new ApiException(
+                                            buildErrorCode(targetName, referencingEntity),
+                                            HttpStatus.CONFLICT
+                                    );
+                                }
+                            } catch (ApiException e) {
+                                throw e; // Re-throw our validation exception
+                            } catch (Exception e) {
+                                log.warn("Skipping reference check for entity {} due to query error (e.g., missing table): {}", 
+                                         entityType.getName(), e.getMessage());
+                            }
                         }
                     }
                 }
