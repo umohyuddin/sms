@@ -20,9 +20,12 @@ import java.util.Map;
 @Slf4j
 public class CountryService {
     private final CountryRepository countryRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public CountryService(CountryRepository countryRepository) {
+    public CountryService(CountryRepository countryRepository, 
+                          com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
         this.countryRepository = countryRepository;
+        this.entityReferenceValidator = entityReferenceValidator;
     }
 
     public List<CountryResponseDTO> getAll() {
@@ -54,6 +57,8 @@ public class CountryService {
     @Transactional
     public void softDeleteById(Long id) {
         log.info("[Service:CountryService] softDeleteById() called - id: {}", id);
+
+        entityReferenceValidator.ensureNotReferenced(CountryEntity.class, id);
 
         int result = countryRepository.softDeleteById(id);
         if (result == 0) {

@@ -24,10 +24,14 @@ import java.util.Map;
 public class CityService {
     private final CityRepository cityRepository;
     private final ProvinceRepository provinceRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public CityService(CityRepository cityRepository, ProvinceRepository provinceRepository) {
+    public CityService(CityRepository cityRepository, 
+                       ProvinceRepository provinceRepository,
+                       com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
         this.cityRepository = cityRepository;
         this.provinceRepository = provinceRepository;
+        this.entityReferenceValidator = entityReferenceValidator;
     }
 
     public List<CityResponseDTO> getAll() {
@@ -77,6 +81,8 @@ public class CityService {
     public void softDeleteById(Long id) {
         log.info("[Service:CityService] softDeleteById() called - id: {}", id);
 
+        entityReferenceValidator.ensureNotReferenced(CityEntity.class, id);
+
         int result = cityRepository.softDeleteById(id);
         if (result == 0) {
             throw new ApiException(CityErrors.CITY_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -124,6 +130,10 @@ public class CityService {
             if (cityRepository.existsByProvinceIdAndNameAndIdNot(targetProvinceId, requestDTO.getName().trim(), id)) {
                 throw new ApiException(CityErrors.DUPLICATE_CITY_NAME, "City name already exists for this province", HttpStatus.CONFLICT);
             }
+        }
+
+        if (existing.isActive() && !requestDTO.isActive()) {
+            entityReferenceValidator.ensureNotReferenced(CityEntity.class, id);
         }
 
         CityMapper.updateEntityFromDTO(existing, requestDTO, newProvince);
