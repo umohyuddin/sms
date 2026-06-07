@@ -76,7 +76,7 @@ public class EntityReferenceValidator {
      * Builds a dynamic BaseErrorCode for reference-violation errors.
      */
     private BaseErrorCode buildErrorCode(String targetName, String referencingEntity) {
-        String msg = "Cannot delete " + targetName + ". It is currently referenced by active " + referencingEntity + " records.";
+        String msg = "Unable to delete this " + targetName + ". Please remove or reassign all associated " + referencingEntity + " records first before attempting deletion.";
         return new BaseErrorCode() {
             @Override
             public AppModule module() {

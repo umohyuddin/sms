@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.sclass.service;
 
 import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 import com.smartsolutions.eschool.sclass.dtos.requestDto.SectionCreateRequestDTO;
 import com.smartsolutions.eschool.sclass.dtos.responseDto.SectionDTO;
 import com.smartsolutions.eschool.sclass.error.SectionErrors;
@@ -25,10 +26,13 @@ import java.util.List;
 public class SectionService {
     private final SectionRepository sectionRepository;
     private final StandardRepository standardRepository;
+    private final EntityReferenceValidator entityReferenceValidator;
 
-    public SectionService(SectionRepository sectionRepository, StandardRepository standardRepository) {
+    public SectionService(SectionRepository sectionRepository, StandardRepository standardRepository,
+                          EntityReferenceValidator entityReferenceValidator) {
         this.sectionRepository = sectionRepository;
         this.standardRepository = standardRepository;
+        this.entityReferenceValidator = entityReferenceValidator;
     }
 
     public List<SectionDTO> getAll() {
@@ -85,6 +89,8 @@ public class SectionService {
             throw new ApiException(SectionErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:SectionService] softDeleteById() called - id: {}, organization: {}", id, organizationId);
+
+        entityReferenceValidator.ensureNotReferenced(SectionEntity.class, id);
 
         if (sectionRepository.findByIdAndInstituteIdAndDeletedFalse(id, organizationId).isEmpty()) {
             throw new ApiException(SectionErrors.SECTION_NOT_FOUND, HttpStatus.NOT_FOUND);
