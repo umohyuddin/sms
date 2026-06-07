@@ -157,6 +157,10 @@ public class CampusService {
             }
         }
 
+        if (existing.isActive() && !requestDTO.isActive()) {
+            entityReferenceValidator.ensureNotReferenced(CampusEntity.class, id);
+        }
+
         CampusMapper.updateEntityFromDTO(existing, requestDTO);
 
         if (requestDTO.getProvinceId() != null) {
