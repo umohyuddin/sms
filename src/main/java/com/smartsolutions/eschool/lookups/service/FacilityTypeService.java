@@ -20,9 +20,12 @@ import java.util.Map;
 @Slf4j
 public class FacilityTypeService {
     private final FacilityTypeRepository facilityTypeRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public FacilityTypeService(FacilityTypeRepository facilityTypeRepository) {
+    public FacilityTypeService(FacilityTypeRepository facilityTypeRepository,
+                               com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
         this.facilityTypeRepository = facilityTypeRepository;
+        this.entityReferenceValidator = entityReferenceValidator;
     }
 
     public List<FacilityTypeResponseDTO> getAll() {
@@ -63,6 +66,8 @@ public class FacilityTypeService {
     public void softDeleteById(Long id) {
         log.info("[Service:FacilityTypeService] softDeleteById() called - id: {}", id);
 
+        entityReferenceValidator.ensureNotReferenced(FacilityTypeEntity.class, id);
+
         int result = facilityTypeRepository.softDeleteById(id);
         if (result == 0) {
             throw new ApiException(FacilityTypeErrors.FACILITY_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -98,6 +103,10 @@ public class FacilityTypeService {
             if (facilityTypeRepository.existsByCodeAndIdNot(requestDTO.getCode().trim(), id)) {
                 throw new ApiException(FacilityTypeErrors.DUPLICATE_FACILITY_TYPE_CODE, "Facility type code already exists", HttpStatus.CONFLICT);
             }
+        }
+
+        if (Boolean.TRUE.equals(existing.getIsActive()) && Boolean.FALSE.equals(requestDTO.getIsActive())) {
+            entityReferenceValidator.ensureNotReferenced(FacilityTypeEntity.class, id);
         }
 
         FacilityTypeMapper.updateEntityFromDTO(existing, requestDTO);
