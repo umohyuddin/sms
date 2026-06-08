@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/academic/evaluation")
@@ -48,7 +49,7 @@ public class ExamAssessmentController {
     @DeleteMapping("/exam-types/{id}")
     public ResponseEntity<?> deleteExamType(@PathVariable Long id) {
         examAssessmentFacade.deleteExamType(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Exam type deleted successfully"));
     }
 
     // Exam Term
@@ -85,7 +86,7 @@ public class ExamAssessmentController {
     @DeleteMapping("/exam-terms/{id}")
     public ResponseEntity<?> deleteExamTerm(@PathVariable Long id) {
         examAssessmentFacade.deleteExamTerm(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Exam term deleted successfully"));
     }
 
     // Assessment Type
@@ -118,7 +119,7 @@ public class ExamAssessmentController {
     @DeleteMapping("/assessment-types/{id}")
     public ResponseEntity<?> deleteAssessmentType(@PathVariable Long id) {
         examAssessmentFacade.deleteAssessmentType(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Assessment type deleted successfully"));
     }
 
     // Exam
@@ -166,7 +167,7 @@ public class ExamAssessmentController {
     @DeleteMapping("/exams/{id}")
     public ResponseEntity<?> deleteExam(@PathVariable Long id) {
         examAssessmentFacade.deleteExam(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Exam deleted successfully"));
     }
 
     // Exam Subject
@@ -192,7 +193,7 @@ public class ExamAssessmentController {
     @DeleteMapping("/exam-subjects")
     public ResponseEntity<?> unscheduleSubject(@RequestParam Long examId, @RequestParam Long subjectId) {
         examAssessmentFacade.unscheduleSubject(examId, subjectId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Exam subject unscheduled successfully"));
     }
 
     // Assessment
@@ -219,20 +220,20 @@ public class ExamAssessmentController {
     @DeleteMapping("/assessments/{id}")
     public ResponseEntity<?> deleteAssessment(@PathVariable Long id) {
         examAssessmentFacade.deleteAssessment(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Assessment deleted successfully"));
     }
 
     // Student Assessment
     @PostMapping("/student-assessments/submit")
     public ResponseEntity<?> submitAssessment(@Valid @RequestBody StudentAssessmentRequestDTO dto) {
         examAssessmentFacade.submitAssessment(dto);
-        return ResponseEntity.ok("Assessment submitted successfully");
+        return ResponseEntity.ok(Map.of("message", "Assessment submitted successfully"));
     }
 
     @PostMapping("/student-assessments/evaluate")
     public ResponseEntity<?> evaluateAssessment(@Valid @RequestBody StudentAssessmentRequestDTO dto) {
         examAssessmentFacade.evaluateAssessment(dto);
-        return ResponseEntity.ok("Assessment evaluated successfully");
+        return ResponseEntity.ok(Map.of("message", "Assessment evaluated successfully"));
     }
 
     @GetMapping("/student-assessments/assessment/{id}")

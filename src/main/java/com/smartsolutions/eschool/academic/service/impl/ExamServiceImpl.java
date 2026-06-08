@@ -116,6 +116,10 @@ public class ExamServiceImpl implements ExamService {
                 ExamEntity entity = examRepository.findByIdAndDeletedFalse(id)
                                 .orElseThrow(() -> new ResourceNotFoundException("Exam not found"));
 
+                if (entity.isActive() && !dto.isActive()) {
+                        entityReferenceValidator.ensureNotReferenced(ExamEntity.class, id);
+                }
+
                 entity.setName(dto.getName());
                 entity.setStartDate(dto.getStartDate());
                 entity.setEndDate(dto.getEndDate());

@@ -30,4 +30,19 @@ public interface ExamSubjectRepository extends JpaRepository<ExamSubjectEntity, 
         @Modifying
         @Query("UPDATE ExamSubjectEntity es SET es.deleted = true, es.deletedAt = CURRENT_TIMESTAMP WHERE es.id = :id")
         void softDeleteById(@Param("id") Long id);
+
+    @Query("SELECT COUNT(es) FROM ExamSubjectEntity es " +
+           "WHERE es.exam.standard.id = :standardId " +
+           "AND es.exam.examTerm.id = :examTermId " +
+           "AND es.exam.academicYear.id = :academicYearId " +
+           "AND es.subject.id = :subjectId " +
+           "AND es.deleted = false " +
+           "AND es.active = true " +
+           "AND es.exam.deleted = false " +
+           "AND es.exam.active = true")
+    long countActiveExamsBySubjectAndTerm(
+            @Param("standardId") Long standardId,
+            @Param("examTermId") Long examTermId,
+            @Param("academicYearId") Long academicYearId,
+            @Param("subjectId") Long subjectId);
 }

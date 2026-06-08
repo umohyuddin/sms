@@ -37,6 +37,11 @@ public class AssessmentTypeServiceImpl implements AssessmentTypeService {
     public AssessmentTypeResponseDTO update(Long id, AssessmentTypeRequestDTO dto) {
         AssessmentTypeEntity entity = assessmentTypeRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Assessment Type not found"));
+
+        if (entity.isActive() && !dto.isActive()) {
+            entityReferenceValidator.ensureNotReferenced(AssessmentTypeEntity.class, id);
+        }
+
         entity.setName(dto.getName());
         entity.setCode(dto.getCode());
         entity.setDescription(dto.getDescription());

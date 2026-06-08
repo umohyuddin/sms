@@ -37,6 +37,11 @@ public class GradeScaleServiceImpl implements GradeScaleService {
     public GradeScaleResponseDTO update(Long id, GradeScaleRequestDTO dto) {
         GradeScaleEntity entity = gradeScaleRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Grade Scale not found"));
+
+        if (entity.isActive() && !dto.isActive()) {
+            entityReferenceValidator.ensureNotReferenced(GradeScaleEntity.class, id);
+        }
+
         entity.setGrade(dto.getGrade());
         entity.setMinPercentage(dto.getMinPercentage());
         entity.setMaxPercentage(dto.getMaxPercentage());

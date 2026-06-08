@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/academic/scheduling")
@@ -50,7 +51,7 @@ public class TeacherTimetableController {
     {
         teacherTimetableFacade.unassignTeacher(employeeId, standardId, sectionId, subjectId, academicYearId,
                 LocalDate.parse(effectiveFrom));
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Teacher unassigned successfully"));
     }
 
     // Timetable
@@ -77,6 +78,6 @@ public class TeacherTimetableController {
     @DeleteMapping("/timetable/{id}")
     public ResponseEntity<?> deleteTimetable(@PathVariable Long id) {
         teacherTimetableFacade.deleteTimetable(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Timetable deleted successfully"));
     }
 }

@@ -11,11 +11,18 @@ import com.smartsolutions.eschool.academic.mapper.ResultsMapper;
 import com.smartsolutions.eschool.academic.repository.ExamSubjectRepository;
 import com.smartsolutions.eschool.academic.repository.StudentExamAttendanceRepository;
 import com.smartsolutions.eschool.academic.repository.StudentExamMarksRepository;
+import com.smartsolutions.eschool.academic.repository.StudentTermResultRepository;
 import com.smartsolutions.eschool.student.model.StudentEntity;
+import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.global.error.AppModule;
+import com.smartsolutions.eschool.global.error.BaseErrorCode;
+import com.smartsolutions.eschool.global.error.ErrorCategory;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import com.smartsolutions.eschool.academic.service.StudentExamMarksService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +38,8 @@ public class StudentExamMarksServiceImpl implements StudentExamMarksService {
     private final ExamSubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
     private final StudentExamAttendanceRepository attendanceRepository;
+    private final EntityReferenceValidator entityReferenceValidator;
+    private final StudentTermResultRepository termResultRepository;
 
     @Override
     @Transactional
@@ -38,7 +47,22 @@ public class StudentExamMarksServiceImpl implements StudentExamMarksService {
         for (StudentExamMarksRequestDTO dto : dtos) {
             // Validate presence check would go here...
 
-            StudentExamMarksEntity entity = ResultsMapper.toEntity(dto);
+            // Check for existing mark to avoid duplicate entry
+            java.util.Optional<com.smartsolutions.eschool.academic.entity.mapping.StudentExamMarksEntity> existingOpt =
+                    marksRepository.findByStudentIdAndExamSubjectId(dto.getStudentId(), dto.getExamSubjectId());
+            StudentExamMarksEntity entity;
+            if (existingOpt.isPresent()) {
+                // Update existing entity fields
+                entity = existingOpt.get();
+                entity.setObtainedMarks(dto.getObtainedMarks());
+                entity.setGraceMarks(dto.getGraceMarks());
+                entity.setLocked(dto.isLocked());
+                entity.setRemarks(dto.getRemarks());
+                entity.setActive(dto.getIsActive() != null && dto.getIsActive());
+            } else {
+                // Create new entity
+                entity = ResultsMapper.toEntity(dto);
+            }
             // organizationId is handled automatically by AuditableEntity
             marksRepository.save(entity);
         }
@@ -125,6 +149,34 @@ public class StudentExamMarksServiceImpl implements StudentExamMarksService {
         return ResultsMapper.toStudentExamMarksResponseList(list);
     }
 
+    @Override
+    @Transactional
+    public void deleteMark(Long id) {
+        // Load mark with full relations to get student + examTerm info
+        StudentExamMarksEntity mark = marksRepository.findByIdWithRelations(id)
+                .orElseThrow(() -> new RuntimeException("Student marks not found"));
+
+        // Block deletion if a StudentTermResult already exists for this student + exam term
+        Long studentId = mark.getStudent().getId();
+        Long examTermId = mark.getExamSubject().getExam().getExamTerm().getId();
+
+        if (termResultRepository.existsByStudent_IdAndExamTerm_Id(studentId, examTermId)) {
+            throw new ApiException(
+                new BaseErrorCode() {
+                    @Override public AppModule module() { return AppModule.COMMON; }
+                    @Override public ErrorCategory category() { return ErrorCategory.BUSINESS; }
+                    @Override public int number() { return 999; }
+                    @Override public String message() {
+                        return "Unable to delete this Student Exam Mark. A Term Result has already been generated for this student. Please remove the Term Result first before attempting deletion.";
+                    }
+                },
+                HttpStatus.CONFLICT
+            );
+        }
+
+        entityReferenceValidator.ensureNotReferenced(StudentExamMarksEntity.class, id);
+        marksRepository.softDeleteById(id);
+    }
 }
 
 

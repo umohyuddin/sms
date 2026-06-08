@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentExamMarksResponseDTO {
+    private Long id;
     private Long examSubjectId;
     private Long studentId;
     private String studentName;

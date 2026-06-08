@@ -38,6 +38,11 @@ public class ExamTypeServiceImpl implements ExamTypeService {
     public ExamTypeResponseDTO update(Long id, ExamTypeRequestDTO dto) {
         ExamTypeEntity entity = examTypeRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exam Type not found"));
+
+        if (entity.isActive() && !dto.isActive()) {
+            entityReferenceValidator.ensureNotReferenced(ExamTypeEntity.class, id);
+        }
+
         entity.setName(dto.getName());
         entity.setCode(dto.getCode());
         entity.setActive(dto.isActive());

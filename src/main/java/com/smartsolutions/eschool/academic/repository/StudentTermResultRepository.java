@@ -43,4 +43,6 @@ public interface StudentTermResultRepository extends JpaRepository<StudentTermRe
        @Modifying
        @Query("UPDATE StudentTermResultEntity str SET str.deleted = true, str.deletedAt = CURRENT_TIMESTAMP WHERE str.id = :id")
        void softDeleteById(@Param("id") Long id);
+
+       boolean existsByStudent_IdAndExamTerm_Id(Long studentId, Long examTermId);
 }

@@ -42,6 +42,11 @@ public class ExamTermServiceImpl implements ExamTermService {
     public ExamTermResponseDTO update(Long id, ExamTermRequestDTO dto) {
         ExamTermEntity entity = examTermRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Exam Term not found"));
+
+        if (entity.isActive() && !dto.isActive()) {
+            entityReferenceValidator.ensureNotReferenced(ExamTermEntity.class, id);
+        }
+
         entity.setName(dto.getName());
         entity.setSequenceNo(dto.getSequenceNo());
         entity.setActive(dto.isActive());

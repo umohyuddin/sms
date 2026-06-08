@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/academic/attendance")
@@ -24,7 +25,7 @@ public class AttendanceController {
     @PostMapping("/students")
     public ResponseEntity<?> markStudentAttendance(@Valid @RequestBody List<StudentAttendanceRequestDTO> dtos) {
         attendanceFacade.markStudentAttendance(dtos);
-        return ResponseEntity.ok("Attendance marked successfully");
+        return ResponseEntity.ok(Map.of("message", "Attendance marked successfully"));
     }
 
     @GetMapping("/students/section")
@@ -38,16 +39,16 @@ public class AttendanceController {
     }
 
     @DeleteMapping("/students/{id}")
-    public ResponseEntity<?> deleteStudentAttendance(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteStudentAttendance(@PathVariable Long id) {
         attendanceFacade.deleteStudentAttendance(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Attendance deleted successfully"));
     }
 
     // Employee Attendance
     @PostMapping("/employees")
     public ResponseEntity<?> markEmployeeAttendance(@Valid @RequestBody List<EmployeeAttendanceRequestDTO> dtos) {
         attendanceFacade.markEmployeeAttendance(dtos);
-        return ResponseEntity.ok("Attendance marked successfully");
+        return ResponseEntity.ok(Map.of("message", "Attendance marked successfully"));
     }
 
     @GetMapping("/employees/{id}/monthly")
@@ -56,8 +57,8 @@ public class AttendanceController {
     }
 
     @DeleteMapping("/employees/{id}")
-    public ResponseEntity<?> deleteEmployeeAttendance(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteEmployeeAttendance(@PathVariable Long id) {
         attendanceFacade.deleteEmployeeAttendance(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Attendance deleted successfully"));
     }
 }

@@ -1,6 +1,6 @@
-    DROP DATABASE IF EXISTS railway;
-    CREATE DATABASE IF NOT EXISTS railway;
-    USE railway;
+    DROP DATABASE IF EXISTS sms;
+    CREATE DATABASE IF NOT EXISTS sms;
+    USE sms ;
 
     -- =============================
     -- LEVEL 0: CORE TABLES (No dependencies)

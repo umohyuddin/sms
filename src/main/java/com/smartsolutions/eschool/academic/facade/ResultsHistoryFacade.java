@@ -110,5 +110,9 @@ public class ResultsHistoryFacade {
             Long campusId, Long standardId, Long sectionId, Long examId, String keyword) {
         return marksService.searchMarks(campusId, standardId, sectionId, examId, keyword);
     }
+
+    public void deleteMark(Long id) {
+        marksService.deleteMark(id);
+    }
 }
 

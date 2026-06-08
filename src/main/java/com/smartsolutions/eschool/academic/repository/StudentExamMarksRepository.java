@@ -63,4 +63,15 @@ List<StudentExamMarksEntity> searchMarks(
         @Param("examId") Long examId,
         @Param("keyword") String keyword);
 
+    @Query("SELECT sem FROM StudentExamMarksEntity sem " +
+           "JOIN FETCH sem.student s " +
+           "JOIN FETCH sem.examSubject es " +
+           "JOIN FETCH es.exam e " +
+           "JOIN FETCH e.examTerm et " +
+           "WHERE sem.id = :id AND sem.deleted = false")
+    java.util.Optional<StudentExamMarksEntity> findByIdWithRelations(@Param("id") Long id);
+
+    @Query("SELECT sem FROM StudentExamMarksEntity sem WHERE sem.student.id = :studentId AND sem.examSubject.id = :examSubjectId AND sem.deleted = false")
+    java.util.Optional<StudentExamMarksEntity> findByStudentIdAndExamSubjectId(@Param("studentId") Long studentId, @Param("examSubjectId") Long examSubjectId);
+
 }
