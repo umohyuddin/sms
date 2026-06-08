@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class GradeScaleServiceImpl implements GradeScaleService {
 
     private final GradeScaleRepository gradeScaleRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     @Override
     @Transactional
@@ -70,6 +72,7 @@ public class GradeScaleServiceImpl implements GradeScaleService {
     @Override
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(GradeScaleEntity.class, id);
         if (!gradeScaleRepository.existsById(id)) {
             throw new ResourceNotFoundException("Grade Scale not found");
         }

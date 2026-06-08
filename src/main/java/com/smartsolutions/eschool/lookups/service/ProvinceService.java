@@ -133,7 +133,7 @@ public class ProvinceService {
             }
         }
 
-        if (existing.isActive() && !requestDTO.isActive()) {
+        if (Boolean.TRUE.equals(existing.getIsActive()) && Boolean.FALSE.equals(requestDTO.getIsActive())) {
             entityReferenceValidator.ensureNotReferenced(ProvinceEntity.class, id);
         }
 

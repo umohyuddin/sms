@@ -23,9 +23,11 @@ public class InstituteBoardMemberService {
 
     private final InstituteBoardMemberRepository memberRepository;
     private final BoardMemberRoleRepository roleRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public InstituteBoardMemberService(InstituteBoardMemberRepository memberRepository,
-                                       BoardMemberRoleRepository roleRepository) {
+                                       BoardMemberRoleRepository roleRepository, com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
         this.memberRepository = memberRepository;
         this.roleRepository = roleRepository;
     }

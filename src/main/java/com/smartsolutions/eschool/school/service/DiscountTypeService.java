@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -25,10 +26,14 @@ public class DiscountTypeService {
     private final DiscountTypeRepository discountTypeRepository;
     private final ChargeTypeRepository chargeTypeRepository;
     private final FeeRecurrenceRuleRepository feeRecurrenceRuleRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public DiscountTypeService(DiscountTypeRepository discountTypeRepository,
             ChargeTypeRepository chargeTypeRepository,
-            FeeRecurrenceRuleRepository feeRecurrenceRuleRepository) {
+            FeeRecurrenceRuleRepository feeRecurrenceRuleRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.discountTypeRepository = discountTypeRepository;
         this.chargeTypeRepository = chargeTypeRepository;
         this.feeRecurrenceRuleRepository = feeRecurrenceRuleRepository;
@@ -166,6 +171,7 @@ public class DiscountTypeService {
         try {
             return discountTypeRepository.softDeleteById(id);
         } catch (DataAccessException dae) {
+        entityReferenceValidator.ensureNotReferenced(DiscountTypeEntity.class, id);
             log.error("Database error while deleting DiscountType with ID {}", id, dae);
             throw new CustomServiceException("Failed to delete DiscountType due to database error", dae);
         } catch (Exception e) {

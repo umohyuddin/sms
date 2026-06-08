@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.service;
 
 import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 import com.smartsolutions.eschool.institute.error.InstituteSocialLinkErrors;
 import com.smartsolutions.eschool.school.dtos.instituteSocialLinks.requestDto.InstituteSocialLinkCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteSocialLinks.requestDto.InstituteSocialLinkUpdateRequestDTO;
@@ -12,6 +13,7 @@ import com.smartsolutions.eschool.school.repository.InstituteSocialLinkRepositor
 import com.smartsolutions.eschool.school.mapper.InstituteSocialLinkMapper;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,10 @@ import java.util.List;
 @Service
 @Slf4j
 public class InstituteSocialLinkServiceImpl implements InstituteSocialLinkService {
+
+    @Autowired
+    private EntityReferenceValidator entityReferenceValidator;
+
 
         private final InstituteSocialLinkRepository instituteSocialLinkRepository;
         private final InstituteRepository instituteRepository;

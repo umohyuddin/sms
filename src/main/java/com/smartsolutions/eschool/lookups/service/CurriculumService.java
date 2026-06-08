@@ -15,13 +15,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class CurriculumService {
     private final CurriculumRepository curriculumRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public CurriculumService(CurriculumRepository curriculumRepository) {
+    public CurriculumService(CurriculumRepository curriculumRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.curriculumRepository = curriculumRepository;
     }
 
@@ -65,6 +70,7 @@ public class CurriculumService {
 
         int result = curriculumRepository.softDeleteById(id);
         if (result == 0) {
+        entityReferenceValidator.ensureNotReferenced(CurriculumEntity.class, id);
             throw new ApiException(CurriculumErrors.CURRICULUM_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         log.info("[Service:CurriculumService] softDeleteById() succeeded - id: {}", id);

@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.service;
 
 import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 import com.smartsolutions.eschool.institute.error.InstituteFacilityErrors;
 import com.smartsolutions.eschool.school.dtos.instituteFacilities.requestDto.InstituteFacilityCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteFacilities.requestDto.InstituteFacilityUpdateRequestDTO;
@@ -14,6 +15,7 @@ import com.smartsolutions.eschool.lookups.model.FacilityTypeEntity;
 import com.smartsolutions.eschool.lookups.repository.FacilityTypeRepository;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,10 @@ import java.util.List;
 @Service("instituteFacilityService")
 @Slf4j
 public class InstituteFacilityServiceImpl implements InstituteFacilityService {
+
+    @Autowired
+    private EntityReferenceValidator entityReferenceValidator;
+
 
     private final InstituteFacilityRepository instituteFacilityRepository;
     private final InstituteRepository instituteRepository;

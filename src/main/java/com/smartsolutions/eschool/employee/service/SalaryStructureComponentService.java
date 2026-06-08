@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -32,7 +33,11 @@ public class SalaryStructureComponentService {
     private final SalaryStructureRepository salaryStructureRepository;
 
     private final SalaryComponentRepository salaryComponentRepository;
-    public SalaryStructureComponentService(SalaryStructureComponentRepository componentRepository, SalaryStructureRepository salaryStructureRepository, SalaryComponentRepository salaryComponentRepository) {
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
+    public SalaryStructureComponentService(SalaryStructureComponentRepository componentRepository, SalaryStructureRepository salaryStructureRepository, SalaryComponentRepository salaryComponentRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.componentRepository = componentRepository;
         this.salaryStructureRepository = salaryStructureRepository;
 
@@ -141,6 +146,7 @@ public class SalaryStructureComponentService {
 
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(SalaryStructureComponentEntity.class, id);
         log.info("Soft deleting SalaryStructureComponent ID: {} from database", id);
         try {
             int affected = componentRepository.softDeleteById(id);

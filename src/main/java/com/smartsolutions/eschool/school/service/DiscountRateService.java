@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -30,10 +31,14 @@ public class DiscountRateService {
     private final DiscountSubTypeRepository discountSubTypeRepository;
     private final CampusRepository campusRepository;
     private final AcademicYearRepository academicYearRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
     public DiscountRateService(DiscountRateRepository discountRateRepository,
             DiscountSubTypeRepository discountSubTypeRepository,
             CampusRepository campusRepository,
-            AcademicYearRepository academicYearRepository) {
+            AcademicYearRepository academicYearRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.discountRateRepository = discountRateRepository;
         this.discountSubTypeRepository = discountSubTypeRepository;
         this.campusRepository = campusRepository;
@@ -157,6 +162,7 @@ public class DiscountRateService {
         try {
             return discountRateRepository.softDeleteById(id);
         } catch (Exception e) {
+        entityReferenceValidator.ensureNotReferenced(DiscountRateEntity.class, id);
             log.error("Error soft deleting Discount Rate with id: {}", id, e);
             throw new CustomServiceException("Failed to soft delete Discount Rate", e);
         }

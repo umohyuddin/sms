@@ -18,8 +18,10 @@ public class FeeSlabGroupService {
 
     private final FeeSlabGroupRepository repository;
     private final FeeComponentRepository feeComponentRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public FeeSlabGroupService(FeeSlabGroupRepository repository, FeeComponentRepository feeComponentRepository) {
+    public FeeSlabGroupService(FeeSlabGroupRepository repository, FeeComponentRepository feeComponentRepository, com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
         this.repository = repository;
         this.feeComponentRepository = feeComponentRepository;
     }

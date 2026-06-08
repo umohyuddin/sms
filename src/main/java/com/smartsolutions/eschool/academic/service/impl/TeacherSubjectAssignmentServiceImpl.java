@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class TeacherSubjectAssignmentServiceImpl implements TeacherSubjectAssign
         private final SectionRepository sectionRepository;
         private final SubjectRepository subjectRepository;
         private final AcademicYearRepository academicYearRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
         @Override
         @Transactional
@@ -105,6 +107,7 @@ public class TeacherSubjectAssignmentServiceImpl implements TeacherSubjectAssign
                                                 employeeId, standardId, sectionId, subjectId, academicYearId)
                                 .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
 
+                entityReferenceValidator.ensureNotReferenced(TeacherSubjectAssignmentEntity.class, entity.getId());
                 teacherAssignmentRepository.softDeleteById(entity.getId());
         }
 }

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class AssessmentTypeServiceImpl implements AssessmentTypeService {
 
     private final AssessmentTypeRepository assessmentTypeRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     @Override
     @Transactional
@@ -68,6 +70,7 @@ public class AssessmentTypeServiceImpl implements AssessmentTypeService {
     @Override
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(AssessmentTypeEntity.class, id);
         if (!assessmentTypeRepository.existsById(id)) {
             throw new ResourceNotFoundException("Assessment Type not found");
         }

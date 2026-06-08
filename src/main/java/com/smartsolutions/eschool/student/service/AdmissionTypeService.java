@@ -16,14 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class AdmissionTypeService {
 
     private final AdmissionTypeRepository admissionTypeRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public AdmissionTypeService(AdmissionTypeRepository admissionTypeRepository) {
+    public AdmissionTypeService(AdmissionTypeRepository admissionTypeRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.admissionTypeRepository = admissionTypeRepository;
     }
 
@@ -72,6 +77,7 @@ public class AdmissionTypeService {
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
+        entityReferenceValidator.ensureNotReferenced(AdmissionTypeEntity.class, id);
             throw new ApiException(AdmissionTypeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:AdmissionTypeService] softDeleteById() called - id: {}, organization: {}", id,

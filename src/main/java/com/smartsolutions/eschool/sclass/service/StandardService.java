@@ -121,6 +121,7 @@ public class StandardService {
 
     @Transactional
     public void softDeleteById(Long id) {
+        entityReferenceValidator.ensureNotReferenced(CampusEntity.class, id);
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
             throw new ApiException(StandardErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);

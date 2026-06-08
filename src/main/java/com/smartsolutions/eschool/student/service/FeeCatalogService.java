@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -30,11 +31,15 @@ public class FeeCatalogService {
     private final InstituteRepository instituteRepository;
     private final ChargeTypeRepository chargeTypeRepository;
     private final FeeRecurrenceRuleRepository recurrenceRuleRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public FeeCatalogService(FeeCatalogRepository feeCatalogRepository,
             InstituteRepository instituteRepository,
             ChargeTypeRepository chargeTypeRepository,
-            FeeRecurrenceRuleRepository recurrenceRuleRepository) {
+            FeeRecurrenceRuleRepository recurrenceRuleRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.feeCatalogRepository = feeCatalogRepository;
         this.instituteRepository = instituteRepository;
         this.chargeTypeRepository = chargeTypeRepository;
@@ -113,6 +118,7 @@ public class FeeCatalogService {
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
+        entityReferenceValidator.ensureNotReferenced(FeeCatalogEntity.class, id);
             throw new ApiException(FeeCatalogErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:FeeCatalogService] softDeleteById() called - id: {}, institute: {}", id, organizationId);

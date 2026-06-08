@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -25,9 +26,13 @@ public class DesignationService {
 
     private final DesignationRepository designationRepository;
     private final EmployeeAssignmentRepository employeeAssignmentRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public DesignationService(DesignationRepository designationRepository,
-                              EmployeeAssignmentRepository employeeAssignmentRepository) {
+                              EmployeeAssignmentRepository employeeAssignmentRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.designationRepository = designationRepository;
         this.employeeAssignmentRepository = employeeAssignmentRepository;
     }
@@ -131,6 +136,7 @@ public class DesignationService {
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
+        entityReferenceValidator.ensureNotReferenced(DesignationEntity.class, id);
             throw new ApiException(DesignationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:DesignationService] softDeleteById() called - id: {}, organization: {}", id, organizationId);

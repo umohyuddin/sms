@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class EmployeeAttendanceServiceImpl implements EmployeeAttendanceService 
 
     private final EmployeeAttendanceRepository attendanceRepository;
     private final EmployeeMasterRepository employeeRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     @Override
     @Transactional
@@ -51,6 +53,7 @@ public class EmployeeAttendanceServiceImpl implements EmployeeAttendanceService 
     @Override
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(EmployeeAttendanceEntity.class, id);
         log.info("Soft deleting Employee Attendance ID: {}", id);
         if (!attendanceRepository.existsById(id)) {
             throw new ResourceNotFoundException("Attendance record not found");

@@ -15,13 +15,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class ModuleService {
     private final ModuleRepository moduleRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public ModuleService(ModuleRepository moduleRepository) {
+    public ModuleService(ModuleRepository moduleRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.moduleRepository = moduleRepository;
     }
 
@@ -65,6 +70,7 @@ public class ModuleService {
 
         int result = moduleRepository.softDeleteById(id);
         if (result == 0) {
+        entityReferenceValidator.ensureNotReferenced(ModuleEntity.class, id);
             throw new ApiException(ModuleErrors.MODULE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         log.info("[Service:ModuleService] softDeleteById() succeeded - id: {}", id);

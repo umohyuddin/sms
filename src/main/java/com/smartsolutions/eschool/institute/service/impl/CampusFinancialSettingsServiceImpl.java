@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.institute.service.impl;
 
 import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 import com.smartsolutions.eschool.institute.dtos.financialSettings.requestDto.CampusFinancialSettingsRequestDTO;
 import com.smartsolutions.eschool.institute.dtos.financialSettings.responseDto.CampusFinancialSettingsResponseDTO;
 import com.smartsolutions.eschool.institute.entity.CampusFinancialSettings;
@@ -11,6 +12,7 @@ import com.smartsolutions.eschool.institute.service.CampusFinancialSettingsServi
 import com.smartsolutions.eschool.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,10 @@ import com.smartsolutions.eschool.lookups.repository.FeeRecurrenceRuleRepository
 @RequiredArgsConstructor
 @Slf4j
 public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettingsService {
+
+    @Autowired
+    private EntityReferenceValidator entityReferenceValidator;
+
 
     private final CampusFinancialSettingsRepository repository;
     private final InstituteRepository instituteRepository;
@@ -105,6 +111,7 @@ public class CampusFinancialSettingsServiceImpl implements CampusFinancialSettin
     @Override
     @Transactional
     public void softDeleteById(Long id) {
+        entityReferenceValidator.ensureNotReferenced(CampusFinancialSettings.class, id);
         Long contextInstituteId = SecurityUtils.getCurrentOrganizationId();
         if (contextInstituteId == null) {
             throw new ApiException(CampusFinancialSettingsErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);

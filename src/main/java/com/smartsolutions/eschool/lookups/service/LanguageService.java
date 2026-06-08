@@ -15,13 +15,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class LanguageService {
     private final LanguageRepository languageRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public LanguageService(LanguageRepository languageRepository) {
+    public LanguageService(LanguageRepository languageRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.languageRepository = languageRepository;
     }
 
@@ -65,6 +70,7 @@ public class LanguageService {
 
         int result = languageRepository.softDeleteById(id);
         if (result == 0) {
+        entityReferenceValidator.ensureNotReferenced(LanguageEntity.class, id);
             throw new ApiException(LanguageErrors.LANGUAGE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         log.info("[Service:LanguageService] softDeleteById() succeeded - id: {}", id);

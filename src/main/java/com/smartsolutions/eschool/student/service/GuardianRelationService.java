@@ -16,14 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class GuardianRelationService {
 
     private final GuardianRelationRepository guardianRelationRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public GuardianRelationService(GuardianRelationRepository guardianRelationRepository) {
+    public GuardianRelationService(GuardianRelationRepository guardianRelationRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.guardianRelationRepository = guardianRelationRepository;
     }
 
@@ -93,6 +98,7 @@ public class GuardianRelationService {
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
+        entityReferenceValidator.ensureNotReferenced(GuardianRelationEntity.class, id);
             throw new ApiException(GuardianRelationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:GuardianRelationService] softDeleteById() called - id: {}, organization: {}", id, organizationId);

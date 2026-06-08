@@ -133,7 +133,7 @@ VALUES
 ('MONTHLY', 'Monthly', 1, 'Fee charged every month (common for tuition fees)', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('QUARTERLY', 'Quarterly', 3, 'Fee charged every three months', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('HALF_YEARLY', 'HALF YEARLY', 6, 'Fee charged twice in an academic year',TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
-('ANNUAL', 'Annual', 12, 'Fee charged once per academic year',TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
+('ANNUAL', 'Annual', 12, 'Fee charged once per academic year',TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP);
 
 
 

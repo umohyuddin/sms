@@ -23,8 +23,10 @@ public class EmployeeAddressService {
     private final ProvinceRepository provinceRepository;
     private final CityRepository cityRepository;
     private final EmployeeMasterRepository employeeMasterRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public EmployeeAddressService(EmployeeAddressRepository employeeRepository, CountryRepository countryRepository, ProvinceRepository provinceRepository, CityRepository cityRepository, EmployeeMasterRepository employeeMasterRepository) {
+    public EmployeeAddressService(EmployeeAddressRepository employeeRepository, CountryRepository countryRepository, ProvinceRepository provinceRepository, CityRepository cityRepository, EmployeeMasterRepository employeeMasterRepository, com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
         this.employeeAddressRepository = employeeRepository;
         this.countryRepository = countryRepository;
         this.provinceRepository = provinceRepository;

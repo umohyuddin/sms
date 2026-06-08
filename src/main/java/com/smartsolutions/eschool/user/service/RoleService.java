@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -26,8 +27,12 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public RoleService(RoleRepository roleRepository, PermissionRepository permissionRepository) {
+    public RoleService(RoleRepository roleRepository, PermissionRepository permissionRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.roleRepository = roleRepository;
         this.permissionRepository = permissionRepository;
     }
@@ -102,6 +107,7 @@ public class RoleService {
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
+        entityReferenceValidator.ensureNotReferenced(RoleEntity.class, id);
             throw new ApiException(RoleErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:RoleService] softDeleteById() called - id: {}, organization: {}", id, organizationId);

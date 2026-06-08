@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class ReportCardServiceImpl implements ReportCardService {
     private final ReportCardRepository reportCardRepository;
     private final StudentRepository studentRepository;
     private final AcademicYearRepository academicYearRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     @Override
     @Transactional
@@ -53,6 +55,7 @@ public class ReportCardServiceImpl implements ReportCardService {
     @Override
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(ReportCardEntity.class, id);
         if (!reportCardRepository.existsById(id)) {
             throw new ResourceNotFoundException("Report card record not found");
         }

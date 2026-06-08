@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -29,11 +30,15 @@ public class DepartmentService {
     private final CampusRepository campusRepository;
     private final DepartmentTypeRepository departmentTypeRepository;
     private final EmployeeMasterRepository employeeMasterRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public DepartmentService(DepartmentRepository departmentRepository,
                              CampusRepository campusRepository,
                              DepartmentTypeRepository departmentTypeRepository,
-                             EmployeeMasterRepository employeeMasterRepository) {
+                             EmployeeMasterRepository employeeMasterRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.departmentRepository = departmentRepository;
         this.campusRepository = campusRepository;
         this.departmentTypeRepository = departmentTypeRepository;
@@ -137,6 +142,7 @@ public class DepartmentService {
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
+        entityReferenceValidator.ensureNotReferenced(DepartmentEntity.class, id);
             throw new ApiException(DepartmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:DepartmentService] softDeleteById() called - id: {}, organization: {}", id, organizationId);

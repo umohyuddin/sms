@@ -63,6 +63,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +84,7 @@ public class StudentService {
     private final UserAccountInfoRepository userAccountInfoRepository;
     private final UserAccountDeactivationLogRepository userAccountDeactivationLogRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     private Long getOrgId() {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
@@ -268,6 +270,7 @@ public class StudentService {
         log.info("[Service:StudentService] softDeleteStudent() called for id: {} org: {}", studentId, orgId);
         int updated = studentRepository.softDeleteByIdAndOrganizationId(studentId, orgId);
         if (updated == 0) {
+        entityReferenceValidator.ensureNotReferenced(StudentEntity.class, studentId);
             throw new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Student not found with id: " + studentId, HttpStatus.NOT_FOUND);
         }
     }

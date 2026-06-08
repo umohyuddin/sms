@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
     private final ExamRepository examRepository;
     private final SubjectRepository subjectRepository;
     private final EmployeeMasterRepository employeeRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     @Override
     @Transactional
@@ -104,6 +106,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
     public void unschedule(Long examId, Long subjectId) {
         ExamSubjectEntity entity = examSubjectRepository.findByExamAndSubject(examId, subjectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Exam Subject assignment not found"));
+        entityReferenceValidator.ensureNotReferenced(ExamSubjectEntity.class, entity.getId());
         examSubjectRepository.softDeleteById(entity.getId());
     }
 }
