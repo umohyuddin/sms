@@ -57,7 +57,7 @@ public class ExamSubjectServiceImpl implements ExamSubjectService {
 
         // ✅ Pehle check karo — exist karta hai ya nahi (soft deleted bhi)
         ExamSubjectEntity entity = examSubjectRepository
-                .findByExamAndSubject(dto.getExamId(), dto.getSubjectId())
+                .findByExamAndSubjectIncludeDeleted(dto.getExamId(), dto.getSubjectId())
                 .orElse(new ExamSubjectEntity());
 
         // Fields set karo (insert aur update dono ke liye)

@@ -45,26 +45,36 @@ public class StudentExamMarksServiceImpl implements StudentExamMarksService {
     @Transactional
     public void recordMarks(List<StudentExamMarksRequestDTO> dtos) {
         for (StudentExamMarksRequestDTO dto : dtos) {
-            // Validate presence check would go here...
 
-            // Check for existing mark to avoid duplicate entry
-            java.util.Optional<com.smartsolutions.eschool.academic.entity.mapping.StudentExamMarksEntity> existingOpt =
-                    marksRepository.findByStudentIdAndExamSubjectId(dto.getStudentId(), dto.getExamSubjectId());
-            StudentExamMarksEntity entity;
+            // Look up any existing record (active or soft-deleted) to avoid duplicate key errors
+            java.util.Optional<StudentExamMarksEntity> existingOpt =
+                    marksRepository.findByStudentIdAndExamSubjectIdIncludeDeleted(
+                            dto.getStudentId(), dto.getExamSubjectId());
+
             if (existingOpt.isPresent()) {
-                // Update existing entity fields
-                entity = existingOpt.get();
+                // Always update the existing row (restores soft-deleted records too)
+                StudentExamMarksEntity entity = existingOpt.get();
                 entity.setObtainedMarks(dto.getObtainedMarks());
                 entity.setGraceMarks(dto.getGraceMarks());
                 entity.setLocked(dto.isLocked());
                 entity.setRemarks(dto.getRemarks());
-                entity.setActive(dto.getIsActive() != null && dto.getIsActive());
+                entity.setDeleted(false);          // un-delete if it was soft-deleted
+                entity.setDeletedAt(null);
+                entity.setActive(dto.getIsActive() == null || dto.getIsActive());
+                marksRepository.save(entity);
             } else {
-                // Create new entity
-                entity = ResultsMapper.toEntity(dto);
+                // No record at all — only insert when there is meaningful data
+                boolean hasData = dto.getObtainedMarks() != null
+                        || (dto.getGraceMarks() != null
+                            && dto.getGraceMarks().compareTo(java.math.BigDecimal.ZERO) != 0)
+                        || (dto.getRemarks() != null && !dto.getRemarks().isBlank());
+
+                if (hasData) {
+                    StudentExamMarksEntity entity = ResultsMapper.toEntity(dto);
+                    entity.setActive(dto.getIsActive() == null || dto.getIsActive());
+                    marksRepository.save(entity);
+                }
             }
-            // organizationId is handled automatically by AuditableEntity
-            marksRepository.save(entity);
         }
     }
 
@@ -134,6 +144,7 @@ public class StudentExamMarksServiceImpl implements StudentExamMarksService {
                     .locked(mark != null && mark.isLocked())
                     .remarks(mark != null ? mark.getRemarks() : null)
                     .markId(mark != null ? mark.getId() : null)
+                    .active(mark != null ? mark.isActive() : true)
                     .build();
         }).collect(Collectors.toList());
     }

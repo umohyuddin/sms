@@ -3,7 +3,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 import org.hibernate.annotations.SQLDelete;
 
-import com.smartsolutions.eschool.global.baseEntity.AuditableEntity;
 import com.smartsolutions.eschool.global.baseEntity.ScopeAuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;

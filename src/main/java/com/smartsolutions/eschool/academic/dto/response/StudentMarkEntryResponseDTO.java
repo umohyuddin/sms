@@ -22,4 +22,5 @@ public class StudentMarkEntryResponseDTO {
     private boolean locked;
     private String remarks;
     private Long markId; // Included if existing mark entity needs update
+    private Boolean active;
 }
