@@ -14,7 +14,10 @@ import java.util.List;
 @Repository
 public interface StudentExamAttendanceRepository extends JpaRepository<StudentExamAttendanceEntity, Long> {
 
-        @Query("SELECT sea FROM StudentExamAttendanceEntity sea JOIN FETCH sea.student " +
+    boolean existsByExamSubject_Id(Long examSubjectId);
+
+
+    @Query("SELECT sea FROM StudentExamAttendanceEntity sea JOIN FETCH sea.student " +
                         "WHERE sea.examSubject.id = :examSubjectId AND sea.organizationId = :orgId AND sea.deleted = false")
         List<StudentExamAttendanceEntity> findByExamSubjectIdAndOrganizationId(
                         @Param("examSubjectId") Long examSubjectId,
@@ -93,7 +96,7 @@ public interface StudentExamAttendanceRepository extends JpaRepository<StudentEx
 
         // 4. Subject Wise Summary
         @Query("SELECT new com.smartsolutions.eschool.academic.dto.response.reports.ExamAttendanceSummaryDTO(" +
-                        "sub.id, " +
+                        "es.id, " +
                         "sub.name, " +
                         "COUNT(sea.id), " +
                         "SUM(CASE WHEN sea.status = 'PRESENT' THEN 1 ELSE 0 END), " +
@@ -107,7 +110,7 @@ public interface StudentExamAttendanceRepository extends JpaRepository<StudentEx
                         "WHERE sea.organizationId = :orgId AND sea.deleted = false " +
                         "AND (:sectionId IS NULL OR e.section.id = :sectionId) " +
                         "AND (:academicYearId IS NULL OR e.academicYear.id = :academicYearId) " +
-                        "GROUP BY sub.id, sub.name")
+                        "GROUP BY es.id, sub.name")
         List<ExamAttendanceSummaryDTO> getSubjectSummary(@Param("orgId") Long orgId, @Param("sectionId") Long sectionId,
                         @Param("academicYearId") Long academicYearId);
 

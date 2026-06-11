@@ -66,7 +66,8 @@ public class ExamAttendanceReportController {
             @RequestParam(required = false) Long studentId,
             @RequestParam(required = false) StudentExamAttendanceEntity.AttendanceStatus status,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate)
+    {
         Long orgId = SecurityUtils.getCurrentOrganizationId();
         log.info("Report API: Fetching detailed report for org: {}", orgId);
         return ResponseEntity.ok(reportFacade.getDetailedReport(orgId, campusId, standardId, sectionId,

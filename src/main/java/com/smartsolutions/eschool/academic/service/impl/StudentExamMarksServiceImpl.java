@@ -66,7 +66,7 @@ public class StudentExamMarksServiceImpl implements StudentExamMarksService {
                 // No record at all — only insert when there is meaningful data
                 boolean hasData = dto.getObtainedMarks() != null
                         || (dto.getGraceMarks() != null
-                            && dto.getGraceMarks().compareTo(java.math.BigDecimal.ZERO) != 0)
+                        && dto.getGraceMarks().compareTo(java.math.BigDecimal.ZERO) != 0)
                         || (dto.getRemarks() != null && !dto.getRemarks().isBlank());
 
                 if (hasData) {
@@ -160,35 +160,116 @@ public class StudentExamMarksServiceImpl implements StudentExamMarksService {
         return ResultsMapper.toStudentExamMarksResponseList(list);
     }
 
+//    @Override
+//    @Transactional
+//    public void deleteMark(Long id) {
+//        // Load mark with full relations to get student + examTerm info
+//        StudentExamMarksEntity mark = marksRepository.findByIdWithRelations(id)
+//                .orElseThrow(() -> new RuntimeException("Student marks not found"));
+//
+//        // Block deletion if a StudentTermResult already exists for this student + exam term
+//        Long studentId = mark.getStudent().getId();
+//        Long examTermId = mark.getExamSubject().getExam().getExamTerm().getId();
+//        Long examSubjectId = mark.getExamSubject().getId();
+//
+//        if (termResultRepository.existsByStudent_IdAndExamTerm_Id(studentId, examTermId)) {
+//            throw new ApiException(
+//                new BaseErrorCode() {
+//                    @Override public AppModule module()
+//                    { return AppModule.COMMON; }
+//
+//                    @Override public ErrorCategory category()
+//                    { return ErrorCategory.BUSINESS; }
+//                    @Override public int number()
+//                    { return 999; }
+//                    @Override public String message()
+//                    {
+//                        return "Unable to delete this Student Exam Mark. A Term Result has already been generated for this student. Please remove the Term Result first before attempting deletion.";
+//                    }
+//                },
+//                HttpStatus.CONFLICT
+//            );
+//        }
+//
+//        entityReferenceValidator.ensureNotReferenced(StudentExamMarksEntity.class, id);
+//        marksRepository.softDeleteById(id);
+//    }
+//}
+
     @Override
     @Transactional
     public void deleteMark(Long id) {
-        // Load mark with full relations to get student + examTerm info
+
+        // 1. Load entity with relations
         StudentExamMarksEntity mark = marksRepository.findByIdWithRelations(id)
                 .orElseThrow(() -> new RuntimeException("Student marks not found"));
 
-        // Block deletion if a StudentTermResult already exists for this student + exam term
         Long studentId = mark.getStudent().getId();
         Long examTermId = mark.getExamSubject().getExam().getExamTerm().getId();
+        Long examSubjectId = mark.getExamSubject().getId();
 
+        // 2. BLOCK if Term Result already generated
         if (termResultRepository.existsByStudent_IdAndExamTerm_Id(studentId, examTermId)) {
             throw new ApiException(
-                new BaseErrorCode() {
-                    @Override public AppModule module() { return AppModule.COMMON; }
-                    @Override public ErrorCategory category() { return ErrorCategory.BUSINESS; }
-                    @Override public int number() { return 999; }
-                    @Override public String message() {
-                        return "Unable to delete this Student Exam Mark. A Term Result has already been generated for this student. Please remove the Term Result first before attempting deletion.";
-                    }
-                },
-                HttpStatus.CONFLICT
+                    new BaseErrorCode() {
+                        @Override
+                        public AppModule module() {
+                            return AppModule.COMMON;
+                        }
+
+                        @Override
+                        public ErrorCategory category() {
+                            return ErrorCategory.BUSINESS;
+                        }
+
+                        @Override
+                        public int number() {
+                            return 999;
+                        }
+
+                        @Override
+                        public String message() {
+                            return "Cannot delete: Term Result already generated for this student.";
+                        }
+                    },
+                    HttpStatus.CONFLICT
             );
         }
 
+        // 3. BLOCK if Attendance exists
+        if (attendanceRepository.existsByExamSubject_Id(examSubjectId)) {
+            throw new ApiException(
+                    new BaseErrorCode() {
+                        @Override
+                        public AppModule module() {
+                            return AppModule.COMMON;
+                        }
+
+                        @Override
+                        public ErrorCategory category() {
+                            return ErrorCategory.BUSINESS;
+                        }
+
+                        @Override
+                        public int number() {
+                            return 998;
+                        }
+
+                        @Override
+                        public String message() {
+                            return "Cannot delete: Attendance already exists for this exam subject.";
+                        }
+                    },
+                    HttpStatus.CONFLICT
+            );
+        }
+
+        // 4. Optional: generic reference check
         entityReferenceValidator.ensureNotReferenced(StudentExamMarksEntity.class, id);
+
+        // 5. Soft delete
         marksRepository.softDeleteById(id);
     }
 }
-
 
 

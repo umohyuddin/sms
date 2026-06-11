@@ -31,11 +31,12 @@ public class PDFService {
             PdfWriter.getInstance(document, baos);
             document.open();
 
-            // Add Header
             addHeader(document, institute);
 
             if ("ADMISSION_FORM".equalsIgnoreCase(docType)) {
                 generateAdmissionForm(document);
+            } else if ("RESULT_CARD".equalsIgnoreCase(docType)) {
+                generateResultCard(document);
             } else {
                 document.add(new Paragraph("Document Type not supported: " + docType));
             }
@@ -53,7 +54,6 @@ public class PDFService {
         headerTable.setWidthPercentage(100);
         headerTable.setWidths(new float[]{1, 3});
 
-        // Logo
         PdfPCell logoCell = new PdfPCell();
         if (institute != null && institute.getLogo() != null) {
             try {
@@ -67,7 +67,6 @@ public class PDFService {
         logoCell.setBorder(Rectangle.NO_BORDER);
         headerTable.addCell(logoCell);
 
-        // School Info
         PdfPCell infoCell = new PdfPCell();
         infoCell.setBorder(Rectangle.NO_BORDER);
         infoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -84,8 +83,8 @@ public class PDFService {
         addrPara.setAlignment(Element.ALIGN_CENTER);
         infoCell.addElement(addrPara);
 
-        String contact = "Phone: " + (institute != null ? institute.getContactNumber() : "N/A") + 
-                          " | Website: " + (institute != null ? institute.getWebsite() : "N/A");
+        String contact = "Phone: " + (institute != null ? institute.getContactNumber() : "N/A") +
+                " | Website: " + (institute != null ? institute.getWebsite() : "N/A");
         Paragraph contactPara = new Paragraph(contact, detailFont);
         contactPara.setAlignment(Element.ALIGN_CENTER);
         infoCell.addElement(contactPara);
@@ -97,9 +96,8 @@ public class PDFService {
 
     private void generateAdmissionForm(Document document) throws DocumentException {
         Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
-        BaseColor sectionBg = new BaseColor(31, 56, 100); // Dark Blue
+        BaseColor sectionBg = new BaseColor(31, 56, 100);
 
-        // Admission Form Title Bar
         PdfPTable titleTable = new PdfPTable(1);
         titleTable.setWidthPercentage(100);
         PdfPCell titleCell = new PdfPCell(new Phrase("Admission Form O Level", sectionFont));
@@ -110,8 +108,6 @@ public class PDFService {
         document.add(titleTable);
         document.add(new Paragraph("\n"));
 
-        // PAGE 1
-        // ADMISSION DETAILS
         addSectionHeader(document, "ADMISSION DETAILS");
         PdfPTable admTable = new PdfPTable(4);
         admTable.setWidthPercentage(100);
@@ -121,7 +117,6 @@ public class PDFService {
         document.add(admTable);
         document.add(new Paragraph("\n"));
 
-        // STUDENT DETAILS
         addSectionHeader(document, "STUDENT DETAILS");
         PdfPTable stdTable = new PdfPTable(2);
         stdTable.setWidthPercentage(100);
@@ -143,7 +138,7 @@ public class PDFService {
         addLabelAndValue(langTable, "Family Language", "");
         addLabelAndValue(langTable, "Nationality", "");
         document.add(langTable);
-        
+
         PdfPTable emailTable = new PdfPTable(2);
         emailTable.setWidthPercentage(100);
         emailTable.setWidths(new float[]{1, 3});
@@ -151,7 +146,6 @@ public class PDFService {
         document.add(emailTable);
         document.add(new Paragraph("\n"));
 
-        // PARENTS DETAILS
         addSectionHeader(document, "PARENTS DETAILS");
         PdfPTable parentTable = new PdfPTable(2);
         parentTable.setWidthPercentage(100);
@@ -161,7 +155,7 @@ public class PDFService {
         addFullWidthRow(parentTable, "Business Address", "");
         addFullWidthRow(parentTable, "Residential Address", "");
         document.add(parentTable);
-        
+
         PdfPTable parentContactTable = new PdfPTable(4);
         parentContactTable.setWidthPercentage(100);
         parentContactTable.setWidths(new float[]{1, 1, 1, 1});
@@ -180,7 +174,6 @@ public class PDFService {
         document.add(motherTable);
 
         document.add(new Paragraph("\n"));
-        // SIBLINGS DETAILS
         addSectionHeader(document, "SIBLINGS DETAILS (Brothers & Sisters)");
         PdfPTable siblingTable = new PdfPTable(6);
         siblingTable.setWidthPercentage(100);
@@ -190,7 +183,6 @@ public class PDFService {
         document.add(siblingTable);
         document.add(new Paragraph("\n"));
 
-        // EMERGENCY CONTACT DETAILS
         addSectionHeader(document, "EMERGENCY CONTACT DETAILS");
         PdfPTable emgTable = new PdfPTable(4);
         emgTable.setWidthPercentage(100);
@@ -200,9 +192,8 @@ public class PDFService {
         addLabelAndValue(emgTable, "Mobile", "");
         document.add(emgTable);
 
-        document.newPage(); // PAGE 2
-        
-        // PREVIOUS SCHOOLING
+        document.newPage();
+
         addSectionHeader(document, "PREVIOUS SCHOOLING");
         PdfPTable prevSchoolTable = new PdfPTable(4);
         prevSchoolTable.setWidthPercentage(100);
@@ -213,22 +204,18 @@ public class PDFService {
         document.add(prevSchoolTable);
         document.add(new Paragraph("\n"));
 
-        // SPORTS
         addSectionHeader(document, "SPORTS");
         addTextBox(document, "Does the applicant have a special interest in sports or games? Has he/she ever played for a school team?");
         document.add(new Paragraph("\n"));
 
-        // INTEREST / HOBBIES
         addSectionHeader(document, "INTEREST / HOBBIES");
         addTextBox(document, "Please list any particular hobby or interest.");
         document.add(new Paragraph("\n"));
 
-        // CO-CURRICULAR ACTIVITIES
         addSectionHeader(document, "CO-CURRICULAR ACTIVITIES");
         addTextBox(document, "Please mark tick (V) or give details if you are able to contribute to the school in any of the following ways:");
         document.add(new Paragraph("\n"));
 
-        // HEALTH
         addSectionHeader(document, "HEALTH");
         PdfPTable healthTable = new PdfPTable(3);
         healthTable.setWidthPercentage(100);
@@ -239,7 +226,6 @@ public class PDFService {
         document.add(healthTable);
         document.add(new Paragraph("\n"));
 
-        // CHECK LIST OF DOCUMENTS
         addSectionHeader(document, "CHECK LIST OF DOCUMENTS");
         PdfPTable checkListTable = new PdfPTable(4);
         checkListTable.setWidthPercentage(100);
@@ -249,7 +235,6 @@ public class PDFService {
         document.add(checkListTable);
         document.add(new Paragraph("\n"));
 
-        // DECLARATION
         addSectionHeader(document, "Declaration");
         Font declFont = FontFactory.getFont(FontFactory.HELVETICA, 8);
         Paragraph decl = new Paragraph("I/We do hereby declare that all the details provided above are true. If any misinformation is found at any stage of the applicant's study, his/her registration may be cancelled and any action taken by the school accepted by me/us. We also agree to abide by all existing rules and regulations of the school and those that may be framed from time to time.", declFont);
@@ -263,6 +248,169 @@ public class PDFService {
         signTable.addCell(new Phrase("____________________\nDate", declFont));
         signTable.addCell(new Phrase("____________________\nSignature of Parent/Guardian", declFont));
         document.add(signTable);
+    }
+
+
+//    Result card  generater
+    private void generateResultCard(Document document) throws DocumentException {
+        Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
+        BaseColor sectionBg = new BaseColor(31, 56, 100);
+
+        PdfPTable titleTable = new PdfPTable(1);
+        titleTable.setWidthPercentage(100);
+        PdfPCell titleCell = new PdfPCell(new Phrase("Result Card", sectionFont));
+        titleCell.setBackgroundColor(sectionBg);
+        titleCell.setPadding(5);
+        titleCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        titleTable.addCell(titleCell);
+        document.add(titleTable);
+        document.add(new Paragraph("\n"));
+
+        addSectionHeader(document, "STUDENT INFORMATION");
+        PdfPTable stdInfoTable = new PdfPTable(2);
+        stdInfoTable.setWidthPercentage(100);
+        stdInfoTable.setWidths(new float[]{1, 3});
+        addFullWidthRow(stdInfoTable, "Name", "Usman Sheikh");
+        addFullWidthRow(stdInfoTable, "Roll / Code", "STU007");
+        addFullWidthRow(stdInfoTable, "Campus", "Downtown Campus");
+        addFullWidthRow(stdInfoTable, "Class", "1st Grade");
+        addFullWidthRow(stdInfoTable, "Section", "B");
+        addFullWidthRow(stdInfoTable, "Exam Term", "DEC Term");
+        addFullWidthRow(stdInfoTable, "Exam", "B-DEC-TEST");
+        document.add(stdInfoTable);
+        document.add(new Paragraph("\n"));
+
+        addSectionHeader(document, "OVERALL SUMMARY");
+        PdfPTable summaryTable = new PdfPTable(4);
+        summaryTable.setWidthPercentage(100);
+        summaryTable.setWidths(new float[]{1, 1, 1, 1});
+
+        Font boldFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
+        Font labelFont = FontFactory.getFont(FontFactory.HELVETICA, 8, BaseColor.GRAY);
+
+        PdfPCell subjectsLabelCell = new PdfPCell(new Phrase("Subjects", labelFont));
+        subjectsLabelCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        subjectsLabelCell.setBorder(Rectangle.NO_BORDER);
+        summaryTable.addCell(subjectsLabelCell);
+
+        PdfPCell marksLabelCell = new PdfPCell(new Phrase("Marks", labelFont));
+        marksLabelCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        marksLabelCell.setBorder(Rectangle.NO_BORDER);
+        summaryTable.addCell(marksLabelCell);
+
+        PdfPCell percentageLabelCell = new PdfPCell(new Phrase("Percentage", labelFont));
+        percentageLabelCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        percentageLabelCell.setBorder(Rectangle.NO_BORDER);
+        summaryTable.addCell(percentageLabelCell);
+
+        PdfPCell gradeLabelCell = new PdfPCell(new Phrase("Grade", labelFont));
+        gradeLabelCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        gradeLabelCell.setBorder(Rectangle.NO_BORDER);
+        summaryTable.addCell(gradeLabelCell);
+
+        PdfPCell subjectsValCell = new PdfPCell(new Phrase("1", boldFont));
+        subjectsValCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        subjectsValCell.setBorder(Rectangle.NO_BORDER);
+        summaryTable.addCell(subjectsValCell);
+
+        PdfPCell marksValCell = new PdfPCell(new Phrase("67/100", boldFont));
+        marksValCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        marksValCell.setBorder(Rectangle.NO_BORDER);
+        summaryTable.addCell(marksValCell);
+
+        PdfPCell percentageValCell = new PdfPCell(new Phrase("67%", boldFont));
+        percentageValCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        percentageValCell.setBorder(Rectangle.NO_BORDER);
+        summaryTable.addCell(percentageValCell);
+
+        PdfPCell gradeValCell = new PdfPCell(new Phrase("B-", boldFont));
+        gradeValCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        gradeValCell.setBorder(Rectangle.NO_BORDER);
+        summaryTable.addCell(gradeValCell);
+
+        PdfPCell statusCell = new PdfPCell(new Phrase("Fail", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE)));
+        statusCell.setBackgroundColor(new BaseColor(220, 53, 69));
+        statusCell.setColspan(4);
+        statusCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        statusCell.setPadding(4);
+        summaryTable.addCell(statusCell);
+
+        document.add(summaryTable);
+        document.add(new Paragraph("\n"));
+
+        addSectionHeader(document, "SUBJECT DETAILS");
+        PdfPTable subjectTable = new PdfPTable(8);
+        subjectTable.setWidthPercentage(100);
+        subjectTable.setWidths(new float[]{0.5f, 2.5f, 1, 1, 1.2f, 1, 1, 1.5f});
+
+        Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, BaseColor.WHITE);
+        BaseColor tableHeaderBg = new BaseColor(50, 50, 50);
+
+        String[] headers = {"#", "Subject / Book", "Obtained", "Total", "Pass Marks", "Percentage", "Grade", "Status"};
+        for (String h : headers) {
+            PdfPCell hCell = new PdfPCell(new Phrase(h, headerFont));
+            hCell.setBackgroundColor(tableHeaderBg);
+            hCell.setPadding(4);
+            hCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            subjectTable.addCell(hCell);
+        }
+
+        Font rowFont = FontFactory.getFont(FontFactory.HELVETICA, 9);
+        Font failFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, new BaseColor(220, 53, 69));
+        Font passMarkFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, new BaseColor(40, 167, 69));
+
+        addSubjectRow(subjectTable, "1", "Islamic Studies", "67", "100", "100", "67%", "B-", "Fail", rowFont, failFont, passMarkFont);
+
+        document.add(subjectTable);
+        document.add(new Paragraph("\n"));
+
+        addSectionHeader(document, "REMARKS");
+        PdfPTable remarksTable = new PdfPTable(1);
+        remarksTable.setWidthPercentage(100);
+        PdfPCell remarksCell = new PdfPCell();
+        remarksCell.setMinimumHeight(50);
+        remarksTable.addCell(remarksCell);
+        document.add(remarksTable);
+        document.add(new Paragraph("\n\n"));
+
+        Font declFont = FontFactory.getFont(FontFactory.HELVETICA, 8);
+        PdfPTable signTable = new PdfPTable(3);
+        signTable.setWidthPercentage(100);
+        signTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+        signTable.addCell(new Phrase("____________________\nClass Teacher", declFont));
+        signTable.addCell(new Phrase("____________________\nPrincipal", declFont));
+        signTable.addCell(new Phrase("____________________\nParent / Guardian", declFont));
+        document.add(signTable);
+    }
+
+    private void addSubjectRow(PdfPTable table, String num, String subject, String obtained,
+                               String total, String passMarks, String percentage, String grade,
+                               String status, Font rowFont, Font failFont, Font passMarkFont) {
+        Font statusFont = status.equalsIgnoreCase("Fail") ? failFont : rowFont;
+
+        PdfPCell c1 = new PdfPCell(new Phrase(num, rowFont));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER); c1.setPadding(4); table.addCell(c1);
+
+        PdfPCell c2 = new PdfPCell(new Phrase(subject, rowFont));
+        c2.setPadding(4); table.addCell(c2);
+
+        PdfPCell c3 = new PdfPCell(new Phrase(obtained, rowFont));
+        c3.setHorizontalAlignment(Element.ALIGN_CENTER); c3.setPadding(4); table.addCell(c3);
+
+        PdfPCell c4 = new PdfPCell(new Phrase(total, rowFont));
+        c4.setHorizontalAlignment(Element.ALIGN_CENTER); c4.setPadding(4); table.addCell(c4);
+
+        PdfPCell c5 = new PdfPCell(new Phrase(passMarks, passMarkFont));
+        c5.setHorizontalAlignment(Element.ALIGN_CENTER); c5.setPadding(4); table.addCell(c5);
+
+        PdfPCell c6 = new PdfPCell(new Phrase(percentage, rowFont));
+        c6.setHorizontalAlignment(Element.ALIGN_CENTER); c6.setPadding(4); table.addCell(c6);
+
+        PdfPCell c7 = new PdfPCell(new Phrase(grade, rowFont));
+        c7.setHorizontalAlignment(Element.ALIGN_CENTER); c7.setPadding(4); table.addCell(c7);
+
+        PdfPCell c8 = new PdfPCell(new Phrase(status, statusFont));
+        c8.setHorizontalAlignment(Element.ALIGN_CENTER); c8.setPadding(4); table.addCell(c8);
     }
 
     private void addSiblingRow(PdfPTable table, String label1, String label2, String val2, String label3, String label4) {
