@@ -22,13 +22,28 @@ public class PDFController {
     private final PDFService pdfService;
 
     @GetMapping("/download")
-    @Operation(summary = "Download PDF Document", description = "Generates and downloads a PDF document based on docType (e.g., ADMISSION_FORM)")
-    public ResponseEntity<byte[]> downloadPdf(@RequestParam String docType) {
-        byte[] pdfContent = pdfService.generatePdf(docType);
+    @Operation(summary = "Download PDF Document", description = "Generates and downloads a PDF document based on docType (e.g., ADMISSION_FORM, RESULT_CARD, RESULT_GAZETTE)")
+    public ResponseEntity<byte[]> downloadPdf(
+            @RequestParam String docType,
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(required = false) Long examId,
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId,
+            @RequestParam(required = false) Long sectionId,
+            @RequestParam(required = false) Long examTermId) {
+
+        byte[] pdfContent = pdfService.generatePdf(docType, studentId, examId, campusId, standardId, sectionId, examTermId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        String filename = docType.toLowerCase() + ".pdf";
+        
+        String filename = docType.toLowerCase();
+        if ("RESULT_GAZETTE".equalsIgnoreCase(docType)) {
+            filename += "_" + (standardId != null ? standardId : "") + "_" + (sectionId != null ? sectionId : "") + ".pdf";
+        } else {
+            filename += (studentId != null ? "_" + studentId : "") + ".pdf";
+        }
+        
         headers.setContentDispositionFormData("attachment", filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 

@@ -134,5 +134,12 @@ public class StudentTermResultServiceImpl implements StudentTermResultService {
                 .orElseThrow(() -> new ResourceNotFoundException("Result not found"));
     }
 
-
+    @Override
+    @Transactional(readOnly = true)
+    public List<StudentTermResultResponseDTO> getResultsByFilters(
+            Long studentId, Long campusId, Long standardId, Long sectionId) {
+        List<StudentTermResultEntity> list = resultRepository.findResultsByFilters(
+                studentId, campusId, standardId, sectionId);
+        return ResultsMapper.toStudentTermResultResponseList(list);
+    }
 }

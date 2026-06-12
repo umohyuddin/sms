@@ -270,6 +270,15 @@ public class StudentExamMarksServiceImpl implements StudentExamMarksService {
         // 5. Soft delete
         marksRepository.softDeleteById(id);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<StudentExamMarksResponseDTO> getMarksByFilters(
+            Long studentId, Long campusId, Long standardId, Long sectionId) {
+        List<StudentExamMarksEntity> list = marksRepository.findMarksByFilters(
+                studentId, campusId, standardId, sectionId);
+        return ResultsMapper.toStudentExamMarksResponseList(list);
+    }
 }
 
 

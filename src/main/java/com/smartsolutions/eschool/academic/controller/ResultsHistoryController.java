@@ -153,4 +153,26 @@ public class ResultsHistoryController {
         resultsHistoryFacade.deleteMark(id);
         return ResponseEntity.ok(Map.of("message", "Student marks deleted successfully"));
     }
+
+    @GetMapping("/marks/filter")
+    public ResponseEntity<?> getMarksByFilters(
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId,
+            @RequestParam(required = false) Long sectionId) {
+        return ResponseEntity.ok(
+                resultsHistoryFacade.getMarksByFilters(studentId, campusId, standardId, sectionId)
+        );
+    }
+
+    @GetMapping("/term-results/filter")
+    public ResponseEntity<?> getResultsByFilters(
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId,
+            @RequestParam(required = false) Long sectionId) {
+        return ResponseEntity.ok(
+                resultsHistoryFacade.getResultsByFilters(studentId, campusId, standardId, sectionId)
+        );
+    }
 }

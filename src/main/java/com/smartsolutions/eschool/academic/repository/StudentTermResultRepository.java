@@ -45,4 +45,24 @@ public interface StudentTermResultRepository extends JpaRepository<StudentTermRe
        void softDeleteById(@Param("id") Long id);
 
        boolean existsByStudent_IdAndExamTerm_Id(Long studentId, Long examTermId);
+
+       @Query("""
+            SELECT str FROM StudentTermResultEntity str
+            JOIN FETCH str.student s
+            JOIN FETCH str.academicYear ay
+            JOIN FETCH str.examTerm et
+            LEFT JOIN FETCH s.campus c
+            LEFT JOIN FETCH s.standard std
+            LEFT JOIN FETCH s.section sec
+            WHERE str.deleted = false
+            AND (:studentId IS NULL OR s.id = :studentId)
+            AND (:campusId IS NULL OR c.id = :campusId)
+            AND (:standardId IS NULL OR std.id = :standardId)
+            AND (:sectionId IS NULL OR sec.id = :sectionId)
+            """)
+       List<StudentTermResultEntity> findResultsByFilters(
+               @Param("studentId") Long studentId,
+               @Param("campusId") Long campusId,
+               @Param("standardId") Long standardId,
+               @Param("sectionId") Long sectionId);
 }

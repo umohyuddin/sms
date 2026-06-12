@@ -20,5 +20,8 @@ public interface StudentExamMarksService {
     List<StudentExamMarksResponseDTO> searchMarks(
             Long campusId, Long standardId, Long sectionId, Long examId, String keyword);
 
+    List<StudentExamMarksResponseDTO> getMarksByFilters(
+            Long studentId, Long campusId, Long standardId, Long sectionId);
+
     void deleteMark(Long id);
 }

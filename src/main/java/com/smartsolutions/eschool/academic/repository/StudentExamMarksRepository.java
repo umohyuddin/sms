@@ -87,4 +87,24 @@ public interface StudentExamMarksRepository extends JpaRepository<StudentExamMar
             nativeQuery = true)
     java.util.Optional<StudentExamMarksEntity> findByStudentIdAndExamSubjectIdIncludeDeleted(
             @Param("studentId") Long studentId, @Param("examSubjectId") Long examSubjectId);
+
+    @Query("""
+        SELECT sem FROM StudentExamMarksEntity sem
+        JOIN FETCH sem.student st
+        JOIN FETCH sem.examSubject es
+        JOIN FETCH es.subject subj
+        LEFT JOIN FETCH st.campus c
+        LEFT JOIN FETCH st.standard std
+        LEFT JOIN FETCH st.section sec
+        WHERE sem.deleted = false
+        AND (:studentId IS NULL OR st.id = :studentId)
+        AND (:campusId IS NULL OR c.id = :campusId)
+        AND (:standardId IS NULL OR std.id = :standardId)
+        AND (:sectionId IS NULL OR sec.id = :sectionId)
+        """)
+    List<StudentExamMarksEntity> findMarksByFilters(
+            @Param("studentId") Long studentId,
+            @Param("campusId") Long campusId,
+            @Param("standardId") Long standardId,
+            @Param("sectionId") Long sectionId);
 }

@@ -114,5 +114,15 @@ public class ResultsHistoryFacade {
     public void deleteMark(Long id) {
         marksService.deleteMark(id);
     }
+
+    public List<StudentExamMarksResponseDTO> getMarksByFilters(
+            Long studentId, Long campusId, Long standardId, Long sectionId) {
+        return marksService.getMarksByFilters(studentId, campusId, standardId, sectionId);
+    }
+
+    public List<StudentTermResultResponseDTO> getResultsByFilters(
+            Long studentId, Long campusId, Long standardId, Long sectionId) {
+        return resultService.getResultsByFilters(studentId, campusId, standardId, sectionId);
+    }
 }
 
