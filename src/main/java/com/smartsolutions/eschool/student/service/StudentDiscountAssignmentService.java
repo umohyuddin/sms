@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -34,13 +35,17 @@ public class StudentDiscountAssignmentService {
     private final CampusRepository campusRepository;
     private final AcademicYearRepository academicYearRepository;
     private final StudentFeeSummaryService studentFeeSummaryService;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public StudentDiscountAssignmentService(StudentDiscountAssignmentRepository assignmentRepository,
             StudentRepository studentRepository,
             DiscountRateRepository discountRateRepository,
             CampusRepository campusRepository,
             AcademicYearRepository academicYearRepository,
-            StudentFeeSummaryService studentFeeSummaryService) {
+            StudentFeeSummaryService studentFeeSummaryService,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.assignmentRepository = assignmentRepository;
         this.studentRepository = studentRepository;
         this.discountRateRepository = discountRateRepository;
@@ -263,6 +268,7 @@ public class StudentDiscountAssignmentService {
     // -------------------------------------------------------------------------
     @Transactional
     public int softDelete(Long assignmentId) {
+        entityReferenceValidator.ensureNotReferenced(StudentDiscountAssignmentEntity.class, assignmentId);
         return assignmentRepository.softDeleteById(assignmentId);
     }
 

@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -30,8 +31,12 @@ public class SalaryStructureService {
 
     private final SalaryStructureRepository salaryStructureRepository;
     private final EmployeeTypeRepository employeeTypeRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public SalaryStructureService(SalaryStructureRepository salaryStructureRepository, EmployeeTypeRepository employeeTypeRepository) {
+    public SalaryStructureService(SalaryStructureRepository salaryStructureRepository, EmployeeTypeRepository employeeTypeRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.salaryStructureRepository = salaryStructureRepository;
         this.employeeTypeRepository = employeeTypeRepository;
     }
@@ -128,6 +133,7 @@ public class SalaryStructureService {
 
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(SalaryStructureEntity.class, id);
         log.info("Soft deleting SalaryStructure ID: {} from database", id);
         try {
             int affected = salaryStructureRepository.softDeleteById(id);

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ import java.util.List;
 public class TransactionTypeService {
 
     private final TransactionTypeRepository transactionTypeRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public List<TransactionTypeResponseDTO> getAll() {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
@@ -74,6 +76,7 @@ public class TransactionTypeService {
 
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(TransactionTypeEntity.class, id);
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         log.info("[Service:TransactionTypeService] delete() called - ID: {}", id);
         int result = transactionTypeRepository.softDeleteByIdAndOrganizationId(id, organizationId);

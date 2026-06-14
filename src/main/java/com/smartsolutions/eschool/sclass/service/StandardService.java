@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.sclass.service;
 
 import com.smartsolutions.eschool.global.error.ApiException;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 import com.smartsolutions.eschool.institute.error.CampusErrors;
 import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
@@ -23,10 +24,13 @@ import java.util.List;
 public class StandardService {
     private final StandardRepository standardRepository;
     private final CampusRepository campusRepository;
+    private final EntityReferenceValidator entityReferenceValidator;
 
-    public StandardService(StandardRepository standardRepository, CampusRepository campusRepository) {
+    public StandardService(StandardRepository standardRepository, CampusRepository campusRepository,
+                           EntityReferenceValidator entityReferenceValidator) {
         this.standardRepository = standardRepository;
         this.campusRepository = campusRepository;
+        this.entityReferenceValidator = entityReferenceValidator;
     }
 
     public List<StandardDTO> getAll() {
@@ -117,11 +121,14 @@ public class StandardService {
 
     @Transactional
     public void softDeleteById(Long id) {
+        entityReferenceValidator.ensureNotReferenced(CampusEntity.class, id);
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
             throw new ApiException(StandardErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:StandardService] softDeleteById() called - id: {}, institute: {}", id, organizationId);
+
+        entityReferenceValidator.ensureNotReferenced(StandardEntity.class, id);
 
         int result = standardRepository.softDeleteByIdAndInstituteId(id, organizationId);
         if (result == 0) {

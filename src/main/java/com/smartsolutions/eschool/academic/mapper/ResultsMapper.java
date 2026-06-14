@@ -58,6 +58,7 @@ public class ResultsMapper {
         if (entity == null)
             return null;
         StudentExamMarksResponseDTO dto = new StudentExamMarksResponseDTO();
+        dto.setId(entity.getId());
 
         if (entity.getExamSubject() != null) {
             dto.setExamSubjectId(entity.getExamSubject().getId());

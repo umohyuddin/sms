@@ -24,10 +24,11 @@ public class FeeComponentService {
 
         private final FeeComponentRepository feeComponentRepository;
         private final FeeCatalogRepository feeCatalogRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-        public FeeComponentService(
-                        FeeComponentRepository feeComponentRepository,
-                        FeeCatalogRepository feeCatalogRepository) {
+        public FeeComponentService(FeeComponentRepository feeComponentRepository,
+                        FeeCatalogRepository feeCatalogRepository, com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
                 this.feeComponentRepository = feeComponentRepository;
                 this.feeCatalogRepository = feeCatalogRepository;
         }

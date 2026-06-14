@@ -24,10 +24,14 @@ import java.util.Map;
 public class CityService {
     private final CityRepository cityRepository;
     private final ProvinceRepository provinceRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public CityService(CityRepository cityRepository, ProvinceRepository provinceRepository) {
+    public CityService(CityRepository cityRepository, 
+                       ProvinceRepository provinceRepository,
+                       com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
         this.cityRepository = cityRepository;
         this.provinceRepository = provinceRepository;
+        this.entityReferenceValidator = entityReferenceValidator;
     }
 
     public List<CityResponseDTO> getAll() {
@@ -46,6 +50,7 @@ public class CityService {
         return responseDTOs;
     }
 
+    @Transactional(readOnly = true)
     public List<CityResponseDTO> getByProvinceId(Long provinceId) {
         log.info("[Service:CityService] getByProvinceId() called - provinceId: {}", provinceId);
         List<CityEntity> result = cityRepository.findByProvinceId(provinceId);
@@ -75,6 +80,8 @@ public class CityService {
     @Transactional
     public void softDeleteById(Long id) {
         log.info("[Service:CityService] softDeleteById() called - id: {}", id);
+
+        entityReferenceValidator.ensureNotReferenced(CityEntity.class, id);
 
         int result = cityRepository.softDeleteById(id);
         if (result == 0) {
@@ -123,6 +130,10 @@ public class CityService {
             if (cityRepository.existsByProvinceIdAndNameAndIdNot(targetProvinceId, requestDTO.getName().trim(), id)) {
                 throw new ApiException(CityErrors.DUPLICATE_CITY_NAME, "City name already exists for this province", HttpStatus.CONFLICT);
             }
+        }
+
+        if (Boolean.TRUE.equals(existing.getIsActive()) && Boolean.FALSE.equals(requestDTO.getIsActive())) {
+            entityReferenceValidator.ensureNotReferenced(CityEntity.class, id);
         }
 
         CityMapper.updateEntityFromDTO(existing, requestDTO, newProvince);

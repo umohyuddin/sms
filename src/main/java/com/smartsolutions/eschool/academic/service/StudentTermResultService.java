@@ -9,4 +9,6 @@ public interface StudentTermResultService {
     void processResults(Long standardId, Long sectionId, Long examTermId);
     List<StudentTermResultResponseDTO> getSectionResults(Long standardId, Long sectionId, Long examTermId);
     StudentTermResultResponseDTO getStudentResult(Long studentId, Long examTermId);
+    List<StudentTermResultResponseDTO> getResultsByFilters(
+            Long studentId, Long campusId, Long standardId, Long sectionId);
 }

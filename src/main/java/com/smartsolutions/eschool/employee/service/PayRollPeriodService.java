@@ -14,13 +14,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class PayRollPeriodService {
     private final PayRollPeriodRepository payrollRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public PayRollPeriodService(PayRollPeriodRepository payrollRepository) {
+    public PayRollPeriodService(PayRollPeriodRepository payrollRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.payrollRepository = payrollRepository;
     }
 
@@ -122,6 +127,7 @@ public class PayRollPeriodService {
 
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(PayrollPeriodEntity.class, id);
         log.info("Soft deleting PayrollPeriod ID: {} from database", id);
         try {
             int affected = payrollRepository.softDeleteById(id);

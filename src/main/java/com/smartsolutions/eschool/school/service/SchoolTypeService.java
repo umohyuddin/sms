@@ -15,14 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class SchoolTypeService {
 
     private final SchoolTypeRepository schoolTypeRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public SchoolTypeService(SchoolTypeRepository schoolTypeRepository) {
+    public SchoolTypeService(SchoolTypeRepository schoolTypeRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.schoolTypeRepository = schoolTypeRepository;
     }
 
@@ -91,6 +96,7 @@ public class SchoolTypeService {
         log.info("[Service:SchoolTypeService] softDeleteById() called - id: {}", id);
         int result = schoolTypeRepository.softDeleteById(id);
         if (result == 0) {
+        entityReferenceValidator.ensureNotReferenced(SchoolTypeEntity.class, id);
             throw new ApiException(SchoolTypeErrors.SCHOOL_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         log.info("[Service:SchoolTypeService] softDeleteById() succeeded - id: {}", id);

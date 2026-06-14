@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -42,11 +43,15 @@ public class FeeRateService {
     private final FeeComponentRepository feeComponentRepository;
     private final ChargeTypeRepository chargeTypeRepository;
     private final FeeSlabGroupRepository feeSlabGroupRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public FeeRateService(FeeRateRepository feeRateRepository, CampusRepository campusRepository,
             StandardRepository standardRepository, AcademicYearRepository academicYearRepository,
             FeeComponentRepository feeComponentRepository, ChargeTypeRepository chargeTypeRepository,
-            FeeSlabGroupRepository feeSlabGroupRepository) {
+            FeeSlabGroupRepository feeSlabGroupRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.feeRateRepository = feeRateRepository;
         this.campusRepository = campusRepository;
         this.standardRepository = standardRepository;
@@ -106,6 +111,7 @@ public class FeeRateService {
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
+        entityReferenceValidator.ensureNotReferenced(FeeRateEntity.class, id);
             throw new ApiException(FeeRateErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:FeeRateService] softDeleteById() called - id: {}, organization: {}", id, organizationId);

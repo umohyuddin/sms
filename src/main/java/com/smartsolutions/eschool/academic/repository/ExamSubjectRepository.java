@@ -24,10 +24,36 @@ public interface ExamSubjectRepository extends JpaRepository<ExamSubjectEntity, 
         List<ExamSubjectEntity> findByExamIdAndOrganizationIdAndDeletedFalse(@Param("examId") Long examId,
                         @Param("orgId") Long orgId);
 
-    @Query("SELECT es FROM ExamSubjectEntity es WHERE es.exam.id = :examId AND es.subject.id = :subjectId")
+    @Query("SELECT es FROM ExamSubjectEntity es WHERE es.exam.id = :examId AND es.subject.id = :subjectId AND es.deleted = false")
     Optional<ExamSubjectEntity> findByExamAndSubject(@Param("examId") Long examId,
                                                      @Param("subjectId") Long subjectId);
+
+    /**
+     * Finds an exam-subject record by examId + subjectId regardless of soft-delete status.
+     * Used in upsert logic to prevent duplicate-key constraint violations when a record was
+     * previously soft-deleted and the same exam/subject combination is scheduled again.
+     * Uses a native query to bypass the entity-level @SQLRestriction("deleted = false").
+     */
+    @Query(value = "SELECT * FROM exam_subjects WHERE exam_id = :examId AND subject_id = :subjectId LIMIT 1",
+           nativeQuery = true)
+    Optional<ExamSubjectEntity> findByExamAndSubjectIncludeDeleted(@Param("examId") Long examId,
+                                                                    @Param("subjectId") Long subjectId);
         @Modifying
         @Query("UPDATE ExamSubjectEntity es SET es.deleted = true, es.deletedAt = CURRENT_TIMESTAMP WHERE es.id = :id")
         void softDeleteById(@Param("id") Long id);
+
+    @Query("SELECT COUNT(es) FROM ExamSubjectEntity es " +
+           "WHERE es.exam.standard.id = :standardId " +
+           "AND es.exam.examTerm.id = :examTermId " +
+           "AND es.exam.academicYear.id = :academicYearId " +
+           "AND es.subject.id = :subjectId " +
+           "AND es.deleted = false " +
+           "AND es.active = true " +
+           "AND es.exam.deleted = false " +
+           "AND es.exam.active = true")
+    long countActiveExamsBySubjectAndTerm(
+            @Param("standardId") Long standardId,
+            @Param("examTermId") Long examTermId,
+            @Param("academicYearId") Long academicYearId,
+            @Param("subjectId") Long subjectId);
 }

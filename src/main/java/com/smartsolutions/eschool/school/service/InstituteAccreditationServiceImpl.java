@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -23,9 +24,13 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
 
     private final InstituteAccreditationRepository instituteAccreditationRepository;
     private final InstituteRepository instituteRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public InstituteAccreditationServiceImpl(InstituteAccreditationRepository instituteAccreditationRepository,
-            InstituteRepository instituteRepository) {
+            InstituteRepository instituteRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.instituteAccreditationRepository = instituteAccreditationRepository;
         this.instituteRepository = instituteRepository;
     }
@@ -151,6 +156,7 @@ public class InstituteAccreditationServiceImpl implements InstituteAccreditation
 
     @Override
     public void deleteById(Long id) {
+        entityReferenceValidator.ensureNotReferenced(InstituteAccreditationEntity.class, id);
         Long contextInstituteId = SecurityUtils.getCurrentOrganizationId();
         if (contextInstituteId == null) {
             throw new ApiException(InstituteAccreditationErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);

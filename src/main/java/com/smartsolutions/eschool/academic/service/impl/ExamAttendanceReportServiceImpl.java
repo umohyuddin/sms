@@ -66,6 +66,7 @@ public class ExamAttendanceReportServiceImpl implements ExamAttendanceReportServ
             StudentExamAttendanceEntity.AttendanceStatus status,
             LocalDate startDate, LocalDate endDate) {
         log.info("Generating Detailed Attendance Report for org: {}, status: {}", orgId, status);
+
         return attendanceRepository.getDetailedReport(orgId, campusId, standardId, sectionId, examSubjectId, studentId,
                 status, startDate, endDate);
     }

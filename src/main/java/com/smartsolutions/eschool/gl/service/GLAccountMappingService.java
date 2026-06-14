@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class GLAccountMappingService {
     private final BusinessKeyRepository businessKeyRepository;
     private final PostingKeyRepository postingKeyRepository;
     private final GLAccountRepository accountRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public List<GLAccountMappingResponseDTO> getAll() {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
@@ -93,6 +95,7 @@ public class GLAccountMappingService {
 
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(GLAccountMappingEntity.class, id);
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         log.info("[Service:GLAccountMappingService] delete() called - ID: {}", id);
         int result = mappingRepository.softDeleteByIdAndOrganizationId(id, organizationId);

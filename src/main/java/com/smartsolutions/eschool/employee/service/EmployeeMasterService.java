@@ -41,6 +41,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -54,6 +55,7 @@ public class EmployeeMasterService {
     private final DesignationRepository designationRepository;
     private final com.smartsolutions.eschool.lookups.repository.CountryRepository countryRepository;
     private final EmployeeDocumentConfig feeConfig;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public EmployeeMasterService(EmployeeMasterRepository employeeRepository,
                                  EmployeeDocumentRepository employeeDocumentRepository,
@@ -62,7 +64,10 @@ public class EmployeeMasterService {
                                  DepartmentRepository departmentRepository,
                                  DesignationRepository designationRepository,
                                  com.smartsolutions.eschool.lookups.repository.CountryRepository countryRepository,
-                                 EmployeeDocumentConfig feeConfig) {
+                                 EmployeeDocumentConfig feeConfig,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.employeeRepository = employeeRepository;
         this.employeeDocumentRepository = employeeDocumentRepository;
         this.assignmentRepository = assignmentRepository;
@@ -304,6 +309,7 @@ public class EmployeeMasterService {
 
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(EmployeeMasterEntity.class, id);
         Long orgId = SecurityUtils.getCurrentOrganizationId();
         if (orgId == null) throw new ApiException(EmployeeErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         log.info("[Service:EmployeeMasterService] delete() called - id: {}, org: {}", id, orgId);

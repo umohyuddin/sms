@@ -39,9 +39,8 @@ public interface ExamWeightageRepository extends JpaRepository<ExamWeightageEnti
                         "AND ew.active = true")
         List<ExamWeightageEntity> findByStandardAndExamTerm(@Param("standardId") Long standardId,
                         @Param("examTermId") Long examTermId);
-
         @Modifying
-        @Query("UPDATE ExamWeightageEntity ew SET ew.deleted = true, ew.deletedAt = CURRENT_TIMESTAMP " +
+        @Query("DELETE FROM ExamWeightageEntity ew " +
                         "WHERE ew.academicYear.id = :academicYearId " +
                         "AND ew.standardSubject.standard.id = :standardId " +
                         "AND ew.examTerm.id = :examTermId")

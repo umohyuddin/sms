@@ -15,14 +15,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class AcademicSubjectService {
 
     private final SubjectRepository_ subjectRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public AcademicSubjectService(SubjectRepository_ subjectRepository) {
+    public AcademicSubjectService(SubjectRepository_ subjectRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.subjectRepository = subjectRepository;
     }
 
@@ -95,6 +100,7 @@ public class AcademicSubjectService {
         try {
             int result = subjectRepository.softDeleteById(id);
             if (result == 0) {
+        entityReferenceValidator.ensureNotReferenced(AcademicSubjectEntity.class, id);
                 log.warn("Subject not found or already deleted: {}", id);
             } else {
                 log.info("Subject soft deleted successfully: {}", id);

@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.user.service;
 
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.global.responseMappers.ResourceMapper;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 import com.smartsolutions.eschool.user.dtos.resources.request.ResourceRequestDTO;
 import com.smartsolutions.eschool.user.dtos.resources.response.ResourceResponseDTO;
 import com.smartsolutions.eschool.user.model.ModuleEntity;
@@ -10,6 +11,7 @@ import com.smartsolutions.eschool.user.repository.ModuleRepository;
 import com.smartsolutions.eschool.user.repository.ResourceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,10 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ResourceService {
+
+    @Autowired
+    private EntityReferenceValidator entityReferenceValidator;
+
 
     private final ResourceRepository resourceRepository;
     private final ModuleRepository moduleRepository;

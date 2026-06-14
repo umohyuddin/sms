@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +40,7 @@ public class ExamServiceImpl implements ExamService {
         private final CampusRepository campusRepository;
         private final StandardRepository standardRepository;
         private final SectionRepository sectionRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
         @Override
         @Transactional
@@ -114,6 +116,10 @@ public class ExamServiceImpl implements ExamService {
                 ExamEntity entity = examRepository.findByIdAndDeletedFalse(id)
                                 .orElseThrow(() -> new ResourceNotFoundException("Exam not found"));
 
+                if (entity.isActive() && !dto.isActive()) {
+                        entityReferenceValidator.ensureNotReferenced(ExamEntity.class, id);
+                }
+
                 entity.setName(dto.getName());
                 entity.setStartDate(dto.getStartDate());
                 entity.setEndDate(dto.getEndDate());
@@ -162,6 +168,7 @@ public class ExamServiceImpl implements ExamService {
         @Override
         @Transactional
         public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(ExamEntity.class, id);
                 if (!examRepository.existsById(id)) {
                         throw new ResourceNotFoundException("Exam not found");
                 }

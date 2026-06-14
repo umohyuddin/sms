@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ import java.util.List;
 public class AccountingModuleService {
 
     private final AccountingModuleRepository accountingModuleRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public List<AccountingModuleResponseDTO> getAll() {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
@@ -74,6 +76,7 @@ public class AccountingModuleService {
 
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(AccountingModuleEntity.class, id);
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         log.info("[Service:AccountingModuleService] delete() called - ID: {}", id);
         int result = accountingModuleRepository.softDeleteByIdAndOrganizationId(id, organizationId);

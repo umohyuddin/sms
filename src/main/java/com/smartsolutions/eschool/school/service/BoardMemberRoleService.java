@@ -20,8 +20,10 @@ import java.util.List;
 public class BoardMemberRoleService {
 
     private final BoardMemberRoleRepository roleRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public BoardMemberRoleService(BoardMemberRoleRepository roleRepository) {
+    public BoardMemberRoleService(BoardMemberRoleRepository roleRepository, com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
         this.roleRepository = roleRepository;
     }
 

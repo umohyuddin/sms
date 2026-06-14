@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -35,6 +36,7 @@ public class StudentAttendanceService {
     private final StandardRepository standardRepository;
     private final SectionRepository sectionRepository;
     private final InstituteRepository instituteRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public List<StudentAttendanceResponseDTO> search(Long campusId, Long standardId, Long sectionId, LocalDate date, String keyword) {
         Long organizationId = getOrgId();
@@ -197,6 +199,7 @@ public class StudentAttendanceService {
         log.info("[Service:StudentAttendanceService] softDelete() called - id: {}", id);
         int rows = attendanceRepository.softDeleteByIdAndOrganizationId(id, organizationId);
         if (rows == 0) {
+        entityReferenceValidator.ensureNotReferenced(StudentAttendanceEntity.class, id);
             throw new ApiException(StudentAttendanceErrors.ATTENDANCE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
     }

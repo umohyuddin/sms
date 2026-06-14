@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class TimetableServiceImpl implements TimetableService {
     private final StandardRepository standardRepository;
     private final SectionRepository sectionRepository;
     private final SubjectRepository subjectRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     @Override
     @Transactional
@@ -96,6 +98,7 @@ public class TimetableServiceImpl implements TimetableService {
     @Override
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(TimetableEntity.class, id);
         log.info("Soft deleting Timetable entry ID: {}", id);
         if (!timetableRepository.existsById(id)) {
             throw new ResourceNotFoundException("Timetable entry not found with ID: " + id);

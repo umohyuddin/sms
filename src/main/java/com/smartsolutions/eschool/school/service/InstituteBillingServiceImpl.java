@@ -1,6 +1,7 @@
 package com.smartsolutions.eschool.school.service;
 
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 import com.smartsolutions.eschool.school.dtos.instituteBilling.requestDto.InstituteBillingCreateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteBilling.requestDto.InstituteBillingUpdateRequestDTO;
 import com.smartsolutions.eschool.school.dtos.instituteBilling.responseDto.InstituteBillingResponseDTO;
@@ -10,6 +11,7 @@ import com.smartsolutions.eschool.school.repository.InstituteBillingRepository;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,10 @@ import java.util.List;
 @Service
 @Slf4j
 public class InstituteBillingServiceImpl implements InstituteBillingService {
+
+    @Autowired
+    private EntityReferenceValidator entityReferenceValidator;
+
 
     private final InstituteBillingRepository instituteBillingRepository;
     private final InstituteRepository instituteRepository;

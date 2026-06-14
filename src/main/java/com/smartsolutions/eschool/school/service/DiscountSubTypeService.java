@@ -17,15 +17,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class DiscountSubTypeService {
     private final DiscountSubTypeRepository discountSubTypeRepository;
     private final DiscountTypeRepository discountTypeRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public DiscountSubTypeService(DiscountSubTypeRepository discountSubTypeRepository,
-            DiscountTypeRepository discountTypeRepository) {
+            DiscountTypeRepository discountTypeRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.discountSubTypeRepository = discountSubTypeRepository;
         this.discountTypeRepository = discountTypeRepository;
     }
@@ -181,6 +186,7 @@ public class DiscountSubTypeService {
         try {
             return discountSubTypeRepository.softDeleteById(id);
         } catch (DataAccessException dae) {
+        entityReferenceValidator.ensureNotReferenced(DiscountSubTypeEntity.class, id);
             log.error("Database error while deleting DiscountSubType with ID {}", id, dae);
             throw new CustomServiceException("Failed to delete DiscountSubType due to database error", dae);
         } catch (Exception e) {

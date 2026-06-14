@@ -15,13 +15,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class SalaryComponentService {
     private final SalaryComponentRepository salaryComponentRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public SalaryComponentService(SalaryComponentRepository salaryComponentRepository) {
+    public SalaryComponentService(SalaryComponentRepository salaryComponentRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.salaryComponentRepository = salaryComponentRepository;
     }
 
@@ -65,6 +70,7 @@ public class SalaryComponentService {
 
         int result = salaryComponentRepository.softDeleteById(id);
         if (result == 0) {
+        entityReferenceValidator.ensureNotReferenced(SalaryComponentEntity.class, id);
             throw new ApiException(SalaryComponentErrors.SALARY_COMPONENT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         log.info("[Service:SalaryComponentService] softDeleteById() succeeded - id: {}", id);

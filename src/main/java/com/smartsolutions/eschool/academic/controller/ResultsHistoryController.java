@@ -6,10 +6,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/academic/results")
@@ -19,11 +21,19 @@ public class ResultsHistoryController {
 
     private final ResultsHistoryFacade resultsHistoryFacade;
 
+
+
+    @GetMapping(value = "",produces = MediaType.APPLICATION_JSON_VALUE)
+   public ResponseEntity<?> getStudentAll(){
+       return ResponseEntity.ok(resultsHistoryFacade.findStudentAll());
+   }
+
+
     // Student Exam Marks
     @PostMapping("/marks")
     public ResponseEntity<?> recordMarks(@Valid @RequestBody List<StudentExamMarksRequestDTO> dtos) {
         resultsHistoryFacade.recordExamMarks(dtos);
-        return ResponseEntity.ok("Marks recorded successfully");
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
     @GetMapping("/marks/subject/{id}")
@@ -45,13 +55,13 @@ public class ResultsHistoryController {
     @PostMapping("/weightages")
     public ResponseEntity<?> saveWeightages(@Valid @RequestBody List<ExamWeightageRequestDTO> dtos) {
         resultsHistoryFacade.saveWeightages(dtos);
-        return ResponseEntity.ok("Weightages saved successfully");
+        return ResponseEntity.ok(Map.of("message", "Weightages saved successfully"));
     }
 
     @PostMapping("/weightages/bulk")
     public ResponseEntity<?> saveBulkWeightages(@Valid @RequestBody BulkExamWeightageRequestDTO dto) {
         resultsHistoryFacade.saveBulkWeightages(dto);
-        return ResponseEntity.ok("Bulk weightages saved successfully");
+        return ResponseEntity.ok(Map.of("message", "Bulk weightages saved successfully"));
     }
 
     @GetMapping("/weightages/standard/{id}")
@@ -64,7 +74,7 @@ public class ResultsHistoryController {
     public ResponseEntity<?> processResults(@RequestParam Long standardId, @RequestParam Long sectionId,
             @RequestParam Long examTermId) {
         resultsHistoryFacade.processTermResults(standardId, sectionId, examTermId);
-        return ResponseEntity.ok("Results processing initiated");
+        return ResponseEntity.ok(Map.of("message", "Results processing initiated"));
     }
 
     @GetMapping("/section")
@@ -92,7 +102,7 @@ public class ResultsHistoryController {
     @DeleteMapping("/report-cards/{id}")
     public ResponseEntity<?> deleteReportCard(@PathVariable Long id) {
         resultsHistoryFacade.deleteReportCard(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Report card deleted successfully"));
     }
 
     // Grade Scale
@@ -124,6 +134,45 @@ public class ResultsHistoryController {
     @DeleteMapping("/grade-scales/{id}")
     public ResponseEntity<?> deleteGradeScale(@PathVariable Long id) {
         resultsHistoryFacade.deleteGradeScale(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Grade scale deleted successfully"));
+    }
+    @GetMapping("/marks/search")
+    public ResponseEntity<?> searchMarks(
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId,
+            @RequestParam(required = false) Long sectionId,
+            @RequestParam(required = false) Long examId,
+            @RequestParam(required = false) String keyword) {
+        return ResponseEntity.ok(
+                resultsHistoryFacade.searchMarks(campusId, standardId, sectionId, examId, keyword)
+        );
+    }
+
+    @DeleteMapping("/marks/{id}")
+    public ResponseEntity<?> deleteMark(@PathVariable Long id) {
+        resultsHistoryFacade.deleteMark(id);
+        return ResponseEntity.ok(Map.of("message", "Student marks deleted successfully"));
+    }
+
+    @GetMapping("/marks/filter")
+    public ResponseEntity<?> getMarksByFilters(
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId,
+            @RequestParam(required = false) Long sectionId) {
+        return ResponseEntity.ok(
+                resultsHistoryFacade.getMarksByFilters(studentId, campusId, standardId, sectionId)
+        );
+    }
+
+    @GetMapping("/term-results/filter")
+    public ResponseEntity<?> getResultsByFilters(
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(required = false) Long campusId,
+            @RequestParam(required = false) Long standardId,
+            @RequestParam(required = false) Long sectionId) {
+        return ResponseEntity.ok(
+                resultsHistoryFacade.getResultsByFilters(studentId, campusId, standardId, sectionId)
+        );
     }
 }

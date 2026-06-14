@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/academic/core")
@@ -46,7 +47,7 @@ public class CoreAcademicController {
     @DeleteMapping("/groups/{id}")
     public ResponseEntity<?> deleteGroup(@PathVariable Long id) {
         coreAcademicFacade.deleteGroup(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Subject group deleted successfully"));
     }
 
     // Subject
@@ -73,7 +74,7 @@ public class CoreAcademicController {
     @DeleteMapping("/subjects/{id}")
     public ResponseEntity<?> deleteSubject(@PathVariable Long id) {
         coreAcademicFacade.deleteSubject(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Subject deleted successfully"));
     }
 
     // Standard Subject
@@ -97,14 +98,14 @@ public class CoreAcademicController {
     public ResponseEntity<?> unassignSubject(@RequestParam Long standardId, @RequestParam Long subjectId,
             @RequestParam Long academicYearId) {
         coreAcademicFacade.unassignSubjectFromStandard(standardId, subjectId, academicYearId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Standard subject unassigned successfully"));
     }
 
     @DeleteMapping("/standard-subjects/bulk")
     public ResponseEntity<?> bulkUnassignSubject(@RequestParam Long standardId, @RequestParam List<Long> subjectIds,
             @RequestParam Long academicYearId) {
         coreAcademicFacade.bulkUnassignSubjectsFromStandard(standardId, subjectIds, academicYearId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Bulk unassignment successful"));
     }
 
     @PutMapping("/standard-subjects/{id}")

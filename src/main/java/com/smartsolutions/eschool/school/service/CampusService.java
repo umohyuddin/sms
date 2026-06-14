@@ -11,6 +11,7 @@ import com.smartsolutions.eschool.school.model.CampusEntity;
 import com.smartsolutions.eschool.school.model.InstituteEntity;
 import com.smartsolutions.eschool.school.repository.CampusRepository;
 import com.smartsolutions.eschool.school.repository.InstituteRepository;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,15 +28,18 @@ public class CampusService {
     private final InstituteRepository instituteRepository;
     private final ProvinceRepository provinceRepository;
     private final CityRepository cityRepository;
+    private final EntityReferenceValidator entityReferenceValidator;
 
     public CampusService(CampusRepository campusRepository,
             InstituteRepository instituteRepository,
             ProvinceRepository provinceRepository,
-            CityRepository cityRepository) {
+            CityRepository cityRepository,
+            EntityReferenceValidator entityReferenceValidator) {
         this.campusRepository = campusRepository;
         this.instituteRepository = instituteRepository;
         this.provinceRepository = provinceRepository;
         this.cityRepository = cityRepository;
+        this.entityReferenceValidator = entityReferenceValidator;
     }
 
     public List<CampusResponseDTO> getAll() {
@@ -91,6 +95,8 @@ public class CampusService {
             throw new ApiException(CampusErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:CampusService] softDeleteById() called - id: {}, institute: {}", id, organizationId);
+
+        entityReferenceValidator.ensureNotReferenced(CampusEntity.class, id);
 
         int result = campusRepository.softDeleteByIdAndInstituteId(id, organizationId);
         if (result == 0) {
@@ -149,6 +155,10 @@ public class CampusService {
                     requestDTO.getCampusCode().trim(), id)) {
                 throw new ApiException(CampusErrors.DUPLICATE_CAMPUS_CODE, HttpStatus.CONFLICT);
             }
+        }
+
+        if (existing.isActive() && !requestDTO.isActive()) {
+            entityReferenceValidator.ensureNotReferenced(CampusEntity.class, id);
         }
 
         CampusMapper.updateEntityFromDTO(existing, requestDTO);

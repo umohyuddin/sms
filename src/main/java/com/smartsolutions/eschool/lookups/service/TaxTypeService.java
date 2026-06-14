@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -24,8 +25,12 @@ public class TaxTypeService {
 
     private final TaxTypeRepository taxTypeRepository;
     private final CountryRepository countryRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public TaxTypeService(TaxTypeRepository taxTypeRepository, CountryRepository countryRepository) {
+    public TaxTypeService(TaxTypeRepository taxTypeRepository, CountryRepository countryRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.taxTypeRepository = taxTypeRepository;
         this.countryRepository = countryRepository;
     }
@@ -79,6 +84,7 @@ public class TaxTypeService {
 
         int result = taxTypeRepository.softDeleteById(id);
         if (result == 0) {
+        entityReferenceValidator.ensureNotReferenced(TaxTypeEntity.class, id);
             throw new ApiException(TaxTypeErrors.TAX_TYPE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         log.info("[Service:TaxTypeService] softDeleteById() succeeded - id: {}", id);

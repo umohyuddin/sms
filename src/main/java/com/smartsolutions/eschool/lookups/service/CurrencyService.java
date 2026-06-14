@@ -15,13 +15,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class CurrencyService {
     private final CurrencyRepository currencyRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public CurrencyService(CurrencyRepository currencyRepository) {
+    public CurrencyService(CurrencyRepository currencyRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.currencyRepository = currencyRepository;
     }
 
@@ -63,6 +68,7 @@ public class CurrencyService {
     public void softDeleteById(Integer id) {
         log.info("[Service:CurrencyService] softDeleteById() called - id: {}", id);
 
+        entityReferenceValidator.ensureNotReferenced(CurrencyEntity.class, id);
         int result = currencyRepository.softDeleteById(id);
         if (result == 0) {
             throw new ApiException(CurrencyErrors.CURRENCY_NOT_FOUND, HttpStatus.NOT_FOUND);

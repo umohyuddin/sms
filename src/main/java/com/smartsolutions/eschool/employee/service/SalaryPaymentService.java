@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -30,6 +31,7 @@ public class SalaryPaymentService {
     private final SalaryPaymentRepository paymentRepository;
     private final EmployeeMasterSalaryRepository salaryRepository;
     private final EmployeeMasterRepository employeeMasterRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
 
     /* =========================
@@ -141,6 +143,7 @@ public class SalaryPaymentService {
     @Transactional
     public void softDeletePayment(Long id) {
         log.info("Soft deleting salary payment id={}", id);
+        entityReferenceValidator.ensureNotReferenced(SalaryPaymentEntity.class, id);
         paymentRepository.softDeleteById(id);
         log.info("Salary payment soft deleted successfully id={}", id);
     }

@@ -34,6 +34,7 @@ public class StandardSubjectServiceImpl implements StandardSubjectService {
         private final StandardRepository standardRepository;
         private final AcademicYearRepository academicYearRepository;
         private final ExamWeightageRepository examWeightageRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
 
     @Override

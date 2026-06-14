@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
@@ -26,8 +27,12 @@ public class GuardianService {
 
     private final GuardianRepository guardianRepository;
     private final StudentGuardianRepository studentGuardianRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public GuardianService(GuardianRepository guardianRepository, StudentGuardianRepository studentGuardianRepository) {
+    public GuardianService(GuardianRepository guardianRepository, StudentGuardianRepository studentGuardianRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.guardianRepository = guardianRepository;
         this.studentGuardianRepository = studentGuardianRepository;
     }
@@ -98,6 +103,7 @@ public class GuardianService {
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
+        entityReferenceValidator.ensureNotReferenced(GuardianEntity.class, id);
             throw new ApiException(GuardianErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:GuardianService] softDeleteById() called - id: {}, organization: {}", id, organizationId);

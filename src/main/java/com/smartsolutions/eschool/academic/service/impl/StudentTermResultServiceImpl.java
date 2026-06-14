@@ -1,5 +1,6 @@
 package com.smartsolutions.eschool.academic.service.impl;
 
+import com.smartsolutions.eschool.academic.dto.response.StudentExamMarksResponseDTO;
 import com.smartsolutions.eschool.global.exception.ResourceNotFoundException;
 import com.smartsolutions.eschool.util.SecurityUtils;
 import com.smartsolutions.eschool.academic.dto.request.StudentTermResultRequestDTO;
@@ -131,5 +132,14 @@ public class StudentTermResultServiceImpl implements StudentTermResultService {
         return resultRepository.findByStudentIdAndExamTerm(studentId, examTermId)
                 .map(ResultsMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Result not found"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<StudentTermResultResponseDTO> getResultsByFilters(
+            Long studentId, Long campusId, Long standardId, Long sectionId) {
+        List<StudentTermResultEntity> list = resultRepository.findResultsByFilters(
+                studentId, campusId, standardId, sectionId);
+        return ResultsMapper.toStudentTermResultResponseList(list);
     }
 }

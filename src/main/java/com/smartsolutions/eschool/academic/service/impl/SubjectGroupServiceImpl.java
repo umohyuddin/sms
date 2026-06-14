@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class SubjectGroupServiceImpl implements SubjectGroupService {
 
     private final SubjectGroupRepository subjectGroupRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     @Override
     @Transactional
@@ -75,6 +77,7 @@ public class SubjectGroupServiceImpl implements SubjectGroupService {
     @Override
     @Transactional
     public void delete(Long id) {
+        entityReferenceValidator.ensureNotReferenced(SubjectGroupEntity.class, id);
         log.info("Soft deleting Subject Group ID: {}", id);
         if (!subjectGroupRepository.existsById(id)) {
             throw new ResourceNotFoundException("Subject Group not found with ID: " + id);

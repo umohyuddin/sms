@@ -15,14 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class FeeRecurrenceRuleService {
 
     private final FeeRecurrenceRuleRepository feeRecurrenceRuleRepository;
+    private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
-    public FeeRecurrenceRuleService(FeeRecurrenceRuleRepository feeRecurrenceRuleRepository) {
+    public FeeRecurrenceRuleService(FeeRecurrenceRuleRepository feeRecurrenceRuleRepository,
+                             com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
+        this.entityReferenceValidator = entityReferenceValidator;
+
         this.feeRecurrenceRuleRepository = feeRecurrenceRuleRepository;
     }
 
@@ -61,6 +66,7 @@ public class FeeRecurrenceRuleService {
 
         int result = feeRecurrenceRuleRepository.softDeleteById(id);
         if (result == 0) {
+        entityReferenceValidator.ensureNotReferenced(FeeRecurrenceRuleEntity.class, id);
             throw new ApiException(FeeRecurrenceRuleErrors.FEE_RECURRENCE_RULE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         log.info("[Service:FeeRecurrenceRuleService] softDeleteById() succeeded - id: {}", id);

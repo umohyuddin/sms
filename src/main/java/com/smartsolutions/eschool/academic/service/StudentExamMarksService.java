@@ -9,9 +9,19 @@ import java.util.List;
 public interface StudentExamMarksService {
     void recordMarks(List<StudentExamMarksRequestDTO> dtos);
 
+     List<StudentExamMarksResponseDTO> getStudentExamMarksResponse();
+
     List<StudentExamMarksResponseDTO> getByExamSubject(Long examSubjectId);
 
     List<StudentExamMarksResponseDTO> getStudentMarks(Long studentId, Long examId);
 
     List<StudentMarkEntryResponseDTO> getStudentsForMarkEntry(Long examSubjectId);
+    // yeh add karo
+    List<StudentExamMarksResponseDTO> searchMarks(
+            Long campusId, Long standardId, Long sectionId, Long examId, String keyword);
+
+    List<StudentExamMarksResponseDTO> getMarksByFilters(
+            Long studentId, Long campusId, Long standardId, Long sectionId);
+
+    void deleteMark(Long id);
 }

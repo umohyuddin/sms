@@ -18,16 +18,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @Slf4j
 public class EmployeeDeductionService {
     private final EmployeeDeductionRepository deductionRepository;
     private final EmployeeMasterRepository employeeRepository;
+    private final EntityReferenceValidator entityReferenceValidator;
 
-    public EmployeeDeductionService(EmployeeDeductionRepository deductionRepository, EmployeeMasterRepository employeeRepository) {
+    public EmployeeDeductionService(EmployeeDeductionRepository deductionRepository, EmployeeMasterRepository employeeRepository, EntityReferenceValidator entityReferenceValidator) {
         this.deductionRepository = deductionRepository;
         this.employeeRepository = employeeRepository;
+        this.entityReferenceValidator = entityReferenceValidator;
     }
 
     /* =========================
@@ -116,6 +119,7 @@ public class EmployeeDeductionService {
     @Transactional
     public void softDeleteDeduction(Long id) {
         log.info("Soft deleting deduction id={}", id);
+        entityReferenceValidator.ensureNotReferenced(EmployeeDeductionEntity.class, id);
         Long orgId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
         deductionRepository.softDeleteByIdAndOrganizationId(id, orgId);
         log.info("Deduction soft deleted successfully id={}", id);

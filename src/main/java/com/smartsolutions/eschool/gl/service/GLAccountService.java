@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import com.smartsolutions.eschool.global.utils.EntityReferenceValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ import java.util.Map;
 public class GLAccountService {
 
     private final GLAccountRepository glAccountRepository;
+    private final com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public List<GLAccountResponseDTO> getAll() {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
@@ -127,6 +129,7 @@ public class GLAccountService {
     public void softDeleteById(Long id) {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
         if (organizationId == null) {
+        entityReferenceValidator.ensureNotReferenced(GLAccountEntity.class, id);
             throw new ApiException(GLAccountErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
         log.info("[Service:GLAccountService] softDeleteById() called - id: {}, organization: {}", id, organizationId);
