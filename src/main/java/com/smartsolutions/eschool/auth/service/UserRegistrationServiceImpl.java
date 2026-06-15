@@ -56,7 +56,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         systemUser.setPhone(requestDTO.getPhone());
         systemUser.setPasswordHash(passwordEncoder.encode(requestDTO.getPassword()));
         systemUser.setStudent(student);
-        systemUser.setUserType(SystemUserEntity.UserType.STUDENT);
+
         systemUser.setIsActive(true);
         systemUser.setIsVerified(false);
         
@@ -96,7 +96,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         systemUser.setPhone(requestDTO.getPhone());
         systemUser.setPasswordHash(passwordEncoder.encode(requestDTO.getPassword()));
         systemUser.setEmployee(employee);
-        systemUser.setUserType(SystemUserEntity.UserType.EMPLOYEE);
+
         systemUser.setIsActive(true);
         systemUser.setIsVerified(false);
         
@@ -122,7 +122,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         response.setUsername(user.getUsername());
         response.setEmail(user.getEmail());
         response.setPhone(user.getPhone());
-        response.setUserType(user.getUserType());
+
         response.setIsActive(user.getIsActive());
         response.setIsVerified(user.getIsVerified());
         

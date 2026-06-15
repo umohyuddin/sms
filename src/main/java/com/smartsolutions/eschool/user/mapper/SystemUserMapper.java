@@ -18,7 +18,7 @@ public class SystemUserMapper {
         user.setEmail(student.getEmail());
         user.setPhone(student.getPhone());
         user.setPasswordHash(encodedPassword);
-        user.setUserType(SystemUserEntity.UserType.STUDENT);
+
         user.setStudent(student);
         user.setIsActive(true);
         user.setIsVerified(true);

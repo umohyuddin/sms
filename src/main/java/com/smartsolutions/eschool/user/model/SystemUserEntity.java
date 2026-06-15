@@ -54,9 +54,6 @@ public class SystemUserEntity extends AuditableEntity {
     @JsonIgnore
     private StudentEntity student;
 
-    @Column(name = "user_type", nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
-    private UserType userType;
 
     // Status
     @Column(name = "is_active")
@@ -71,9 +68,4 @@ public class SystemUserEntity extends AuditableEntity {
     @JsonIgnore
     private Set<UserRolesEntity> userRoles = new HashSet<>();
 
-    public enum UserType {
-        EMPLOYEE,
-        STUDENT,
-        ADMIN
-    }
 }

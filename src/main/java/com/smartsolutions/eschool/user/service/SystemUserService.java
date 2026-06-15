@@ -109,7 +109,7 @@ public class SystemUserService {
         responseDTO.setUsername(result.getUsername());
         responseDTO.setOrganizationId(result.getOrganizationId());
         responseDTO.setUserId(result.getId().toString());
-        responseDTO.setUserType(result.getUserType());
+
 
         if (result.getEmployee() != null) {
             EmployeeDetailsDTO employeeDTO = new EmployeeDetailsDTO();

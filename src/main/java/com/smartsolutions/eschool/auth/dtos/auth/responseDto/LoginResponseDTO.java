@@ -42,8 +42,6 @@ public class LoginResponseDTO {
     @Schema(description = "Username", example = "admin")
     private String username;
 
-    @Schema(description = "Type of the user (e.g., ADMIN, TEACHER, STUDENT)")
-    private SystemUserEntity.UserType userType;
 
     @Schema(description = "Employee details if the user is an employee")
     private EmployeeDetailsDTO employee;

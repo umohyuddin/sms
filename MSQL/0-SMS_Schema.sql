@@ -1322,7 +1322,6 @@ CREATE TABLE student_guardians (
         password_hash VARCHAR(255) NOT NULL,
         employee_id BIGINT NULL UNIQUE,
         student_id BIGINT NULL UNIQUE,
-        user_type VARCHAR(20) NOT NULL,
         is_active BOOLEAN DEFAULT TRUE,
         is_verified BOOLEAN DEFAULT FALSE,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -1334,7 +1333,6 @@ CREATE TABLE student_guardians (
         deleted_by BIGINT,
         CONSTRAINT fk_system_user_employee FOREIGN KEY (employee_id) REFERENCES employee_master(id) ON DELETE SET NULL,
         CONSTRAINT fk_system_user_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
-        INDEX idx_user_type (user_type),
         INDEX idx_user_email (email),
         INDEX idx_user_employee (employee_id),
         INDEX idx_user_student (student_id)

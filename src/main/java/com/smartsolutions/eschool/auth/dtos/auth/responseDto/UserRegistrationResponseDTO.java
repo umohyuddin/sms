@@ -25,8 +25,6 @@ public class UserRegistrationResponseDTO {
     @Schema(description = "Contact phone number", example = "+923001234567")
     private String phone;
 
-    @Schema(description = "Type of the user (e.g., ADMIN, TEACHER, STUDENT)")
-    private SystemUserEntity.UserType userType;
 
     @Schema(description = "Employee ID if registered as an employee", example = "50")
     private Long employeeId;
