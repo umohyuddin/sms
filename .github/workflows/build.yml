@@ -3,9 +3,9 @@ name: CI
 on:
   push:
     branches:
-      - develop
-      - uat
-      - prod
+      - origin/develop
+      - origin/uat
+      - origin/prod
 
 jobs:
   build:
