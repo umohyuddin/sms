@@ -89,6 +89,21 @@ public interface StudentExamMarksRepository extends JpaRepository<StudentExamMar
             @Param("studentId") Long studentId, @Param("examSubjectId") Long examSubjectId);
 
     @Query("""
+    SELECT sem FROM StudentExamMarksEntity sem
+    JOIN FETCH sem.student st
+    JOIN FETCH sem.examSubject es
+    JOIN FETCH es.exam e
+    WHERE e.id       = :examId
+    AND st.campus.id = :campusId
+    AND sem.deleted  = false
+""")
+    List<StudentExamMarksEntity> findMarksForPromotion(
+            @Param("examId")   Long examId,
+            @Param("campusId") Long campusId
+    );
+
+
+    @Query("""
         SELECT sem FROM StudentExamMarksEntity sem
         JOIN FETCH sem.student st
         JOIN FETCH sem.examSubject es
@@ -108,3 +123,4 @@ public interface StudentExamMarksRepository extends JpaRepository<StudentExamMar
             @Param("standardId") Long standardId,
             @Param("sectionId") Long sectionId);
 }
+

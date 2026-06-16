@@ -410,4 +410,25 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
       @Param("toDate") java.time.LocalDate toDate,
       @Param("campusIds") java.util.List<Long> campusIds,
       @Param("organizationId") Long organizationId);
+
+
+
+
+    @Query("""
+    SELECT st FROM StudentEntity st
+    JOIN FETCH st.standard std
+    JOIN FETCH st.section sec
+    JOIN FETCH st.campus c
+    WHERE st.academicYear.id = :academicYearId
+    AND st.campus.id         = :campusId
+    AND (:standardId IS NULL OR std.id = :standardId)
+    AND (:sectionId  IS NULL OR sec.id = :sectionId)
+    AND st.deleted           = false
+""")
+    List<StudentEntity> findStudentsByAcademicYear(
+            @Param("academicYearId") Long academicYearId,
+            @Param("campusId")       Long campusId,
+            @Param("standardId")     Long standardId,
+            @Param("sectionId")      Long sectionId
+    );
 }

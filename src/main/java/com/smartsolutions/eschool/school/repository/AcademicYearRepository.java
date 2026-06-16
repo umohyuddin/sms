@@ -19,15 +19,17 @@ import java.util.Optional;
 @Repository
 public interface AcademicYearRepository extends JpaRepository<AcademicYearEntity, Long> {
 
+    Optional<AcademicYearEntity> findFirstByIsCurrentTrueOrderByIdDesc();
+
     @Query("SELECT a FROM AcademicYearEntity a WHERE a.id = :id AND a.deletedAt IS NULL")
     Optional<AcademicYearEntity> findActiveById(@Param("id") Long id);
+
     @Query("SELECT a FROM AcademicYearEntity a WHERE a.deletedAt IS NULL ORDER BY a.startDate DESC")
     List<AcademicYearEntity> findAllActiveAcademicYears();
 
     @Query("SELECT ar FROM AcademicYearEntity ar " +
             "WHERE ar.isCurrent = true")
     Optional<AcademicYearEntity> findByIsCurrentTrue();
-
 
 
     @Modifying
@@ -68,18 +70,30 @@ public interface AcademicYearRepository extends JpaRepository<AcademicYearEntity
                    @Param("deletedBy") Long deletedBy);
 
     @Query("""
-    SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END
-    FROM AcademicYearEntity a
-    WHERE a.startDate <= :endDate
-      AND a.endDate >= :startDate
-      AND a.id <> :id
-""")
+                SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END
+                FROM AcademicYearEntity a
+                WHERE a.startDate <= :endDate
+                  AND a.endDate >= :startDate
+                  AND a.id <> :id
+            """)
     boolean existsByDateRangeExcludingId(
             LocalDate startDate,
             LocalDate endDate,
             Long id
     );
-}
 
+    @Query("""
+                SELECT ay FROM AcademicYearEntity ay
+                WHERE ay.startDate > (
+                    SELECT a.startDate FROM AcademicYearEntity a WHERE a.id = :currentAcademicYearId
+                )
+                AND ay.status != 'DELETED'
+                AND ay.deleted = false
+                ORDER BY ay.startDate ASC
+            """)
+    Optional<AcademicYearEntity> findNextAcademicYear(
+            @Param("currentAcademicYearId") Long currentAcademicYearId
+    );
+}
 
 
