@@ -104,6 +104,8 @@ public class BoardMemberRoleService {
 
         BoardMemberRoleEntity entity = roleRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new ApiException(BoardMemberRoleErrors.ROLE_NOT_FOUND, HttpStatus.NOT_FOUND));
+         this.entityReferenceValidator.ensureNotReferenced(BoardMemberRoleEntity.class, id);
+         log.info("Entity Already Use IN Other Entity");
 
         entity.setDeleted(true);
         roleRepository.save(entity);

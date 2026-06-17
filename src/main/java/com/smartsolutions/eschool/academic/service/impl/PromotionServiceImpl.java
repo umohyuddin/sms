@@ -50,7 +50,6 @@ public class PromotionServiceImpl implements PromotionService {
     public List<PromotionResponseDTO> previewPromotion(PromotionRequestDTO request) {
         log.info("Generating promotion preview for examId: {}", request.getExamId());
 
-        // ✅ Sirf examId aur campusId se marks fetch karo
         List<StudentExamMarksEntity> marks = marksRepository.findMarksForPromotion(
                 request.getExamId(),
                 request.getCampusId()
@@ -181,7 +180,6 @@ public class PromotionServiceImpl implements PromotionService {
                 historyStatus = AcademicStatus.RETAINED;
             }
 
-            // ✅ History mein save karo
             Optional<StudentAcademicHistoryEntity> existingOpt = historyRepository
                     .findByStudentId(studentId)
                     .stream()
@@ -189,7 +187,6 @@ public class PromotionServiceImpl implements PromotionService {
                     .findFirst();
 
             StudentAcademicHistoryEntity history;
-            // ✅ History save karte waqt student ka actual standard use karo
             if (existingOpt.isPresent()) {
                 history = existingOpt.get();
                 history.setStatus(historyStatus);

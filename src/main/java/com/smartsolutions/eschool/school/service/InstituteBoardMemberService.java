@@ -106,10 +106,13 @@ public class InstituteBoardMemberService {
         if (organizationId == null) {
             throw new ApiException(InstituteBoardMemberErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN);
         }
+
         log.info("[Service:InstituteBoardMemberService] delete() called - id: {}, Organization: {}", id, organizationId);
 
         InstituteBoardMemberEntity entity = memberRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new ApiException(InstituteBoardMemberErrors.MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND));
+        this.entityReferenceValidator.ensureNotReferenced(InstituteBoardMemberEntity.class, id);
+        log.info("This Entity Already Are User in Other Entity");
 
         entity.setDeleted(true);
         memberRepository.save(entity);
