@@ -98,4 +98,17 @@ public interface StandardRepository extends JpaRepository<StandardEntity, Long> 
         @Query("SELECT (COUNT(s) > 0) FROM StandardEntity s WHERE s.campus.institute.id = :instituteId AND s.standardName = :standardName AND s.id <> :id AND s.deleted = false")
         boolean existsByInstituteIdAndStandardNameAndIdNot(@Param("instituteId") Long instituteId,
                         @Param("standardName") String standardName, @Param("id") Long id);
+
+    @Query("""
+    SELECT s FROM StandardEntity s
+    WHERE s.campus.id = :campusId
+    AND s.id > :currentStandardId
+    AND s.deleted = false
+    ORDER BY s.id ASC
+    LIMIT 1
+""")
+    Optional<StandardEntity> findNextStandard(
+            @Param("campusId")           Long campusId,
+            @Param("currentStandardId")  Long currentStandardId
+    );
 }

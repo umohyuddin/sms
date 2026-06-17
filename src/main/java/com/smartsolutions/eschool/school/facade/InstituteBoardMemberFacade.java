@@ -2,7 +2,7 @@ package com.smartsolutions.eschool.school.facade;
 
 import com.smartsolutions.eschool.school.dtos.boardMembers.request.InstituteBoardMemberRequestDTO;
 import com.smartsolutions.eschool.school.dtos.boardMembers.response.InstituteBoardMemberResponseDTO;
-import com.smartsolutions.eschool.school.service.InstituteBoardMemberService;
+import com.smartsolutions.eschool.school.service.   InstituteBoardMemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

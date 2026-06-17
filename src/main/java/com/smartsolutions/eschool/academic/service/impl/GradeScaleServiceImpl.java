@@ -29,6 +29,11 @@ public class GradeScaleServiceImpl implements GradeScaleService {
     @Transactional
     public GradeScaleResponseDTO create(GradeScaleRequestDTO dto) {
         GradeScaleEntity entity = ResultsMapper.toEntity(dto);
+
+         if(entity.getGrade().equals(dto.getGrade())){
+             throw new ResourceNotFoundException("Grade Already Exists");
+         }
+
         return ResultsMapper.toResponse(gradeScaleRepository.save(entity));
     }
 
