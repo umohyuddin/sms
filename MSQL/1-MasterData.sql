@@ -89,7 +89,7 @@ VALUES
    INSERT INTO employee_master
    (organization_id, employee_code, first_name, last_name, full_name, gender, date_of_birth, marital_status, joining_date, primary_phone, email, active, created_by)
    VALUES
-   (1, 'EMP-MASTER', 'System', 'Admin', 'System Admin', 'MALE', '1980-01-01', 'SINGLE', CURRENT_DATE, '03000000000', 'admin@yourdomain.com', TRUE, 1);
+   (1, 'EMP-MASTER', 'System', 'Admin', 'System Admin', 'MALE', '1980-01-01', 'SINGLE', CURRENT_DATE, '03001234567', 'admin@gmail.com', TRUE, 1);
 
 -- ==========================================
 -- SYSTEM USERS WITH USER TYPE
@@ -135,6 +135,43 @@ INSERT INTO facility_types (code, name, description, is_active, deleted, created
 ('PARKING', 'Parking Facility', 'Staff and visitor parking', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP),
 ('MULTIPURPOSE_HALL', 'Multipurpose Hall', 'For indoor activities, events, or assemblies', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP);
 
+INSERT INTO board_member_roles (organization_id, code, name, created_at, updated_at) VALUES
+(1, 'CHAIRMAN', 'Chairman', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'CHAIRPERSON', 'Chairperson', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'PRESIDENT', 'President', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'VICE_CHAIRMAN', 'Vice Chairman', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'VICE_CHAIRPERSON', 'Vice Chairperson', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'VICE_PRESIDENT', 'Vice President', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'DIRECTOR', 'Board Director', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'EXECUTIVE_DIRECTOR', 'Executive Director', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'NON_EXECUTIVE_DIRECTOR', 'Non-Executive Director', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'INDEPENDENT_DIRECTOR', 'Independent Director', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'ADVISOR', 'Advisor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'TRUSTEE', 'Trustee', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'GOVERNOR', 'Governor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'BOARD_MEMBER', 'Board Member', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'SECRETARY', 'Board Secretary', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'ASSISTANT_SECRETARY', 'Assistant Secretary', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'TREASURER', 'Treasurer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'ASSISTANT_TREASURER', 'Assistant Treasurer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'CHANCELLOR', 'Chancellor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'VICE_CHANCELLOR', 'Vice Chancellor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'PRO_CHANCELLOR', 'Pro Chancellor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'RECTOR', 'Rector', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'PROVOST', 'Provost', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'AUDIT_COMMITTEE_MEMBER', 'Audit Committee Member', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'FINANCE_COMMITTEE_MEMBER', 'Finance Committee Member', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'ACADEMIC_COMMITTEE_MEMBER', 'Academic Committee Member', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'GOVERNANCE_COMMITTEE_MEMBER', 'Governance Committee Member', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'LEGAL_ADVISOR', 'Legal Advisor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'FINANCIAL_ADVISOR', 'Financial Advisor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'STRATEGIC_ADVISOR', 'Strategic Advisor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'EXTERNAL_MEMBER', 'External Board Member', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'INTERNAL_MEMBER', 'Internal Board Member', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'PATRON', 'Patron', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'FOUNDER', 'Founder', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'CO_FOUNDER', 'Co-Founder', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'HONORARY_MEMBER', 'Honorary Member', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
 INSERT INTO currencies (iso_code, name, symbol, is_active, deleted, created_at, created_by, updated_at) VALUES
@@ -154,6 +191,3 @@ INSERT INTO tax_types
 (id, code, name, tax_percentage, country_id, is_active, deleted, created_at, created_by, updated_at, updated_by)
 VALUES
 (1,'PK_GST','Pakistan GST',17.00,1,TRUE,FALSE,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP,1);
-
-
-
