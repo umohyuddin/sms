@@ -108,7 +108,7 @@ public class SectionService {
         }
         log.info("[Service:SectionService] softDeleteByStandardId() called - standardId: {}, organization: {}",
                 standardId, organizationId);
-        int rows = sectionRepository.softDeleteByStandardIdAndInstituteId(standardId, organizationId);
+        int rows = sectionRepository.softDeleteByIdAndInstituteId(standardId, organizationId);
         log.info("[Service:SectionService] softDeleteByStandardId() succeeded - Deleted {} sections", rows);
         return rows;
     }

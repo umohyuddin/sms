@@ -205,49 +205,6 @@ INSERT INTO department_types
 
 
 
-INSERT INTO guardian_relations 
-(organization_id, name, code, description, status, is_default, created_at, updated_at)
-VALUES
-
--- 🔹 Core Parents
-(1, 'Father', 'FATHER', 'Male parent (biological or legal)', 'ACTIVE', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(1, 'Mother', 'MOTHER', 'Female parent (biological or legal)', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- 🔹 Primary Guardian
-(1, 'Guardian', 'GUARDIAN', 'Primary responsible adult (non-parent)', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- 🔹 Immediate Family
-(1, 'Grandparent', 'GRANDPARENT', 'Grandfather or grandmother', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(1, 'Sibling', 'SIBLING', 'Brother or sister', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- 🔹 Extended Family
-(1, 'Uncle/Aunt', 'UNCLE_AUNT', 'Parent’s sibling', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(1, 'Relative', 'RELATIVE', 'Any other family member', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- 🔹 Legal / Care Types
-(1, 'Foster Parent', 'FOSTER_PARENT', 'Temporary guardian assigned legally', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(1, 'Adoptive Parent', 'ADOPTIVE_PARENT', 'Legally adopted parent', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(1, 'Legal Guardian', 'LEGAL_GUARDIAN', 'Court-appointed guardian', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- 🔹 Care Providers
-(1, 'Caretaker', 'CARETAKER', 'Responsible for daily care', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(1, 'Nanny', 'NANNY', 'Childcare provider', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- 🔹 Institutional
-(1, 'Hostel Authority', 'HOSTEL_AUTHORITY', 'Hostel or boarding authority', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(1, 'Organization', 'ORGANIZATION', 'Institution acting as guardian', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- 🔹 Financial / Support
-(1, 'Sponsor', 'SPONSOR', 'Financial supporter of student', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- 🔹 Emergency / Misc
-(1, 'Emergency Contact', 'EMERGENCY_CONTACT', 'Emergency-only contact person', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- 🔹 Fallback
-(1, 'Other', 'OTHER', 'Other relationship', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-
-
 
 
 -- ============================================================
@@ -1715,29 +1672,7 @@ VALUES
 
 
 -- Admission Types
-INSERT INTO admission_type
-(id, organization_id, code, name, description, is_active, deleted, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
-VALUES
-(1, 1, 'REG', 'Regular Admission', 'Standard admission for new academic session', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
 
-(2, 1, 'LAT', 'Lateral Entry', 'Admission granted to students transferring from another institution', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
-
-(3, 1, 'TRF', 'Transfer Admission', 'Student migrated from another branch or campus', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
-
-(4, 1, 'SCH', 'Scholarship Admission', 'Admission granted under scholarship program', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
-
-(5, 1, 'SPC', 'Sports Quota', 'Admission based on sports quota eligibility', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
-
-(6, 1, 'MGMT', 'Management Quota', 'Admission under management quota', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
-
-(7, 1, 'INT', 'International Student', 'Admission for foreign or overseas students', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
-
-(8, 1, 'RADM', 'Re-Admission', 'Student rejoining after leaving previously', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
-
-(9, 1, 'COND', 'Conditional Admission', 'Admission granted with pending documents or requirements', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL),
-
-(10, 1, 'WAIT', 'Waiting List Admission', 'Admission offered from waiting list after seat availability', TRUE, FALSE, CURRENT_TIMESTAMP, 1, CURRENT_TIMESTAMP, 1, NULL, NULL);
--- Student Data (5 per section for 30 sections = 150 students)
 -- Campus 1, Standards 1-5, Sections 1-15
 -- Campus 2, Standards 6-10, Sections 16-30
 

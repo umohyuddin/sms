@@ -51,7 +51,14 @@ public interface SectionRepository extends JpaRepository<SectionEntity, Long> {
   @Modifying
   @Transactional
   @Query("UPDATE SectionEntity s SET s.deleted = true, s.deletedAt = CURRENT_TIMESTAMP " +
-      "WHERE s.id = :id AND s.standard.campus.institute.id = :instituteId")
+          "WHERE s.id = :id " +
+          "AND EXISTS (" +
+          "  SELECT 1 FROM StandardEntity st " +
+          "  JOIN st.campus c " +
+          "  JOIN c.institute i " +
+          "  WHERE st.id = s.standard.id " +
+          "  AND i.id = :instituteId" +
+          ")")
   int softDeleteByIdAndInstituteId(@Param("id") Long id, @Param("instituteId") Long instituteId);
 
   @Modifying

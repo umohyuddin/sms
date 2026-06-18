@@ -167,6 +167,7 @@ public class StudentService {
         Long orgId = getOrgId();
         log.info("[Service:StudentService] createStudent() called for org: {} DTO: {}", orgId, studentDTO);
 
+
         if (studentDTO.getStudentCode() != null && !studentDTO.getStudentCode().trim().isEmpty() &&
                 studentRepository.existsByOrganizationIdAndStudentCode(orgId, studentDTO.getStudentCode())) {
             throw new ApiException(StudentErrors.DUPLICATE_STUDENT_CODE, "Student code already exists in this organization", HttpStatus.CONFLICT);
@@ -174,12 +175,16 @@ public class StudentService {
 
         CampusEntity campus = campusRepository.findById(studentDTO.getCampusId())
                 .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Campus not found", HttpStatus.BAD_REQUEST));
+
         StandardEntity standard = standardRepository.findById(studentDTO.getStandardId())
                 .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Standard not found", HttpStatus.BAD_REQUEST));
+
         SectionEntity section = sectionRepository.findById(studentDTO.getSectionId())
                 .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Section not found", HttpStatus.BAD_REQUEST));
+
         AdmissionTypeEntity admissionType = admissionTypeRepository.findById(studentDTO.getAdmissionTypeId())
                 .orElseThrow(() -> new ApiException(StudentErrors.INVALID_STUDENT_DATA, "Admission Type not found", HttpStatus.BAD_REQUEST));
+
         AcademicYearEntity academicYear = academicYearRepository.findById(studentDTO.getAcademicYearId() != null ? studentDTO.getAcademicYearId() : 0L)
                 .orElseGet(() -> academicYearRepository.findByIsCurrentTrue()
                         .orElseThrow(() -> new ApiException(StudentErrors.STUDENT_NOT_FOUND, "Academic Year not found", HttpStatus.BAD_REQUEST)));
