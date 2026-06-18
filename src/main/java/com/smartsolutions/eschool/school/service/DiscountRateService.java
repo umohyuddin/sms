@@ -67,6 +67,8 @@ public class DiscountRateService {
                             "Academic Year not found with id: " + requestDTO.getAcademicYearId()));
 
             DiscountRateEntity entity = DiscountRateMapper.toEntity(requestDTO);
+
+
             entity.setDiscountSubType(subType);
             entity.setCampus(campus);
             entity.setAcademicYear(academicYear);

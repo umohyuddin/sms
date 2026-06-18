@@ -36,7 +36,7 @@ public class SectionFacade {
 
     public int softDeleteById(Long sectionId) {
         log.info("[Facade:SectionFacade] softDeleteById() called - id: {}", sectionId);
-        return sectionService.softDeleteById(sectionId);
+        return sectionService.softDeleteByStandardId(sectionId);
     }
 
     public int softDeleteByStandardId(Long standardId) {
