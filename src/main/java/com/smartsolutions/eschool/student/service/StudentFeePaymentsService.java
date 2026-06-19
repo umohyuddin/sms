@@ -19,7 +19,6 @@ import com.smartsolutions.eschool.student.enums.PaymentMode;
 import com.smartsolutions.eschool.institute.enums.LateFeeFrequency;
 import com.smartsolutions.eschool.institute.enums.LateFeeType;
 import com.smartsolutions.eschool.institute.repository.CampusFinancialSettingsRepository;
-import com.smartsolutions.eschool.school.repository.InstituteFinancialSettingsRepository;
 import com.smartsolutions.eschool.student.repository.StudentFeeInvoiceRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
 import com.smartsolutions.eschool.util.SecurityUtils;
@@ -46,7 +45,6 @@ public class StudentFeePaymentsService {
     private final AcademicYearRepository academicYearRepository;
     private final StudentFeePaymentsRepository studentFeePaymentsRepository;
     private final InstituteRepository instituteRepository;
-    private final InstituteFinancialSettingsRepository instituteFinancialSettingsRepository;
     private final CampusFinancialSettingsRepository campusFinancialSettingsRepository;
     private final StudentFeeInvoiceRepository studentFeeInvoiceRepository;
     private final LateFeeCalculationService lateFeeCalculationService;
@@ -61,7 +59,6 @@ public class StudentFeePaymentsService {
             AcademicYearRepository academicYearRepository, 
             StudentFeePaymentsRepository studentFeePaymentsRepository,
             InstituteRepository instituteRepository,
-            InstituteFinancialSettingsRepository instituteFinancialSettingsRepository,
             CampusFinancialSettingsRepository campusFinancialSettingsRepository,
             StudentFeeInvoiceRepository studentFeeInvoiceRepository,
             com.smartsolutions.eschool.lookups.repository.TaxTypeRepository taxTypeRepository,
@@ -75,7 +72,6 @@ public class StudentFeePaymentsService {
         this.academicYearRepository = academicYearRepository;
         this.studentFeePaymentsRepository = studentFeePaymentsRepository;
         this.instituteRepository = instituteRepository;
-        this.instituteFinancialSettingsRepository = instituteFinancialSettingsRepository;
         this.campusFinancialSettingsRepository = campusFinancialSettingsRepository;
         this.studentFeeInvoiceRepository = studentFeeInvoiceRepository;
         this.taxTypeRepository = taxTypeRepository;
@@ -95,14 +91,14 @@ public class StudentFeePaymentsService {
                 studentId, requestDTO.getAmountPaid(), organizationId);
 
         // Fetch student
-        StudentEntity student = studentRepository.findById(studentId).orElseThrow(() -> {
-            log.error("[Service:StudentFeePaymentsService] Student with id {} not found", studentId);
+        StudentEntity student = studentRepository.findByIdAndOrganizationId(studentId, organizationId).orElseThrow(() -> {
+            log.error("[Service:StudentFeePaymentsService] Student with id {} not found in organization {}", studentId, organizationId);
             return new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Student not found", HttpStatus.NOT_FOUND);
         });
 
         // Fetch academic year
-        AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() -> {
-            log.error("[Service:StudentFeePaymentsService] Current academic year not found");
+        AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrueAndOrganizationId(organizationId).orElseThrow(() -> {
+            log.error("[Service:StudentFeePaymentsService] Current academic year not found for organization {}", organizationId);
             return new ApiException(StudentFeeAssignmentErrors.CURRENT_ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND);
         });
 
@@ -144,25 +140,6 @@ public class StudentFeePaymentsService {
             graceDays = settings.getGraceDays();
             lateFeeFrequency = settings.getLateFeeFrequency();
             lateFeeMaxAmount = settings.getLateFeeMaxAmount();
-        } else {
-            // Fallback to Institute Settings (currently using InstituteFinancialSettingsEntity which has fewer late fee fields)
-            var instituteSettings = instituteFinancialSettingsRepository
-                    .findByInstituteIdAndAcademicYearIdAndDeletedFalse(organizationId, currentYear.getId());
-            if (instituteSettings.isPresent()) {
-                var settings = instituteSettings.get();
-                allowPartialPayments = settings.getAllowPartialPayments();
-                invoiceMandatory = settings.getInvoiceMandatory();
-                // Institute settings have simplified late fee fields
-                lateFeeApplicable = settings.getLateFeeType() != null;
-                if (settings.getLateFeeType() != null) {
-                    try {
-                        lateFeeType = LateFeeType.valueOf(settings.getLateFeeType());
-                    } catch (Exception e) {
-                        lateFeeType = LateFeeType.FIXED;
-                    }
-                }
-                lateFeeFixedAmount = settings.getLateFeeAmount();
-            }
         }
 
         // Fetch Invoice for Due Date validation
@@ -171,13 +148,13 @@ public class StudentFeePaymentsService {
                         studentId, currentYear.getId(), requestDTO.getPaymentMonth(), requestDTO.getPaymentYear())
                 .orElse(null);
 
-        // Invoice Enforcement
-        if (Boolean.TRUE.equals(invoiceMandatory) && invoice == null) {
-            log.warn("[Service:StudentFeePaymentsService] Payment rejected - No mandatory invoice found | studentId={}, month={}, year={}",
-                    studentId, requestDTO.getPaymentMonth(), requestDTO.getPaymentYear());
-            throw new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, 
-                    "An invoice/voucher must be generated before recording a payment for this period.", HttpStatus.BAD_REQUEST);
-        }
+        // Invoice Enforcement - Temporarily disabled by user request
+        // if (Boolean.TRUE.equals(invoiceMandatory) && invoice == null) {
+        //     log.warn("[Service:StudentFeePaymentsService] Payment rejected - No mandatory invoice found | studentId={}, month={}, year={}",
+        //             studentId, requestDTO.getPaymentMonth(), requestDTO.getPaymentYear());
+        //     throw new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, 
+        //             "An invoice/voucher must be generated before recording a payment for this period.", HttpStatus.BAD_REQUEST);
+        // }
 
         // Late Fee Calculation
         BigDecimal calculatedLateFee = BigDecimal.ZERO;
