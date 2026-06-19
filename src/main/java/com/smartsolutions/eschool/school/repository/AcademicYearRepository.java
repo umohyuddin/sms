@@ -35,6 +35,10 @@ public interface AcademicYearRepository extends JpaRepository<AcademicYearEntity
             "WHERE ar.isCurrent = true AND ar.organizationId = :organizationId AND ar.deleted = false")
     Optional<AcademicYearEntity> findByIsCurrentTrueAndOrganizationId(@Param("organizationId") Long organizationId);
 
+    @Query("SELECT ar FROM AcademicYearEntity ar " +
+            "WHERE ar.id = :id AND ar.organizationId = :organizationId AND ar.deleted = false")
+    Optional<AcademicYearEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
+
 
     @Modifying
     @Query("UPDATE AcademicYearEntity a SET a.isCurrent = false WHERE a.isCurrent = true")

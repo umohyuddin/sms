@@ -38,6 +38,20 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
     );
 
     @Query("""
+            SELECT COALESCE(SUM(a.totalAmount), 0)
+            FROM StudentFeeAssignmentEntity a
+            WHERE a.student.id = :studentId
+              AND a.academicYear.id = :academicYearId
+              AND a.organizationId = :instituteId
+              AND a.feeRate.feeComponent.discountable = true
+            """)
+    BigDecimal findTotalDiscountableAssignedFee(
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId,
+            @Param("instituteId") Long instituteId
+    );
+
+    @Query("""
             SELECT sfa
             FROM StudentFeeAssignmentEntity sfa
             JOIN FETCH sfa.student s
