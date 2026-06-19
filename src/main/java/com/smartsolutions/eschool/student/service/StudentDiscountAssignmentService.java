@@ -84,11 +84,31 @@ public class StudentDiscountAssignmentService {
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Academic year not found with id: " + requestDTO.getAcademicYearId()));
 
-            StudentDiscountAssignmentEntity entity = new StudentDiscountAssignmentEntity();
+            // Fetch all assignments for this student and academic year (including deleted)
+            List<StudentDiscountAssignmentEntity> allAssignments = assignmentRepository
+                    .findAllIncludingDeletedForStudentAndYear(student.getId(), academicYear.getId());
+            
+            CampusEntity finalCampus = campus;
+            // Mark all active assignments for this campus as deleted to clear out old discounts
+            allAssignments.stream()
+                    .filter(a -> !a.isDeleted() && (finalCampus == null || (a.getCampus() != null && a.getCampus().getId().equals(finalCampus.getId()))))
+                    .forEach(a -> a.setDeleted(true));
+
+            // Check if there is an existing assignment for the exact requested discount rate
+            StudentDiscountAssignmentEntity entity = allAssignments.stream()
+                    .filter(a -> a.getDiscountRate().getId().equals(discountRate.getId()) && (finalCampus == null || (a.getCampus() != null && a.getCampus().getId().equals(finalCampus.getId()))))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        StudentDiscountAssignmentEntity newAssignment = new StudentDiscountAssignmentEntity();
+                        allAssignments.add(newAssignment);
+                        return newAssignment;
+                    });
+
             entity.setStudent(student);
             entity.setDiscountRate(discountRate);
             entity.setCampus(campus);
             entity.setAcademicYear(academicYear);
+            entity.setDeleted(false);
 
             // Calculate applied amount based strictly on discountable fee components
             BigDecimal finalAmount = requestDTO.getAppliedAmount();
@@ -118,9 +138,9 @@ public class StudentDiscountAssignmentService {
             entity.setAppliedPercentage(finalPercentage);
             entity.setReason(requestDTO.getReason());
             entity.setIsActive(true);
-            entity.setDeleted(false);
-            entity.setId(null);
-            assignmentRepository.save(entity);
+            entity.setOrganizationId(organizationId);
+
+            assignmentRepository.saveAll(allAssignments);
 
             log.info("Successfully assigned discount, id: {}", entity.getId());
 
@@ -169,22 +189,31 @@ public class StudentDiscountAssignmentService {
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Academic year not found with id: " + requestDTO.getAcademicYearId()));
 
-            // Check for existing discount assignment
-            assignmentRepository
-                    .findDiscountByAcademic_Campus_stundentId(student.getId(), academicYear.getId(),
-                            campus != null ? campus.getId() : null)
-                    .ifPresent(existing -> {
-                        log.info("Deleting existing discount assignment with id: {}", existing.getId());
-                        assignmentRepository.delete(existing);
-                        assignmentRepository.flush();
-                    });
+            // Fetch all assignments for this student and academic year (including deleted)
+            List<StudentDiscountAssignmentEntity> allAssignments = assignmentRepository
+                    .findAllIncludingDeletedForStudentAndYear(student.getId(), academicYear.getId());
+            
+            CampusEntity finalCampus = campus;
+            // Mark all active assignments for this campus as deleted to clear out old discounts
+            allAssignments.stream()
+                    .filter(a -> !a.isDeleted() && (finalCampus == null || (a.getCampus() != null && a.getCampus().getId().equals(finalCampus.getId()))))
+                    .forEach(a -> a.setDeleted(true));
 
-            // Create new assignment
-            StudentDiscountAssignmentEntity entity = new StudentDiscountAssignmentEntity();
+            // Check if there is an existing assignment for the exact requested discount rate
+            StudentDiscountAssignmentEntity entity = allAssignments.stream()
+                    .filter(a -> a.getDiscountRate().getId().equals(discountRate.getId()) && (finalCampus == null || (a.getCampus() != null && a.getCampus().getId().equals(finalCampus.getId()))))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        StudentDiscountAssignmentEntity newAssignment = new StudentDiscountAssignmentEntity();
+                        allAssignments.add(newAssignment);
+                        return newAssignment;
+                    });
+            
             entity.setStudent(student);
             entity.setDiscountRate(discountRate);
             entity.setCampus(campus);
             entity.setAcademicYear(academicYear);
+            entity.setDeleted(false);
 
             // Calculate applied amount based strictly on discountable fee components
             BigDecimal finalAmount = requestDTO.getAppliedAmount();
@@ -214,12 +243,11 @@ public class StudentDiscountAssignmentService {
             entity.setAppliedPercentage(finalPercentage);
             entity.setReason(requestDTO.getReason());
             entity.setIsActive(true);
-            entity.setDeleted(false);
-            entity.setId(null);
+            entity.setOrganizationId(organizationId);
 
-            assignmentRepository.save(entity);
+            assignmentRepository.saveAll(allAssignments);
             assignmentRepository.flush();
-            log.info("Successfully created discount assignment, id: {}", entity.getId());
+            log.info("Successfully created/updated discount assignments");
 
             // Update Summary
             if (organizationId != null) {
