@@ -125,7 +125,7 @@ public class StudentFeePaymentsService {
         LateFeeFrequency lateFeeFrequency = LateFeeFrequency.ONE_TIME;
         BigDecimal lateFeeMaxAmount = BigDecimal.ZERO;
         
-        // Check Campus Settings first (more specific)
+        // Check Campus Settings
         var campusSettings = campusFinancialSettingsRepository
                 .findByCampusIdAndAcademicYearId(student.getCampus().getId(), currentYear.getId());
         

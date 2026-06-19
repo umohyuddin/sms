@@ -40,6 +40,15 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRateEntity
         List<DiscountRateEntity> findAllDeletedFalse();
 
         @Query("""
+                        SELECT DISTINCT dr FROM DiscountRateEntity dr
+                        LEFT JOIN FETCH dr.discountSubType dst
+                        LEFT JOIN FETCH dst.discountType dt
+                        LEFT JOIN FETCH dr.academicYear ay
+                        WHERE dr.id = :id AND dr.organizationId = :organizationId AND dr.deleted = false
+                        """)
+        Optional<DiscountRateEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
+
+        @Query("""
                         SELECT dr FROM DiscountRateEntity dr
                         JOIN FETCH dr.discountSubType dst
                         JOIN FETCH dst.discountType dt

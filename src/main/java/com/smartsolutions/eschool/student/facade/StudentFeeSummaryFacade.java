@@ -84,7 +84,8 @@ public class StudentFeeSummaryFacade {
                 .getDetailedSummary(studentId, academicYearId);
 
         // Fetch Financial Settings to determine installments
-        StudentEntity student = studentRepository.findById(studentId).orElse(null);
+        Long organizationId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        StudentEntity student = studentRepository.findByIdAndOrganizationId(studentId, organizationId).orElse(null);
         int occurrenceInterval = 1; // Default to monthly
         String billingCycleName = "Monthly"; // Default
         CampusFinancialSettings campusSett = null;

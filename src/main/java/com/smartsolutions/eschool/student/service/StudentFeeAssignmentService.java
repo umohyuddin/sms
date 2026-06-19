@@ -98,13 +98,13 @@ public class StudentFeeAssignmentService {
         log.info("[Service:StudentFeeAssignmentService] assignStudentFee() called - studentId={}, institute={}", studentId, organizationId);
 
         // Fetch student
-        StudentEntity student = studentRepository.findById(studentId).orElseThrow(() -> {
-            log.error("[Service:StudentFeeAssignmentService] Student with id {} not found", studentId);
+        StudentEntity student = studentRepository.findByIdAndOrganizationId(studentId, organizationId).orElseThrow(() -> {
+            log.error("[Service:StudentFeeAssignmentService] Student with id {} not found in organization {}", studentId, organizationId);
             return new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Student not found", HttpStatus.NOT_FOUND);
         });
 
         // Fetch Academic Year details
-        AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
+        AcademicYearEntity academicYear = academicYearRepository.findByIdAndOrganizationId(dto.getAcademicYearId(), organizationId)
                 .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.CURRENT_ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         long totalMonths = academicYear.getTotalMonths();
@@ -185,10 +185,10 @@ public class StudentFeeAssignmentService {
         }
         log.info("[Service:StudentFeeAssignmentService] updateStudentFee() called - studentId={}, institute={}", studentId, organizationId);
 
-        StudentEntity student = studentRepository.findById(studentId).orElseThrow(() ->
+        StudentEntity student = studentRepository.findByIdAndOrganizationId(studentId, organizationId).orElseThrow(() ->
                 new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Student not found", HttpStatus.NOT_FOUND));
 
-        AcademicYearEntity academicYear = academicYearRepository.findById(dto.getAcademicYearId())
+        AcademicYearEntity academicYear = academicYearRepository.findByIdAndOrganizationId(dto.getAcademicYearId(), organizationId)
                 .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.CURRENT_ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         long totalMonths = academicYear.getTotalMonths();
@@ -273,7 +273,7 @@ public class StudentFeeAssignmentService {
         log.info("[Service:StudentFeeAssignmentService] getFeeAssignmentByStudentId() called - studentId={}, academicYearId={}, institute={}",
                 studentId, academicYearId, organizationId);
 
-        StudentEntity student = studentRepository.findById(studentId).orElseThrow(() ->
+        StudentEntity student = studentRepository.findByIdAndOrganizationId(studentId, organizationId).orElseThrow(() ->
                 new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, "Student not found", HttpStatus.NOT_FOUND));
 
         List<StudentFeeAssignmentEntity> assignments = studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, academicYearId, organizationId);
@@ -312,7 +312,7 @@ public class StudentFeeAssignmentService {
                 academicYearId, organizationId);
 
         if (academicYearId == null) {
-            AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() ->
+            AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrueAndOrganizationId(organizationId).orElseThrow(() ->
                     new ApiException(StudentFeeAssignmentErrors.CURRENT_ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND));
             academicYearId = currentYear.getId();
         }
@@ -328,7 +328,7 @@ public class StudentFeeAssignmentService {
                 studentId, academicYearId, organizationId);
 
         if (academicYearId == null) {
-            AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElseThrow(() ->
+            AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrueAndOrganizationId(organizationId).orElseThrow(() ->
                     new ApiException(StudentFeeAssignmentErrors.CURRENT_ACADEMIC_YEAR_NOT_FOUND, HttpStatus.NOT_FOUND));
             academicYearId = currentYear.getId();
             log.info("[Service:StudentFeeAssignmentService] Null academicYearId provided, defaulting to current: {}", academicYearId);
@@ -375,7 +375,7 @@ public class StudentFeeAssignmentService {
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalAssignments", studentFeeAssignmentRepository.countTotalAssignments(organizationId));
         
-        AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrue().orElse(null);
+        AcademicYearEntity currentYear = academicYearRepository.findByIsCurrentTrueAndOrganizationId(organizationId).orElse(null);
         Long academicYearId = currentYear != null ? currentYear.getId() : null;
         
         if (academicYearId != null) {

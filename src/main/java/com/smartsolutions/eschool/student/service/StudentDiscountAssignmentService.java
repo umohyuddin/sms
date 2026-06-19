@@ -61,20 +61,22 @@ public class StudentDiscountAssignmentService {
     public StudentDiscountAssignmentResponseDTO assignDiscount(@Valid StudentDiscountAssignmentRequestDTO requestDTO) {
         log.info("Assigning discount to student: {}", requestDTO.getStudentId());
         try {
-            StudentEntity student = studentRepository.findByIdAndDeletedFalse(requestDTO.getStudentId()).orElseThrow(
+            Long organizationId = SecurityUtils.getCurrentOrganizationId();
+
+            StudentEntity student = studentRepository.findByIdAndOrganizationId(requestDTO.getStudentId(), organizationId).orElseThrow(
                     () -> new ResourceNotFoundException("Student not found with id: " + requestDTO.getStudentId()));
 
-            DiscountRateEntity discountRate = discountRateRepository.findById(requestDTO.getDiscountRateId())
+            DiscountRateEntity discountRate = discountRateRepository.findByIdAndOrganizationId(requestDTO.getDiscountRateId(), organizationId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Discount rate not found with id: " + requestDTO.getDiscountRateId()));
 
             CampusEntity campus = null;
             if (requestDTO.getCampusId() != null) {
-                campus = campusRepository.findById(requestDTO.getCampusId()).orElseThrow(
+                campus = campusRepository.findByIdAndInstituteId(requestDTO.getCampusId(), organizationId).orElseThrow(
                         () -> new ResourceNotFoundException("Campus not found with id: " + requestDTO.getCampusId()));
             }
 
-            AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId())
+            AcademicYearEntity academicYear = academicYearRepository.findByIdAndOrganizationId(requestDTO.getAcademicYearId(), organizationId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Academic year not found with id: " + requestDTO.getAcademicYearId()));
 
@@ -136,22 +138,24 @@ public class StudentDiscountAssignmentService {
                 requestDTO.getAcademicYearId());
 
         try {
-            StudentEntity student = studentRepository.findByIdAndDeletedFalse(requestDTO.getStudentId())
+            Long organizationId = SecurityUtils.getCurrentOrganizationId();
+
+            StudentEntity student = studentRepository.findByIdAndOrganizationId(requestDTO.getStudentId(), organizationId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Student not found with id: " + requestDTO.getStudentId()));
 
-            DiscountRateEntity discountRate = discountRateRepository.findById(requestDTO.getDiscountRateId())
+            DiscountRateEntity discountRate = discountRateRepository.findByIdAndOrganizationId(requestDTO.getDiscountRateId(), organizationId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Discount rate not found with id: " + requestDTO.getDiscountRateId()));
 
             CampusEntity campus = null;
             if (requestDTO.getCampusId() != null) {
-                campus = campusRepository.findById(requestDTO.getCampusId())
+                campus = campusRepository.findByIdAndInstituteId(requestDTO.getCampusId(), organizationId)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Campus not found with id: " + requestDTO.getCampusId()));
             }
 
-            AcademicYearEntity academicYear = academicYearRepository.findById(requestDTO.getAcademicYearId())
+            AcademicYearEntity academicYear = academicYearRepository.findByIdAndOrganizationId(requestDTO.getAcademicYearId(), organizationId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Academic year not found with id: " + requestDTO.getAcademicYearId()));
 
