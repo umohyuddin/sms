@@ -4,6 +4,7 @@ import com.smartsolutions.eschool.setup.dto.SetupStatusResponseDto;
 import com.smartsolutions.eschool.setup.dto.SetupStepDto;
 import com.smartsolutions.eschool.setup.dto.SetupStepStatus;
 import com.smartsolutions.eschool.util.SecurityUtils;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SetupStatusService {
 
-    // Inject your repositories here to check data existence
-    // e.g., private final CampusRepository campusRepository;
-    // e.g., private final AcademicYearRepository academicYearRepository;
-    // ...
+    private final EntityManager entityManager;
 
     public SetupStatusResponseDto getSetupStatus() {
         Long organizationId = SecurityUtils.getCurrentOrganizationId();
@@ -113,46 +111,61 @@ public class SetupStatusService {
         return isPreviousPendingOrLocked;
     }
 
-    // =================================================================================================
-    // Replace the return statements below with actual repository counts: e.g. repository.count() > 0
-    // =================================================================================================
-
     private boolean checkCampusExists(Long organizationId) {
-        // e.g. return campusRepository.countByOrganizationId(organizationId) > 0;
-        return true; 
+        return checkEntityExists("CampusEntity", organizationId);
     }
 
     private boolean checkAcademicYearExists(Long organizationId) {
-        // e.g. return academicYearRepository.countByOrganizationId(organizationId) > 0;
-        return true;
+        return checkEntityExists("AcademicYearEntity", organizationId);
     }
 
     private boolean checkStandardsExist(Long organizationId) {
-        // e.g. return standardRepository.countByOrganizationId(organizationId) > 0;
-        return false;
+        return checkEntityExists("StandardEntity", organizationId);
     }
 
     private boolean checkSectionsExist(Long organizationId) {
-        return false;
+        return checkEntityExists("SectionEntity", organizationId);
     }
 
     private boolean checkSubjectsExist(Long organizationId) {
-        return false;
+        return checkEntityExists("SubjectEntity", organizationId);
     }
 
     private boolean checkStaffExists(Long organizationId) {
-        return false;
+        return checkEntityExists("SystemUserEntity", organizationId);
     }
 
     private boolean checkFeeTypesExist(Long organizationId) {
-        return false;
+        // ChargeTypeEntity extends ScopeAuditableEntity which doesn't use organizationId directly
+        try {
+            Long count = entityManager.createQuery(
+                    "SELECT COUNT(e) FROM ChargeTypeEntity e WHERE e.deleted = false", Long.class)
+                    .getSingleResult();
+            return count != null && count > 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private boolean checkFeeStructureExists(Long organizationId) {
-        return false;
+        return checkEntityExists("FeeCatalogEntity", organizationId);
     }
 
     private boolean checkStudentsExist(Long organizationId) {
-        return false;
+        return checkEntityExists("StudentEntity", organizationId);
+    }
+
+    private boolean checkEntityExists(String entityName, Long organizationId) {
+        if (organizationId == null) return false;
+        try {
+            Long count = entityManager.createQuery(
+                    "SELECT COUNT(e) FROM " + entityName + " e WHERE e.organizationId = :orgId AND e.deleted = false", Long.class)
+                    .setParameter("orgId", organizationId)
+                    .getSingleResult();
+            return count != null && count > 0;
+        } catch (Exception e) {
+            // Failsafe in case of any mapping issues
+            return false;
+        }
     }
 }
