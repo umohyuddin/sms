@@ -15,6 +15,8 @@ public class ResourceRequestDTO {
     @NotBlank
     private String resourceName;
 
+    private String resourceCode;
+
     @NotNull
     private Long moduleId;
 

@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class ResourceResponseDTO {
     private Long id;
     private String resourceName;
+    private String resourceCode;
     private ModuleResponseDTO module;
     private String version;
     private Boolean isActive;

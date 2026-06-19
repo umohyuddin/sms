@@ -21,6 +21,7 @@ public class ResourceMapper {
 
         ResourceEntity entity = new ResourceEntity();
         entity.setResourceName(dto.getResourceName());
+        entity.setResourceCode(dto.getResourceCode());
         entity.setVersion(dto.getVersion());
         if (dto.getIsActive() != null) {
             entity.setActive(dto.getIsActive());
@@ -53,6 +54,7 @@ public class ResourceMapper {
         ResourceResponseDTO dto = new ResourceResponseDTO();
         dto.setId(entity.getId());
         dto.setResourceName(entity.getResourceName());
+        dto.setResourceCode(entity.getResourceCode());
         dto.setVersion(entity.getVersion());
         dto.setIsActive(entity.isActive());
         dto.setDescription(entity.getDescription());
