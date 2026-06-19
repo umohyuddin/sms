@@ -4,10 +4,17 @@ import com.smartsolutions.eschool.auth.dtos.auth.requestDto.LoginRequestDTO;
 import com.smartsolutions.eschool.auth.dtos.auth.responseDto.EmployeeDetailsDTO;
 import com.smartsolutions.eschool.auth.dtos.auth.responseDto.LoginResponseDTO;
 import com.smartsolutions.eschool.auth.dtos.auth.responseDto.StudentDetailsDTO;
+import com.smartsolutions.eschool.auth.dtos.auth.responseDto.UserModulePermissionResponseDTO;
+import com.smartsolutions.eschool.auth.dtos.auth.responseDto.UserResourcePermissionResponseDTO;
+import com.smartsolutions.eschool.auth.dtos.auth.responseDto.UserRoleResponseDTO;
+import com.smartsolutions.eschool.user.model.ModuleEntity;
+import com.smartsolutions.eschool.user.model.PermissionEntity;
+import com.smartsolutions.eschool.user.model.ResourceEntity;
 import com.smartsolutions.eschool.user.model.RoleEntity;
 import com.smartsolutions.eschool.user.model.SystemUserEntity;
 import com.smartsolutions.eschool.user.model.UserRoleId;
 import com.smartsolutions.eschool.user.model.UserRolesEntity;
+import com.smartsolutions.eschool.user.repository.RolePermissionRepository;
 import com.smartsolutions.eschool.user.repository.RoleRepository;
 import com.smartsolutions.eschool.user.repository.SystemUserRepository;
 import com.smartsolutions.eschool.user.repository.UserRolesRepository;
@@ -17,7 +24,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,15 +37,18 @@ public class SystemUserService {
     private final UserRolesRepository userRolesRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RolePermissionRepository rolePermissionRepository;
 
     public SystemUserService(SystemUserRepository systemUserRepository,
                              UserRolesRepository userRolesRepository,
                              RoleRepository roleRepository,
-                             PasswordEncoder passwordEncoder) {
+                             PasswordEncoder passwordEncoder,
+                             RolePermissionRepository rolePermissionRepository) {
         this.systemUserRepository = systemUserRepository;
         this.userRolesRepository = userRolesRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.rolePermissionRepository = rolePermissionRepository;
     }
 
     @jakarta.transaction.Transactional
@@ -96,6 +110,7 @@ public class SystemUserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public LoginResponseDTO getUserByUserName(LoginRequestDTO loginRequestDTO) {
         log.info("Fetching user by email: {}", loginRequestDTO.getEmail());
         SystemUserEntity result = systemUserRepository.findByEmail(loginRequestDTO.getEmail())
@@ -109,7 +124,6 @@ public class SystemUserService {
         responseDTO.setUsername(result.getUsername());
         responseDTO.setOrganizationId(result.getOrganizationId());
         responseDTO.setUserId(result.getId().toString());
-
 
         if (result.getEmployee() != null) {
             EmployeeDetailsDTO employeeDTO = new EmployeeDetailsDTO();
@@ -126,6 +140,49 @@ public class SystemUserService {
             studentDTO.setStudentCode(result.getStudent().getStudentCode());
             responseDTO.setStudent(studentDTO);
         }
+
+        // ── Roles ──────────────────────────────────────────────────────────────
+        List<RoleEntity> activeRoles = userRolesRepository.findActiveRolesByUserId(result.getId());
+        List<Long> roleIds = new ArrayList<>();
+        List<UserRoleResponseDTO> roleResponseDTOs = new ArrayList<>();
+        for (RoleEntity role : activeRoles) {
+            roleIds.add(role.getId());
+            roleResponseDTOs.add(new UserRoleResponseDTO(role.getId(), role.getName()));
+        }
+        responseDTO.setRoles(roleResponseDTOs);
+
+        // ── Module-wise permissions ────────────────────────────────────────────
+        List<UserModulePermissionResponseDTO> modulePermissions = new ArrayList<>();
+        if (!roleIds.isEmpty()) {
+            List<PermissionEntity> permissions =
+                    rolePermissionRepository.findActivePermissionsByRoleIds(roleIds);
+
+            // Group by module
+            Map<Long, List<PermissionEntity>> byModule = permissions.stream()
+                    .collect(Collectors.groupingBy(p -> p.getModule().getId()));
+
+            for (Map.Entry<Long, List<PermissionEntity>> modEntry : byModule.entrySet()) {
+                ModuleEntity module = modEntry.getValue().get(0).getModule();
+
+                // Group by resource within module
+                Map<Long, List<PermissionEntity>> byResource = modEntry.getValue().stream()
+                        .collect(Collectors.groupingBy(p -> p.getResource().getId()));
+
+                List<UserResourcePermissionResponseDTO> resourceDTOs = new ArrayList<>();
+                for (Map.Entry<Long, List<PermissionEntity>> resEntry : byResource.entrySet()) {
+                    ResourceEntity resource = resEntry.getValue().get(0).getResource();
+                    List<String> actions = resEntry.getValue().stream()
+                            .map(p -> p.getAction().getCode())
+                            .distinct()
+                            .collect(Collectors.toList());
+                    resourceDTOs.add(new UserResourcePermissionResponseDTO(
+                            resource.getId(), resource.getResourceName(), actions));
+                }
+                modulePermissions.add(new UserModulePermissionResponseDTO(
+                        module.getId(), module.getName(), resourceDTOs));
+            }
+        }
+        responseDTO.setPermissions(modulePermissions);
 
         log.info("Successfully fetched user data for email: {}", loginRequestDTO.getEmail());
         return responseDTO;
