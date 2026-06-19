@@ -114,7 +114,6 @@ public class StudentDiscountAssignmentService {
             log.info("Successfully assigned discount, id: {}", entity.getId());
 
             // Update Summary
-            Long organizationId = SecurityUtils.getCurrentOrganizationId();
             if (organizationId != null) {
                 studentFeeSummaryService.updateSummary(student.getId(), academicYear.getId(), organizationId);
             }
@@ -205,7 +204,6 @@ public class StudentDiscountAssignmentService {
             log.info("Successfully created discount assignment, id: {}", entity.getId());
 
             // Update Summary
-            Long organizationId = SecurityUtils.getCurrentOrganizationId();
             if (organizationId != null) {
                 studentFeeSummaryService.updateSummary(student.getId(), academicYear.getId(), organizationId);
             }
