@@ -2,6 +2,7 @@ package com.smartsolutions.eschool.user.repository;
 
 import com.smartsolutions.eschool.user.model.UserRolesEntity;
 import com.smartsolutions.eschool.user.model.UserRoleId;
+import com.smartsolutions.eschool.user.model.RoleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,10 @@ import java.util.Set;
 
 @Repository
 public interface UserRolesRepository extends JpaRepository<UserRolesEntity, UserRoleId> {
+
+    @Query("SELECT ur.role FROM UserRolesEntity ur JOIN ur.role r WHERE ur.id.userId = :userId AND r.active = true")
+    List<RoleEntity> findActiveRolesByUserId(@Param("userId") Long userId);
+
 
     @Query("SELECT ur FROM UserRolesEntity ur WHERE ur.id.userId = :userId")
     List<UserRolesEntity> findByUserId(@Param("userId") Long userId);

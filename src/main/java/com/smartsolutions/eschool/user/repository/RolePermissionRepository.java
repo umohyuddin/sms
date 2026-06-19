@@ -24,6 +24,21 @@ public interface RolePermissionRepository extends JpaRepository<RolePermissionEn
             """)
     List<PermissionEntity> findPermissionsByRoleId(@Param("roleId") Long roleId);
 
+    @Query("""
+            SELECT DISTINCT p FROM RolePermissionEntity rp
+            JOIN rp.permission p
+            JOIN FETCH p.module m
+            JOIN FETCH p.resource r
+            JOIN FETCH p.action a
+            WHERE rp.id.roleId IN :roleIds
+              AND p.active = true
+              AND m.active = true
+              AND r.isActive = true
+              AND a.active = true
+            """)
+    List<PermissionEntity> findActivePermissionsByRoleIds(@Param("roleIds") java.util.Collection<Long> roleIds);
+
+
 
     @Query("""
             SELECT rp FROM RolePermissionEntity rp
