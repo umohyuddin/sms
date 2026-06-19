@@ -27,6 +27,8 @@ public class ResourceEntity extends ScopeAuditableEntity {
 
     @Column(name = "resource_name", nullable = false)
     private String resourceName;
+    @Column(name = "resource_code", nullable = false)
+    private  String resourceCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")

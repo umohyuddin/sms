@@ -1558,57 +1558,8 @@ VALUES
     (1, 12, (SELECT id FROM subjects WHERE code='ENG' LIMIT 1), 1, FALSE, 5, 100, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
-INSERT INTO exam_type
-(
-    organization_id,
-    code,
-    name,
-    description,
-    is_active,
-    deleted,
-    created_at,
-    updated_at,
-    created_by
-)
-VALUES
-
--- Major Exams
-(1,'MID','Mid Term Exam','Mid session evaluation',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'FINAL','Final Exam','End term final exam',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'ANNUAL','Annual Exam','Yearly evaluation',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'SUPP','Supplementary Exam','Reattempt failed subjects',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'RET','Retake Exam','Retake full exam',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-
--- Periodic Exams
-(1,'UT1','Unit Test 1','First unit test',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'UT2','Unit Test 2','Second unit test',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'UT3','Unit Test 3','Third unit test',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'MT1','Monthly Test','Monthly performance test',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'WKLY','Weekly Test','Weekly short test',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-
--- Internal Evaluation
-(1,'INT','Internal Exam','Internal assessment',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'CLASS','Class Test','Classroom evaluation',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'ORAL','Oral Exam','Spoken evaluation',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-
--- Practical Based
-(1,'PRAC','Practical Exam','Hands-on practical exam',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'LAB','Lab Exam','Laboratory evaluation',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'VIVA','Viva Voce','Oral viva assessment',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-
--- Special Cases
-(1,'ENT','Entrance Exam','Admission test',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'MOCK','Mock Exam','Practice exam',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'SCH','Scholarship Exam','Scholarship qualification test',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1);
 
 
-INSERT INTO exam_terms
-(organization_id, name, sequence_no, academic_year_id, created_at, updated_at, created_by) VALUES
-(1,'First Term',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'Mid Term',2,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'Second Term',3,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'Pre Final',4,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
-(1,'Final Term',5,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1);
 
 
 
@@ -1655,20 +1606,6 @@ VALUES
 (1,'SKILL','Skill Test','Skill-based evaluation',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
 (1,'PHYS','Physical Test','Physical activity assessment',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1);
 
-
-INSERT INTO grade_scales
-(organization_id, min_percentage, max_percentage, grade, remarks, created_at, updated_at, created_by)
-VALUES
-(1, 90.00, 100.00, 'A+', 'Outstanding', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-(1, 85.00, 89.99, 'A',  'Excellent', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-(1, 80.00, 84.99, 'A-', 'Very Good', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-(1, 75.00, 79.99, 'B+', 'Good', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-(1, 70.00, 74.99, 'B',  'Above Average', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-(1, 65.00, 69.99, 'B-', 'Satisfactory', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-(1, 60.00, 64.99, 'C+', 'Acceptable', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-(1, 55.00, 59.99, 'C',  'Needs Improvement', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-(1, 50.00, 54.99, 'D',  'Pass', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
-(1, 0.00, 49.99, 'F',  'Fail', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1);
 
 
 -- Admission Types
