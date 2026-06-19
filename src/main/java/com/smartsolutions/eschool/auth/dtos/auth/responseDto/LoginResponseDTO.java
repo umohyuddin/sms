@@ -48,4 +48,11 @@ public class LoginResponseDTO {
 
     @Schema(description = "Student details if the user is a student")
     private StudentDetailsDTO student;
+
+    @Schema(description = "Roles assigned to the user")
+    private java.util.List<UserRoleResponseDTO> roles;
+
+    @Schema(description = "Permissions assigned to the user module-wise")
+    private java.util.List<UserModulePermissionResponseDTO> permissions;
 }
+
