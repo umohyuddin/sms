@@ -47,9 +47,6 @@ public interface AcademicYearRepository extends JpaRepository<AcademicYearEntity
     @Query("SELECT a FROM AcademicYearEntity a WHERE a.id = :id")
     Optional<AcademicYearEntity> findAcademicYearById(@Param("id") Long id);
 
-    @Query("SELECT a FROM AcademicYearEntity a WHERE a.id = :id AND a.organizationId = :organizationId AND a.deleted = false")
-    Optional<AcademicYearEntity> findByIdAndOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
-
 
     @Query("""
                 SELECT CASE WHEN COUNT(ay) > 0 THEN true ELSE false END

@@ -2,6 +2,8 @@ package com.smartsolutions.eschool.student.dtos.studentFeeSummary.responseDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import com.smartsolutions.eschool.student.dtos.studentFeePayment.responseDto.StudentFeePaymentResponseDTO;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentFeeAssignmentFlatDTO;
+import com.smartsolutions.eschool.student.dtos.studentDiscountAssignment.responseDto.StudentDiscountAssignmentResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -90,8 +92,14 @@ public class StudentFeeSummaryResponseDto {
     private List<String> monthsNames;
 
     // Original payment list (optional, detailed list)
-    @Schema(description = "Detailed list of all raw payments")
-    private List<StudentFeePaymentResponseDTO> studentFeePaymentsList;
+    @Schema(description = "Payment records associated with this session")
+    private List<StudentFeePaymentResponseDTO> studentFeePaymentsList = new ArrayList<>();
+
+    @Schema(description = "Detailed list of all assigned fees for this session")
+    private List<StudentFeeAssignmentFlatDTO> assignedFeeDetails = new ArrayList<>();
+
+    @Schema(description = "Detailed list of all assigned discounts for this session")
+    private List<StudentDiscountAssignmentResponseDTO> discountDetails = new ArrayList<>();
 
     // -----------------------------
     // New field: Monthly payments with partial payment details

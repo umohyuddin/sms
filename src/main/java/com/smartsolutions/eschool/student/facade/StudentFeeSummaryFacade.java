@@ -12,6 +12,10 @@ import com.smartsolutions.eschool.global.utils.SmsUtil;
 import com.smartsolutions.eschool.student.dtos.responseDto.StudentFeeSummaryDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeePayment.responseDto.StudentFeePaymentResponseDTO;
 import com.smartsolutions.eschool.student.dtos.studentFeeSummary.responseDto.StudentFeeSummaryResponseDto;
+import com.smartsolutions.eschool.student.service.StudentFeeAssignmentService;
+import com.smartsolutions.eschool.student.service.StudentDiscountAssignmentService;
+import com.smartsolutions.eschool.student.dtos.student.responseDto.StudentFeeAssignmentFlatDTO;
+import com.smartsolutions.eschool.student.dtos.studentDiscountAssignment.responseDto.StudentDiscountAssignmentResponseDTO;
 import com.smartsolutions.eschool.student.service.StudentFeePaymentsService;
 import com.smartsolutions.eschool.student.service.StudentFeeSummaryService;
 import com.smartsolutions.eschool.student.service.LateFeeCalculationService;
@@ -39,6 +43,8 @@ public class StudentFeeSummaryFacade {
     private final StudentRepository studentRepository;
     private final StudentFeeInvoiceRepository studentFeeInvoiceRepository;
     private final LateFeeCalculationService lateFeeCalculationService;
+    private final StudentFeeAssignmentService studentFeeAssignmentService;
+    private final StudentDiscountAssignmentService studentDiscountAssignmentService;
 
     public StudentFeeSummaryFacade(StudentFeeSummaryService studentFeeSummaryService,
             StudentFeePaymentsService studentFeePaymentsService,
@@ -46,7 +52,9 @@ public class StudentFeeSummaryFacade {
             FeeRecurrenceRuleRepository feeRecurrenceRuleRepository,
             StudentRepository studentRepository,
             StudentFeeInvoiceRepository studentFeeInvoiceRepository,
-            LateFeeCalculationService lateFeeCalculationService) {
+            LateFeeCalculationService lateFeeCalculationService,
+            StudentFeeAssignmentService studentFeeAssignmentService,
+            StudentDiscountAssignmentService studentDiscountAssignmentService) {
         this.studentFeeSummaryService = studentFeeSummaryService;
         this.studentFeePaymentsService = studentFeePaymentsService;
         this.campusFinancialSettingsRepository = campusFinancialSettingsRepository;
@@ -54,6 +62,8 @@ public class StudentFeeSummaryFacade {
         this.studentRepository = studentRepository;
         this.studentFeeInvoiceRepository = studentFeeInvoiceRepository;
         this.lateFeeCalculationService = lateFeeCalculationService;
+        this.studentFeeAssignmentService = studentFeeAssignmentService;
+        this.studentDiscountAssignmentService = studentDiscountAssignmentService;
     }
 
     public StudentFeeSummaryDTO getByStudentId(Long id) {
@@ -82,6 +92,15 @@ public class StudentFeeSummaryFacade {
         // Fetch base summary
         StudentFeeSummaryResponseDto studentFeeSummaryDTO = studentFeeSummaryService
                 .getDetailedSummary(studentId, academicYearId);
+
+        // Fetch and attach assignment details
+        List<StudentFeeAssignmentFlatDTO> assignedFees = studentFeeAssignmentService
+                .getAssignedFeesForStudent(studentId, academicYearId);
+        studentFeeSummaryDTO.setAssignedFeeDetails(assignedFees);
+
+        List<StudentDiscountAssignmentResponseDTO> assignedDiscounts = studentDiscountAssignmentService
+                .getAssignedDiscount(studentId, academicYearId);
+        studentFeeSummaryDTO.setDiscountDetails(assignedDiscounts);
 
         // Fetch Financial Settings to determine installments
         Long organizationId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();

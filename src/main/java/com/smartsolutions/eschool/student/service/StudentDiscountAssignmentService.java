@@ -11,6 +11,7 @@ import com.smartsolutions.eschool.student.dtos.studentDiscountAssignment.respons
 import com.smartsolutions.eschool.student.model.StudentDiscountAssignmentEntity;
 import com.smartsolutions.eschool.student.model.StudentEntity;
 import com.smartsolutions.eschool.student.repository.StudentDiscountAssignmentRepository;
+import com.smartsolutions.eschool.student.repository.StudentFeeAssignmentRepository;
 import com.smartsolutions.eschool.student.repository.StudentRepository;
 import com.smartsolutions.eschool.util.MapperUtil;
 import com.smartsolutions.eschool.util.SecurityUtils;
@@ -35,6 +36,7 @@ public class StudentDiscountAssignmentService {
     private final CampusRepository campusRepository;
     private final AcademicYearRepository academicYearRepository;
     private final StudentFeeSummaryService studentFeeSummaryService;
+    private final StudentFeeAssignmentRepository studentFeeAssignmentRepository;
     private com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator;
 
     public StudentDiscountAssignmentService(StudentDiscountAssignmentRepository assignmentRepository,
@@ -43,6 +45,7 @@ public class StudentDiscountAssignmentService {
             CampusRepository campusRepository,
             AcademicYearRepository academicYearRepository,
             StudentFeeSummaryService studentFeeSummaryService,
+            StudentFeeAssignmentRepository studentFeeAssignmentRepository,
                              com.smartsolutions.eschool.global.utils.EntityReferenceValidator entityReferenceValidator) {
         this.entityReferenceValidator = entityReferenceValidator;
 
@@ -52,6 +55,7 @@ public class StudentDiscountAssignmentService {
         this.campusRepository = campusRepository;
         this.academicYearRepository = academicYearRepository;
         this.studentFeeSummaryService = studentFeeSummaryService;
+        this.studentFeeAssignmentRepository = studentFeeAssignmentRepository;
     }
 
     // -------------------------------------------------------------------------
@@ -86,21 +90,28 @@ public class StudentDiscountAssignmentService {
             entity.setCampus(campus);
             entity.setAcademicYear(academicYear);
 
-            // Calculate applied amount if not provided
+            // Calculate applied amount based strictly on discountable fee components
             BigDecimal finalAmount = requestDTO.getAppliedAmount();
             BigDecimal finalPercentage = requestDTO.getAppliedPercentage();
+
+            BigDecimal discountableFee = studentFeeAssignmentRepository.findTotalDiscountableAssignedFee(
+                    requestDTO.getStudentId(), requestDTO.getAcademicYearId(), organizationId);
+            if (discountableFee == null) discountableFee = BigDecimal.ZERO;
 
             if (finalAmount == null) {
                 if (Boolean.TRUE.equals(discountRate.getIsPercentage())) {
                     finalPercentage = discountRate.getValue();
-                    if (requestDTO.getTotalAssignedFee() != null) {
-                        finalAmount = requestDTO.getTotalAssignedFee().multiply(finalPercentage)
-                                .divide(BigDecimal.valueOf(100));
-                    }
+                    finalAmount = discountableFee.multiply(finalPercentage)
+                            .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
                 } else {
                     finalAmount = discountRate.getValue();
                     finalPercentage = null;
                 }
+            }
+            
+            // Ensure finalAmount does not exceed the total discountable fee
+            if (finalAmount != null && finalAmount.compareTo(discountableFee) > 0) {
+                finalAmount = discountableFee;
             }
 
             entity.setAppliedAmount(finalAmount);
@@ -175,21 +186,28 @@ public class StudentDiscountAssignmentService {
             entity.setCampus(campus);
             entity.setAcademicYear(academicYear);
 
-            // Calculate applied amount if not provided
+            // Calculate applied amount based strictly on discountable fee components
             BigDecimal finalAmount = requestDTO.getAppliedAmount();
             BigDecimal finalPercentage = requestDTO.getAppliedPercentage();
+
+            BigDecimal discountableFee = studentFeeAssignmentRepository.findTotalDiscountableAssignedFee(
+                    requestDTO.getStudentId(), requestDTO.getAcademicYearId(), organizationId);
+            if (discountableFee == null) discountableFee = BigDecimal.ZERO;
 
             if (finalAmount == null) {
                 if (Boolean.TRUE.equals(discountRate.getIsPercentage())) {
                     finalPercentage = discountRate.getValue();
-                    if (requestDTO.getTotalAssignedFee() != null) {
-                        finalAmount = requestDTO.getTotalAssignedFee().multiply(finalPercentage)
-                                .divide(BigDecimal.valueOf(100));
-                    }
+                    finalAmount = discountableFee.multiply(finalPercentage)
+                            .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
                 } else {
                     finalAmount = discountRate.getValue();
                     finalPercentage = null;
                 }
+            }
+            
+            // Ensure finalAmount does not exceed the total discountable fee
+            if (finalAmount != null && finalAmount.compareTo(discountableFee) > 0) {
+                finalAmount = discountableFee;
             }
 
             entity.setAppliedAmount(finalAmount);
