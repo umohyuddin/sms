@@ -99,6 +99,15 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMasterEn
         GROUP BY e.employeeType.name
     """)
     java.util.List<Object[]> countEmployeesByTypeDistribution(@Param("campusIds") java.util.List<Long> campusIds, @Param("organizationId") Long organizationId);
+
+    @Query("""
+        SELECT e.gender, COUNT(e) FROM EmployeeMasterEntity e
+        LEFT JOIN EmployeeAssignmentEntity a ON a.employee.id = e.id AND a.isPrimary = true
+        WHERE e.organizationId = :organizationId AND e.deleted = false
+          AND (:campusIds IS NULL OR a.campus.id IN :campusIds)
+        GROUP BY e.gender
+    """)
+    java.util.List<Object[]> countEmployeesByGenderDistribution(@Param("campusIds") java.util.List<Long> campusIds, @Param("organizationId") Long organizationId);
 }
 
 

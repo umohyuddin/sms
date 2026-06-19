@@ -17,6 +17,9 @@ public class KpiMetric {
     private BigDecimal percentageChange;
     private TrendDirection trendDirection;
 
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    private java.util.Map<String, Long> genderDistribution;
+
     public enum TrendDirection {
         UP, DOWN, NEUTRAL
     }

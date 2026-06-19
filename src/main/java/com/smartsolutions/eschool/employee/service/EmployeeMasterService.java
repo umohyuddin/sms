@@ -462,4 +462,17 @@ public class EmployeeMasterService {
         log.info("[Service:EmployeeMasterService] getStaffCountByType() succeeded - found types: {}", distribution.size());
         return distribution;
     }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Map<String, Long> getEmployeeGenderDistribution(com.smartsolutions.eschool.dashboard.dtos.DashboardFilter filter, Long orgId) {
+        log.info("[Service:EmployeeMasterService] getEmployeeGenderDistribution() called - orgId: {}", orgId);
+        List<Object[]> results = employeeRepository.countEmployeesByGenderDistribution(filter.getCampusIds(), orgId);
+        Map<String, Long> distribution = new HashMap<>();
+        for (Object[] row : results) {
+            String gender = row[0] != null ? row[0].toString() : "Unknown";
+            distribution.put(gender, (Long) row[1]);
+        }
+        log.info("[Service:EmployeeMasterService] getEmployeeGenderDistribution() succeeded - found genders: {}", distribution.size());
+        return distribution;
+    }
 }

@@ -48,27 +48,46 @@ public class Dashboard360Facade {
         CompletableFuture<Double> efficiencyFuture = CompletableFuture.supplyAsync(() -> nFeeService.getCollectionEfficiency(filter, orgId));
         CompletableFuture<Long> totalEmployeesFuture = CompletableFuture.supplyAsync(() -> nEmployeeService.countEmployees(filter, orgId));
         CompletableFuture<java.util.Map<String, Long>> genderFuture = CompletableFuture.supplyAsync(() -> nStudentService.getGenderDistribution(filter, orgId));
+        CompletableFuture<java.util.Map<String, Long>> employeeGenderFuture = CompletableFuture.supplyAsync(() -> nEmployeeService.getEmployeeGenderDistribution(filter, orgId));
 
         CompletableFuture.allOf(
                 totalStudentsFuture, activeStudentsFuture, inactiveStudentsFuture,
                 newAdmissionsFuture, withdrawalsFuture,
                 totalCollectionFuture, pendingDuesFuture, efficiencyFuture,
-                totalEmployeesFuture, genderFuture
+                totalEmployeesFuture, genderFuture, employeeGenderFuture
         ).join();
 
         try {
             return DashboardKpiResponse.builder()
-                    .totalStudents(KpiMetric.builder().currentValue(BigDecimal.valueOf(totalStudentsFuture.get())).build())
-                    .activeStudents(KpiMetric.builder().currentValue(BigDecimal.valueOf(activeStudentsFuture.get())).build())
-                    .inactiveStudents(
-                            KpiMetric.builder().currentValue(BigDecimal.valueOf(inactiveStudentsFuture.get())).build())
-                    .newAdmissions(KpiMetric.builder().currentValue(BigDecimal.valueOf(newAdmissionsFuture.get())).build())
-                    .withdrawals(KpiMetric.builder().currentValue(BigDecimal.valueOf(withdrawalsFuture.get())).build())
-                    .totalCollection(KpiMetric.builder().currentValue(totalCollectionFuture.get()).build())
-                    .pendingDues(KpiMetric.builder().currentValue(pendingDuesFuture.get()).build())
-                    .collectionEfficiency(KpiMetric.builder().currentValue(BigDecimal.valueOf(efficiencyFuture.get())).build())
-                    .totalEmployees(KpiMetric.builder().currentValue(BigDecimal.valueOf(totalEmployeesFuture.get())).build())
-                    .genderDistribution(genderFuture.get())
+                    .totalStudents(KpiMetric.builder()
+                            .currentValue(BigDecimal.valueOf(totalStudentsFuture.join()))
+                            .build())
+                    .activeStudents(KpiMetric.builder()
+                            .currentValue(BigDecimal.valueOf(activeStudentsFuture.join()))
+                            .build())
+                    .inactiveStudents(KpiMetric.builder()
+                            .currentValue(BigDecimal.valueOf(inactiveStudentsFuture.join()))
+                            .build())
+                    .newAdmissions(KpiMetric.builder()
+                            .currentValue(BigDecimal.valueOf(newAdmissionsFuture.join()))
+                            .build())
+                    .withdrawals(KpiMetric.builder()
+                            .currentValue(BigDecimal.valueOf(withdrawalsFuture.join()))
+                            .build())
+                    .totalCollection(KpiMetric.builder()
+                            .currentValue(totalCollectionFuture.join())
+                            .build())
+                    .pendingDues(KpiMetric.builder()
+                            .currentValue(pendingDuesFuture.join())
+                            .build())
+                    .collectionEfficiency(KpiMetric.builder()
+                            .currentValue(BigDecimal.valueOf(efficiencyFuture.join()))
+                            .build())
+                    .totalEmployees(KpiMetric.builder()
+                            .currentValue(BigDecimal.valueOf(totalEmployeesFuture.join()))
+                            .genderDistribution(employeeGenderFuture.join())
+                            .build())
+                    .genderDistribution(genderFuture.join())
                     .build();
         } catch (Exception e) {
             log.error("[Facade:DashboardFacade] Error aggregating KPIs", e);
