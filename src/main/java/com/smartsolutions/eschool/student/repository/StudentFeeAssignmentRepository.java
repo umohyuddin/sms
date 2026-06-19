@@ -74,6 +74,13 @@ public interface StudentFeeAssignmentRepository extends JpaRepository<StudentFee
             @Param("instituteId") Long instituteId
     );
 
+    @Query(value = "SELECT * FROM student_fee_assignments WHERE student_id = :studentId AND academic_year_id = :academicYearId AND organization_id = :instituteId", nativeQuery = true)
+    List<StudentFeeAssignmentEntity> findAllIncludingDeleted(
+            @Param("studentId") Long studentId,
+            @Param("academicYearId") Long academicYearId,
+            @Param("instituteId") Long instituteId
+    );
+
     @Query("""
             SELECT a
             FROM StudentFeeAssignmentEntity a
