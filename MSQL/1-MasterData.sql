@@ -218,7 +218,6 @@ VALUES
 
 
 
-
 INSERT INTO guardian_relations
 (organization_id, name, code, description, status, is_default, created_at, updated_at)
 VALUES
@@ -261,3 +260,106 @@ VALUES
 (1, 'Other', 'OTHER', 'Other relationship', 'ACTIVE', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
+INSERT INTO exam_type
+(
+    organization_id,
+    code,
+    name,
+    description,
+    is_active,
+    deleted,
+    created_at,
+    updated_at,
+    created_by
+)
+VALUES
+
+-- Major Exams
+(1,'MID','Mid Term Exam','Mid session evaluation',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'FINAL','Final Exam','End term final exam',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'ANNUAL','Annual Exam','Yearly evaluation',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'SUPP','Supplementary Exam','Reattempt failed subjects',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'RET','Retake Exam','Retake full exam',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+-- Special Cases
+(1,'ENT','Entrance Exam','Admission test',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'MOCK','Mock Exam','Practice exam',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'SCH','Scholarship Exam','Scholarship qualification test',TRUE,FALSE,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1);
+
+
+
+
+INSERT INTO exam_terms
+(organization_id, name, sequence_no, academic_year_id, created_at, updated_at, created_by) VALUES
+(1,'First Term',1,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'Mid Term',2,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'Second Term',3,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'Pre Final',4,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1),
+(1,'Final Term',5,1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,1);
+
+
+
+INSERT INTO grade_scales
+(organization_id, min_percentage, max_percentage, grade, remarks, created_at, updated_at, created_by)
+VALUES
+(1, 90.00, 100.00, 'A+', 'Outstanding', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+(1, 85.00, 89.99, 'A',  'Excellent', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+(1, 80.00, 84.99, 'A-', 'Very Good', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+(1, 75.00, 79.99, 'B+', 'Good', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+(1, 70.00, 74.99, 'B',  'Above Average', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+(1, 65.00, 69.99, 'B-', 'Satisfactory', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+(1, 60.00, 64.99, 'C+', 'Acceptable', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+(1, 55.00, 59.99, 'C',  'Needs Improvement', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+(1, 50.00, 54.99, 'D',  'Pass', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1),
+(1, 0.00, 49.99, 'F',  'Fail', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1);
+
+
+
+-- 1. INSERT SUBJECT GROUPS
+INSERT INTO subject_groups (organization_id, code, name, created_at, updated_at)
+VALUES
+-- Core Academic Streams
+(1, 'SCI',  'Science Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'ART',  'Arts Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'COM',  'Commerce Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Technology
+(1, 'CS',   'Computer Studies Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'IT',   'Information Technology Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'AI',   'Robotics & AI Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Creative Arts
+(1, 'FA',   'Fine Arts Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'PA',   'Performing Arts Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'DES',  'Design & Media Studies Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Physical & Health
+(1, 'PE',   'Physical Education Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'SP',   'Sports Science Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'HLT',  'Health & Wellness Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Moral & Religious
+(1, 'REL',  'Religious Studies Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'ETH',  'Ethics & Moral Education Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Foundational
+(1, 'GEN',  'General Studies Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'PRI',  'Primary Education Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'ECE',  'Early Childhood Education Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Humanities & Society
+(1, 'SOC',  'Social Sciences Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'HUM',  'Humanities Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'CIV',  'Civics & Global Studies Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Career & Practical
+(1, 'BUS',  'Business & Economics Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'VOC',  'Vocational Studies Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'LIFE', 'Life Skills & Career Guidance Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Languages
+(1, 'LANG', 'Languages Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(1, 'FL',   'Foreign Languages Group', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    is_active = TRUE,
+    deleted = FALSE;
