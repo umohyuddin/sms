@@ -2960,3 +2960,24 @@ CREATE TABLE gl_journal_entry_lines (
     CONSTRAINT fk_je_line_bkey FOREIGN KEY (business_key_id) REFERENCES gl_business_keys(id)
 );
 
+
+    INSERT INTO actions(code, name, description, is_active, created_by, deleted, created_at, updated_at)
+    VALUES
+-- Core CRUD
+('VIEW', 'View', 'Read access to the resource', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('CREATE', 'Create', 'Ability to create new records', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('UPDATE', 'Update', 'Ability to modify existing records', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('DELETE', 'Delete', 'Ability to remove records', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Workflow & Utility
+('APPROVE', 'Approve', 'Ability to approve workflows', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('EXPORT', 'Export', 'Ability to export data to Excel or PDF', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('IMPORT', 'Import', 'Ability to import data from files', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- Management
+('ASSIGN', 'Assign', 'Assign roles or resources', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('UNASSIGN', 'Unassign', 'Remove assigned roles or resources', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+-- System Control
+('ACTIVATE', 'Activate', 'Activate a disabled record', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('DEACTIVATE', 'Deactivate', 'Deactivate an active record', TRUE, 1, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
