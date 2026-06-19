@@ -194,13 +194,12 @@ public class StudentFeeAssignmentService {
         long totalMonths = academicYear.getTotalMonths();
         if (totalMonths <= 0) totalMonths = 12;
 
-        // Delete existing assignments for this student and academic year
-        List<StudentFeeAssignmentEntity> existingAssignments = studentFeeAssignmentRepository.findAllByStudentAndAcademicYear(studentId, dto.getAcademicYearId(), organizationId);
-        if (!existingAssignments.isEmpty()) {
-            studentFeeAssignmentRepository.deleteAll(existingAssignments);
-            studentFeeAssignmentRepository.flush();
-            log.info("[Service:StudentFeeAssignmentService] Deleted and flushed {} existing fee assignments", existingAssignments.size());
-        }
+        // Fetch ALL existing assignments including soft-deleted ones to recycle them and avoid unique constraint errors
+        List<StudentFeeAssignmentEntity> allAssignments = 
+                studentFeeAssignmentRepository.findAllIncludingDeleted(studentId, dto.getAcademicYearId(), organizationId);
+        
+        // Mark all as deleted initially. We will un-delete the ones we need.
+        allAssignments.forEach(a -> a.setDeleted(true));
 
         // Fetch new applicable fee rates
         List<FeeRateEntity> feeRates = feeRateRepository.findApplicableFeeRatesForStudent(dto.getComponentIds(),
@@ -215,12 +214,24 @@ public class StudentFeeAssignmentService {
                 .orElseThrow(() -> new ApiException(StudentFeeAssignmentErrors.ORGANIZATION_ACCESS_DENIED, HttpStatus.FORBIDDEN));
 
         long finalTotalMonths = totalMonths;
-        List<StudentFeeAssignmentEntity> updatedAssignments = feeRates.stream().map(feeRate -> {
-            StudentFeeAssignmentEntity assignment = new StudentFeeAssignmentEntity();
-            assignment.setStudent(student);
-            assignment.setFeeRate(feeRate);
-            assignment.setOrganizationId(organizationId);
-            assignment.setAcademicYear(academicYear);
+        for (FeeRateEntity feeRate : feeRates) {
+            // Find existing assignment (active or deleted) for this fee rate to recycle it
+            StudentFeeAssignmentEntity assignment = allAssignments.stream()
+                    .filter(a -> a.getFeeRate().getId().equals(feeRate.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (assignment == null) {
+                assignment = new StudentFeeAssignmentEntity();
+                assignment.setStudent(student);
+                assignment.setFeeRate(feeRate);
+                assignment.setOrganizationId(organizationId);
+                assignment.setAcademicYear(academicYear);
+                allAssignments.add(assignment);
+            }
+
+            // Un-delete if it was soft-deleted
+            assignment.setDeleted(false);
 
             Integer interval = getCatalogRecurrenceInterval(feeRate);
             
@@ -230,10 +241,9 @@ public class StudentFeeAssignmentService {
 
             assignment.setTotalAmount(totalAmount);
             assignment.setAssignedDate(LocalDate.now());
-            return assignment;
-        }).collect(Collectors.toList());
+        }
 
-        studentFeeAssignmentRepository.saveAll(updatedAssignments);
+        studentFeeAssignmentRepository.saveAll(allAssignments);
         studentFeeAssignmentRepository.flush();
 
         // Calculate Total assigned AFTER saving so it includes newly saved records
