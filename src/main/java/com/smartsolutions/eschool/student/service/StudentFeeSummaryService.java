@@ -72,8 +72,32 @@ public class StudentFeeSummaryService {
         BigDecimal totalAssigned = studentFeeAssignmentRepository.findTotalAssignedFee(studentId, academicYearId, organizationId);
         if (totalAssigned == null) totalAssigned = BigDecimal.ZERO;
 
-        BigDecimal totalDiscount = studentDiscountAssignmentRepository.findTotalDiscountByStudentAndYear(studentId, academicYearId);
-        if (totalDiscount == null) totalDiscount = BigDecimal.ZERO;
+        BigDecimal discountableFee = studentFeeAssignmentRepository.findTotalDiscountableAssignedFee(studentId, academicYearId, organizationId);
+        if (discountableFee == null) discountableFee = BigDecimal.ZERO;
+
+        List<com.smartsolutions.eschool.student.model.StudentDiscountAssignmentEntity> discountAssignments = 
+                studentDiscountAssignmentRepository.findByStudentAndAcademicYear(studentId, academicYearId);
+        
+        BigDecimal totalDiscount = BigDecimal.ZERO;
+        for (com.smartsolutions.eschool.student.model.StudentDiscountAssignmentEntity d : discountAssignments) {
+            BigDecimal appliedAmt = BigDecimal.ZERO;
+            if (Boolean.TRUE.equals(d.getDiscountRate().getIsPercentage())) {
+                appliedAmt = discountableFee.multiply(d.getDiscountRate().getValue())
+                        .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+            } else {
+                appliedAmt = d.getDiscountRate().getValue();
+            }
+            
+            if (appliedAmt != null && appliedAmt.compareTo(discountableFee) > 0) {
+                appliedAmt = discountableFee;
+            }
+            
+            if (d.getAppliedAmount() == null || d.getAppliedAmount().compareTo(appliedAmt) != 0) {
+                d.setAppliedAmount(appliedAmt);
+                studentDiscountAssignmentRepository.save(d);
+            }
+            totalDiscount = totalDiscount.add(appliedAmt);
+        }
 
         BigDecimal totalPaid = studentFeePaymentsRepository.findTotalPaidByStudentAndYear(studentId, academicYearId, organizationId);
         if (totalPaid == null) totalPaid = BigDecimal.ZERO;

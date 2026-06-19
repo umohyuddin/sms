@@ -85,6 +85,11 @@ public class StudentFeeSummaryFacade {
         log.info("[Facade:StudentFeeSummaryFacade] getByStudentFeeSummaryAcademicYear() called - studentId: {}, academicYearId: {}", 
                 studentId, academicYearId);
 
+        Long organizationId = com.smartsolutions.eschool.util.SecurityUtils.getCurrentOrganizationId();
+        
+        // Auto-correct and ensure summary is fully synced with current discount/fee rules before reading
+        studentFeeSummaryService.updateSummary(studentId, academicYearId, organizationId);
+
         // Fetch all student payments for this academic year for detailed list
         List<StudentFeePaymentResponseDTO> payments = studentFeePaymentsService
                 .getStudentPaymentsByAcademicYear(studentId, academicYearId);
