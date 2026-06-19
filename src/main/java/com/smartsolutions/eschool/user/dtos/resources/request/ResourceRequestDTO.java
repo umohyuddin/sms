@@ -15,6 +15,7 @@ public class ResourceRequestDTO {
     @NotBlank
     private String resourceName;
 
+    @NotNull
     private String resourceCode;
 
     @NotNull
