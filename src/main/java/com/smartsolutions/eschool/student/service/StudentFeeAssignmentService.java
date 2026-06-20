@@ -112,7 +112,7 @@ public class StudentFeeAssignmentService {
 
         // Fetch applicable fee rates
         List<FeeRateEntity> feeRates = feeRateRepository.findApplicableFeeRatesForStudent(dto.getComponentIds(),
-                dto.getCampusId(), dto.getStandardId(), dto.getAcademicYearId());
+                dto.getCampusId(), dto.getStandardId(), dto.getAcademicYearId(), organizationId);
 
         if (feeRates.isEmpty()) {
             log.warn("[Service:StudentFeeAssignmentService] No fee rates found for criteria");
@@ -203,7 +203,7 @@ public class StudentFeeAssignmentService {
 
         // Fetch new applicable fee rates
         List<FeeRateEntity> feeRates = feeRateRepository.findApplicableFeeRatesForStudent(dto.getComponentIds(),
-                dto.getCampusId(), dto.getStandardId(), dto.getAcademicYearId());
+                dto.getCampusId(), dto.getStandardId(), dto.getAcademicYearId(), organizationId);
 
         if (feeRates.isEmpty()) {
             throw new ApiException(StudentFeeAssignmentErrors.NO_FEE_RATES_AVAILABLE, HttpStatus.NOT_FOUND);

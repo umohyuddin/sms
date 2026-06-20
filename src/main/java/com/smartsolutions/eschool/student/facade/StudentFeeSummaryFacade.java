@@ -202,33 +202,6 @@ public class StudentFeeSummaryFacade {
             monthToInstallmentIdx.put(academicMonths.get(m), m / occurrenceInterval);
         }
 
-        // Fetch Invoices to get Late Fee information
-        List<StudentFeeInvoiceEntity> invoices = studentFeeInvoiceRepository
-                .findByStudentAndAcademicYear(studentId, academicYearId);
-
-        for (StudentFeeInvoiceEntity invoice : invoices) {
-            Integer installmentIdx = monthToInstallmentIdx.get(invoice.getMonth());
-            if (installmentIdx != null && installmentMap.containsKey(installmentIdx)) {
-                StudentFeeSummaryResponseDto.MonthlyPaymentDTO instDto = installmentMap.get(installmentIdx);
-                
-                // Calculate dynamic late fee based on current date and grace days/settings
-                BigDecimal lateFee = BigDecimal.ZERO;
-                if (invoice.getStatus() != StudentFeeInvoiceEntity.InvoiceStatus.PAID && campusSett != null) {
-                    lateFee = lateFeeCalculationService.calculateLateFee(invoice, campusSett);
-                }
-                
-                // If invoice already has a higher late fee recorded in DB (or if it's already cleared)
-                if (invoice.getLateFeeAmount() != null && invoice.getLateFeeAmount().compareTo(lateFee) > 0) {
-                    lateFee = invoice.getLateFeeAmount();
-                }
-                
-                BigDecimal waived = invoice.getWaivedAmount() != null ? invoice.getWaivedAmount() : BigDecimal.ZERO;
-                
-                instDto.setLateFeeAmount(instDto.getLateFeeAmount().add(lateFee));
-                instDto.setWaivedAmount(instDto.getWaivedAmount().add(waived));
-            }
-        }
-
         // Map each payment to its installment
         for (StudentFeePaymentResponseDTO payment : payments) {
             Integer installmentIdx = monthToInstallmentIdx.get(payment.getPaymentMonth());
@@ -237,18 +210,70 @@ public class StudentFeeSummaryFacade {
             }
         }
 
-        BigDecimal cumulativePaid = BigDecimal.ZERO;
-        BigDecimal cumulativeFee = BigDecimal.ZERO;
-        
+        // First loop: calculate partial payments and set instPaid, keeping original installment fee
         for (StudentFeeSummaryResponseDto.MonthlyPaymentDTO instDto : installmentList) {
             BigDecimal instPaid = instDto.getPartialPayments().stream()
                     .map(StudentFeeSummaryResponseDto.PartialPaymentDTO::getAmountPaid)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
+            instDto.setTotalPaid(instPaid);
+        }
 
-            cumulativePaid = cumulativePaid.add(instPaid);
+        // Apply dynamic late fees for each installment if settings allow
+        for (int i = 0; i < totalInstallments; i++) {
+            StudentFeeSummaryResponseDto.MonthlyPaymentDTO instDto = installmentList.get(i);
+            
+            // Calculate dynamic late fee based on current date and grace days/settings
+            BigDecimal lateFee = BigDecimal.ZERO;
+            if (campusSett != null && Boolean.TRUE.equals(campusSett.getLateFeeApplicable())) {
+                int startMonthIdx = i * occurrenceInterval;
+                LocalDate baseDate = studentFeeSummaryDTO.getAcademicStartDate() != null ? 
+                        studentFeeSummaryDTO.getAcademicStartDate().plusMonths(startMonthIdx) : LocalDate.now();
+                
+                int dueDay = campusSett.getInvoiceDueDay() != null ? campusSett.getInvoiceDueDay() : 10;
+                dueDay = Math.min(dueDay, baseDate.lengthOfMonth());
+                LocalDate dueDate = baseDate.withDayOfMonth(dueDay);
+                
+                BigDecimal baseAmount;
+                if (com.smartsolutions.eschool.institute.enums.LateFeeApplyOn.TOTAL.equals(campusSett.getLateFeeApplyOn())) {
+                    baseAmount = instDto.getTotalMonthlyFee();
+                } else {
+                    // Default to OUTSTANDING
+                    baseAmount = instDto.getTotalMonthlyFee().subtract(instDto.getTotalPaid());
+                }
+                
+                if (baseAmount.compareTo(BigDecimal.ZERO) > 0) {
+                    lateFee = lateFeeCalculationService.calculateLateFee(baseAmount, dueDate, LocalDate.now(), campusSett);
+                }
+            }
+            instDto.setLateFeeAmount(lateFee);
+        }
+
+        // Fetch Invoices to get overridden Late Fee information and waived amount
+        List<StudentFeeInvoiceEntity> invoices = studentFeeInvoiceRepository
+                .findByStudentAndAcademicYear(studentId, academicYearId);
+
+        for (StudentFeeInvoiceEntity invoice : invoices) {
+            Integer installmentIdx = monthToInstallmentIdx.get(invoice.getMonth());
+            if (installmentIdx != null && installmentMap.containsKey(installmentIdx)) {
+                StudentFeeSummaryResponseDto.MonthlyPaymentDTO instDto = installmentMap.get(installmentIdx);
+                
+                // If invoice already has a higher late fee recorded in DB (or if it's manually adjusted)
+                if (invoice.getLateFeeAmount() != null && invoice.getLateFeeAmount().compareTo(instDto.getLateFeeAmount()) > 0) {
+                    instDto.setLateFeeAmount(invoice.getLateFeeAmount());
+                }
+                
+                BigDecimal waived = invoice.getWaivedAmount() != null ? invoice.getWaivedAmount() : BigDecimal.ZERO;
+                instDto.setWaivedAmount(instDto.getWaivedAmount().add(waived));
+            }
+        }
+
+        BigDecimal cumulativePaid = BigDecimal.ZERO;
+        BigDecimal cumulativeFee = BigDecimal.ZERO;
+        
+        for (StudentFeeSummaryResponseDto.MonthlyPaymentDTO instDto : installmentList) {
+            cumulativePaid = cumulativePaid.add(instDto.getTotalPaid());
             cumulativeFee = cumulativeFee.add(instDto.getTotalMonthlyFee());
 
-            instDto.setTotalPaid(instPaid);
             // In the UI, 'totalMonthlyFee' might be expected as cumulative or per installment.
             // Based on previous code: monthDto.setTotalMonthlyFee(cumulativeFee);
             instDto.setTotalMonthlyFee(cumulativeFee); 
@@ -265,6 +290,31 @@ public class StudentFeeSummaryFacade {
                 instDto.setStatus("Unpaid");
             }
         }
+
+        // Recalculate top-level totalLateFee dynamically
+        BigDecimal dynamicTotalLateFee = installmentList.stream()
+                .map(StudentFeeSummaryResponseDto.MonthlyPaymentDTO::getLateFeeAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal dynamicTotalWaived = installmentList.stream()
+                .map(StudentFeeSummaryResponseDto.MonthlyPaymentDTO::getWaivedAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal finalLateFee = dynamicTotalLateFee.subtract(dynamicTotalWaived);
+        if (finalLateFee.compareTo(BigDecimal.ZERO) < 0) {
+            finalLateFee = BigDecimal.ZERO;
+        }
+
+        studentFeeSummaryDTO.setTotalLateFee(finalLateFee);
+        
+        // Recalculate top-level balance = totalAssigned + finalLateFee + tax - discount - paid
+        BigDecimal totalAssignedFinal = studentFeeSummaryDTO.getTotalAssignedFee() != null ? studentFeeSummaryDTO.getTotalAssignedFee() : BigDecimal.ZERO;
+        BigDecimal totalPaidFinal = studentFeeSummaryDTO.getTotalPaid() != null ? studentFeeSummaryDTO.getTotalPaid() : BigDecimal.ZERO;
+        BigDecimal totalTaxFinal = studentFeeSummaryDTO.getTotalTax() != null ? studentFeeSummaryDTO.getTotalTax() : BigDecimal.ZERO;
+        BigDecimal totalDiscountFinal = studentFeeSummaryDTO.getTotalDiscount() != null ? studentFeeSummaryDTO.getTotalDiscount() : BigDecimal.ZERO;
+        
+        BigDecimal newBalance = totalAssignedFinal.add(finalLateFee).add(totalTaxFinal).subtract(totalDiscountFinal).subtract(totalPaidFinal);
+        studentFeeSummaryDTO.setBalance(newBalance);
 
         studentFeeSummaryDTO.setMonthlyPayments(installmentList);
         studentFeeSummaryDTO.setMonthlyFeeDecimal(installmentAmount); // Representing the base installment amount
