@@ -303,26 +303,28 @@ public class StudentFeeSummaryFacade {
         }
 
         BigDecimal cumulativePaid = BigDecimal.ZERO;
-        BigDecimal cumulativeFee = BigDecimal.ZERO;
+        BigDecimal excessFromPrevious = BigDecimal.ZERO;
         
         for (StudentFeeSummaryResponseDto.MonthlyPaymentDTO instDto : installmentList) {
-            cumulativePaid = cumulativePaid.add(instDto.getTotalPaid());
-            cumulativeFee = cumulativeFee.add(instDto.getTotalMonthlyFee());
+            BigDecimal currentMonthFee = instDto.getTotalMonthlyFee();
 
-            // In the UI, 'totalMonthlyFee' might be expected as cumulative or per installment.
-            // Based on previous code: monthDto.setTotalMonthlyFee(cumulativeFee);
-            instDto.setTotalMonthlyFee(cumulativeFee); 
+            BigDecimal availableForThisMonth = instDto.getTotalPaid().add(excessFromPrevious);
+            cumulativePaid = cumulativePaid.add(instDto.getTotalPaid());
+            
             instDto.setTotalPaidSoFar(cumulativePaid);
 
-            // Determine status based on installment fee (not cumulative)
-            BigDecimal targetFee = instDto.getTotalMonthlyFee();
-            // Wait, if it's cumulative, I should compare cumulativePaid vs cumulativeFee
-            if (cumulativePaid.compareTo(cumulativeFee) >= 0) {
+            if (availableForThisMonth.compareTo(currentMonthFee) >= 0) {
                 instDto.setStatus("Paid");
-            } else if (cumulativePaid.compareTo(BigDecimal.ZERO) > 0) {
+                excessFromPrevious = availableForThisMonth.subtract(currentMonthFee);
+                instDto.setTotalPaid(currentMonthFee);
+            } else if (availableForThisMonth.compareTo(BigDecimal.ZERO) > 0) {
                 instDto.setStatus("Partial");
+                excessFromPrevious = BigDecimal.ZERO;
+                instDto.setTotalPaid(availableForThisMonth);
             } else {
                 instDto.setStatus("Unpaid");
+                excessFromPrevious = BigDecimal.ZERO;
+                instDto.setTotalPaid(BigDecimal.ZERO);
             }
         }
 
