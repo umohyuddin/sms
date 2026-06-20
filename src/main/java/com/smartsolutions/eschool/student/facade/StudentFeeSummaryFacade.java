@@ -157,13 +157,31 @@ public class StudentFeeSummaryFacade {
         long totalMonths = studentFeeSummaryDTO.getAcademicTotalMonths();
         int totalInstallments = (int) Math.ceil((double) totalMonths / occurrenceInterval);
         
-        BigDecimal totalAssigned = studentFeeSummaryDTO.getTotalAssignedFee();
+        BigDecimal totalAssigned = studentFeeSummaryDTO.getTotalAssignedFee() != null ? studentFeeSummaryDTO.getTotalAssignedFee() : BigDecimal.ZERO;
+        
+        // Gracefully apply discount to installments
+        BigDecimal totalDiscount = studentFeeSummaryDTO.getDiscountDetails() != null ? 
+                studentFeeSummaryDTO.getDiscountDetails().stream()
+                        .map(d -> d.getAppliedAmount() != null ? d.getAppliedAmount() : BigDecimal.ZERO)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add) 
+                : BigDecimal.ZERO;
+                
+        BigDecimal netAssigned = totalAssigned.subtract(totalDiscount);
+        if (netAssigned.compareTo(BigDecimal.ZERO) < 0) {
+            netAssigned = BigDecimal.ZERO;
+        }
+
         BigDecimal installmentAmount = (totalInstallments > 0) 
-                ? totalAssigned.divide(BigDecimal.valueOf(totalInstallments), 2, RoundingMode.FLOOR) 
+                ? netAssigned.divide(BigDecimal.valueOf(totalInstallments), 2, RoundingMode.FLOOR) 
                 : BigDecimal.ZERO;
         
         // Handle remainder for the last installment
-        BigDecimal remainder = totalAssigned.subtract(installmentAmount.multiply(BigDecimal.valueOf(totalInstallments)));
+        BigDecimal remainder = netAssigned.subtract(installmentAmount.multiply(BigDecimal.valueOf(totalInstallments)));
+
+        BigDecimal installmentDiscount = (totalInstallments > 0)
+                ? totalDiscount.divide(BigDecimal.valueOf(totalInstallments), 2, RoundingMode.FLOOR)
+                : BigDecimal.ZERO;
+        BigDecimal discountRemainder = totalDiscount.subtract(installmentDiscount.multiply(BigDecimal.valueOf(totalInstallments)));
 
         // Group months and payments into installments
         List<StudentFeeSummaryResponseDto.MonthlyPaymentDTO> installmentList = new ArrayList<>();
@@ -188,10 +206,14 @@ public class StudentFeeSummaryFacade {
             
             // Set monthly fee for this installment (add remainder to last one)
             BigDecimal currentInstallmentFee = installmentAmount;
+            BigDecimal currentDiscount = installmentDiscount;
+            
             if (i == totalInstallments - 1) {
                 currentInstallmentFee = installmentAmount.add(remainder);
+                currentDiscount = installmentDiscount.add(discountRemainder);
             }
             installmentDto.setTotalMonthlyFee(currentInstallmentFee); // Reusing field for installment fee
+            installmentDto.setDiscountAmount(currentDiscount);
             
             installmentList.add(installmentDto);
             installmentMap.put(i, installmentDto);

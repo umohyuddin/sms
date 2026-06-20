@@ -146,8 +146,10 @@ public class StudentFeeSummaryResponseDto {
         private BigDecimal totalPaid = BigDecimal.ZERO;
         @Schema(description = "Cumulative amount paid up to this month", example = "5000.00")
         private BigDecimal totalPaidSoFar = BigDecimal.ZERO;
-        @Schema(description = "Amount required for this month", example = "5000.00")
+        @Schema(description = "Amount required for this month (after discount)", example = "5000.00")
         private BigDecimal totalMonthlyFee = BigDecimal.ZERO;
+        @Schema(description = "Discount applied for this month", example = "500.00")
+        private BigDecimal discountAmount = BigDecimal.ZERO;
         @Schema(description = "Payment status", example = "PAID")
         private String status; // Paid | Partial | Unpaid
         @Schema(description = "Total late fee applied for this installment", example = "100.00")
