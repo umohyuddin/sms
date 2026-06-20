@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -305,15 +306,15 @@ public class StudentFeeSummaryFacade {
             finalLateFee = BigDecimal.ZERO;
         }
 
+        // Recalculate top-level balance by adding the dynamically calculated late fee difference
+        BigDecimal originalLateFee = studentFeeSummaryDTO.getTotalLateFee() != null ? studentFeeSummaryDTO.getTotalLateFee() : BigDecimal.ZERO;
+        BigDecimal differenceInLateFee = finalLateFee.subtract(originalLateFee);
+        
         studentFeeSummaryDTO.setTotalLateFee(finalLateFee);
+
+        BigDecimal currentBalance = studentFeeSummaryDTO.getBalance() != null ? studentFeeSummaryDTO.getBalance() : BigDecimal.ZERO;
+        BigDecimal newBalance = currentBalance.add(differenceInLateFee);
         
-        // Recalculate top-level balance = totalAssigned + finalLateFee + tax - discount - paid
-        BigDecimal totalAssignedFinal = studentFeeSummaryDTO.getTotalAssignedFee() != null ? studentFeeSummaryDTO.getTotalAssignedFee() : BigDecimal.ZERO;
-        BigDecimal totalPaidFinal = studentFeeSummaryDTO.getTotalPaid() != null ? studentFeeSummaryDTO.getTotalPaid() : BigDecimal.ZERO;
-        BigDecimal totalTaxFinal = studentFeeSummaryDTO.getTotalTax() != null ? studentFeeSummaryDTO.getTotalTax() : BigDecimal.ZERO;
-        BigDecimal totalDiscountFinal = studentFeeSummaryDTO.getTotalDiscount() != null ? studentFeeSummaryDTO.getTotalDiscount() : BigDecimal.ZERO;
-        
-        BigDecimal newBalance = totalAssignedFinal.add(finalLateFee).add(totalTaxFinal).subtract(totalDiscountFinal).subtract(totalPaidFinal);
         studentFeeSummaryDTO.setBalance(newBalance);
 
         studentFeeSummaryDTO.setMonthlyPayments(installmentList);
