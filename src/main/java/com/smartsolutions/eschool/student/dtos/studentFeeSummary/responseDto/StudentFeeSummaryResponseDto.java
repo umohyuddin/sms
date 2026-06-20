@@ -76,17 +76,16 @@ public class StudentFeeSummaryResponseDto {
     @Schema(description = "Late fee percentage rate", example = "5.00")
     private BigDecimal lateFeePercentage;
 
-    @Schema(description = "Number of grace days allowed", example = "5")
+    @Schema(description = "Grace days before late fee applies", example = "5")
     private Integer graceDays;
-
-    @Schema(description = "Frequency of late fee enforcement", example = "PER_DAY")
+    @Schema(description = "Frequency of late fee application", example = "PER_DAY")
     private String lateFeeFrequency;
-
-    @Schema(description = "Maximum late fee cap limit", example = "1000.00")
+    @Schema(description = "Maximum late fee limit", example = "1000.00")
     private BigDecimal lateFeeMaxAmount;
-
-    @Schema(description = "Scope of late fee application", example = "OUTSTANDING")
+    @Schema(description = "What the late fee is applied on", example = "OUTSTANDING")
     private String lateFeeApplyOn;
+    @Schema(description = "Indicates whether partial payments are allowed based on campus financial settings")
+    private Boolean allowPartialPayments = true;
 
     @Schema(description = "List of months in the session", example = "[\"April\", \"May\", \"June\"]")
     private List<String> monthsNames;

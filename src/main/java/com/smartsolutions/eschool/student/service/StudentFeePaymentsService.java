@@ -227,23 +227,6 @@ public class StudentFeePaymentsService {
             }
         }
 
-        if (Boolean.FALSE.equals(allowPartialPayments)) {
-            // Calculate what should be the monthly installment
-            BigDecimal totalAssigned = summary.getTotalAssignedFee();
-            long totalMonths = summary.getAcademicTotalMonths();
-            
-            if (totalMonths > 0) {
-                BigDecimal monthlyInstallment = totalAssigned.divide(BigDecimal.valueOf(totalMonths), 2, RoundingMode.HALF_UP);
-                
-                if (requestDTO.getAmountPaid().compareTo(monthlyInstallment) < 0) {
-                    log.warn("[Service:StudentFeePaymentsService] Partial payment rejected | studentId={}, amountPaid={}, required={}",
-                            studentId, requestDTO.getAmountPaid(), monthlyInstallment);
-                    throw new ApiException(StudentFeeAssignmentErrors.INVALID_ASSIGNMENT_DATA, 
-                            "Partial payments are not allowed. Minimum required: " + monthlyInstallment, HttpStatus.BAD_REQUEST);
-                }
-            }
-        }
-
         StudentFeePaymentEntity payment = new StudentFeePaymentEntity();
         payment.setStudent(student);
         payment.setOrganizationId(organizationId);

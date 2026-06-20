@@ -2,7 +2,7 @@ package com.smartsolutions.eschool.student.dtos.studentFeePayment.requestDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class StudentFeePaymentRequestDTO {
     private Long academicYearId;
 
     @NotNull(message = "Amount paid is required")
-    @Positive(message = "Amount must be greater than zero")
+    @PositiveOrZero(message = "Amount must be zero or greater")
     @Schema(description = "Monetary amount paid", example = "5000.00")
     private BigDecimal amountPaid;
 

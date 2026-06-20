@@ -137,6 +137,12 @@ public class StudentFeeSummaryFacade {
 
         if (campusSett != null) {
             studentFeeSummaryDTO.setLateFeeApplicable(campusSett.getLateFeeApplicable());
+            if (campusSett.getLateFeeApplyOn() != null) {
+                studentFeeSummaryDTO.setLateFeeApplyOn(campusSett.getLateFeeApplyOn().name());
+            }
+            if (campusSett.getAllowPartialPayments() != null) {
+                studentFeeSummaryDTO.setAllowPartialPayments(campusSett.getAllowPartialPayments());
+            }
             studentFeeSummaryDTO.setLateFeeType(campusSett.getLateFeeType() != null ? campusSett.getLateFeeType().name() : null);
             studentFeeSummaryDTO.setLateFeeFixedAmount(campusSett.getLateFeeFixedAmount());
             studentFeeSummaryDTO.setLateFeePercentage(campusSett.getLateFeePercentage());
@@ -266,6 +272,12 @@ public class StudentFeeSummaryFacade {
                 
                 if (baseAmount.compareTo(BigDecimal.ZERO) > 0) {
                     lateFee = lateFeeCalculationService.calculateLateFee(baseAmount, dueDate, LocalDate.now(), campusSett);
+                }
+                
+                // CRITICAL EDGE CASE: If they paid the late fee, the lateFeeAmount MUST NOT drop below what they paid
+                // even if the base amount is now 0 (which would cause calculated lateFee to be 0)
+                if (instDto.getLateFeePaid() != null && instDto.getLateFeePaid().compareTo(lateFee) > 0) {
+                    lateFee = instDto.getLateFeePaid();
                 }
             }
             instDto.setLateFeeAmount(lateFee);
