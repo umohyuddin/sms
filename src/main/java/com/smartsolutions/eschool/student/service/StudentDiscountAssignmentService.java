@@ -122,7 +122,7 @@ public class StudentDiscountAssignmentService {
                 if (Boolean.TRUE.equals(discountRate.getIsPercentage())) {
                     finalPercentage = discountRate.getValue();
                     finalAmount = discountableFee.multiply(finalPercentage)
-                            .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+                            .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.HALF_UP);
                 } else {
                     finalAmount = discountRate.getValue();
                     finalPercentage = null;
@@ -227,7 +227,7 @@ public class StudentDiscountAssignmentService {
                 if (Boolean.TRUE.equals(discountRate.getIsPercentage())) {
                     finalPercentage = discountRate.getValue();
                     finalAmount = discountableFee.multiply(finalPercentage)
-                            .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+                            .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.HALF_UP);
                 } else {
                     finalAmount = discountRate.getValue();
                     finalPercentage = null;

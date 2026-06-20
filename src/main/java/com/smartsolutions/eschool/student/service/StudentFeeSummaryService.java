@@ -83,7 +83,7 @@ public class StudentFeeSummaryService {
             BigDecimal appliedAmt = BigDecimal.ZERO;
             if (Boolean.TRUE.equals(d.getDiscountRate().getIsPercentage())) {
                 appliedAmt = discountableFee.multiply(d.getDiscountRate().getValue())
-                        .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+                        .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.HALF_UP);
             } else {
                 appliedAmt = d.getDiscountRate().getValue();
             }
@@ -126,7 +126,8 @@ public class StudentFeeSummaryService {
             if (taxType.isPresent()) {
                 BigDecimal taxableAmount = totalAssigned.subtract(totalDiscount);
                 if (taxableAmount.compareTo(BigDecimal.ZERO) > 0) {
-                    totalTax = taxableAmount.multiply(taxType.get().getTaxPercentage().divide(BigDecimal.valueOf(100), 4, java.math.RoundingMode.HALF_UP));
+                    totalTax = taxableAmount.multiply(taxType.get().getTaxPercentage())
+                            .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.HALF_UP);
                 }
             }
         }

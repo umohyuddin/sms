@@ -178,14 +178,14 @@ public class StudentFeeSummaryFacade {
         }
 
         BigDecimal installmentAmount = (totalInstallments > 0) 
-                ? netAssigned.divide(BigDecimal.valueOf(totalInstallments), 2, RoundingMode.FLOOR) 
+                ? netAssigned.divide(BigDecimal.valueOf(totalInstallments), 0, RoundingMode.HALF_UP) 
                 : BigDecimal.ZERO;
         
         // Handle remainder for the last installment
         BigDecimal remainder = netAssigned.subtract(installmentAmount.multiply(BigDecimal.valueOf(totalInstallments)));
 
         BigDecimal installmentDiscount = (totalInstallments > 0)
-                ? totalDiscount.divide(BigDecimal.valueOf(totalInstallments), 2, RoundingMode.FLOOR)
+                ? totalDiscount.divide(BigDecimal.valueOf(totalInstallments), 0, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
         BigDecimal discountRemainder = totalDiscount.subtract(installmentDiscount.multiply(BigDecimal.valueOf(totalInstallments)));
 

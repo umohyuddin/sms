@@ -62,6 +62,6 @@ public class LateFeeCalculationService {
             lateFee = lateFee.min(maxAmount);
         }
 
-        return lateFee.setScale(2, RoundingMode.HALF_UP);
+        return lateFee.setScale(0, RoundingMode.HALF_UP);
     }
 }
