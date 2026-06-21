@@ -293,6 +293,7 @@ public class StudentFeeSummaryFacade {
         BigDecimal cumulativePaid = BigDecimal.ZERO;
         BigDecimal excessFromPrevious = BigDecimal.ZERO;
         
+        int installmentIndex = 0;
         for (StudentFeeSummaryResponseDto.MonthlyPaymentDTO instDto : installmentList) {
             BigDecimal currentMonthFee = instDto.getTotalMonthlyFee();
 
@@ -310,10 +311,19 @@ public class StudentFeeSummaryFacade {
                 excessFromPrevious = BigDecimal.ZERO;
                 instDto.setTotalPaid(availableForThisMonth);
             } else {
-                instDto.setStatus("Unpaid");
+                int startMonthIdx = installmentIndex * occurrenceInterval;
+                LocalDate baseDate = studentFeeSummaryDTO.getAcademicStartDate() != null ? 
+                        studentFeeSummaryDTO.getAcademicStartDate().plusMonths(startMonthIdx) : LocalDate.now();
+                LocalDate now = LocalDate.now();
+                if (baseDate.getYear() > now.getYear() || (baseDate.getYear() == now.getYear() && baseDate.getMonthValue() > now.getMonthValue())) {
+                    instDto.setStatus("Locked");
+                } else {
+                    instDto.setStatus("Unpaid");
+                }
                 excessFromPrevious = BigDecimal.ZERO;
                 instDto.setTotalPaid(BigDecimal.ZERO);
             }
+            installmentIndex++;
         }
 
         // Recalculate top-level totalLateFee dynamically
