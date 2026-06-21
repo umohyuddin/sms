@@ -135,24 +135,7 @@ public class StudentFeeSummaryFacade {
         }
         studentFeeSummaryDTO.setBillingCycle(billingCycleName);
 
-        if (campusSett != null) {
-            studentFeeSummaryDTO.setLateFeeApplicable(campusSett.getLateFeeApplicable());
-            if (campusSett.getLateFeeApplyOn() != null) {
-                studentFeeSummaryDTO.setLateFeeApplyOn(campusSett.getLateFeeApplyOn().name());
-            }
-            if (campusSett.getAllowPartialPayments() != null) {
-                studentFeeSummaryDTO.setAllowPartialPayments(campusSett.getAllowPartialPayments());
-            }
-            studentFeeSummaryDTO.setLateFeeType(campusSett.getLateFeeType() != null ? campusSett.getLateFeeType().name() : null);
-            studentFeeSummaryDTO.setLateFeeFixedAmount(campusSett.getLateFeeFixedAmount());
-            studentFeeSummaryDTO.setLateFeePercentage(campusSett.getLateFeePercentage());
-            studentFeeSummaryDTO.setGraceDays(campusSett.getGraceDays());
-            studentFeeSummaryDTO.setLateFeeFrequency(campusSett.getLateFeeFrequency() != null ? campusSett.getLateFeeFrequency().name() : null);
-            studentFeeSummaryDTO.setLateFeeMaxAmount(campusSett.getLateFeeMaxAmount());
-            studentFeeSummaryDTO.setLateFeeApplyOn(campusSett.getLateFeeApplyOn() != null ? campusSett.getLateFeeApplyOn().name() : null);
-        } else {
-            studentFeeSummaryDTO.setLateFeeApplicable(false);
-        }
+        mapLateFeeSettings(studentFeeSummaryDTO, campusSett);
 
         // Generate month names for the entire academic year
         List<String> academicMonths = SmsUtil.getAcademicMonths(studentFeeSummaryDTO.getAcademicStartDate(),
@@ -271,7 +254,12 @@ public class StudentFeeSummaryFacade {
                 }
                 
                 if (baseAmount.compareTo(BigDecimal.ZERO) > 0) {
-                    lateFee = lateFeeCalculationService.calculateLateFee(baseAmount, dueDate, LocalDate.now(), campusSett);
+                    LocalDate endOfCycle = baseDate.plusMonths(occurrenceInterval).minusDays(1);
+                    LocalDate calculationDate = LocalDate.now();
+                    if (calculationDate.isAfter(endOfCycle)) {
+                        calculationDate = endOfCycle;
+                    }
+                    lateFee = lateFeeCalculationService.calculateLateFee(baseAmount, dueDate, calculationDate, campusSett);
                 }
                 
                 // CRITICAL EDGE CASE: If they paid the late fee, the lateFeeAmount MUST NOT drop below what they paid
@@ -359,6 +347,27 @@ public class StudentFeeSummaryFacade {
         
         log.info("[Facade:StudentFeeSummaryFacade] getByStudentFeeSummaryAcademicYear() succeeded");
         return studentFeeSummaryDTO;
+    }
+
+    private void mapLateFeeSettings(StudentFeeSummaryResponseDto studentFeeSummaryDTO, CampusFinancialSettings campusSett) {
+        if (campusSett != null) {
+            studentFeeSummaryDTO.setLateFeeApplicable(campusSett.getLateFeeApplicable());
+            if (campusSett.getLateFeeApplyOn() != null) {
+                studentFeeSummaryDTO.setLateFeeApplyOn(campusSett.getLateFeeApplyOn().name());
+            }
+            if (campusSett.getAllowPartialPayments() != null) {
+                studentFeeSummaryDTO.setAllowPartialPayments(campusSett.getAllowPartialPayments());
+            }
+            studentFeeSummaryDTO.setLateFeeType(campusSett.getLateFeeType() != null ? campusSett.getLateFeeType().name() : null);
+            studentFeeSummaryDTO.setLateFeeFixedAmount(campusSett.getLateFeeFixedAmount());
+            studentFeeSummaryDTO.setLateFeePercentage(campusSett.getLateFeePercentage());
+            studentFeeSummaryDTO.setGraceDays(campusSett.getGraceDays());
+            studentFeeSummaryDTO.setLateFeeFrequency(campusSett.getLateFeeFrequency() != null ? campusSett.getLateFeeFrequency().name() : null);
+            studentFeeSummaryDTO.setLateFeeMaxAmount(campusSett.getLateFeeMaxAmount());
+            studentFeeSummaryDTO.setLateFeeApplyOn(campusSett.getLateFeeApplyOn() != null ? campusSett.getLateFeeApplyOn().name() : null);
+        } else {
+            studentFeeSummaryDTO.setLateFeeApplicable(false);
+        }
     }
 }
 
